@@ -149,8 +149,9 @@ gcloud storage buckets add-iam-policy-binding gs://$BUCKET_NAME \
 # Authenticate Docker to Artifact Registry (one-time setup per machine)
 gcloud auth configure-docker ${REGISTRY_LOCATION}
 
-# From repo root — build the image
-docker build -t "${REGISTRY_LOCATION}/${PROJECT_ID}/${REPO_NAME}/${API_SERVICE_NAME}:latest" \
+# From repo root — build for linux/amd64 (required by Cloud Run, even on Apple Silicon)
+docker build --platform linux/amd64 \
+  -t "${REGISTRY_LOCATION}/${PROJECT_ID}/${REPO_NAME}/${API_SERVICE_NAME}:latest" \
   selfserve-jobs-customer-api/
 
 # Push to Artifact Registry
