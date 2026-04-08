@@ -17,7 +17,7 @@ export BUCKET_NAME="selfserve-jobs-resumes"
 export API_SERVICE_NAME="selfserve-jobs-customer-api"
 export WEB_DOMAIN="yourdomain.com"
 export RESEND_API_KEY="re_your_resend_api_key"
-export REPO_NAME="selfserve-jobs"
+export REPO_NAME="selfserve-jobs-platform"
 export REGISTRY_LOCATION="${REGION}-docker.pkg.dev"
 export DB_CONNECTION_NAME="${PROJECT_ID}:${REGION}:${DB_INSTANCE}"
 ```
