@@ -143,6 +143,8 @@ gcloud storage buckets add-iam-policy-binding gs://$BUCKET_NAME \
 
 ## 6. Deploy the API (Cloud Run)
 
+> **Note:** Steps 6a, 6b, and 6c must all be run together for a full deployment. Pushing an image to Artifact Registry (6a) does **not** automatically update Cloud Run — step 6c is what actually deploys it. The GitHub Actions `deploy-api.yml` workflow runs all three steps automatically on every push to `main`.
+
 ### 6a. Build and push Docker image
 
 ```bash
