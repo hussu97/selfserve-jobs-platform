@@ -19,6 +19,7 @@ export WEB_DOMAIN="yourdomain.com"
 export RESEND_API_KEY="re_your_resend_api_key"
 export REPO_NAME="selfserve-jobs"
 export REGISTRY_LOCATION="${REGION}-docker.pkg.dev"
+export DB_CONNECTION_NAME="${PROJECT_ID}:${REGION}:${DB_INSTANCE}"
 ```
 
 ## 1. GCP Project Setup
@@ -80,10 +81,9 @@ gcloud sql users create $DB_USER \
   --instance=$DB_INSTANCE \
   --password=$DB_PASSWORD
 
-# Get the connection name (you'll need this for Cloud Run)
+# Verify the connection name matches your DB_CONNECTION_NAME variable
 gcloud sql instances describe $DB_INSTANCE --format='value(connectionName)'
-# Output format: PROJECT_ID:REGION:DB_INSTANCE
-export DB_CONNECTION_NAME="${PROJECT_ID}:${REGION}:${DB_INSTANCE}"
+# Should output: PROJECT_ID:REGION:DB_INSTANCE (same as $DB_CONNECTION_NAME set in step 0)
 ```
 
 ## 4. GCS Bucket (Resume Storage)
@@ -176,7 +176,7 @@ gcloud run deploy $API_SERVICE_NAME \
   --allow-unauthenticated \
   --port 8080 \
   --service-account $SA_EMAIL \
-  --add-cloudsql-instances $DB_CONNECTION_NAME \
+  --add-cloudsql-instances=$DB_CONNECTION_NAME \
   --set-env-vars "DATABASE_URL=postgresql+asyncpg://${DB_USER}:${DB_PASSWORD}@/${DB_NAME}?host=/cloudsql/${DB_CONNECTION_NAME}" \
   --set-env-vars "GCS_BUCKET_NAME=${BUCKET_NAME}" \
   --set-env-vars "RESEND_API_KEY=${RESEND_API_KEY}" \
