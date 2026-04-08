@@ -61,6 +61,7 @@ gcloud artifacts repositories list --location=$REGION
 # Create PostgreSQL 16 instance (~5-10 minutes)
 gcloud sql instances create $DB_INSTANCE \
   --database-version=POSTGRES_16 \
+  --edition=ENTERPRISE \
   --tier=db-f1-micro \
   --region=$REGION \
   --storage-type=SSD \
