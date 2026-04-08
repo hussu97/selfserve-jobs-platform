@@ -6,6 +6,8 @@ on:
     paths:
       - 'selfserve-jobs-customer-api/**'
       - 'docker-compose.yml'
+      - '.github/workflows/**'
+      - 'README.md'
 
 jobs:
   test:

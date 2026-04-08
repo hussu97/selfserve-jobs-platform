@@ -111,7 +111,8 @@ A free-to-use jobs platform with two core entities: **Jobs** (company listings) 
 - Workflow files named `test-{app}.yml` and `deploy-{app}.yml` (e.g. `test-api.yml`, `deploy-web.yml`)
 - Every deploy workflow must call its corresponding test workflow via `uses:` (reusable workflow) — never deploy without tests passing
 - Path filters: API workflows trigger on `selfserve-jobs-customer-api/**`; web workflows trigger on `selfserve-jobs-customer-web/**`
-- Do NOT trigger workflows on doc-only changes (README.md, CHANGELOG.md, PRODUCTION.md, CLAUDE.md)
+- Do NOT trigger workflows on doc-only changes (CHANGELOG.md, PRODUCTION.md, CLAUDE.md)
+- **Do** trigger all workflows on changes to `.github/workflows/**` or `README.md` — workflow/infra changes should always be validated
 - Required secrets for API deploy: `GCP_WORKLOAD_IDENTITY_PROVIDER`, `GCP_SERVICE_ACCOUNT`, `GCP_PROJECT_ID`, `GCP_REGION`
 - Required secrets for web deploy: `VERCEL_TOKEN`
 

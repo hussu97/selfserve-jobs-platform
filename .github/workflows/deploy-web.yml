@@ -10,6 +10,8 @@ on:
     branches: [main]
     paths:
       - 'selfserve-jobs-customer-web/**'
+      - '.github/workflows/**'
+      - 'README.md'
 
 jobs:
   test:
