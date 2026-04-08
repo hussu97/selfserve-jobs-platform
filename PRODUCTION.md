@@ -146,14 +146,18 @@ gcloud storage buckets add-iam-policy-binding gs://$BUCKET_NAME \
 ### 6a. Build and push Docker image
 
 ```bash
-# From repo root
+# Authenticate Docker to Artifact Registry (one-time setup per machine)
+gcloud auth configure-docker ${REGISTRY_LOCATION}
+
+# From repo root — build the image
 docker build -t "${REGISTRY_LOCATION}/${PROJECT_ID}/${REPO_NAME}/${API_SERVICE_NAME}:latest" \
   selfserve-jobs-customer-api/
 
+# Push to Artifact Registry
 docker push "${REGISTRY_LOCATION}/${PROJECT_ID}/${REPO_NAME}/${API_SERVICE_NAME}:latest"
 ```
 
-Or use Cloud Build (no local Docker needed):
+Or use Cloud Build (no local Docker or auth setup needed):
 ```bash
 gcloud builds submit selfserve-jobs-customer-api/ \
   --tag "${REGISTRY_LOCATION}/${PROJECT_ID}/${REPO_NAME}/${API_SERVICE_NAME}:latest"
