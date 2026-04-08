@@ -17,12 +17,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="text-sm font-medium"
-            style={{ color: 'var(--color-text)' }}
+            className="text-sm font-medium text-text-main"
           >
             {label}
             {props.required && (
-              <span className="ml-1" style={{ color: 'var(--color-primary)' }}>*</span>
+              <span className="ml-1 text-primary">*</span>
             )}
           </label>
         )}
@@ -30,19 +29,18 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           id={inputId}
           className={cn(
-            'w-full rounded-lg border px-3 py-2 text-sm transition-colors',
-            'placeholder:text-[#7A7067]',
-            'focus:outline-none focus:ring-2 focus:ring-[#C2703E] focus:border-transparent',
+            'w-full rounded-lg border px-3 py-2 text-sm transition-colors text-text-main',
+            'placeholder:text-text-muted',
+            'focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent',
             error
               ? 'border-red-400 bg-red-50'
-              : 'border-[#DDD5C8] bg-white hover:border-[#C2703E]/50',
+              : 'border-border bg-white hover:border-primary/50',
             className
           )}
-          style={{ color: 'var(--color-text)' }}
           {...props}
         />
         {hint && !error && (
-          <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+          <p className="text-xs text-text-muted">
             {hint}
           </p>
         )}

@@ -13,7 +13,7 @@ export function SkillTag({ skill, removable = false, onRemove, className, size =
     <span
       className={cn(
         'inline-flex items-center gap-1 rounded-full font-medium',
-        'bg-[#8BA888]/15 text-[#4a7547] border border-[#8BA888]/30',
+        'bg-accent/15 text-accent-dark border border-accent/30',
         size === 'sm' ? 'px-2 py-0.5 text-xs' : 'px-3 py-1 text-sm',
         className
       )}
@@ -23,7 +23,7 @@ export function SkillTag({ skill, removable = false, onRemove, className, size =
         <button
           type="button"
           onClick={() => onRemove(skill)}
-          className="ml-0.5 rounded-full hover:bg-[#8BA888]/30 transition-colors p-0.5 cursor-pointer"
+          className="ml-0.5 rounded-full hover:bg-accent/30 transition-colors p-0.5 cursor-pointer"
           aria-label={`Remove ${skill}`}
         >
           <svg className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">

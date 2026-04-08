@@ -27,8 +27,7 @@ export function SearchBar({ value = '', onChange, placeholder = 'Search…', cla
     <div className={cn('relative', className)}>
       <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
         <svg
-          className="h-4 w-4"
-          style={{ color: 'var(--color-text-muted)' }}
+          className="h-4 w-4 text-text-muted"
           viewBox="0 0 20 20"
           fill="currentColor"
           aria-hidden="true"
@@ -46,12 +45,11 @@ export function SearchBar({ value = '', onChange, placeholder = 'Search…', cla
         onChange={handleChange}
         placeholder={placeholder}
         className={cn(
-          'w-full rounded-xl border border-[#DDD5C8] bg-white pl-9 pr-9 py-2.5 text-sm',
-          'placeholder:text-[#7A7067]',
-          'focus:outline-none focus:ring-2 focus:ring-[#C2703E] focus:border-transparent',
-          'hover:border-[#C2703E]/50 transition-colors'
+          'w-full rounded-xl border border-border bg-white pl-9 pr-9 py-2.5 text-sm text-text-main',
+          'placeholder:text-text-muted',
+          'focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent',
+          'hover:border-primary/50 transition-colors'
         )}
-        style={{ color: 'var(--color-text)' }}
       />
       {internal && (
         <button
@@ -61,8 +59,7 @@ export function SearchBar({ value = '', onChange, placeholder = 'Search…', cla
           aria-label="Clear search"
         >
           <svg
-            className="h-4 w-4 transition-colors"
-            style={{ color: 'var(--color-text-muted)' }}
+            className="h-4 w-4 transition-colors text-text-muted"
             viewBox="0 0 20 20"
             fill="currentColor"
             aria-hidden="true"

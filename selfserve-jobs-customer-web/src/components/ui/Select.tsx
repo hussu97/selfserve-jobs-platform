@@ -24,12 +24,11 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
         {label && (
           <label
             htmlFor={selectId}
-            className="text-sm font-medium"
-            style={{ color: 'var(--color-text)' }}
+            className="text-sm font-medium text-text-main"
           >
             {label}
             {props.required && (
-              <span className="ml-1" style={{ color: 'var(--color-primary)' }}>*</span>
+              <span className="ml-1 text-primary">*</span>
             )}
           </label>
         )}
@@ -38,18 +37,17 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             ref={ref}
             id={selectId}
             className={cn(
-              'w-full appearance-none rounded-lg border px-3 py-2 text-sm transition-colors pr-9',
-              'focus:outline-none focus:ring-2 focus:ring-[#C2703E] focus:border-transparent',
+              'w-full appearance-none rounded-lg border px-3 py-2 text-sm transition-colors pr-9 text-text-main',
+              'focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent',
               error
                 ? 'border-red-400 bg-red-50'
-                : 'border-[#DDD5C8] bg-white hover:border-[#C2703E]/50',
+                : 'border-border bg-white hover:border-primary/50',
               className
             )}
-            style={{ color: 'var(--color-text)' }}
             {...props}
           >
             {placeholder && (
-              <option value="" style={{ color: 'var(--color-text-muted)' }}>
+              <option value="" className="text-text-muted">
                 {placeholder}
               </option>
             )}
@@ -61,8 +59,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           </select>
           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2">
             <svg
-              className="h-4 w-4"
-              style={{ color: 'var(--color-text-muted)' }}
+              className="h-4 w-4 text-text-muted"
               viewBox="0 0 20 20"
               fill="currentColor"
               aria-hidden="true"
@@ -76,7 +73,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           </div>
         </div>
         {hint && !error && (
-          <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+          <p className="text-xs text-text-muted">
             {hint}
           </p>
         )}

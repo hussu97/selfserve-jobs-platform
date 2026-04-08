@@ -35,13 +35,12 @@ export function Pagination({ page, totalPages, onPageChange, className }: Pagina
         onClick={() => onPageChange(page - 1)}
         disabled={page === 1}
         className={cn(
-          'flex items-center gap-1 px-3 py-2 text-sm rounded-lg transition-colors',
-          'border border-[#DDD5C8] hover:border-[#C2703E]/50',
+          'flex items-center gap-1 px-3 py-2 text-sm rounded-lg transition-colors text-text-muted',
+          'border border-border hover:border-primary/50',
           page === 1
             ? 'opacity-40 cursor-not-allowed'
-            : 'hover:bg-[#F0EBE1] cursor-pointer'
+            : 'hover:bg-surface cursor-pointer'
         )}
-        style={{ color: 'var(--color-text-muted)' }}
         aria-label="Previous page"
       >
         <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -55,8 +54,7 @@ export function Pagination({ page, totalPages, onPageChange, className }: Pagina
           p === 'ellipsis' ? (
             <span
               key={`ellipsis-${i}`}
-              className="px-2 py-2 text-sm"
-              style={{ color: 'var(--color-text-muted)' }}
+              className="px-2 py-2 text-sm text-text-muted"
             >
               …
             </span>
@@ -67,10 +65,9 @@ export function Pagination({ page, totalPages, onPageChange, className }: Pagina
               className={cn(
                 'min-w-[36px] h-9 px-2 text-sm rounded-lg transition-colors cursor-pointer',
                 p === page
-                  ? 'bg-[#C2703E] text-white font-medium'
-                  : 'border border-[#DDD5C8] hover:bg-[#F0EBE1] hover:border-[#C2703E]/50'
+                  ? 'bg-primary text-white font-medium'
+                  : 'border border-border hover:bg-surface hover:border-primary/50 text-text-main'
               )}
-              style={p !== page ? { color: 'var(--color-text)' } : undefined}
               aria-current={p === page ? 'page' : undefined}
             >
               {p}
@@ -83,13 +80,12 @@ export function Pagination({ page, totalPages, onPageChange, className }: Pagina
         onClick={() => onPageChange(page + 1)}
         disabled={page === totalPages}
         className={cn(
-          'flex items-center gap-1 px-3 py-2 text-sm rounded-lg transition-colors',
-          'border border-[#DDD5C8] hover:border-[#C2703E]/50',
+          'flex items-center gap-1 px-3 py-2 text-sm rounded-lg transition-colors text-text-muted',
+          'border border-border hover:border-primary/50',
           page === totalPages
             ? 'opacity-40 cursor-not-allowed'
-            : 'hover:bg-[#F0EBE1] cursor-pointer'
+            : 'hover:bg-surface cursor-pointer'
         )}
-        style={{ color: 'var(--color-text-muted)' }}
         aria-label="Next page"
       >
         Next

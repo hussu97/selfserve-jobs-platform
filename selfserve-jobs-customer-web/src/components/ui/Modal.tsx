@@ -47,7 +47,7 @@ export function Modal({ open, onClose, title, children, size = 'md' }: ModalProp
       ref={dialogRef}
       className={cn(
         'w-full rounded-2xl border shadow-xl p-0 backdrop:bg-black/40 backdrop:backdrop-blur-sm',
-        'bg-[#FAF7F2] border-[#DDD5C8]',
+        'bg-bg border-border',
         sizes[size]
       )}
       onClick={(e) => {
@@ -57,7 +57,7 @@ export function Modal({ open, onClose, title, children, size = 'md' }: ModalProp
       <div className="p-6">
         {title && (
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold" style={{ color: 'var(--color-secondary)', fontFamily: 'Lora, serif' }}>
+            <h2 className="text-xl font-semibold text-secondary">
               {title}
             </h2>
             <Button variant="ghost" size="sm" onClick={onClose} aria-label="Close modal">

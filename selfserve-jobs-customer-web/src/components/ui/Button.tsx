@@ -21,11 +21,11 @@ export function Button({
 
   const variants = {
     primary:
-      'bg-[#C2703E] text-white hover:bg-[#a85c30] focus-visible:ring-[#C2703E]',
+      'bg-primary text-white hover:bg-primary-hover focus-visible:ring-primary',
     outline:
-      'border border-[#C2703E] text-[#C2703E] bg-transparent hover:bg-[#C2703E] hover:text-white focus-visible:ring-[#C2703E]',
+      'border border-primary text-primary bg-transparent hover:bg-primary hover:text-white focus-visible:ring-primary',
     ghost:
-      'text-[#7A7067] bg-transparent hover:bg-[#F0EBE1] hover:text-[#2C2825] focus-visible:ring-[#DDD5C8]',
+      'text-text-muted bg-transparent hover:bg-surface hover:text-text-main focus-visible:ring-border',
     danger:
       'bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-600',
   };

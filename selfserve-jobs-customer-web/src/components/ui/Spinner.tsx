@@ -16,7 +16,7 @@ export function Spinner({ size = 'md', className }: SpinnerProps) {
     <div
       className={cn(
         'animate-spin rounded-full border-t-transparent',
-        'border-[#C2703E]',
+        'border-primary',
         sizes[size],
         className
       )}
@@ -31,7 +31,7 @@ export function SpinnerPage() {
     <div className="flex items-center justify-center min-h-[300px]">
       <div className="flex flex-col items-center gap-3">
         <Spinner size="lg" />
-        <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+        <p className="text-sm text-text-muted">
           Loading…
         </p>
       </div>

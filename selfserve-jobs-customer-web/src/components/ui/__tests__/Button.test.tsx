@@ -47,19 +47,19 @@ describe('Button', () => {
   it('applies primary variant classes by default', () => {
     render(<Button>Primary</Button>);
     const btn = screen.getByRole('button');
-    expect(btn.className).toContain('bg-[#C2703E]');
+    expect(btn.className).toContain('bg-primary');
   });
 
   it('applies outline variant classes', () => {
     render(<Button variant="outline">Outline</Button>);
     const btn = screen.getByRole('button');
-    expect(btn.className).toContain('border-[#C2703E]');
+    expect(btn.className).toContain('border-primary');
   });
 
   it('applies ghost variant classes', () => {
     render(<Button variant="ghost">Ghost</Button>);
     const btn = screen.getByRole('button');
-    expect(btn.className).toContain('text-[#7A7067]');
+    expect(btn.className).toContain('text-text-muted');
   });
 
   it('applies danger variant classes', () => {
