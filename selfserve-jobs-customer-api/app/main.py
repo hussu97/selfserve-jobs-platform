@@ -17,7 +17,6 @@ logger = logging.getLogger(__name__)
 settings = get_settings()
 
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Startup and shutdown lifecycle manager."""
@@ -36,7 +35,7 @@ async def lifespan(app: FastAPI):
         await loop.run_in_executor(None, lambda: command.upgrade(alembic_cfg, "head"))
         logger.info("Alembic migrations completed successfully")
     except Exception as exc:
-        logger.error("Failed to run Alembic migrations: %s", exc)
+        logger.error("Failed to run Alembic. migrations: %s", exc)
         raise
 
     yield
