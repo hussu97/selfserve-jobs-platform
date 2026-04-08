@@ -8,7 +8,7 @@ Run these once in your terminal session before executing any commands below. All
 
 ```bash
 export PROJECT_ID="your-gcp-project-id"
-export REGION="us-central1"
+export REGION="me-central1"
 export DB_INSTANCE="selfserve-jobs-db"
 export DB_NAME="selfserve_jobs"
 export DB_USER="selfserve_jobs_api"
