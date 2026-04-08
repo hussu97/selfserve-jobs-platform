@@ -9,10 +9,8 @@ export const metadata: Metadata = {
 export default function NewProfilePage() {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="mb-10">
-        <h1
-          className="text-3xl sm:text-4xl font-bold mb-2 font-heading text-secondary"
-        >
+      <div className="text-center mb-10">
+        <h1 className="text-3xl sm:text-4xl font-bold mb-2 font-heading text-secondary">
           Create a Profile
         </h1>
         <p className="text-base text-text-muted">

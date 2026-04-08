@@ -120,10 +120,8 @@ function JobsContent() {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       {/* Page header */}
-      <div className="mb-8">
-        <h1
-          className="text-3xl sm:text-4xl font-bold mb-2 font-heading text-secondary"
-        >
+      <div className="text-center mb-8">
+        <h1 className="text-3xl sm:text-4xl font-bold mb-2 font-heading text-secondary">
           Browse Jobs
         </h1>
         <p className="text-sm text-text-muted">
@@ -142,7 +140,7 @@ function JobsContent() {
 
       <div className="flex gap-8">
         {/* Sidebar filters */}
-        <aside className="w-64 flex-shrink-0">
+        <aside className="hidden lg:block w-64 flex-shrink-0">
           <JobFilters filters={filters} onChange={handleFiltersChange} />
         </aside>
 

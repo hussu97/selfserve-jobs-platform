@@ -80,10 +80,8 @@ export default function AboutPage() {
       <section
         className="border-b bg-surface border-border"
       >
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-          <h1
-            className="text-4xl sm:text-5xl font-bold mb-5 font-heading text-secondary"
-          >
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 text-center">
+          <h1 className="text-4xl sm:text-5xl font-bold mb-5 font-heading text-secondary">
             About jobs4u
           </h1>
           <p className="text-lg leading-relaxed text-text-muted">
@@ -95,26 +93,22 @@ export default function AboutPage() {
 
       {/* How it works — Job Seekers */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h2
-          className="text-2xl sm:text-3xl font-bold mb-2 font-heading text-secondary"
-        >
-          For job seekers
-        </h2>
-        <p className="text-sm mb-10 text-text-muted">
-          Find your next opportunity without the friction.
-        </p>
+        <div className="text-center mb-10">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-2 font-heading text-secondary">
+            For job seekers
+          </h2>
+          <p className="text-sm text-text-muted">
+            Find your next opportunity without the friction.
+          </p>
+        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {JOB_SEEKER_STEPS.map(({ step, title, desc }) => (
-            <div key={step} className="flex flex-col gap-3">
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm bg-primary"
-              >
+            <div key={step} className="flex flex-col gap-3 rounded-xl border border-border bg-surface p-6">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm bg-primary">
                 {step}
               </div>
-              <h3
-                className="font-semibold text-base font-heading text-text-main"
-              >
+              <h3 className="font-semibold text-base font-heading text-text-main">
                 {title}
               </h3>
               <p className="text-sm text-text-muted">
@@ -124,7 +118,7 @@ export default function AboutPage() {
           ))}
         </div>
 
-        <div className="mt-8 flex gap-3">
+        <div className="mt-8 flex justify-center gap-3">
           <Link
             href="/jobs"
             className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl text-white font-medium transition-opacity hover:opacity-90 text-sm bg-primary"
@@ -133,7 +127,7 @@ export default function AboutPage() {
           </Link>
           <Link
             href="/profiles/new"
-            className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl font-medium border-2 text-sm transition-colors hover:bg-[#2D5F3A] hover:text-white border-secondary text-secondary"
+            className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl font-medium border-2 text-sm transition-colors hover:bg-secondary hover:text-white border-secondary text-secondary"
           >
             Create your profile
           </Link>
@@ -148,26 +142,22 @@ export default function AboutPage() {
         className="border-b border-border bg-surface"
       >
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <h2
-            className="text-2xl sm:text-3xl font-bold mb-2 font-heading text-secondary"
-          >
-            For employers
-          </h2>
-          <p className="text-sm mb-10 text-text-muted">
-            Post a job in minutes. Reach candidates worldwide.
-          </p>
+          <div className="text-center mb-10">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-2 font-heading text-secondary">
+              For employers
+            </h2>
+            <p className="text-sm text-text-muted">
+              Post a job in minutes. Reach candidates worldwide.
+            </p>
+          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {EMPLOYER_STEPS.map(({ step, title, desc }) => (
-              <div key={step} className="flex flex-col gap-3">
-                <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm bg-secondary"
-                >
+              <div key={step} className="flex flex-col gap-3 rounded-xl border border-border bg-bg p-6">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm bg-secondary">
                   {step}
                 </div>
-                <h3
-                  className="font-semibold text-base font-heading text-text-main"
-                >
+                <h3 className="font-semibold text-base font-heading text-text-main">
                   {title}
                 </h3>
                 <p className="text-sm text-text-muted">
@@ -177,7 +167,7 @@ export default function AboutPage() {
             ))}
           </div>
 
-          <div className="mt-8">
+          <div className="mt-8 flex justify-center">
             <Link
               href="/jobs/new"
               className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl text-white font-medium transition-opacity hover:opacity-90 text-sm bg-primary"
@@ -190,26 +180,22 @@ export default function AboutPage() {
 
       {/* Values */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h2
-          className="text-2xl sm:text-3xl font-bold mb-2 font-heading text-secondary"
-        >
-          Our principles
-        </h2>
-        <p className="text-sm mb-10 text-text-muted">
-          What we stand for.
-        </p>
+        <div className="text-center mb-10">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-2 font-heading text-secondary">
+            Our principles
+          </h2>
+          <p className="text-sm text-text-muted">
+            What we stand for.
+          </p>
+        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {VALUES.map(({ icon, title, desc }) => (
-            <div key={title} className="flex flex-col gap-3">
-              <div
-                className="w-12 h-12 rounded-2xl flex items-center justify-center bg-surface"
-              >
+            <div key={title} className="flex flex-col gap-3 rounded-xl border border-border bg-surface p-6">
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-bg">
                 {icon}
               </div>
-              <h3
-                className="font-semibold text-base font-heading text-text-main"
-              >
+              <h3 className="font-semibold text-base font-heading text-text-main">
                 {title}
               </h3>
               <p className="text-sm text-text-muted">
