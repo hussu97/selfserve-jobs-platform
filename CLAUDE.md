@@ -100,3 +100,39 @@ A free-to-use jobs platform with two core entities: **Jobs** (company listings) 
 - Bot protection: honeypot fields + IP rate limiting on creation endpoints
 - Never expose internal `id` columns in API responses — only `*_code` fields
 - Email normalization: lowercase + trim on ingestion
+
+## Directory Conventions
+- **API directory:** `selfserve-jobs-customer-api/` (FastAPI backend)
+- **Web directory:** `selfserve-jobs-customer-web/` (Next.js frontend)
+- **Naming pattern for new services:** `selfserve-jobs-{audience}-{type}` (e.g. `selfserve-jobs-admin-api`, `selfserve-jobs-admin-web`)
+- When referencing these directories in code, configs, or documentation, always use the full directory name — never abbreviate to "backend" or "frontend" as a folder path
+
+## CI/CD Conventions
+- Workflow files named `test-{app}.yml` and `deploy-{app}.yml` (e.g. `test-api.yml`, `deploy-web.yml`)
+- Every deploy workflow must call its corresponding test workflow via `uses:` (reusable workflow) — never deploy without tests passing
+- Path filters: API workflows trigger on `selfserve-jobs-customer-api/**`; web workflows trigger on `selfserve-jobs-customer-web/**`
+- Do NOT trigger workflows on doc-only changes (README.md, CHANGELOG.md, PRODUCTION.md, CLAUDE.md)
+- Required secrets for API deploy: `GCP_WORKLOAD_IDENTITY_PROVIDER`, `GCP_SERVICE_ACCOUNT`, `GCP_PROJECT_ID`, `GCP_REGION`
+- Required secrets for web deploy: `VERCEL_TOKEN`
+
+## Testing Conventions
+- **API tests:** pytest + pytest-asyncio, test files in `selfserve-jobs-customer-api/tests/`, named `test_*.py`
+- **Web tests:** Vitest + @testing-library/react, test files colocated as `src/**/__tests__/*.test.{ts,tsx}`
+- **API test DB:** SQLite in-memory via aiosqlite — no Postgres required in CI or local test runs
+- **Mock external services** (email, GCS storage) in all tests — never call real APIs in tests
+- **Do NOT test** Postgres-specific features (JSONB `contains()`, GIN indexes, full-text search) with the SQLite test DB — these are integration-test-only concerns
+- Test priorities: endpoint HTTP contracts (status codes, response shapes), service business logic, pure utility functions, and key component rendering
+
+## Pre-commit Hook Rules
+- Pre-commit hooks managed by Husky (root `package.json`) — do NOT use the `pre-commit` Python framework
+- When Python files are staged: run `ruff check` + `ruff format --check`
+- When TypeScript files are staged: run `eslint`
+- When API files are staged: run `pytest tests/ -x -q`
+- When web files are staged: run `vitest run`
+- Hook file: `.husky/pre-commit`
+
+## Documentation Maintenance
+- **CHANGELOG.md:** Update with every user-visible change using [Keep a Changelog](https://keepachangelog.com) format — Added, Changed, Fixed, Removed sections
+- **PRODUCTION.md:** Update whenever deployment steps, infrastructure, or required secrets change
+- **README.md:** Update when architecture, local dev setup, or project structure changes materially
+- **CLAUDE.md:** Update when adding new conventions, changing tech stack, or when you're given new directions that should apply to future sessions
