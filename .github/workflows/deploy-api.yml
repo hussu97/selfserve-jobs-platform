@@ -20,7 +20,7 @@ jobs:
       id-token: write
 
     env:
-      IMAGE: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/selfserve-jobs/selfserve-jobs-customer-api:${{ github.sha }}
+      IMAGE: "${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/selfserve-jobs/selfserve-jobs-customer-api:${{ github.sha }}"
 
     steps:
       - uses: actions/checkout@v4

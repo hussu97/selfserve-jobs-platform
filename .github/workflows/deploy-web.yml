@@ -1,5 +1,10 @@
 name: Deploy Web
 
+# Vercel deploys automatically via its GitHub integration on push to main.
+# This workflow ensures tests pass before Vercel picks up the change.
+# Configure "Required status checks" in your GitHub branch protection rules
+# to block Vercel deployments until this workflow passes.
+
 on:
   push:
     branches: [main]
@@ -9,32 +14,3 @@ on:
 jobs:
   test:
     uses: ./.github/workflows/test-web.yml
-
-  deploy:
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
-          cache-dependency-path: selfserve-jobs-customer-web/package-lock.json
-
-      - name: Install Vercel CLI
-        run: npm install -g vercel@latest
-
-      - name: Pull Vercel environment
-        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
-        working-directory: selfserve-jobs-customer-web
-
-      - name: Build
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
-        working-directory: selfserve-jobs-customer-web
-
-      - name: Deploy
-        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
-        working-directory: selfserve-jobs-customer-web
