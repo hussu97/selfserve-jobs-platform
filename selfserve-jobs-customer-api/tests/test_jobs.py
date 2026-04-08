@@ -14,7 +14,7 @@ VALID_JOB_PAYLOAD = {
 
 
 async def test_list_jobs_empty(client):
-    response = await client.get("/api/v1/jobs/")
+    response = await client.get("/api/v1/jobs")
     assert response.status_code == 200
     data = response.json()
     assert "items" in data
@@ -23,18 +23,18 @@ async def test_list_jobs_empty(client):
 
 
 async def test_create_job_missing_fields(client):
-    response = await client.post("/api/v1/jobs/", json={})
+    response = await client.post("/api/v1/jobs", json={})
     assert response.status_code == 422
 
 
 async def test_create_job_honeypot_rejected(client):
     payload = {**VALID_JOB_PAYLOAD, "website": "http://spam.example.com"}
-    response = await client.post("/api/v1/jobs/", json=payload)
+    response = await client.post("/api/v1/jobs", json=payload)
     assert response.status_code == 400
 
 
 async def test_create_job_valid(client):
-    response = await client.post("/api/v1/jobs/", json=VALID_JOB_PAYLOAD)
+    response = await client.post("/api/v1/jobs", json=VALID_JOB_PAYLOAD)
     assert response.status_code == 201
     data = response.json()
     assert "code" in data

@@ -17,7 +17,7 @@ router = APIRouter(prefix="/api/v1/jobs", tags=["jobs"])
 settings = get_settings()
 
 
-@router.get("/", response_model=JobListResponse)
+@router.get("", response_model=JobListResponse)
 async def list_jobs(
     page: int = Query(1, ge=1),
     per_page: int = Query(20, ge=1, le=50),
@@ -59,7 +59,7 @@ async def get_job(
     return JobResponse.model_validate(job)
 
 
-@router.post("/", response_model=JobCreateResponse, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=JobCreateResponse, status_code=status.HTTP_201_CREATED)
 async def create_job(
     data: JobCreate,
     db: AsyncSession = Depends(get_session),

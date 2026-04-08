@@ -18,7 +18,7 @@ router = APIRouter(prefix="/api/v1/verify", tags=["verification"])
 settings = get_settings()
 
 
-@router.post("/", response_model=VerificationResponse)
+@router.post("", response_model=VerificationResponse)
 async def verify_email(
     data: VerificationRequest,
     db: AsyncSession = Depends(get_session),

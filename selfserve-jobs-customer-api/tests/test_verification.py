@@ -1,5 +1,5 @@
 async def test_verify_invalid_code(client):
-    response = await client.post("/api/v1/verify/", json={"code": "this-code-does-not-exist-at-all-12345678"})
+    response = await client.post("/api/v1/verify", json={"code": "this-code-does-not-exist-at-all-12345678"})
     assert response.status_code == 400
 
 

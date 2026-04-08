@@ -13,7 +13,7 @@ VALID_PROFILE_PAYLOAD = {
 
 
 async def test_list_profiles_empty(client):
-    response = await client.get("/api/v1/profiles/")
+    response = await client.get("/api/v1/profiles")
     assert response.status_code == 200
     data = response.json()
     assert "items" in data
@@ -22,12 +22,12 @@ async def test_list_profiles_empty(client):
 
 
 async def test_create_profile_missing_fields(client):
-    response = await client.post("/api/v1/profiles/", json={})
+    response = await client.post("/api/v1/profiles", json={})
     assert response.status_code == 422
 
 
 async def test_create_profile_valid(client):
-    response = await client.post("/api/v1/profiles/", json=VALID_PROFILE_PAYLOAD)
+    response = await client.post("/api/v1/profiles", json=VALID_PROFILE_PAYLOAD)
     assert response.status_code == 201
     data = response.json()
     assert "code" in data

@@ -19,7 +19,7 @@ router = APIRouter(prefix="/api/v1/reports", tags=["reports"])
 REPORT_THRESHOLD = 3
 
 
-@router.post("/", response_model=ReportResponse, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=ReportResponse, status_code=status.HTTP_201_CREATED)
 async def submit_report(
     data: ReportCreate,
     db: AsyncSession = Depends(get_session),

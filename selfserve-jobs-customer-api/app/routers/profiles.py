@@ -18,7 +18,7 @@ router = APIRouter(prefix="/api/v1/profiles", tags=["profiles"])
 settings = get_settings()
 
 
-@router.get("/", response_model=ProfileListResponse)
+@router.get("", response_model=ProfileListResponse)
 async def list_profiles(
     page: int = Query(1, ge=1),
     per_page: int = Query(20, ge=1, le=50),
@@ -96,7 +96,7 @@ async def get_profile(
     return ProfileResponse.from_orm_with_resume(profile)
 
 
-@router.post("/", response_model=ProfileCreateResponse, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=ProfileCreateResponse, status_code=status.HTTP_201_CREATED)
 async def create_profile(
     data: ProfileCreate,
     db: AsyncSession = Depends(get_session),
