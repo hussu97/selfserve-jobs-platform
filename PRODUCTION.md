@@ -150,6 +150,11 @@ gcloud artifacts repositories add-iam-policy-binding $REPO_NAME \
 gcloud projects add-iam-policy-binding $PROJECT_ID \
   --member="serviceAccount:${SA_EMAIL}" \
   --role="roles/run.developer"
+
+# Grant actAs on itself (required for GitHub Actions to deploy Cloud Run with this SA attached)
+gcloud iam service-accounts add-iam-policy-binding ${SA_EMAIL} \
+  --member="serviceAccount:${SA_EMAIL}" \
+  --role="roles/iam.serviceAccountUser"
 ```
 
 ## 6. Deploy the API (Cloud Run)
