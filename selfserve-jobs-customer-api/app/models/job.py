@@ -6,12 +6,21 @@ from sqlalchemy import (
     Date,
     Index,
     Integer,
+    JSON,
     Text,
     VARCHAR,
     func,
 )
-from sqlalchemy.dialects.postgresql import JSONB, TIMESTAMPTZ
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import TIMESTAMP as _PG_TIMESTAMP
 from sqlalchemy.orm import Mapped, mapped_column
+
+# TIMESTAMPTZ is TIMESTAMP with timezone=True — SQLAlchemy 2.x removed the TIMESTAMPTZ alias
+TIMESTAMPTZ = _PG_TIMESTAMP(timezone=True)
+# JSONB_COMPAT falls back to JSON when used with non-PostgreSQL engines (e.g. SQLite in tests)
+JSONB_COMPAT = JSON().with_variant(JSONB(), "postgresql")
+# BIGINT_COMPAT uses INTEGER (SQLite-compatible autoincrement) with BIGINT variant for PostgreSQL
+BIGINT_COMPAT = Integer().with_variant(BigInteger(), "postgresql")
 
 from app.database import Base
 
@@ -19,7 +28,7 @@ from app.database import Base
 class Job(Base):
     __tablename__ = "job"
 
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(BIGINT_COMPAT, primary_key=True, autoincrement=True)
     job_code: Mapped[str] = mapped_column(VARCHAR(12), unique=True, nullable=False, index=True)
     email: Mapped[str] = mapped_column(VARCHAR(320), nullable=False)
     email_verified: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
@@ -30,7 +39,7 @@ class Job(Base):
     employment_type: Mapped[str] = mapped_column(VARCHAR(20), nullable=False, index=True)
     deadline_date: Mapped[datetime | None] = mapped_column(Date, nullable=True)
     description: Mapped[str] = mapped_column(Text, nullable=False)
-    key_skills: Mapped[list] = mapped_column(JSONB, default=list, nullable=False, server_default="[]")
+    key_skills: Mapped[list] = mapped_column(JSONB_COMPAT, default=list, nullable=False, server_default="[]")
     contact_method: Mapped[str] = mapped_column(VARCHAR(10), nullable=False)
     contact_email: Mapped[str | None] = mapped_column(VARCHAR(320), nullable=True)
     contact_url: Mapped[str | None] = mapped_column(VARCHAR(2048), nullable=True)
