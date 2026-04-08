@@ -222,26 +222,17 @@ gcloud run services update $API_SERVICE_NAME \
 
 ## 8. Deploy the Web App (Vercel)
 
-```bash
-# Install Vercel CLI
-npm install -g vercel
+1. Go to [vercel.com](https://vercel.com) → **Add New Project**
+2. Click **Import Git Repository** → connect your GitHub account if not already connected → select `selfserve-jobs-platform`
+3. Under **Configure Project**:
+   - **Framework Preset:** Next.js (auto-detected)
+   - **Root Directory:** `selfserve-jobs-customer-web`
+   - Leave build/output settings as defaults
+4. Under **Environment Variables**, add:
+   - `NEXT_PUBLIC_API_URL` = the Cloud Run URL from step 6 (e.g. `https://selfserve-jobs-customer-api-xxxx-uc.a.run.app`)
+5. Click **Deploy**
 
-# From the web app directory
-cd selfserve-jobs-customer-web
-
-# Deploy (follow prompts to link to your Vercel account/project)
-vercel --prod
-```
-
-In the Vercel dashboard, set this environment variable:
-- `NEXT_PUBLIC_API_URL` = the Cloud Run URL from step 6 (e.g. `https://selfserve-jobs-customer-api-xxxx-uc.a.run.app`)
-
-Or via CLI:
-```bash
-vercel env add NEXT_PUBLIC_API_URL production
-# Enter the API URL when prompted
-vercel --prod
-```
+From now on, every push to `main` that touches `selfserve-jobs-customer-web/` will trigger an automatic Vercel deployment (in addition to your GitHub Actions workflow).
 
 ## 9. Custom Domain
 
