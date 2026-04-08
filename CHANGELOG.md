@@ -21,3 +21,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Frontend tests: Vitest + Testing Library (98 tests across utils, API client, and components)
 - Pre-commit hooks with Husky: ruff for Python, ESLint for TypeScript, tests on commit
 - Project documentation: README, CHANGELOG, PRODUCTION setup guide
+
+### Fixed
+- Initial Alembic migration was missing — all tables (`job`, `profile`, `email_verification`, `report`) are now created on first deploy via the lifespan migration runner
+- CI deploy pipeline failing due to wrong Artifact Registry repository name (`selfserve-jobs` → `selfserve-jobs-platform`) in the Docker image path
+- CI deploy pipeline failing due to missing `artifactregistry.writer` IAM grant on the service account
+- CI deploy pipeline failing due to missing `iam.serviceAccountUser` grant, preventing Cloud Run from attaching the service account during deployment
+- All CI/CD workflows now also trigger on changes to `.github/workflows/**` and `README.md`

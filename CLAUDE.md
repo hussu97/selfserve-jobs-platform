@@ -133,7 +133,14 @@ A free-to-use jobs platform with two core entities: **Jobs** (company listings) 
 - Hook file: `.husky/pre-commit`
 
 ## Documentation Maintenance
-- **CHANGELOG.md:** Update with every user-visible change using [Keep a Changelog](https://keepachangelog.com) format — Added, Changed, Fixed, Removed sections
-- **PRODUCTION.md:** Update whenever deployment steps, infrastructure, or required secrets change
+
+**CRITICAL: CHANGELOG.md must be updated in the same commit as every change — no exceptions.**
+- Use [Keep a Changelog](https://keepachangelog.com) format: Added, Changed, Fixed, Removed sections under `## [Unreleased]`
+- Every code change, bug fix, CI/infrastructure fix, and behavioural change gets an entry — even if it's internal or not end-user-facing
+- Write the entry before committing, not after
+- Do NOT batch changelog entries across multiple commits — each commit's changelog entry describes only that commit's changes
+
+**Other docs:**
+- **PRODUCTION.md:** Update in the same commit whenever deployment steps, infrastructure setup, IAM grants, or required secrets change
 - **README.md:** Update when architecture, local dev setup, or project structure changes materially
-- **CLAUDE.md:** Update when adding new conventions, changing tech stack, or when you're given new directions that should apply to future sessions
+- **CLAUDE.md:** Update when adding new conventions, changing tech stack, or when given new directions that should apply to future sessions
