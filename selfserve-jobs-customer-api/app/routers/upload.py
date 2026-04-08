@@ -18,6 +18,7 @@ PDF_MAGIC_BYTES = b"%PDF"
 
 class ResumeUploadResponse(BaseModel):
     """Frontend expects { resume_key: string; message: string }"""
+
     resume_key: str
     message: str
 
@@ -30,9 +31,7 @@ async def upload_resume(
     db: AsyncSession = Depends(get_session),
 ):
     # Validate profile and token
-    profile = await profile_service.get_profile_by_code_and_token(
-        db, profile_code, edit_token
-    )
+    await profile_service.get_profile_by_code_and_token(db, profile_code, edit_token)
 
     # Read file
     file_data = await file.read()
@@ -63,9 +62,7 @@ async def upload_resume(
     unique_id = generate_code(12)
     original_filename = file.filename or "resume.pdf"
     # Sanitize filename
-    safe_filename = "".join(
-        c for c in original_filename if c.isalnum() or c in "._- "
-    ).strip()
+    safe_filename = "".join(c for c in original_filename if c.isalnum() or c in "._- ").strip()
     if not safe_filename.endswith(".pdf"):
         safe_filename = f"{safe_filename}.pdf"
 

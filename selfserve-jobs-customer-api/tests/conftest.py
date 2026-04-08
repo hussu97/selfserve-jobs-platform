@@ -9,7 +9,7 @@ os.environ["RESEND_API_KEY"] = "test-key"
 
 # Patch the database module before it is imported so that the module-level engine
 # creation uses SQLite-compatible arguments.
-from unittest.mock import patch, AsyncMock  # noqa: E402
+from unittest.mock import AsyncMock, patch  # noqa: E402
 
 import sqlalchemy.ext.asyncio as _sqla_async  # noqa: E402
 
@@ -29,7 +29,11 @@ _sqla_async.create_async_engine = _sqlite_safe_create_async_engine  # type: igno
 
 import pytest  # noqa: E402
 from httpx import ASGITransport, AsyncClient  # noqa: E402
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine  # noqa: E402
+from sqlalchemy.ext.asyncio import (  # noqa: E402
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 
 from app.config import get_settings  # noqa: E402
 from app.database import Base  # noqa: E402

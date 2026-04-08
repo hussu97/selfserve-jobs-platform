@@ -1,4 +1,5 @@
 from functools import lru_cache
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -8,7 +9,6 @@ class Settings(BaseSettings):
     gcs_bucket_name: str = ""
     resend_api_key: str = ""
     environment: str = "development"
-    run_migrations: bool = False
 
     model_config = SettingsConfigDict(
         env_file=".env",

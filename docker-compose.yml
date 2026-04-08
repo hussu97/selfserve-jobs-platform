@@ -27,7 +27,6 @@ services:
       GCS_BUCKET_NAME: jobs4u-resumes-dev
       RESEND_API_KEY: ""
       ENVIRONMENT: development
-      RUN_MIGRATIONS: "true"
     depends_on:
       db:
         condition: service_healthy

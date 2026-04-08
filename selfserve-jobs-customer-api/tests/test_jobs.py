@@ -1,6 +1,3 @@
-import pytest
-
-
 VALID_JOB_PAYLOAD = {
     "email": "test@example.com",
     "job_title": "Software Engineer",

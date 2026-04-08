@@ -1,7 +1,6 @@
 import logging
 import math
-from datetime import datetime, timedelta, timezone
-from typing import Optional
+from datetime import UTC, datetime, timedelta
 
 from fastapi import HTTPException, status
 from sqlalchemy import and_, func, select, update
@@ -38,7 +37,7 @@ async def create_profile(db: AsyncSession, data: ProfileCreate) -> Profile:
             detail=f"Maximum of {MAX_ACTIVE_PROFILES_PER_EMAIL} active profiles per email address.",
         )
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     profile = Profile(
         profile_code=generate_code(12),
         person_name=data.person_name,
@@ -74,13 +73,9 @@ async def get_profile_by_code(db: AsyncSession, profile_code: str) -> Profile:
     return profile
 
 
-async def get_profile_by_code_and_token(
-    db: AsyncSession, profile_code: str, edit_token: str
-) -> Profile:
+async def get_profile_by_code_and_token(db: AsyncSession, profile_code: str, edit_token: str) -> Profile:
     result = await db.execute(
-        select(Profile).where(
-            and_(Profile.profile_code == profile_code, Profile.edit_token == edit_token)
-        )
+        select(Profile).where(and_(Profile.profile_code == profile_code, Profile.edit_token == edit_token))
     )
     profile = result.scalar_one_or_none()
     if not profile:
@@ -93,9 +88,7 @@ async def get_profile_by_code_and_token(
 
 async def increment_view_count(db: AsyncSession, profile_code: str) -> None:
     await db.execute(
-        update(Profile)
-        .where(Profile.profile_code == profile_code)
-        .values(view_count=Profile.view_count + 1)
+        update(Profile).where(Profile.profile_code == profile_code).values(view_count=Profile.view_count + 1)
     )
 
 
@@ -112,12 +105,12 @@ async def list_profiles(
     db: AsyncSession,
     page: int = 1,
     per_page: int = 20,
-    q: Optional[str] = None,
-    country: Optional[str] = None,
-    skills: Optional[list[str]] = None,
-    min_experience: Optional[int] = None,
-    max_experience: Optional[int] = None,
-    relocation_preference: Optional[str] = None,
+    q: str | None = None,
+    country: str | None = None,
+    skills: list[str] | None = None,
+    min_experience: int | None = None,
+    max_experience: int | None = None,
+    relocation_preference: str | None = None,
     sort: str = "newest",
 ) -> dict:
     per_page = min(per_page, 50)
@@ -194,7 +187,7 @@ async def update_profile(
     for field, value in update_data.items():
         setattr(profile, field, value)
 
-    profile.updated_at = datetime.now(timezone.utc)
+    profile.updated_at = datetime.now(UTC)
     await db.flush()
     return profile
 
@@ -206,7 +199,7 @@ async def remove_profile(
 ) -> Profile:
     profile = await get_profile_by_code_and_token(db, profile_code, edit_token)
     profile.status = "removed"
-    profile.updated_at = datetime.now(timezone.utc)
+    profile.updated_at = datetime.now(UTC)
     await db.flush()
     return profile
 
@@ -220,7 +213,7 @@ async def update_resume(
     profile = await get_profile_by_code(db, profile_code)
     profile.resume_gcs_path = gcs_path
     profile.resume_original_filename = original_filename
-    profile.updated_at = datetime.now(timezone.utc)
+    profile.updated_at = datetime.now(UTC)
     await db.flush()
     return profile
 
@@ -231,9 +224,7 @@ async def validate_token(
     token: str,
 ) -> bool:
     result = await db.execute(
-        select(Profile).where(
-            and_(Profile.profile_code == entity_code, Profile.edit_token == token)
-        )
+        select(Profile).where(and_(Profile.profile_code == entity_code, Profile.edit_token == token))
     )
     return result.scalar_one_or_none() is not None
 
@@ -258,13 +249,15 @@ async def get_entities_for_email(
         )
     )
     for job in job_result.scalars().all():
-        entities.append({
-            "entity_type": "job",
-            "entity_code": job.job_code,
-            "title": job.job_title,
-            "status": job.status,
-            "manage_url": f"{frontend_url}/manage/job/{job.job_code}?token={job.edit_token}",
-        })
+        entities.append(
+            {
+                "entity_type": "job",
+                "entity_code": job.job_code,
+                "title": job.job_title,
+                "status": job.status,
+                "manage_url": f"{frontend_url}/manage/job/{job.job_code}?token={job.edit_token}",
+            }
+        )
 
     # Profiles
     profile_result = await db.execute(
@@ -276,12 +269,14 @@ async def get_entities_for_email(
         )
     )
     for profile in profile_result.scalars().all():
-        entities.append({
-            "entity_type": "profile",
-            "entity_code": profile.profile_code,
-            "title": profile.current_title,
-            "status": profile.status,
-            "manage_url": f"{frontend_url}/manage/profile/{profile.profile_code}?token={profile.edit_token}",
-        })
+        entities.append(
+            {
+                "entity_type": "profile",
+                "entity_code": profile.profile_code,
+                "title": profile.current_title,
+                "status": profile.status,
+                "manage_url": f"{frontend_url}/manage/profile/{profile.profile_code}?token={profile.edit_token}",
+            }
+        )
 
     return entities

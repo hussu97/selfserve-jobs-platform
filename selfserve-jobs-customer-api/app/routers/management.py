@@ -3,12 +3,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
 from app.dependencies import get_session
+from app.schemas.common import MessageResponse
 from app.schemas.verification import (
     ManagementLinkRequest,
     ValidateTokenResponse,
 )
-from app.schemas.common import MessageResponse
-from app.services import email_service, profile_service, job_service
+from app.services import email_service, job_service, profile_service
 
 router = APIRouter(prefix="/api/v1/manage", tags=["management"])
 settings = get_settings()
@@ -36,9 +36,7 @@ async def request_management_links(
         entities=entities,
     )
 
-    return MessageResponse(
-        message="Management links sent. Please check your email."
-    )
+    return MessageResponse(message="Management links sent. Please check your email.")
 
 
 @router.get("/validate-token", response_model=ValidateTokenResponse)

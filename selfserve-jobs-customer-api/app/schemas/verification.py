@@ -1,9 +1,11 @@
-from typing import Literal, Optional
+from typing import Literal
+
 from pydantic import BaseModel, EmailStr, field_validator
 
 
 class VerificationRequest(BaseModel):
     """Frontend sends { code: string } to POST /verify."""
+
     code: str
 
 
@@ -12,10 +14,11 @@ class VerificationResponse(BaseModel):
     Response for POST /verify.
     Frontend expects: { success, message, entity_type?, code? }
     """
+
     success: bool
     message: str
-    entity_type: Optional[str] = None
-    code: Optional[str] = None
+    entity_type: str | None = None
+    code: str | None = None
 
 
 class ResendVerificationRequest(BaseModel):
@@ -24,9 +27,10 @@ class ResendVerificationRequest(BaseModel):
     entity_code is optional — when missing the API will look up pending
     entities for the given email + entity_type.
     """
+
     entity_type: Literal["job", "profile"]
     email: EmailStr
-    entity_code: Optional[str] = None
+    entity_code: str | None = None
 
     @field_validator("email", mode="before")
     @classmethod
@@ -54,6 +58,7 @@ class ValidateTokenResponse(BaseModel):
     Response for GET /manage/validate-token.
     Frontend expects: { valid, entity_type, code }
     """
+
     valid: bool
-    entity_type: Optional[str] = None
-    code: Optional[str] = None
+    entity_type: str | None = None
+    code: str | None = None

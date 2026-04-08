@@ -1,8 +1,7 @@
 from datetime import date, datetime
-from typing import Literal, Optional
+from typing import Literal
 
 from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
-
 
 EMPLOYMENT_TYPES = Literal["full_time", "part_time", "contract", "internship", "freelance", "remote"]
 CONTACT_METHODS = Literal["email", "url"]
@@ -16,14 +15,14 @@ class JobCreate(BaseModel):
     company_city: str = Field(..., min_length=1, max_length=100)
     company_country: str = Field(..., min_length=2, max_length=100)
     employment_type: EMPLOYMENT_TYPES
-    deadline_date: Optional[date] = None
+    deadline_date: date | None = None
     description: str = Field(..., min_length=50)
     key_skills: list[str] = Field(default_factory=list, max_length=30)
     contact_method: CONTACT_METHODS
-    contact_email: Optional[EmailStr] = None
-    contact_url: Optional[str] = Field(None, max_length=2048)
+    contact_email: EmailStr | None = None
+    contact_url: str | None = Field(None, max_length=2048)
     # Honeypot field — must be empty
-    website: Optional[str] = Field(None, exclude=True)
+    website: str | None = Field(None, exclude=True)
 
     @field_validator("email", mode="before")
     @classmethod
@@ -45,17 +44,17 @@ class JobCreate(BaseModel):
 
 
 class JobUpdate(BaseModel):
-    job_title: Optional[str] = Field(None, min_length=2, max_length=200)
-    company_name: Optional[str] = Field(None, min_length=1, max_length=200)
-    company_city: Optional[str] = Field(None, min_length=1, max_length=100)
-    company_country: Optional[str] = Field(None, min_length=2, max_length=100)
-    employment_type: Optional[EMPLOYMENT_TYPES] = None
-    deadline_date: Optional[date] = None
-    description: Optional[str] = Field(None, min_length=50)
-    key_skills: Optional[list[str]] = Field(None, max_length=30)
-    contact_method: Optional[CONTACT_METHODS] = None
-    contact_email: Optional[EmailStr] = None
-    contact_url: Optional[str] = Field(None, max_length=2048)
+    job_title: str | None = Field(None, min_length=2, max_length=200)
+    company_name: str | None = Field(None, min_length=1, max_length=200)
+    company_city: str | None = Field(None, min_length=1, max_length=100)
+    company_country: str | None = Field(None, min_length=2, max_length=100)
+    employment_type: EMPLOYMENT_TYPES | None = None
+    deadline_date: date | None = None
+    description: str | None = Field(None, min_length=50)
+    key_skills: list[str] | None = Field(None, max_length=30)
+    contact_method: CONTACT_METHODS | None = None
+    contact_email: EmailStr | None = None
+    contact_url: str | None = Field(None, max_length=2048)
 
     @field_validator("key_skills", mode="before")
     @classmethod
@@ -67,18 +66,19 @@ class JobUpdate(BaseModel):
 
 class JobResponse(BaseModel):
     """Full job detail — used for GET /jobs/{code}, PUT, DELETE responses."""
+
     code: str
     job_title: str
     company_name: str
     company_city: str
     company_country: str
     employment_type: str
-    deadline_date: Optional[date]
+    deadline_date: date | None
     description: str
     key_skills: list[str]
     contact_method: str
-    contact_email: Optional[str]
-    contact_url: Optional[str]
+    contact_email: str | None
+    contact_url: str | None
     status: str
     view_count: int
     expires_at: datetime
@@ -119,13 +119,14 @@ class JobResponse(BaseModel):
 
 class JobListItem(BaseModel):
     """Lightweight job item for list responses — no description, no contact info."""
+
     code: str
     job_title: str
     company_name: str
     company_city: str
     company_country: str
     employment_type: str
-    deadline_date: Optional[date]
+    deadline_date: date | None
     key_skills: list[str]
     status: str
     view_count: int
@@ -165,5 +166,6 @@ class JobListResponse(BaseModel):
 
 class JobCreateResponse(BaseModel):
     """Response for POST /jobs — frontend expects { code, message }."""
+
     code: str
     message: str

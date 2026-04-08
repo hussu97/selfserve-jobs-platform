@@ -1,10 +1,9 @@
 import logging
 import math
-from datetime import date, datetime, timedelta, timezone
-from typing import Optional
+from datetime import UTC, datetime, timedelta
 
 from fastapi import HTTPException, status
-from sqlalchemy import and_, func, or_, select, text, update
+from sqlalchemy import and_, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.job import Job
@@ -39,7 +38,7 @@ async def create_job(db: AsyncSession, data: JobCreate) -> Job:
             detail=f"Maximum of {MAX_ACTIVE_JOBS_PER_EMAIL} active job listings per email address.",
         )
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     job = Job(
         job_code=generate_code(12),
         email=data.email,
@@ -78,11 +77,7 @@ async def get_job_by_code(db: AsyncSession, job_code: str) -> Job:
 
 async def get_job_by_code_and_token(db: AsyncSession, job_code: str, edit_token: str) -> Job:
     """Get a job ensuring the edit token matches."""
-    result = await db.execute(
-        select(Job).where(
-            and_(Job.job_code == job_code, Job.edit_token == edit_token)
-        )
-    )
+    result = await db.execute(select(Job).where(and_(Job.job_code == job_code, Job.edit_token == edit_token)))
     job = result.scalar_one_or_none()
     if not job:
         raise HTTPException(
@@ -94,9 +89,7 @@ async def get_job_by_code_and_token(db: AsyncSession, job_code: str, edit_token:
 
 async def increment_view_count(db: AsyncSession, job_code: str) -> None:
     """Atomically increment view count."""
-    await db.execute(
-        update(Job).where(Job.job_code == job_code).values(view_count=Job.view_count + 1)
-    )
+    await db.execute(update(Job).where(Job.job_code == job_code).values(view_count=Job.view_count + 1))
 
 
 async def get_job_detail(db: AsyncSession, job_code: str) -> Job:
@@ -112,11 +105,11 @@ async def list_jobs(
     db: AsyncSession,
     page: int = 1,
     per_page: int = 20,
-    q: Optional[str] = None,
-    country: Optional[str] = None,
-    city: Optional[str] = None,
-    employment_type: Optional[str | list[str]] = None,
-    skills: Optional[list[str]] = None,
+    q: str | None = None,
+    country: str | None = None,
+    city: str | None = None,
+    employment_type: str | list[str] | None = None,
+    skills: list[str] | None = None,
     sort: str = "newest",
 ) -> dict:
     """List active jobs with filtering and pagination."""
@@ -208,7 +201,7 @@ async def update_job(
     for field, value in update_data.items():
         setattr(job, field, value)
 
-    job.updated_at = datetime.now(timezone.utc)
+    job.updated_at = datetime.now(UTC)
     await db.flush()
     return job
 
@@ -221,7 +214,7 @@ async def remove_job(
     """Soft-delete a job listing."""
     job = await get_job_by_code_and_token(db, job_code, edit_token)
     job.status = "removed"
-    job.updated_at = datetime.now(timezone.utc)
+    job.updated_at = datetime.now(UTC)
     await db.flush()
     return job
 
@@ -232,9 +225,5 @@ async def validate_token(
     token: str,
 ) -> bool:
     """Check if an edit token is valid for a job."""
-    result = await db.execute(
-        select(Job).where(
-            and_(Job.job_code == entity_code, Job.edit_token == token)
-        )
-    )
+    result = await db.execute(select(Job).where(and_(Job.job_code == entity_code, Job.edit_token == token)))
     return result.scalar_one_or_none() is not None

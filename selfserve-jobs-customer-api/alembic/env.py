@@ -6,11 +6,11 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
+from app.config import get_settings
 
 # Import all models so Alembic can detect them
 from app.database import Base  # noqa: F401
-from app.models import job, profile, email_verification, report  # noqa: F401
-from app.config import get_settings
+from app.models import email_verification, job, profile, report  # noqa: F401
 
 settings = get_settings()
 

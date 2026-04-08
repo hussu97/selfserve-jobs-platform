@@ -41,7 +41,11 @@ asyncio_mode = "auto"
 
 [tool.ruff]
 target-version = "py312"
-line-length = 100
+line-length = 120
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "W", "UP", "B", "SIM"]
+ignore = [
+    "B008",   # FastAPI uses Depends()/File() in function defaults — this is intentional
+    "E402",   # Module-level import not at top — needed for SQLite/Postgres compat shims in models
+]

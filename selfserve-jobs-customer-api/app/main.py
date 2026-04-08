@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.config import get_settings
-from app.routers import jobs, profiles, verification, management, upload, reports, meta
+from app.routers import jobs, management, meta, profiles, reports, upload, verification
 
 logging.basicConfig(
     level=logging.INFO,
@@ -22,21 +22,21 @@ async def lifespan(app: FastAPI):
     """Startup and shutdown lifecycle manager."""
     logger.info("Starting selfserve-jobs-customer-api (environment: %s)", settings.environment)
 
-    if settings.run_migrations:
-        logger.info("RUN_MIGRATIONS=true — running Alembic migrations...")
-        try:
-            import asyncio
-            from alembic.config import Config
-            from alembic import command
+    logger.info("Running Alembic migrations...")
+    try:
+        import asyncio
 
-            alembic_cfg = Config("alembic.ini")
-            # Run in a thread pool since Alembic uses sync code
-            loop = asyncio.get_event_loop()
-            await loop.run_in_executor(None, lambda: command.upgrade(alembic_cfg, "head"))
-            logger.info("Alembic migrations completed successfully")
-        except Exception as exc:
-            logger.error("Failed to run Alembic migrations: %s", exc)
-            raise
+        from alembic.config import Config
+
+        from alembic import command
+
+        alembic_cfg = Config("alembic.ini")
+        loop = asyncio.get_event_loop()
+        await loop.run_in_executor(None, lambda: command.upgrade(alembic_cfg, "head"))
+        logger.info("Alembic migrations completed successfully")
+    except Exception as exc:
+        logger.error("Failed to run Alembic migrations: %s", exc)
+        raise
 
     yield
 

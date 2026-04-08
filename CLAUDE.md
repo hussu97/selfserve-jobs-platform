@@ -26,7 +26,7 @@ A free-to-use jobs platform with two core entities: **Jobs** (company listings) 
 - **Router → Service → Model** layering. Business logic lives exclusively in `services/`, never in routers.
 - Use async SQLAlchemy 2.0 with asyncpg driver.
 - Pydantic v2 for all request/response schemas (separate from SQLAlchemy models).
-- Alembic for DB migrations. Never run migrations from the main app process — use a separate migration step.
+- Alembic for DB migrations. Migrations run automatically on app startup via the lifespan handler.
 - Environment config via `pydantic-settings` (`app/config.py`). All secrets from env vars.
 - Edit/delete operations authenticated via `X-Edit-Token` header (64-char nanoid stored in DB).
 - Code generation: nanoid 12-char for public codes, 64-char for tokens and verification codes.
@@ -70,7 +70,7 @@ A free-to-use jobs platform with two core entities: **Jobs** (company listings) 
 - **Backend (Cloud Run):** Docker image from `selfserve-jobs-customer-api/`, port 8080, scale-to-zero
 - **Database (CloudSQL):** PostgreSQL 16, connected via Cloud SQL connector
 - **Storage (GCS):** Bucket `jobs4u-resumes`, paths: `resumes/{profile_code}/{nanoid}.pdf`
-- **Alembic migrations:** Run as separate Cloud Run job before deploy, never on app startup
+- **Alembic migrations:** Run automatically on app startup (lifespan handler in `app/main.py`)
 
 ## Email Verification Flow (reference)
 1. User creates job/profile → entity created with `status='pending_verification'`

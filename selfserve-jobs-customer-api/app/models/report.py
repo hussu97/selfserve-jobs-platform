@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import BigInteger, Integer, Text, VARCHAR, func
+from sqlalchemy import VARCHAR, BigInteger, Integer, Text, func
 from sqlalchemy.dialects.postgresql import TIMESTAMP as _PG_TIMESTAMP
 
 # TIMESTAMPTZ is TIMESTAMP with timezone=True — SQLAlchemy 2.x removed the TIMESTAMPTZ alias
@@ -23,9 +23,7 @@ class Report(Base):
     reason: Mapped[str] = mapped_column(VARCHAR(50), nullable=False)
     details: Mapped[str | None] = mapped_column(Text, nullable=True)
     status: Mapped[str] = mapped_column(VARCHAR(20), default="pending", nullable=False)
-    created_at: Mapped[datetime] = mapped_column(
-        TIMESTAMPTZ, nullable=False, server_default=func.now()
-    )
+    created_at: Mapped[datetime] = mapped_column(TIMESTAMPTZ, nullable=False, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         TIMESTAMPTZ, nullable=False, server_default=func.now(), onupdate=func.now()
     )

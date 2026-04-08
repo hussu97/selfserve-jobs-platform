@@ -1,5 +1,3 @@
-from typing import Optional
-
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -14,7 +12,7 @@ from app.schemas.profile import (
     ProfileUpdate,
     ResumeUrlResponse,
 )
-from app.services import profile_service, verification_service, email_service, storage_service
+from app.services import email_service, profile_service, storage_service, verification_service
 
 router = APIRouter(prefix="/api/v1/profiles", tags=["profiles"])
 settings = get_settings()
@@ -24,12 +22,12 @@ settings = get_settings()
 async def list_profiles(
     page: int = Query(1, ge=1),
     per_page: int = Query(20, ge=1, le=50),
-    search: Optional[str] = Query(None, description="Full-text search"),
-    country: Optional[str] = Query(None),
-    skills: Optional[list[str]] = Query(None),
-    min_experience: Optional[int] = Query(None, ge=0),
-    max_experience: Optional[int] = Query(None, le=50),
-    relocation_preference: Optional[str] = Query(None),
+    search: str | None = Query(None, description="Full-text search"),
+    country: str | None = Query(None),
+    skills: list[str] | None = Query(None),
+    min_experience: int | None = Query(None, ge=0),
+    max_experience: int | None = Query(None, le=50),
+    relocation_preference: str | None = Query(None),
     sort: str = Query("newest", pattern="^(newest|oldest)$"),
     db: AsyncSession = Depends(get_session),
 ):

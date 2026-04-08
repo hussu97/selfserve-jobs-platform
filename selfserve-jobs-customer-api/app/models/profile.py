@@ -1,14 +1,14 @@
 from datetime import datetime
 
 from sqlalchemy import (
+    JSON,
+    VARCHAR,
     BigInteger,
     Boolean,
     Index,
     Integer,
-    JSON,
     SmallInteger,
     Text,
-    VARCHAR,
     func,
 )
 from sqlalchemy.dialects.postgresql import JSONB
@@ -49,9 +49,7 @@ class Profile(Base):
     view_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     expires_at: Mapped[datetime] = mapped_column(TIMESTAMPTZ, nullable=False)
     edit_token: Mapped[str] = mapped_column(VARCHAR(64), unique=True, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(
-        TIMESTAMPTZ, nullable=False, server_default=func.now()
-    )
+    created_at: Mapped[datetime] = mapped_column(TIMESTAMPTZ, nullable=False, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         TIMESTAMPTZ, nullable=False, server_default=func.now(), onupdate=func.now()
     )

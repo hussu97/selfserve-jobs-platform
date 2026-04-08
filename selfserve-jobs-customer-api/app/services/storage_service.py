@@ -1,5 +1,4 @@
 import logging
-import os
 from datetime import timedelta
 from pathlib import Path
 
@@ -57,7 +56,6 @@ async def generate_signed_url(
 
     try:
         from google.cloud import storage
-        from datetime import datetime, timezone
 
         client = storage.Client()
         bucket = client.bucket(settings.gcs_bucket_name)

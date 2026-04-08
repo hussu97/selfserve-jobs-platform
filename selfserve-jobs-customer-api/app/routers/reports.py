@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import and_, func, select
@@ -74,7 +74,7 @@ async def submit_report(
             detail="You have already reported this listing",
         )
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     report = Report(
         report_code=generate_code(12),
         entity_type=data.entity_type,

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import BigInteger, Integer, VARCHAR, func
+from sqlalchemy import VARCHAR, BigInteger, Integer, func
 from sqlalchemy.dialects.postgresql import TIMESTAMP as _PG_TIMESTAMP
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -22,6 +22,4 @@ class EmailVerification(Base):
     entity_code: Mapped[str] = mapped_column(VARCHAR(12), nullable=False, index=True)
     verified_at: Mapped[datetime | None] = mapped_column(TIMESTAMPTZ, nullable=True)
     expires_at: Mapped[datetime] = mapped_column(TIMESTAMPTZ, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(
-        TIMESTAMPTZ, nullable=False, server_default=func.now()
-    )
+    created_at: Mapped[datetime] = mapped_column(TIMESTAMPTZ, nullable=False, server_default=func.now())

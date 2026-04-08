@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from fastapi import HTTPException, status
 from sqlalchemy import and_, func, select
@@ -25,7 +25,7 @@ async def create_verification(
 ) -> EmailVerification:
     """Create a new email verification record."""
     code = generate_verification_code(64)
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     verification = EmailVerification(
         verification_code=code,
         email=email,
@@ -43,7 +43,7 @@ async def verify_code(
     verification_code: str,
 ) -> dict:
     """Verify a code and activate the entity. Returns entity_type and entity_code."""
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     result = await db.execute(
         select(EmailVerification).where(
@@ -67,18 +67,14 @@ async def verify_code(
 
     # Activate the entity
     if verification.entity_type == "job":
-        result = await db.execute(
-            select(Job).where(Job.job_code == verification.entity_code)
-        )
+        result = await db.execute(select(Job).where(Job.job_code == verification.entity_code))
         entity = result.scalar_one_or_none()
         if entity:
             entity.email_verified = True
             entity.status = "active"
             entity.updated_at = now
     elif verification.entity_type == "profile":
-        result = await db.execute(
-            select(Profile).where(Profile.profile_code == verification.entity_code)
-        )
+        result = await db.execute(select(Profile).where(Profile.profile_code == verification.entity_code))
         entity = result.scalar_one_or_none()
         if entity:
             entity.email_verified = True
@@ -104,7 +100,7 @@ async def check_resend_rate_limit(
     entity_code: str,
 ) -> None:
     """Raise if resend limit is exceeded for this entity in the past 24h."""
-    window_start = datetime.now(timezone.utc) - timedelta(hours=RESEND_WINDOW_HOURS)
+    window_start = datetime.now(UTC) - timedelta(hours=RESEND_WINDOW_HOURS)
     result = await db.execute(
         select(func.count(EmailVerification.id)).where(
             and_(
@@ -118,5 +114,5 @@ async def check_resend_rate_limit(
     if count >= RESEND_LIMIT_PER_ENTITY:
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-            detail=f"Resend limit reached. Maximum {RESEND_LIMIT_PER_ENTITY} verification emails per entity per 24 hours.",
+            detail=f"Resend limit reached. Maximum {RESEND_LIMIT_PER_ENTITY} verification emails per entity per 24 hours.",  # noqa: E501
         )

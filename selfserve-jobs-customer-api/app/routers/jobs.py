@@ -1,5 +1,3 @@
-from typing import Optional
-
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -8,12 +6,12 @@ from app.dependencies import get_session, require_edit_token
 from app.schemas.job import (
     JobCreate,
     JobCreateResponse,
-    JobListResponse,
     JobListItem,
+    JobListResponse,
     JobResponse,
     JobUpdate,
 )
-from app.services import job_service, verification_service, email_service
+from app.services import email_service, job_service, verification_service
 
 router = APIRouter(prefix="/api/v1/jobs", tags=["jobs"])
 settings = get_settings()
@@ -23,11 +21,11 @@ settings = get_settings()
 async def list_jobs(
     page: int = Query(1, ge=1),
     per_page: int = Query(20, ge=1, le=50),
-    search: Optional[str] = Query(None, description="Full-text search"),
-    country: Optional[str] = Query(None),
-    city: Optional[str] = Query(None),
-    employment_type: Optional[list[str]] = Query(None),
-    skills: Optional[list[str]] = Query(None),
+    search: str | None = Query(None, description="Full-text search"),
+    country: str | None = Query(None),
+    city: str | None = Query(None),
+    employment_type: list[str] | None = Query(None),
+    skills: list[str] | None = Query(None),
     sort: str = Query("newest", pattern="^(newest|oldest|deadline)$"),
     db: AsyncSession = Depends(get_session),
 ):

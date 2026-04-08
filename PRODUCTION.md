@@ -143,7 +143,7 @@ gcloud storage buckets add-iam-policy-binding gs://$BUCKET_NAME \
 
 ## 6. Deploy the API (Cloud Run)
 
-> **Note:** Steps 6a–6c are for the **initial / manual deploy only**. After this, the GitHub Actions `deploy-api.yml` workflow handles all three steps automatically on every push to `main`. Pushing an image to Artifact Registry alone does **not** trigger Cloud Run — step 6c is what actually deploys it.
+> **Note:** Steps 6a and 6b are for the **initial / manual deploy only**. After this, the GitHub Actions `deploy-api.yml` workflow handles both steps automatically on every push to `main`. Pushing an image to Artifact Registry alone does **not** trigger Cloud Run — step 6b is what actually deploys it. Alembic migrations run automatically on app startup.
 
 ### 6a. Build and push Docker image
 
@@ -166,26 +166,7 @@ gcloud builds submit selfserve-jobs-customer-api/ \
   --tag "${REGISTRY_LOCATION}/${PROJECT_ID}/${REPO_NAME}/${API_SERVICE_NAME}:latest"
 ```
 
-### 6b. Create the Alembic migration job (one-time setup)
-
-This creates a Cloud Run Job that the deploy workflow will execute before each deployment. You only need to create it once — subsequent deploys update the image automatically.
-
-```bash
-gcloud run jobs create selfserve-jobs-migrate \
-  --image "${REGISTRY_LOCATION}/${PROJECT_ID}/${REPO_NAME}/${API_SERVICE_NAME}:latest" \
-  --region $REGION \
-  --service-account $SA_EMAIL \
-  --set-cloudsql-instances $DB_CONNECTION_NAME \
-  --set-env-vars "DATABASE_URL=postgresql+asyncpg://${DB_USER}:${DB_PASSWORD}@/${DB_NAME}?host=/cloudsql/${DB_CONNECTION_NAME}" \
-  --command "alembic" \
-  --args "upgrade,head" \
-  --max-retries=1
-
-# Run migrations for the first time
-gcloud run jobs execute selfserve-jobs-migrate --region $REGION --wait
-```
-
-### 6c. Deploy Cloud Run service
+### 6b. Deploy Cloud Run service
 
 ```bash
 gcloud run deploy $API_SERVICE_NAME \
@@ -201,7 +182,6 @@ gcloud run deploy $API_SERVICE_NAME \
   --set-env-vars "RESEND_API_KEY=${RESEND_API_KEY}" \
   --set-env-vars "FRONTEND_URL=https://${WEB_DOMAIN}" \
   --set-env-vars "ENVIRONMENT=production" \
-  --set-env-vars "RUN_MIGRATIONS=false" \
   --min-instances=0 \
   --max-instances=10 \
   --memory=512Mi \

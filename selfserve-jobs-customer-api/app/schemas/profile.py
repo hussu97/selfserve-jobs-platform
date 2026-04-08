@@ -1,8 +1,7 @@
 from datetime import datetime
-from typing import Literal, Optional
+from typing import Literal
 
 from pydantic import BaseModel, EmailStr, Field, field_validator
-
 
 # Values used by frontend: 'yes' | 'no' | 'open'
 RELOCATION_PREFERENCES = Literal["yes", "no", "open"]
@@ -15,19 +14,19 @@ NOTICE_PERIODS = Literal["immediate", "1_week", "2_weeks", "1_month", "3_months"
 class ProfileCreate(BaseModel):
     person_name: str = Field(..., min_length=2, max_length=200)
     email: EmailStr
-    contact_number: Optional[str] = Field(None, max_length=30)
+    contact_number: str | None = Field(None, max_length=30)
     brief: str = Field(..., min_length=50)
     current_city: str = Field(..., min_length=1, max_length=100)
     current_country: str = Field(..., min_length=2, max_length=100)
     years_of_experience: int = Field(..., ge=0, le=50)
     current_title: str = Field(..., min_length=2, max_length=200)
-    notice_period: Optional[NOTICE_PERIODS] = None
+    notice_period: NOTICE_PERIODS | None = None
     relocation_preference: RELOCATION_PREFERENCES = "open"
-    linkedin_profile_link: Optional[str] = Field(None, max_length=500)
+    linkedin_profile_link: str | None = Field(None, max_length=500)
     key_skills: list[str] = Field(default_factory=list, max_length=30)
-    resume_key: Optional[str] = Field(None, max_length=500)
+    resume_key: str | None = Field(None, max_length=500)
     # Honeypot
-    website: Optional[str] = Field(None, exclude=True)
+    website: str | None = Field(None, exclude=True)
 
     @field_validator("email", mode="before")
     @classmethod
@@ -41,17 +40,17 @@ class ProfileCreate(BaseModel):
 
 
 class ProfileUpdate(BaseModel):
-    person_name: Optional[str] = Field(None, min_length=2, max_length=200)
-    contact_number: Optional[str] = Field(None, max_length=30)
-    brief: Optional[str] = Field(None, min_length=50)
-    current_city: Optional[str] = Field(None, min_length=1, max_length=100)
-    current_country: Optional[str] = Field(None, min_length=2, max_length=100)
-    years_of_experience: Optional[int] = Field(None, ge=0, le=50)
-    current_title: Optional[str] = Field(None, min_length=2, max_length=200)
-    notice_period: Optional[NOTICE_PERIODS] = None
-    relocation_preference: Optional[RELOCATION_PREFERENCES] = None
-    linkedin_profile_link: Optional[str] = Field(None, max_length=500)
-    key_skills: Optional[list[str]] = Field(None, max_length=30)
+    person_name: str | None = Field(None, min_length=2, max_length=200)
+    contact_number: str | None = Field(None, max_length=30)
+    brief: str | None = Field(None, min_length=50)
+    current_city: str | None = Field(None, min_length=1, max_length=100)
+    current_country: str | None = Field(None, min_length=2, max_length=100)
+    years_of_experience: int | None = Field(None, ge=0, le=50)
+    current_title: str | None = Field(None, min_length=2, max_length=200)
+    notice_period: NOTICE_PERIODS | None = None
+    relocation_preference: RELOCATION_PREFERENCES | None = None
+    linkedin_profile_link: str | None = Field(None, max_length=500)
+    key_skills: list[str] | None = Field(None, max_length=30)
 
     @field_validator("key_skills", mode="before")
     @classmethod
@@ -63,15 +62,16 @@ class ProfileUpdate(BaseModel):
 
 class ProfileResponse(BaseModel):
     """Full profile detail — email and contact_number are intentionally excluded for privacy."""
+
     code: str
     person_name: str
     current_city: str
     current_country: str
     years_of_experience: int
     current_title: str
-    notice_period: Optional[str]
+    notice_period: str | None
     relocation_preference: str
-    linkedin_profile_link: Optional[str]
+    linkedin_profile_link: str | None
     key_skills: list[str]
     brief: str
     status: str
@@ -113,13 +113,14 @@ class ProfileResponse(BaseModel):
 
 class ProfileListItem(BaseModel):
     """Lightweight profile item for list responses — no email, brief, or contact info."""
+
     code: str
     person_name: str
     current_city: str
     current_country: str
     years_of_experience: int
     current_title: str
-    notice_period: Optional[str]
+    notice_period: str | None
     relocation_preference: str
     key_skills: list[str]
     status: str
@@ -141,6 +142,7 @@ class ProfileListResponse(BaseModel):
 
 class ProfileCreateResponse(BaseModel):
     """Response for POST /profiles — frontend expects { code, message }."""
+
     code: str
     message: str
 

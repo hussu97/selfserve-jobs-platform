@@ -1,6 +1,3 @@
-import pytest
-
-
 VALID_PROFILE_PAYLOAD = {
     "person_name": "Jane Smith",
     "email": "jane@example.com",

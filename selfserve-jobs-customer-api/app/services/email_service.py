@@ -10,6 +10,7 @@ settings = get_settings()
 def _get_resend_client():
     try:
         import resend
+
         resend.api_key = settings.resend_api_key
         return resend
     except ImportError:
@@ -39,7 +40,8 @@ async def send_verification_email(
 
       <div style="margin: 30px 0;">
         <a href="{verify_url}"
-           style="background-color: #8B6914; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">
+           style="background-color: #8B6914; color: white; padding: 12px 24px;
+                  text-decoration: none; border-radius: 4px; display: inline-block;">
           Verify Email Address
         </a>
       </div>
@@ -72,16 +74,17 @@ async def send_verification_email(
 
     if not settings.resend_api_key:
         logger.info(
-            "DEV MODE - Verification email (would send to %s):\n"
-            "Subject: %s\n"
-            "Verify URL: %s\n"
-            "Manage URL: %s",
-            email, subject, verify_url, manage_url,
+            "DEV MODE - Verification email (would send to %s):\nSubject: %s\nVerify URL: %s\nManage URL: %s",
+            email,
+            subject,
+            verify_url,
+            manage_url,
         )
         return True
 
     try:
         import resend
+
         resend.api_key = settings.resend_api_key
         params: dict[str, Any] = {
             "from": "jobs4u <noreply@jobs4u.io>",
@@ -142,12 +145,15 @@ async def send_management_links_email(
     if not settings.resend_api_key:
         logger.info(
             "DEV MODE - Management links email (would send to %s):\nSubject: %s\nEntities: %s",
-            email, subject, entities,
+            email,
+            subject,
+            entities,
         )
         return True
 
     try:
         import resend
+
         resend.api_key = settings.resend_api_key
         params: dict[str, Any] = {
             "from": "jobs4u <noreply@jobs4u.io>",

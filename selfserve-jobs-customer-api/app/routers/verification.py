@@ -1,18 +1,18 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import and_, select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
 from app.dependencies import get_session
 from app.models.job import Job
 from app.models.profile import Profile
+from app.schemas.common import MessageResponse
 from app.schemas.verification import (
     ResendVerificationRequest,
     VerificationRequest,
     VerificationResponse,
 )
-from app.schemas.common import MessageResponse
-from app.services import verification_service, email_service
+from app.services import email_service, verification_service
 
 router = APIRouter(prefix="/api/v1/verify", tags=["verification"])
 settings = get_settings()
@@ -87,9 +87,7 @@ async def resend_verification(
         )
 
     # Rate limit check
-    await verification_service.check_resend_rate_limit(
-        db, data.entity_type, entity_code
-    )
+    await verification_service.check_resend_rate_limit(db, data.entity_type, entity_code)
 
     # Create new verification record
     verification = await verification_service.create_verification(

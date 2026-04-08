@@ -34,14 +34,10 @@ async def get_skills():
 
 @router.get("/stats", response_model=StatsResponse)
 async def get_stats(db: AsyncSession = Depends(get_session)):
-    jobs_result = await db.execute(
-        select(func.count(Job.id)).where(Job.status == "active")
-    )
+    jobs_result = await db.execute(select(func.count(Job.id)).where(Job.status == "active"))
     active_jobs = jobs_result.scalar_one()
 
-    profiles_result = await db.execute(
-        select(func.count(Profile.id)).where(Profile.status == "active")
-    )
+    profiles_result = await db.execute(select(func.count(Profile.id)).where(Profile.status == "active"))
     active_profiles = profiles_result.scalar_one()
 
     return StatsResponse(active_jobs=active_jobs, active_profiles=active_profiles)
