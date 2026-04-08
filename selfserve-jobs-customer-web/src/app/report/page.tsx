@@ -40,15 +40,14 @@ function ReportContent() {
     return (
       <div className="max-w-lg mx-auto px-4 sm:px-6 py-20 text-center">
         <h1
-          className="text-2xl font-bold mb-3"
-          style={{ fontFamily: 'Lora, serif', color: 'var(--color-secondary)' }}
+          className="text-2xl font-bold mb-3 font-heading text-secondary"
         >
           Nothing to report
         </h1>
-        <p className="text-sm mb-6" style={{ color: 'var(--color-text-muted)' }}>
+        <p className="text-sm mb-6 text-text-muted">
           No listing was specified. Please use the report button on a specific listing.
         </p>
-        <Link href="/" className="text-sm font-medium hover:opacity-70" style={{ color: 'var(--color-primary)' }}>
+        <Link href="/" className="text-sm font-medium hover:opacity-70 text-primary">
           ← Back to home
         </Link>
       </div>
@@ -95,18 +94,16 @@ function ReportContent() {
           </svg>
         </div>
         <h1
-          className="text-2xl font-bold mb-3"
-          style={{ fontFamily: 'Lora, serif', color: 'var(--color-secondary)' }}
+          className="text-2xl font-bold mb-3 font-heading text-secondary"
         >
           Report submitted
         </h1>
-        <p className="text-sm mb-8" style={{ color: 'var(--color-text-muted)' }}>
+        <p className="text-sm mb-8 text-text-muted">
           Thank you for your report. We&apos;ll review it shortly and take appropriate action.
         </p>
         <Link
           href={`/${entityType}/${entityCode}`}
-          className="inline-flex items-center justify-center px-6 py-3 rounded-xl text-white font-semibold transition-opacity hover:opacity-90"
-          style={{ backgroundColor: 'var(--color-primary)' }}
+          className="inline-flex items-center justify-center px-6 py-3 rounded-xl text-white font-semibold transition-opacity hover:opacity-90 bg-primary"
         >
           ← Back to listing
         </Link>
@@ -118,8 +115,7 @@ function ReportContent() {
     <div className="max-w-xl mx-auto px-4 sm:px-6 py-12">
       <Link
         href={`/${entityType}/${entityCode}`}
-        className="inline-flex items-center gap-1.5 text-sm mb-8 hover:opacity-70"
-        style={{ color: 'var(--color-text-muted)' }}
+        className="inline-flex items-center gap-1.5 text-sm mb-8 hover:opacity-70 text-text-muted"
       >
         <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
           <path fillRule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" />
@@ -128,12 +124,11 @@ function ReportContent() {
       </Link>
 
       <h1
-        className="text-3xl font-bold mb-2"
-        style={{ fontFamily: 'Lora, serif', color: 'var(--color-secondary)' }}
+        className="text-3xl font-bold mb-2 font-heading text-secondary"
       >
         Report a listing
       </h1>
-      <p className="text-sm mb-8" style={{ color: 'var(--color-text-muted)' }}>
+      <p className="text-sm mb-8 text-text-muted">
         Help us keep jobs4u safe and spam-free. We review all reports manually.
       </p>
 
@@ -173,11 +168,10 @@ function ReportContent() {
         />
 
         <div
-          className="rounded-xl border p-4 text-sm"
-          style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
+          className="rounded-xl border p-4 text-sm bg-surface border-border"
         >
-          <p style={{ color: 'var(--color-text-muted)' }}>
-            <span className="font-medium" style={{ color: 'var(--color-text)' }}>Listing: </span>
+          <p className="text-text-muted">
+            <span className="font-medium text-text-main">Listing: </span>
             {entityCode} ({entityType === 'jobs' ? 'job' : 'profile'})
           </p>
         </div>

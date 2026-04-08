@@ -11,12 +11,11 @@ export default function NewJobPage() {
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="mb-10">
         <h1
-          className="text-3xl sm:text-4xl font-bold mb-2"
-          style={{ fontFamily: 'Lora, serif', color: 'var(--color-secondary)' }}
+          className="text-3xl sm:text-4xl font-bold mb-2 font-heading text-secondary"
         >
           Post a Job
         </h1>
-        <p className="text-base" style={{ color: 'var(--color-text-muted)' }}>
+        <p className="text-base text-text-muted">
           Free forever. Just verify your email to publish. No account needed.
         </p>
       </div>

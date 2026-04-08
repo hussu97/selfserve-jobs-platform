@@ -7,6 +7,7 @@ import { JobFilters } from '@/components/jobs/JobFilters';
 import { SearchBar } from '@/components/shared/SearchBar';
 import { Pagination } from '@/components/shared/Pagination';
 import { Spinner } from '@/components/ui/Spinner';
+import { StatusBanner } from '@/components/shared/StatusBanner';
 import { getJobs } from '@/lib/api';
 import type { JobFilters as JobFiltersType, JobListItem } from '@/lib/types';
 import { ITEMS_PER_PAGE } from '@/lib/constants';
@@ -43,7 +44,7 @@ function filtersToParams(filters: JobFiltersType): URLSearchParams {
 
 export default function JobsPage() {
   return (
-    <Suspense fallback={<div className="flex justify-center py-20"><span style={{ color: 'var(--color-text-muted)' }}>Loading…</span></div>}>
+    <Suspense fallback={<div className="flex justify-center py-20"><span className="text-text-muted">Loading…</span></div>}>
       <JobsContent />
     </Suspense>
   );
@@ -117,16 +118,15 @@ function JobsContent() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       {/* Page header */}
       <div className="mb-8">
         <h1
-          className="text-3xl sm:text-4xl font-bold mb-2"
-          style={{ fontFamily: 'Lora, serif', color: 'var(--color-secondary)' }}
+          className="text-3xl sm:text-4xl font-bold mb-2 font-heading text-secondary"
         >
           Browse Jobs
         </h1>
-        <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+        <p className="text-sm text-text-muted">
           {loading ? 'Loading…' : `${total.toLocaleString()} job${total !== 1 ? 's' : ''} found`}
         </p>
       </div>
@@ -149,35 +149,24 @@ function JobsContent() {
         {/* Main content */}
         <div className="flex-1 min-w-0">
           {error && (
-            <div
-              className="mb-6 rounded-xl border p-4 text-sm"
-              style={{
-                borderColor: '#FCA5A5',
-                backgroundColor: '#FEF2F2',
-                color: '#DC2626',
-              }}
-            >
-              {error}
-            </div>
+            <StatusBanner type="error" message={error} className="mb-6" />
           )}
 
           {loading ? (
             <div className="flex items-center justify-center py-24">
               <div className="flex flex-col items-center gap-3">
                 <Spinner size="lg" />
-                <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                <p className="text-sm text-text-muted">
                   Loading jobs…
                 </p>
               </div>
             </div>
           ) : jobs.length === 0 ? (
             <div
-              className="text-center py-20 rounded-2xl border"
-              style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-surface)' }}
+              className="text-center py-20 rounded-2xl border border-border bg-surface"
             >
               <svg
-                className="h-12 w-12 mx-auto mb-4"
-                style={{ color: 'var(--color-border)' }}
+                className="h-12 w-12 mx-auto mb-4 text-border"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -186,18 +175,16 @@ function JobsContent() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
               </svg>
               <h3
-                className="text-lg font-semibold mb-2"
-                style={{ fontFamily: 'Lora, serif', color: 'var(--color-text)' }}
+                className="text-lg font-semibold mb-2 font-heading text-text-main"
               >
                 No jobs found
               </h3>
-              <p className="text-sm mb-4" style={{ color: 'var(--color-text-muted)' }}>
+              <p className="text-sm mb-4 text-text-muted">
                 Try adjusting your search or removing some filters.
               </p>
               <button
                 onClick={() => applyFilters({ page: 1 })}
-                className="text-sm font-medium hover:opacity-70"
-                style={{ color: 'var(--color-primary)' }}
+                className="text-sm font-medium hover:opacity-70 text-primary"
               >
                 Clear all filters
               </button>

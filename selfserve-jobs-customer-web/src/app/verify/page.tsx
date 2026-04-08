@@ -17,7 +17,7 @@ export default function VerifyPage() {
     <Suspense fallback={
       <div className="max-w-lg mx-auto px-4 sm:px-6 py-20 text-center">
         <Spinner size="lg" className="mx-auto mb-4" />
-        <p className="text-base font-medium" style={{ color: 'var(--color-text)' }}>Loading…</p>
+        <p className="text-base font-medium text-text-main">Loading…</p>
       </div>
     }>
       <VerifyContent />
@@ -84,26 +84,23 @@ function VerifyContent() {
     return (
       <div className="max-w-lg mx-auto px-4 sm:px-6 py-20 text-center">
         <div
-          className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5"
-          style={{ backgroundColor: 'var(--color-surface)' }}
+          className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5 bg-surface"
         >
-          <svg className="h-8 w-8" style={{ color: 'var(--color-text-muted)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <svg className="h-8 w-8 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
           </svg>
         </div>
         <h1
-          className="text-2xl font-bold mb-3"
-          style={{ fontFamily: 'Lora, serif', color: 'var(--color-secondary)' }}
+          className="text-2xl font-bold mb-3 font-heading text-secondary"
         >
           Check your email
         </h1>
-        <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+        <p className="text-sm text-text-muted">
           No verification code found. Check your email for the verification link we sent when you created your listing.
         </p>
         <Link
           href="/"
-          className="mt-6 inline-block text-sm font-medium hover:opacity-70"
-          style={{ color: 'var(--color-primary)' }}
+          className="mt-6 inline-block text-sm font-medium hover:opacity-70 text-primary"
         >
           ← Back to home
         </Link>
@@ -115,10 +112,10 @@ function VerifyContent() {
     return (
       <div className="max-w-lg mx-auto px-4 sm:px-6 py-20 text-center">
         <Spinner size="lg" className="mx-auto mb-4" />
-        <p className="text-base font-medium" style={{ color: 'var(--color-text)' }}>
+        <p className="text-base font-medium text-text-main">
           Verifying your email…
         </p>
-        <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+        <p className="mt-1 text-sm text-text-muted">
           Just a moment
         </p>
       </div>
@@ -139,28 +136,25 @@ function VerifyContent() {
           </svg>
         </div>
         <h1
-          className="text-2xl font-bold mb-3"
-          style={{ fontFamily: 'Lora, serif', color: 'var(--color-secondary)' }}
+          className="text-2xl font-bold mb-3 font-heading text-secondary"
         >
           Your listing is now live!
         </h1>
-        <p className="text-sm mb-8" style={{ color: 'var(--color-text-muted)' }}>
+        <p className="text-sm mb-8 text-text-muted">
           {result.message || 'Your listing has been verified and published successfully.'}
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           {listingHref && (
             <Link
               href={listingHref}
-              className="inline-flex items-center justify-center px-6 py-3 rounded-xl text-white font-semibold transition-opacity hover:opacity-90"
-              style={{ backgroundColor: 'var(--color-primary)' }}
+              className="inline-flex items-center justify-center px-6 py-3 rounded-xl text-white font-semibold transition-opacity hover:opacity-90 bg-primary"
             >
               View your listing →
             </Link>
           )}
           <Link
             href="/"
-            className="inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold border-2 transition-colors hover:bg-[#2D5F3A] hover:text-white"
-            style={{ borderColor: 'var(--color-secondary)', color: 'var(--color-secondary)' }}
+            className="inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold border-2 transition-colors hover:bg-[#2D5F3A] hover:text-white border-secondary text-secondary"
           >
             Back to home
           </Link>
@@ -174,36 +168,32 @@ function VerifyContent() {
     <div className="max-w-lg mx-auto px-4 sm:px-6 py-16">
       <div className="text-center mb-10">
         <div
-          className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5"
-          style={{ backgroundColor: '#FEF9C3' }}
+          className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5 bg-yellow-100"
         >
           <svg className="h-8 w-8 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
         </div>
         <h1
-          className="text-2xl font-bold mb-3"
-          style={{ fontFamily: 'Lora, serif', color: 'var(--color-secondary)' }}
+          className="text-2xl font-bold mb-3 font-heading text-secondary"
         >
           Verification link expired
         </h1>
-        <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+        <p className="text-sm text-text-muted">
           {errorMessage || 'This verification link has expired or is invalid.'}
         </p>
       </div>
 
       {/* Resend form */}
       <div
-        className="rounded-2xl border p-6"
-        style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
+        className="rounded-2xl border p-6 bg-surface border-border"
       >
         <h2
-          className="font-semibold text-lg mb-1"
-          style={{ fontFamily: 'Lora, serif', color: 'var(--color-text)' }}
+          className="font-semibold text-lg mb-1 font-heading text-text-main"
         >
           Resend Verification Email
         </h2>
-        <p className="text-sm mb-5" style={{ color: 'var(--color-text-muted)' }}>
+        <p className="text-sm mb-5 text-text-muted">
           Enter the email address you used when creating your listing.
         </p>
 
@@ -224,7 +214,7 @@ function VerifyContent() {
             required
           />
           <div className="flex flex-col gap-1.5">
-            <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
+            <p className="text-sm font-medium text-text-main">
               Listing type
             </p>
             <div className="flex gap-4">
@@ -235,9 +225,9 @@ function VerifyContent() {
                   value="jobs"
                   checked={resendEntityType === 'jobs'}
                   onChange={() => setResendEntityType('jobs')}
-                  style={{ accentColor: '#C2703E' }}
+                  className="accent-primary"
                 />
-                <span className="text-sm" style={{ color: 'var(--color-text)' }}>Job listing</span>
+                <span className="text-sm text-text-main">Job listing</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -246,9 +236,9 @@ function VerifyContent() {
                   value="profiles"
                   checked={resendEntityType === 'profiles'}
                   onChange={() => setResendEntityType('profiles')}
-                  style={{ accentColor: '#C2703E' }}
+                  className="accent-primary"
                 />
-                <span className="text-sm" style={{ color: 'var(--color-text)' }}>Talent profile</span>
+                <span className="text-sm text-text-main">Talent profile</span>
               </label>
             </div>
           </div>

@@ -73,7 +73,7 @@ export default async function JobDetailPage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <JobDetail job={job} />
 
         {/* Recent jobs */}
@@ -81,15 +81,13 @@ export default async function JobDetailPage({ params }: PageProps) {
           <section className="mt-16">
             <div className="flex items-center justify-between mb-6">
               <h2
-                className="text-xl font-bold"
-                style={{ fontFamily: 'Lora, serif', color: 'var(--color-secondary)' }}
+                className="text-xl font-bold font-heading text-secondary"
               >
                 More Jobs
               </h2>
               <Link
                 href="/jobs"
-                className="text-sm font-medium hover:opacity-70"
-                style={{ color: 'var(--color-primary)' }}
+                className="text-sm font-medium hover:opacity-70 text-primary"
               >
                 Browse all →
               </Link>

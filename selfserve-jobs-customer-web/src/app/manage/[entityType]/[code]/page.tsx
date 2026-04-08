@@ -28,7 +28,7 @@ type PageState = 'loading' | 'invalid' | 'valid' | 'deleted';
 
 export default function ManagePage() {
   return (
-    <Suspense fallback={<div className="flex justify-center py-20"><span style={{ color: 'var(--color-text-muted)' }}>Loading…</span></div>}>
+    <Suspense fallback={<div className="flex justify-center py-20"><span className="text-text-muted">Loading…</span></div>}>
       <ManageContent />
     </Suspense>
   );
@@ -235,7 +235,7 @@ function ManageContent() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-3">
           <Spinner size="lg" />
-          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Verifying access…</p>
+          <p className="text-sm text-text-muted">Verifying access…</p>
         </div>
       </div>
     );
@@ -250,18 +250,16 @@ function ManageContent() {
           </svg>
         </div>
         <h1
-          className="text-2xl font-bold mb-3"
-          style={{ fontFamily: 'Lora, serif', color: 'var(--color-secondary)' }}
+          className="text-2xl font-bold mb-3 font-heading text-secondary"
         >
           Listing removed
         </h1>
-        <p className="text-sm mb-8" style={{ color: 'var(--color-text-muted)' }}>
+        <p className="text-sm mb-8 text-text-muted">
           Your listing has been permanently deleted.
         </p>
         <Link
           href={`/${entityType}`}
-          className="inline-flex items-center justify-center px-6 py-3 rounded-xl text-white font-semibold transition-opacity hover:opacity-90"
-          style={{ backgroundColor: 'var(--color-primary)' }}
+          className="inline-flex items-center justify-center px-6 py-3 rounded-xl text-white font-semibold transition-opacity hover:opacity-90 bg-primary"
         >
           ← Browse {entityType === 'jobs' ? 'Jobs' : 'Profiles'}
         </Link>
@@ -274,36 +272,32 @@ function ManageContent() {
       <div className="max-w-lg mx-auto px-4 sm:px-6 py-16">
         <div className="text-center mb-10">
           <div
-            className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5"
-            style={{ backgroundColor: '#FEF9C3' }}
+            className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5 bg-yellow-100"
           >
             <svg className="h-8 w-8 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
           </div>
           <h1
-            className="text-2xl font-bold mb-3"
-            style={{ fontFamily: 'Lora, serif', color: 'var(--color-secondary)' }}
+            className="text-2xl font-bold mb-3 font-heading text-secondary"
           >
             Invalid management link
           </h1>
-          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+          <p className="text-sm text-text-muted">
             {tokenError || 'This management link is invalid or has expired.'}
           </p>
         </div>
 
         {/* Request new link */}
         <div
-          className="rounded-2xl border p-6"
-          style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
+          className="rounded-2xl border p-6 bg-surface border-border"
         >
           <h2
-            className="font-semibold text-lg mb-1"
-            style={{ fontFamily: 'Lora, serif', color: 'var(--color-text)' }}
+            className="font-semibold text-lg mb-1 font-heading text-text-main"
           >
             Request a new link
           </h2>
-          <p className="text-sm mb-5" style={{ color: 'var(--color-text-muted)' }}>
+          <p className="text-sm mb-5 text-text-muted">
             Enter your email to receive new management links for all your listings.
           </p>
 
@@ -341,8 +335,7 @@ function ManageContent() {
       <div className="flex items-center gap-3 mb-2">
         <Link
           href={listingHref}
-          className="text-sm hover:opacity-70 flex items-center gap-1"
-          style={{ color: 'var(--color-text-muted)' }}
+          className="text-sm hover:opacity-70 flex items-center gap-1 text-text-muted"
         >
           <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
             <path fillRule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" />
@@ -351,12 +344,11 @@ function ManageContent() {
         </Link>
       </div>
       <h1
-        className="text-3xl sm:text-4xl font-bold mb-2"
-        style={{ fontFamily: 'Lora, serif', color: 'var(--color-secondary)' }}
+        className="text-3xl sm:text-4xl font-bold mb-2 font-heading text-secondary"
       >
         Manage {isJobs ? 'Job Listing' : 'Profile'}
       </h1>
-      <p className="text-sm mb-10" style={{ color: 'var(--color-text-muted)' }}>
+      <p className="text-sm mb-10 text-text-muted">
         {isJobs
           ? `Editing: ${job?.job_title} at ${job?.company_name}`
           : `Editing: ${profile?.person_name} — ${profile?.current_title}`}
@@ -423,7 +415,7 @@ function ManageContent() {
 
           {/* Skills */}
           <div className="flex flex-col gap-2">
-            <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>Key skills</p>
+            <p className="text-sm font-medium text-text-main">Key skills</p>
             <div className="flex gap-2">
               <input
                 type="text"
@@ -436,15 +428,14 @@ function ManageContent() {
                   }
                 }}
                 placeholder="Type a skill and press Enter"
-                className="flex-1 rounded-lg border border-[#DDD5C8] bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C2703E] focus:border-transparent"
-                style={{ color: 'var(--color-text)' }}
+                className="flex-1 rounded-lg border border-border bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-text-main"
               />
               <Button type="button" variant="outline" size="md" onClick={() => addJobSkill(jobSkillInput)}>
                 Add
               </Button>
             </div>
             {(jobForm.key_skills?.length ?? 0) > 0 && (
-              <div className="flex flex-wrap gap-2 p-3 rounded-lg border" style={{ borderColor: 'var(--color-border)' }}>
+              <div className="flex flex-wrap gap-2 p-3 rounded-lg border border-border">
                 {jobForm.key_skills?.map((skill) => (
                   <SkillTag key={skill} skill={skill} removable onRemove={removeJobSkill} size="md" />
                 ))}
@@ -454,7 +445,7 @@ function ManageContent() {
 
           {/* Contact */}
           <div className="flex flex-col gap-3">
-            <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>Contact method</p>
+            <p className="text-sm font-medium text-text-main">Contact method</p>
             <div className="flex gap-4">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -463,9 +454,9 @@ function ManageContent() {
                   value="email"
                   checked={jobForm.contact_method === 'email'}
                   onChange={() => setJobField('contact_method', 'email')}
-                  style={{ accentColor: '#C2703E' }}
+                  className="accent-primary"
                 />
-                <span className="text-sm" style={{ color: 'var(--color-text)' }}>Via email</span>
+                <span className="text-sm text-text-main">Via email</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -474,9 +465,9 @@ function ManageContent() {
                   value="url"
                   checked={jobForm.contact_method === 'url'}
                   onChange={() => setJobField('contact_method', 'url')}
-                  style={{ accentColor: '#C2703E' }}
+                  className="accent-primary"
                 />
-                <span className="text-sm" style={{ color: 'var(--color-text)' }}>Via URL</span>
+                <span className="text-sm text-text-main">Via URL</span>
               </label>
             </div>
             {jobForm.contact_method === 'email' ? (
@@ -572,7 +563,7 @@ function ManageContent() {
 
           {/* Skills */}
           <div className="flex flex-col gap-2">
-            <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>Key skills</p>
+            <p className="text-sm font-medium text-text-main">Key skills</p>
             <div className="flex gap-2">
               <input
                 type="text"
@@ -585,15 +576,14 @@ function ManageContent() {
                   }
                 }}
                 placeholder="Type a skill and press Enter"
-                className="flex-1 rounded-lg border border-[#DDD5C8] bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C2703E] focus:border-transparent"
-                style={{ color: 'var(--color-text)' }}
+                className="flex-1 rounded-lg border border-border bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-text-main"
               />
               <Button type="button" variant="outline" size="md" onClick={() => addProfileSkill(profileSkillInput)}>
                 Add
               </Button>
             </div>
             {(profileForm.key_skills?.length ?? 0) > 0 && (
-              <div className="flex flex-wrap gap-2 p-3 rounded-lg border" style={{ borderColor: 'var(--color-border)' }}>
+              <div className="flex flex-wrap gap-2 p-3 rounded-lg border border-border">
                 {profileForm.key_skills?.map((skill) => (
                   <SkillTag key={skill} skill={skill} removable onRemove={removeProfileSkill} size="md" />
                 ))}
@@ -609,16 +599,14 @@ function ManageContent() {
 
       {/* Delete section */}
       <div
-        className="mt-16 pt-8 border-t"
-        style={{ borderColor: 'var(--color-border)' }}
+        className="mt-16 pt-8 border-t border-border"
       >
         <h2
-          className="text-xl font-bold mb-2"
-          style={{ fontFamily: 'Lora, serif', color: '#DC2626' }}
+          className="text-xl font-bold mb-2 font-heading text-red-600"
         >
           Delete Listing
         </h2>
-        <p className="text-sm mb-6" style={{ color: 'var(--color-text-muted)' }}>
+        <p className="text-sm mb-6 text-text-muted">
           This action is permanent and cannot be undone. Your listing will be immediately removed from the platform.
         </p>
 
@@ -632,10 +620,9 @@ function ManageContent() {
           </Button>
         ) : (
           <div
-            className="rounded-xl border p-5"
-            style={{ borderColor: '#FCA5A5', backgroundColor: '#FEF2F2' }}
+            className="rounded-xl border p-5 border-red-300 bg-red-50"
           >
-            <p className="text-sm font-medium mb-4" style={{ color: '#991B1B' }}>
+            <p className="text-sm font-medium mb-4 text-red-800">
               Are you sure? This cannot be undone.
             </p>
             <div className="flex gap-3">

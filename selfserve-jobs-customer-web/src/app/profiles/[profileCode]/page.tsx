@@ -44,22 +44,20 @@ export default async function ProfileDetailPage({ params }: PageProps) {
     recentProfilesResult?.items.filter((p) => p.code !== profileCode).slice(0, 3) ?? [];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <ProfileDetail profile={profile} />
 
       {recentProfiles.length > 0 && (
         <section className="mt-16">
           <div className="flex items-center justify-between mb-6">
             <h2
-              className="text-xl font-bold"
-              style={{ fontFamily: 'Lora, serif', color: 'var(--color-secondary)' }}
+              className="text-xl font-bold font-heading text-secondary"
             >
               More Talent
             </h2>
             <Link
               href="/profiles"
-              className="text-sm font-medium hover:opacity-70"
-              style={{ color: 'var(--color-primary)' }}
+              className="text-sm font-medium hover:opacity-70 text-primary"
             >
               Browse all →
             </Link>
