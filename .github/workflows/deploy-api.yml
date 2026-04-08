@@ -19,6 +19,9 @@ jobs:
       contents: read
       id-token: write
 
+    env:
+      IMAGE: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/selfserve-jobs/selfserve-jobs-customer-api:${{ github.sha }}
+
     steps:
       - uses: actions/checkout@v4
 
@@ -36,15 +39,27 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          IMAGE="${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/selfserve-jobs/customer-api:${{ github.sha }}"
-          docker build -t "$IMAGE" selfserve-jobs-customer-api/
+          docker build --platform linux/amd64 \
+            -t "$IMAGE" \
+            selfserve-jobs-customer-api/
           docker push "$IMAGE"
+
+      - name: Run Alembic migrations
+        run: |
+          gcloud run jobs update selfserve-jobs-migrate \
+            --image "$IMAGE" \
+            --region "${{ secrets.GCP_REGION }}"
+          gcloud run jobs execute selfserve-jobs-migrate \
+            --region "${{ secrets.GCP_REGION }}" \
+            --wait
 
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy selfserve-jobs-customer-api \
-            --image "${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/selfserve-jobs/customer-api:${{ github.sha }}" \
+            --image "$IMAGE" \
             --region "${{ secrets.GCP_REGION }}" \
             --platform managed \
             --allow-unauthenticated \
-            --port 8080
+            --port 8080 \
+            --set-env-vars "ENVIRONMENT=production" \
+            --set-env-vars "RUN_MIGRATIONS=false"

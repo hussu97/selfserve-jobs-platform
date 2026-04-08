@@ -143,7 +143,7 @@ gcloud storage buckets add-iam-policy-binding gs://$BUCKET_NAME \
 
 ## 6. Deploy the API (Cloud Run)
 
-> **Note:** Steps 6a, 6b, and 6c must all be run together for a full deployment. Pushing an image to Artifact Registry (6a) does **not** automatically update Cloud Run — step 6c is what actually deploys it. The GitHub Actions `deploy-api.yml` workflow runs all three steps automatically on every push to `main`.
+> **Note:** Steps 6a–6c are for the **initial / manual deploy only**. After this, the GitHub Actions `deploy-api.yml` workflow handles all three steps automatically on every push to `main`. Pushing an image to Artifact Registry alone does **not** trigger Cloud Run — step 6c is what actually deploys it.
 
 ### 6a. Build and push Docker image
 
@@ -166,7 +166,9 @@ gcloud builds submit selfserve-jobs-customer-api/ \
   --tag "${REGISTRY_LOCATION}/${PROJECT_ID}/${REPO_NAME}/${API_SERVICE_NAME}:latest"
 ```
 
-### 6b. Run Alembic migrations (before deploying new image)
+### 6b. Create the Alembic migration job (one-time setup)
+
+This creates a Cloud Run Job that the deploy workflow will execute before each deployment. You only need to create it once — subsequent deploys update the image automatically.
 
 ```bash
 gcloud run jobs create selfserve-jobs-migrate \
@@ -175,12 +177,11 @@ gcloud run jobs create selfserve-jobs-migrate \
   --service-account $SA_EMAIL \
   --set-cloudsql-instances $DB_CONNECTION_NAME \
   --set-env-vars "DATABASE_URL=postgresql+asyncpg://${DB_USER}:${DB_PASSWORD}@/${DB_NAME}?host=/cloudsql/${DB_CONNECTION_NAME}" \
-  --set-env-vars "RUN_MIGRATIONS=true" \
   --command "alembic" \
   --args "upgrade,head" \
   --max-retries=1
 
-# Execute the migration job
+# Run migrations for the first time
 gcloud run jobs execute selfserve-jobs-migrate --region $REGION --wait
 ```
 
