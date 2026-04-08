@@ -1,5 +1,9 @@
 # jobs4u — Claude Code Guidelines
 
+## Git Rules
+- **After every change, commit immediately** with an appropriate, descriptive message.
+- **Commit author:** Hussain Abbasi <h_abbasi97@hotmail.com> — do NOT add `Co-Authored-By` or any other author lines.
+
 ## Project Overview
 A free-to-use jobs platform with two core entities: **Jobs** (company listings) and **Profiles** (candidate listings). No signup/login — email verification prevents fraud. Desktop + responsive mobile web.
 
