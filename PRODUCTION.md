@@ -15,7 +15,7 @@ export DB_USER="selfserve_jobs_api"
 export DB_PASSWORD="your-secure-db-password"
 export BUCKET_NAME="selfserve-jobs-resumes"
 export API_SERVICE_NAME="selfserve-jobs-customer-api"
-export WEB_DOMAIN="yourdomain.com"
+export FRONTEND_URL="https://yourdomain.com"
 export RESEND_API_KEY="re_your_resend_api_key"
 export REPO_NAME="selfserve-jobs-platform"
 export REGISTRY_LOCATION="${REGION}-docker.pkg.dev"
@@ -196,7 +196,7 @@ gcloud run deploy $API_SERVICE_NAME \
   --set-env-vars "DATABASE_URL=postgresql+asyncpg://${DB_USER}:${DB_PASSWORD}@/${DB_NAME}?host=/cloudsql/${DB_CONNECTION_NAME}" \
   --set-env-vars "GCS_BUCKET_NAME=${BUCKET_NAME}" \
   --set-env-vars "RESEND_API_KEY=${RESEND_API_KEY}" \
-  --set-env-vars "FRONTEND_URL=https://${WEB_DOMAIN}" \
+  --set-env-vars "FRONTEND_URL=${FRONTEND_URL}" \
   --set-env-vars "ENVIRONMENT=production" \
   --min-instances=0 \
   --max-instances=10 \
@@ -249,12 +249,12 @@ From now on, every push to `main` that touches `selfserve-jobs-customer-web/` wi
 ```bash
 gcloud run domain-mappings create \
   --service $API_SERVICE_NAME \
-  --domain api.${WEB_DOMAIN} \
+  --domain api.${FRONTEND_URL#https://} \
   --region $REGION
 
 # Get DNS records to configure
 gcloud run domain-mappings describe \
-  --domain api.${WEB_DOMAIN} \
+  --domain api.${FRONTEND_URL#https://} \
   --region $REGION
 ```
 
@@ -262,7 +262,7 @@ Update the FRONTEND_URL in Cloud Run to use the custom domain:
 ```bash
 gcloud run services update $API_SERVICE_NAME \
   --region $REGION \
-  --update-env-vars "FRONTEND_URL=https://${WEB_DOMAIN}"
+  --update-env-vars "FRONTEND_URL=${FRONTEND_URL}"
 ```
 
 ## 10. GitHub Actions Secrets
