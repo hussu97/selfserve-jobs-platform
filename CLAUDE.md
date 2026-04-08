@@ -66,8 +66,8 @@ A free-to-use jobs platform with two core entities: **Jobs** (company listings) 
 **Design principles:** Minimalistic, lightweight, easy to browse. No generic AI aesthetics. Subtle earth textures/tones only.
 
 ## Deployment Architecture
-- **Frontend (Vercel):** Root directory = `frontend/`, env: `NEXT_PUBLIC_API_URL`
-- **Backend (Cloud Run):** Docker image from `backend/`, port 8080, scale-to-zero
+- **Frontend (Vercel):** Root directory = `selfserve-jobs-customer-web/`, env: `NEXT_PUBLIC_API_URL`
+- **Backend (Cloud Run):** Docker image from `selfserve-jobs-customer-api/`, port 8080, scale-to-zero
 - **Database (CloudSQL):** PostgreSQL 16, connected via Cloud SQL connector
 - **Storage (GCS):** Bucket `jobs4u-resumes`, paths: `resumes/{profile_code}/{nanoid}.pdf`
 - **Alembic migrations:** Run as separate Cloud Run job before deploy, never on app startup

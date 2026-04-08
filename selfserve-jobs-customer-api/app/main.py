@@ -20,7 +20,7 @@ settings = get_settings()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Startup and shutdown lifecycle manager."""
-    logger.info("Starting jobs4u backend (environment: %s)", settings.environment)
+    logger.info("Starting selfserve-jobs-customer-api (environment: %s)", settings.environment)
 
     if settings.run_migrations:
         logger.info("RUN_MIGRATIONS=true — running Alembic migrations...")
@@ -40,11 +40,11 @@ async def lifespan(app: FastAPI):
 
     yield
 
-    logger.info("Shutting down jobs4u backend")
+    logger.info("Shutting down selfserve-jobs-customer-api")
 
 
 app = FastAPI(
-    title="jobs4u API",
+    title="selfserve-jobs-customer-api",
     description="Self-serve jobs platform API — post jobs and profiles without registration",
     version="1.0.0",
     lifespan=lifespan,
@@ -84,4 +84,4 @@ async def health_check():
 
 @app.get("/", include_in_schema=False)
 async def root():
-    return JSONResponse(content={"service": "jobs4u-api", "status": "running"})
+    return JSONResponse(content={"service": "selfserve-jobs-customer-api", "status": "running"})

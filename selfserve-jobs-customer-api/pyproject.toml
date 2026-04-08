@@ -1,7 +1,7 @@
 [project]
-name = "jobs4u-backend"
+name = "selfserve-jobs-customer-api"
 version = "0.1.0"
-description = "Backend API for jobs4u platform"
+description = "Self-serve jobs customer API"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.115",

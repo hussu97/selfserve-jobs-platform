@@ -21,7 +21,7 @@ class VerificationResponse(BaseModel):
 class ResendVerificationRequest(BaseModel):
     """
     Frontend sends { email, entity_type } to POST /verify/resend.
-    entity_code is optional — when missing the backend will look up pending
+    entity_code is optional — when missing the API will look up pending
     entities for the given email + entity_type.
     """
     entity_type: Literal["job", "profile"]
