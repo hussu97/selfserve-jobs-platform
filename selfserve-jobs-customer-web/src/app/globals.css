@@ -1,6 +1,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
 @import "tailwindcss";
 
+@theme {
+  --color-primary: #C2703E;
+  --color-primary-hover: #a85c30;
+  --color-secondary: #2D5F3A;
+  --color-secondary-hover: #234a2d;
+  --color-bg: #FAF7F2;
+  --color-surface: #F0EBE1;
+  --color-text-main: #2C2825;
+  --color-text-muted: #7A7067;
+  --color-accent: #8BA888;
+  --color-accent-dark: #4a7547;
+  --color-border: #DDD5C8;
+  --font-sans: 'Inter', sans-serif;
+  --font-heading: 'Lora', serif;
+}
+
 :root {
   --color-primary: #C2703E;
   --color-secondary: #2D5F3A;
@@ -135,6 +151,12 @@ a {
   border: none;
   border-top: 1px solid var(--color-border);
   margin: 1.5em 0;
+}
+
+/* Accent color for form controls */
+input[type="radio"],
+input[type="checkbox"] {
+  accent-color: var(--color-primary);
 }
 
 /* Focus ring */
