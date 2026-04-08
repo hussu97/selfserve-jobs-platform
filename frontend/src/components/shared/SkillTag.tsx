@@ -1,0 +1,36 @@
+import { cn } from '@/lib/utils';
+
+interface SkillTagProps {
+  skill: string;
+  removable?: boolean;
+  onRemove?: (skill: string) => void;
+  className?: string;
+  size?: 'sm' | 'md';
+}
+
+export function SkillTag({ skill, removable = false, onRemove, className, size = 'sm' }: SkillTagProps) {
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center gap-1 rounded-full font-medium',
+        'bg-[#8BA888]/15 text-[#4a7547] border border-[#8BA888]/30',
+        size === 'sm' ? 'px-2 py-0.5 text-xs' : 'px-3 py-1 text-sm',
+        className
+      )}
+    >
+      {skill}
+      {removable && onRemove && (
+        <button
+          type="button"
+          onClick={() => onRemove(skill)}
+          className="ml-0.5 rounded-full hover:bg-[#8BA888]/30 transition-colors p-0.5 cursor-pointer"
+          aria-label={`Remove ${skill}`}
+        >
+          <svg className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+          </svg>
+        </button>
+      )}
+    </span>
+  );
+}

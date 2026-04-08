@@ -1,0 +1,39 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: jobs4u
+      POSTGRES_PASSWORD: jobs4u_dev
+      POSTGRES_DB: jobs4u
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jobs4u"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://jobs4u:jobs4u_dev@db:5432/jobs4u
+      FRONTEND_URL: http://localhost:3000
+      GCS_BUCKET_NAME: jobs4u-resumes-dev
+      RESEND_API_KEY: ""
+      ENVIRONMENT: development
+      RUN_MIGRATIONS: "true"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend/app:/app/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8080 --reload
+
+volumes:
+  postgres_data:

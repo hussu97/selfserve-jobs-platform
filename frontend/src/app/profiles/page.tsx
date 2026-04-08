@@ -1,0 +1,225 @@
+'use client';
+
+import { Suspense, useState, useEffect, useCallback, useRef } from 'react';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import { ProfileCard } from '@/components/profiles/ProfileCard';
+import { ProfileFilters } from '@/components/profiles/ProfileFilters';
+import { SearchBar } from '@/components/shared/SearchBar';
+import { Pagination } from '@/components/shared/Pagination';
+import { Spinner } from '@/components/ui/Spinner';
+import { getProfiles } from '@/lib/api';
+import type { ProfileFilters as ProfileFiltersType, ProfileListItem, RelocationPreference } from '@/lib/types';
+import { ITEMS_PER_PAGE } from '@/lib/constants';
+
+function parseFiltersFromParams(searchParams: URLSearchParams): ProfileFiltersType {
+  const filters: ProfileFiltersType = {};
+  const search = searchParams.get('search');
+  const country = searchParams.get('country');
+  const sort = searchParams.get('sort') as ProfileFiltersType['sort'];
+  const page = searchParams.get('page');
+  const min_experience = searchParams.get('min_experience');
+  const max_experience = searchParams.get('max_experience');
+  const relocation_preference = searchParams.get('relocation_preference') as RelocationPreference | null;
+  const skills = searchParams.getAll('skills');
+
+  if (search) filters.search = search;
+  if (country) filters.country = country;
+  if (sort) filters.sort = sort;
+  if (page) filters.page = parseInt(page);
+  if (min_experience) filters.min_experience = parseInt(min_experience);
+  if (max_experience) filters.max_experience = parseInt(max_experience);
+  if (relocation_preference) filters.relocation_preference = relocation_preference;
+  if (skills.length) filters.skills = skills;
+
+  return filters;
+}
+
+function filtersToParams(filters: ProfileFiltersType): URLSearchParams {
+  const params = new URLSearchParams();
+  if (filters.search) params.set('search', filters.search);
+  if (filters.country) params.set('country', filters.country);
+  if (filters.sort && filters.sort !== 'newest') params.set('sort', filters.sort);
+  if (filters.page && filters.page > 1) params.set('page', String(filters.page));
+  if (filters.min_experience !== undefined) params.set('min_experience', String(filters.min_experience));
+  if (filters.max_experience !== undefined) params.set('max_experience', String(filters.max_experience));
+  if (filters.relocation_preference) params.set('relocation_preference', filters.relocation_preference);
+  filters.skills?.forEach((s) => params.append('skills', s));
+  return params;
+}
+
+export default function ProfilesPage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center py-20"><span style={{ color: 'var(--color-text-muted)' }}>Loading…</span></div>}>
+      <ProfilesContent />
+    </Suspense>
+  );
+}
+
+function ProfilesContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const [filters, setFilters] = useState<ProfileFiltersType>(() =>
+    parseFiltersFromParams(searchParams)
+  );
+  const [profiles, setProfiles] = useState<ProfileListItem[]>([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchProfiles = useCallback(async (f: ProfileFiltersType) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await getProfiles({ ...f, per_page: ITEMS_PER_PAGE });
+      setProfiles(result.items);
+      setTotalPages(result.total_pages);
+      setTotal(result.total);
+    } catch {
+      setError('Failed to load profiles. Please try again.');
+      setProfiles([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const applyFilters = useCallback(
+    (newFilters: ProfileFiltersType) => {
+      setFilters(newFilters);
+      const params = filtersToParams(newFilters);
+      const qs = params.toString();
+      router.replace(`${pathname}${qs ? `?${qs}` : ''}`, { scroll: false });
+      fetchProfiles(newFilters);
+    },
+    [router, pathname, fetchProfiles]
+  );
+
+  useEffect(() => {
+    fetchProfiles(filters);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleSearchChange = (value: string) => {
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+    searchTimerRef.current = setTimeout(() => {
+      applyFilters({ ...filters, search: value || undefined, page: 1 });
+    }, 350);
+    setFilters((prev) => ({ ...prev, search: value || undefined }));
+  };
+
+  const handleFiltersChange = (newFilters: ProfileFiltersType) => {
+    applyFilters(newFilters);
+  };
+
+  const handlePageChange = (page: number) => {
+    applyFilters({ ...filters, page });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      {/* Page header */}
+      <div className="mb-8">
+        <h1
+          className="text-3xl sm:text-4xl font-bold mb-2"
+          style={{ fontFamily: 'Lora, serif', color: 'var(--color-secondary)' }}
+        >
+          Browse Talent
+        </h1>
+        <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+          {loading ? 'Loading…' : `${total.toLocaleString()} profile${total !== 1 ? 's' : ''} found`}
+        </p>
+      </div>
+
+      {/* Search */}
+      <div className="mb-6">
+        <SearchBar
+          value={filters.search ?? ''}
+          onChange={handleSearchChange}
+          placeholder="Search by name, title, or skill…"
+        />
+      </div>
+
+      <div className="flex gap-8">
+        {/* Sidebar */}
+        <aside className="w-64 flex-shrink-0">
+          <ProfileFilters filters={filters} onChange={handleFiltersChange} />
+        </aside>
+
+        {/* Main content */}
+        <div className="flex-1 min-w-0">
+          {error && (
+            <div
+              className="mb-6 rounded-xl border p-4 text-sm"
+              style={{ borderColor: '#FCA5A5', backgroundColor: '#FEF2F2', color: '#DC2626' }}
+            >
+              {error}
+            </div>
+          )}
+
+          {loading ? (
+            <div className="flex items-center justify-center py-24">
+              <div className="flex flex-col items-center gap-3">
+                <Spinner size="lg" />
+                <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                  Loading profiles…
+                </p>
+              </div>
+            </div>
+          ) : profiles.length === 0 ? (
+            <div
+              className="text-center py-20 rounded-2xl border"
+              style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-surface)' }}
+            >
+              <svg
+                className="h-12 w-12 mx-auto mb-4"
+                style={{ color: 'var(--color-border)' }}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              <h3
+                className="text-lg font-semibold mb-2"
+                style={{ fontFamily: 'Lora, serif', color: 'var(--color-text)' }}
+              >
+                No profiles found
+              </h3>
+              <p className="text-sm mb-4" style={{ color: 'var(--color-text-muted)' }}>
+                Try adjusting your search or removing some filters.
+              </p>
+              <button
+                onClick={() => applyFilters({ page: 1 })}
+                className="text-sm font-medium hover:opacity-70"
+                style={{ color: 'var(--color-primary)' }}
+              >
+                Clear all filters
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+                {profiles.map((profile) => (
+                  <ProfileCard key={profile.code} profile={profile} />
+                ))}
+              </div>
+
+              <div className="mt-10">
+                <Pagination
+                  page={filters.page ?? 1}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,240 @@
+import logging
+import math
+from datetime import date, datetime, timedelta, timezone
+from typing import Optional
+
+from fastapi import HTTPException, status
+from sqlalchemy import and_, func, or_, select, text, update
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.models.job import Job
+from app.schemas.job import JobCreate, JobUpdate
+from app.services.code_generator import generate_code, generate_token
+
+logger = logging.getLogger(__name__)
+
+JOB_EXPIRY_DAYS = 60
+MAX_ACTIVE_JOBS_PER_EMAIL = 5
+
+
+async def get_active_job_count_for_email(db: AsyncSession, email: str) -> int:
+    result = await db.execute(
+        select(func.count(Job.id)).where(
+            and_(
+                Job.email == email,
+                Job.status.in_(["active", "pending_verification"]),
+            )
+        )
+    )
+    return result.scalar_one()
+
+
+async def create_job(db: AsyncSession, data: JobCreate) -> Job:
+    """Create a new job listing."""
+    # Rate limit check
+    active_count = await get_active_job_count_for_email(db, data.email)
+    if active_count >= MAX_ACTIVE_JOBS_PER_EMAIL:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=f"Maximum of {MAX_ACTIVE_JOBS_PER_EMAIL} active job listings per email address.",
+        )
+
+    now = datetime.now(timezone.utc)
+    job = Job(
+        job_code=generate_code(12),
+        email=data.email,
+        email_verified=False,
+        job_title=data.job_title,
+        company_name=data.company_name,
+        company_city=data.company_city,
+        company_country=data.company_country,
+        employment_type=data.employment_type,
+        deadline_date=data.deadline_date,
+        description=data.description,
+        key_skills=data.key_skills or [],
+        contact_method=data.contact_method,
+        contact_email=str(data.contact_email) if data.contact_email else None,
+        contact_url=data.contact_url,
+        status="pending_verification",
+        view_count=0,
+        expires_at=now + timedelta(days=JOB_EXPIRY_DAYS),
+        edit_token=generate_token(64),
+        created_at=now,
+        updated_at=now,
+    )
+    db.add(job)
+    await db.flush()
+    return job
+
+
+async def get_job_by_code(db: AsyncSession, job_code: str) -> Job:
+    """Get a job by its public code."""
+    result = await db.execute(select(Job).where(Job.job_code == job_code))
+    job = result.scalar_one_or_none()
+    if not job:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
+    return job
+
+
+async def get_job_by_code_and_token(db: AsyncSession, job_code: str, edit_token: str) -> Job:
+    """Get a job ensuring the edit token matches."""
+    result = await db.execute(
+        select(Job).where(
+            and_(Job.job_code == job_code, Job.edit_token == edit_token)
+        )
+    )
+    job = result.scalar_one_or_none()
+    if not job:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Invalid edit token or job not found",
+        )
+    return job
+
+
+async def increment_view_count(db: AsyncSession, job_code: str) -> None:
+    """Atomically increment view count."""
+    await db.execute(
+        update(Job).where(Job.job_code == job_code).values(view_count=Job.view_count + 1)
+    )
+
+
+async def get_job_detail(db: AsyncSession, job_code: str) -> Job:
+    """Get job detail and increment view count automatically."""
+    job = await get_job_by_code(db, job_code)
+    if job.status not in ("active", "pending_verification"):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
+    await increment_view_count(db, job_code)
+    return job
+
+
+async def list_jobs(
+    db: AsyncSession,
+    page: int = 1,
+    per_page: int = 20,
+    q: Optional[str] = None,
+    country: Optional[str] = None,
+    city: Optional[str] = None,
+    employment_type: Optional[str | list[str]] = None,
+    skills: Optional[list[str]] = None,
+    sort: str = "newest",
+) -> dict:
+    """List active jobs with filtering and pagination."""
+    per_page = min(per_page, 50)
+
+    filters = [Job.status == "active"]
+
+    if q:
+        # Full-text search using PostgreSQL tsvector
+        ts_query = func.plainto_tsquery("english", q)
+        ts_vector = func.to_tsvector(
+            "english",
+            func.concat_ws(" ", Job.job_title, Job.company_name, Job.description),
+        )
+        filters.append(ts_vector.op("@@")(ts_query))
+
+    if country:
+        filters.append(func.lower(Job.company_country) == country.lower())
+
+    if city:
+        filters.append(func.lower(Job.company_city) == city.lower())
+
+    if employment_type:
+        # Accept both a single string and a list (multi-select from frontend)
+        if isinstance(employment_type, list):
+            if len(employment_type) == 1:
+                filters.append(Job.employment_type == employment_type[0])
+            elif len(employment_type) > 1:
+                filters.append(Job.employment_type.in_(employment_type))
+        else:
+            filters.append(Job.employment_type == employment_type)
+
+    if skills:
+        for skill in skills:
+            filters.append(Job.key_skills.contains([skill]))
+
+    base_query = select(Job).where(and_(*filters))
+
+    # Count total
+    count_query = select(func.count()).select_from(base_query.subquery())
+    total_result = await db.execute(count_query)
+    total = total_result.scalar_one()
+
+    # Sort
+    if sort == "oldest":
+        base_query = base_query.order_by(Job.created_at.asc())
+    elif sort == "deadline":
+        base_query = base_query.order_by(Job.deadline_date.asc().nulls_last())
+    else:  # newest
+        base_query = base_query.order_by(Job.created_at.desc())
+
+    # Paginate
+    offset = (page - 1) * per_page
+    base_query = base_query.offset(offset).limit(per_page)
+
+    result = await db.execute(base_query)
+    jobs = result.scalars().all()
+
+    total_pages = math.ceil(total / per_page) if total > 0 else 1
+
+    return {
+        "items": jobs,
+        "total": total,
+        "page": page,
+        "per_page": per_page,
+        "total_pages": total_pages,
+    }
+
+
+async def update_job(
+    db: AsyncSession,
+    job_code: str,
+    edit_token: str,
+    data: JobUpdate,
+) -> Job:
+    """Update a job listing."""
+    job = await get_job_by_code_and_token(db, job_code, edit_token)
+
+    if job.status == "removed":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot edit a removed listing",
+        )
+
+    update_data = data.model_dump(exclude_unset=True)
+    if "contact_email" in update_data and update_data["contact_email"]:
+        update_data["contact_email"] = str(update_data["contact_email"])
+
+    for field, value in update_data.items():
+        setattr(job, field, value)
+
+    job.updated_at = datetime.now(timezone.utc)
+    await db.flush()
+    return job
+
+
+async def remove_job(
+    db: AsyncSession,
+    job_code: str,
+    edit_token: str,
+) -> Job:
+    """Soft-delete a job listing."""
+    job = await get_job_by_code_and_token(db, job_code, edit_token)
+    job.status = "removed"
+    job.updated_at = datetime.now(timezone.utc)
+    await db.flush()
+    return job
+
+
+async def validate_token(
+    db: AsyncSession,
+    entity_code: str,
+    token: str,
+) -> bool:
+    """Check if an edit token is valid for a job."""
+    result = await db.execute(
+        select(Job).where(
+            and_(Job.job_code == entity_code, Job.edit_token == token)
+        )
+    )
+    return result.scalar_one_or_none() is not None

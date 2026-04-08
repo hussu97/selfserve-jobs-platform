@@ -1,0 +1,51 @@
+from datetime import datetime
+
+from sqlalchemy import (
+    BigInteger,
+    Boolean,
+    Date,
+    Index,
+    Integer,
+    Text,
+    VARCHAR,
+    func,
+)
+from sqlalchemy.dialects.postgresql import JSONB, TIMESTAMPTZ
+from sqlalchemy.orm import Mapped, mapped_column
+
+from app.database import Base
+
+
+class Job(Base):
+    __tablename__ = "job"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    job_code: Mapped[str] = mapped_column(VARCHAR(12), unique=True, nullable=False, index=True)
+    email: Mapped[str] = mapped_column(VARCHAR(320), nullable=False)
+    email_verified: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    job_title: Mapped[str] = mapped_column(VARCHAR(200), nullable=False)
+    company_name: Mapped[str] = mapped_column(VARCHAR(200), nullable=False)
+    company_city: Mapped[str] = mapped_column(VARCHAR(100), nullable=False)
+    company_country: Mapped[str] = mapped_column(VARCHAR(100), nullable=False, index=True)
+    employment_type: Mapped[str] = mapped_column(VARCHAR(20), nullable=False, index=True)
+    deadline_date: Mapped[datetime | None] = mapped_column(Date, nullable=True)
+    description: Mapped[str] = mapped_column(Text, nullable=False)
+    key_skills: Mapped[list] = mapped_column(JSONB, default=list, nullable=False, server_default="[]")
+    contact_method: Mapped[str] = mapped_column(VARCHAR(10), nullable=False)
+    contact_email: Mapped[str | None] = mapped_column(VARCHAR(320), nullable=True)
+    contact_url: Mapped[str | None] = mapped_column(VARCHAR(2048), nullable=True)
+    status: Mapped[str] = mapped_column(VARCHAR(20), default="pending_verification", nullable=False)
+    view_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(TIMESTAMPTZ, nullable=False)
+    edit_token: Mapped[str] = mapped_column(VARCHAR(64), unique=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMPTZ, nullable=False, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        TIMESTAMPTZ, nullable=False, server_default=func.now(), onupdate=func.now()
+    )
+
+    __table_args__ = (
+        Index("ix_job_status_created_at", "status", "created_at"),
+        Index("ix_job_key_skills_gin", "key_skills", postgresql_using="gin"),
+    )

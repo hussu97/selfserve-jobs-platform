@@ -1,0 +1,262 @@
+'use client';
+
+import { Suspense, useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import { Spinner } from '@/components/ui/Spinner';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { StatusBanner } from '@/components/shared/StatusBanner';
+import { verifyEmail, resendVerification } from '@/lib/api';
+import type { VerificationResponse } from '@/lib/types';
+
+type VerifyState = 'idle' | 'loading' | 'success' | 'error' | 'no_code';
+
+export default function VerifyPage() {
+  return (
+    <Suspense fallback={
+      <div className="max-w-lg mx-auto px-4 sm:px-6 py-20 text-center">
+        <Spinner size="lg" className="mx-auto mb-4" />
+        <p className="text-base font-medium" style={{ color: 'var(--color-text)' }}>Loading…</p>
+      </div>
+    }>
+      <VerifyContent />
+    </Suspense>
+  );
+}
+
+function VerifyContent() {
+  const searchParams = useSearchParams();
+  const code = searchParams.get('code');
+
+  const [state, setState] = useState<VerifyState>('idle');
+  const [result, setResult] = useState<VerificationResponse | null>(null);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  // Resend form state
+  const [resendEmail, setResendEmail] = useState('');
+  const [resendEntityType, setResendEntityType] = useState<'jobs' | 'profiles'>('jobs');
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendMessage, setResendMessage] = useState('');
+  const [resendError, setResendError] = useState('');
+
+  const hasRun = useRef(false);
+
+  useEffect(() => {
+    if (hasRun.current) return;
+    hasRun.current = true;
+
+    if (!code) {
+      setState('no_code');
+      return;
+    }
+
+    setState('loading');
+    verifyEmail(code)
+      .then((res) => {
+        setResult(res);
+        setState('success');
+      })
+      .catch((err) => {
+        const msg = err instanceof Error ? err.message : 'Verification failed.';
+        setErrorMessage(msg);
+        setState('error');
+      });
+  }, [code]);
+
+  const handleResend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!resendEmail.trim()) return;
+    setResendLoading(true);
+    setResendError('');
+    setResendMessage('');
+    try {
+      const res = await resendVerification(resendEmail.trim(), resendEntityType);
+      setResendMessage(res.message || 'Verification email sent. Check your inbox.');
+    } catch (err) {
+      setResendError(err instanceof Error ? err.message : 'Failed to resend. Please try again.');
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
+  if (state === 'no_code') {
+    return (
+      <div className="max-w-lg mx-auto px-4 sm:px-6 py-20 text-center">
+        <div
+          className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5"
+          style={{ backgroundColor: 'var(--color-surface)' }}
+        >
+          <svg className="h-8 w-8" style={{ color: 'var(--color-text-muted)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <h1
+          className="text-2xl font-bold mb-3"
+          style={{ fontFamily: 'Lora, serif', color: 'var(--color-secondary)' }}
+        >
+          Check your email
+        </h1>
+        <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+          No verification code found. Check your email for the verification link we sent when you created your listing.
+        </p>
+        <Link
+          href="/"
+          className="mt-6 inline-block text-sm font-medium hover:opacity-70"
+          style={{ color: 'var(--color-primary)' }}
+        >
+          ← Back to home
+        </Link>
+      </div>
+    );
+  }
+
+  if (state === 'loading' || state === 'idle') {
+    return (
+      <div className="max-w-lg mx-auto px-4 sm:px-6 py-20 text-center">
+        <Spinner size="lg" className="mx-auto mb-4" />
+        <p className="text-base font-medium" style={{ color: 'var(--color-text)' }}>
+          Verifying your email…
+        </p>
+        <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+          Just a moment
+        </p>
+      </div>
+    );
+  }
+
+  if (state === 'success' && result) {
+    const listingHref =
+      result.entity_type && result.code
+        ? `/${result.entity_type}/${result.code}`
+        : null;
+
+    return (
+      <div className="max-w-lg mx-auto px-4 sm:px-6 py-20 text-center">
+        <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-5">
+          <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <h1
+          className="text-2xl font-bold mb-3"
+          style={{ fontFamily: 'Lora, serif', color: 'var(--color-secondary)' }}
+        >
+          Your listing is now live!
+        </h1>
+        <p className="text-sm mb-8" style={{ color: 'var(--color-text-muted)' }}>
+          {result.message || 'Your listing has been verified and published successfully.'}
+        </p>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          {listingHref && (
+            <Link
+              href={listingHref}
+              className="inline-flex items-center justify-center px-6 py-3 rounded-xl text-white font-semibold transition-opacity hover:opacity-90"
+              style={{ backgroundColor: 'var(--color-primary)' }}
+            >
+              View your listing →
+            </Link>
+          )}
+          <Link
+            href="/"
+            className="inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold border-2 transition-colors hover:bg-[#2D5F3A] hover:text-white"
+            style={{ borderColor: 'var(--color-secondary)', color: 'var(--color-secondary)' }}
+          >
+            Back to home
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  return (
+    <div className="max-w-lg mx-auto px-4 sm:px-6 py-16">
+      <div className="text-center mb-10">
+        <div
+          className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5"
+          style={{ backgroundColor: '#FEF9C3' }}
+        >
+          <svg className="h-8 w-8 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <h1
+          className="text-2xl font-bold mb-3"
+          style={{ fontFamily: 'Lora, serif', color: 'var(--color-secondary)' }}
+        >
+          Verification link expired
+        </h1>
+        <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+          {errorMessage || 'This verification link has expired or is invalid.'}
+        </p>
+      </div>
+
+      {/* Resend form */}
+      <div
+        className="rounded-2xl border p-6"
+        style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
+      >
+        <h2
+          className="font-semibold text-lg mb-1"
+          style={{ fontFamily: 'Lora, serif', color: 'var(--color-text)' }}
+        >
+          Resend Verification Email
+        </h2>
+        <p className="text-sm mb-5" style={{ color: 'var(--color-text-muted)' }}>
+          Enter the email address you used when creating your listing.
+        </p>
+
+        {resendMessage && (
+          <StatusBanner type="success" message={resendMessage} className="mb-4" />
+        )}
+        {resendError && (
+          <StatusBanner type="error" message={resendError} className="mb-4" />
+        )}
+
+        <form onSubmit={handleResend} className="flex flex-col gap-4">
+          <Input
+            type="email"
+            label="Email address"
+            placeholder="you@example.com"
+            value={resendEmail}
+            onChange={(e) => setResendEmail(e.target.value)}
+            required
+          />
+          <div className="flex flex-col gap-1.5">
+            <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
+              Listing type
+            </p>
+            <div className="flex gap-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="entity_type"
+                  value="jobs"
+                  checked={resendEntityType === 'jobs'}
+                  onChange={() => setResendEntityType('jobs')}
+                  style={{ accentColor: '#C2703E' }}
+                />
+                <span className="text-sm" style={{ color: 'var(--color-text)' }}>Job listing</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="entity_type"
+                  value="profiles"
+                  checked={resendEntityType === 'profiles'}
+                  onChange={() => setResendEntityType('profiles')}
+                  style={{ accentColor: '#C2703E' }}
+                />
+                <span className="text-sm" style={{ color: 'var(--color-text)' }}>Talent profile</span>
+              </label>
+            </div>
+          </div>
+          <Button type="submit" loading={resendLoading} className="self-start">
+            Send verification email
+          </Button>
+        </form>
+      </div>
+    </div>
+  );
+}
