@@ -37,7 +37,7 @@ jobs:
       - name: Run tests
         run: uv run pytest tests/ -v --tb=short
         env:
-          DATABASE_URL: sqlite+aiosqlite:///:memory:
+          DATABASE_URL: "sqlite+aiosqlite:///:memory:"
           ENVIRONMENT: test
           FRONTEND_URL: http://localhost:3000
           GCS_BUCKET_NAME: test-bucket
