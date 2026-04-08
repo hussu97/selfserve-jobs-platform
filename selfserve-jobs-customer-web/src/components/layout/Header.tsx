@@ -17,20 +17,13 @@ export function Header() {
 
   return (
     <>
-      <header
-        className="sticky top-0 z-30 border-b backdrop-blur-md"
-        style={{
-          backgroundColor: 'rgba(250, 247, 242, 0.92)',
-          borderColor: 'var(--color-border)',
-        }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <header className="sticky top-0 z-30 border-b border-border backdrop-blur-md bg-bg/92">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link
               href="/"
-              className="flex items-center gap-2 font-bold text-2xl tracking-tight hover:opacity-80 transition-opacity"
-              style={{ fontFamily: 'Lora, serif', color: 'var(--color-secondary)' }}
+              className="flex items-center gap-2 font-bold text-2xl tracking-tight hover:opacity-80 transition-opacity font-heading text-secondary"
             >
               jobs4u
             </Link>
@@ -46,10 +39,9 @@ export function Header() {
                     className={cn(
                       'px-4 py-2 text-sm font-medium rounded-lg transition-colors',
                       isActive
-                        ? 'bg-[#C2703E]/10 text-[#C2703E]'
-                        : 'hover:bg-[#F0EBE1]'
+                        ? 'bg-primary/10 text-primary'
+                        : 'hover:bg-surface text-text-main'
                     )}
-                    style={!isActive ? { color: 'var(--color-text)' } : undefined}
                   >
                     {link.label}
                   </Link>
@@ -61,18 +53,13 @@ export function Header() {
             <div className="hidden md:flex items-center gap-2">
               <Link
                 href="/jobs/new"
-                className="px-4 py-2 text-sm font-medium rounded-lg border transition-all hover:bg-[#C2703E] hover:text-white hover:border-[#C2703E]"
-                style={{
-                  borderColor: 'var(--color-border)',
-                  color: 'var(--color-text)',
-                }}
+                className="px-4 py-2 text-sm font-medium rounded-lg border border-border text-text-main transition-all hover:bg-primary hover:text-white hover:border-primary"
               >
                 Post a Job
               </Link>
               <Link
                 href="/profiles/new"
-                className="px-4 py-2 text-sm font-medium rounded-lg text-white transition-all hover:opacity-90"
-                style={{ backgroundColor: 'var(--color-primary)' }}
+                className="px-4 py-2 text-sm font-medium rounded-lg text-white bg-primary transition-all hover:opacity-90"
               >
                 Create Profile
               </Link>
@@ -80,8 +67,7 @@ export function Header() {
 
             {/* Mobile Hamburger */}
             <button
-              className="md:hidden p-2 rounded-lg transition-colors"
-              style={{ color: 'var(--color-text)' }}
+              className="md:hidden p-2 rounded-lg transition-colors text-text-main"
               onClick={() => setMobileOpen(true)}
               aria-label="Open menu"
             >

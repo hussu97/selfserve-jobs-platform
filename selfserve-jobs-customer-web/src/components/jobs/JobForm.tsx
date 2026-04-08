@@ -92,10 +92,10 @@ export function JobForm({ onSuccess }: JobFormProps) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h2 className="text-2xl mb-2" style={{ fontFamily: 'Lora, serif', color: 'var(--color-secondary)' }}>
+        <h2 className="text-2xl mb-2 text-secondary">
           Job posted!
         </h2>
-        <p className="mb-6 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+        <p className="mb-6 text-sm text-text-muted">
           Check your email and click the verification link to publish your listing. It won&apos;t appear publicly until verified.
         </p>
         <StatusBanner
@@ -117,8 +117,8 @@ export function JobForm({ onSuccess }: JobFormProps) {
       )}
 
       {/* Contact email for verification */}
-      <div className="p-4 rounded-xl border" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
-        <p className="text-sm font-medium mb-3" style={{ color: 'var(--color-text)' }}>
+      <div className="p-4 rounded-xl border border-border bg-surface">
+        <p className="text-sm font-medium mb-3 text-text-main">
           Your email (for verification & management)
         </p>
         <Input
@@ -133,7 +133,7 @@ export function JobForm({ onSuccess }: JobFormProps) {
 
       {/* Job Details */}
       <div className="flex flex-col gap-4">
-        <h3 className="font-semibold" style={{ color: 'var(--color-text)', fontFamily: 'Lora, serif' }}>
+        <h3 className="font-semibold text-text-main">
           Job details
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -203,8 +203,8 @@ export function JobForm({ onSuccess }: JobFormProps) {
 
       {/* Skills */}
       <div className="flex flex-col gap-2">
-        <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
-          Key skills <span style={{ color: 'var(--color-primary)' }}>*</span>
+        <p className="text-sm font-medium text-text-main">
+          Key skills <span className="text-primary">*</span>
         </p>
         <div className="flex gap-2">
           <input
@@ -218,8 +218,7 @@ export function JobForm({ onSuccess }: JobFormProps) {
               }
             }}
             placeholder="Type a skill and press Enter"
-            className="flex-1 rounded-lg border border-[#DDD5C8] bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C2703E] focus:border-transparent"
-            style={{ color: 'var(--color-text)' }}
+            className="flex-1 rounded-lg border border-border bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-text-main"
           />
           <Button type="button" variant="outline" size="md" onClick={() => addSkill(skillInput)}>
             Add
@@ -227,7 +226,7 @@ export function JobForm({ onSuccess }: JobFormProps) {
         </div>
         {errors.key_skills && <p className="text-xs text-red-600">{errors.key_skills}</p>}
         {(form.key_skills?.length ?? 0) > 0 && (
-          <div className="flex flex-wrap gap-2 p-3 rounded-lg border" style={{ borderColor: 'var(--color-border)' }}>
+          <div className="flex flex-wrap gap-2 p-3 rounded-lg border border-border">
             {form.key_skills?.map((skill) => (
               <SkillTag key={skill} skill={skill} removable onRemove={removeSkill} size="md" />
             ))}
@@ -237,7 +236,7 @@ export function JobForm({ onSuccess }: JobFormProps) {
 
       {/* Contact */}
       <div className="flex flex-col gap-3">
-        <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
+        <p className="text-sm font-medium text-text-main">
           How should candidates apply?
         </p>
         <div className="flex gap-4">
@@ -248,9 +247,8 @@ export function JobForm({ onSuccess }: JobFormProps) {
               value="email"
               checked={form.contact_method === 'email'}
               onChange={() => set('contact_method', 'email')}
-              style={{ accentColor: '#C2703E' }}
             />
-            <span className="text-sm" style={{ color: 'var(--color-text)' }}>Via email</span>
+            <span className="text-sm text-text-main">Via email</span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer">
             <input
@@ -259,9 +257,8 @@ export function JobForm({ onSuccess }: JobFormProps) {
               value="url"
               checked={form.contact_method === 'url'}
               onChange={() => set('contact_method', 'url')}
-              style={{ accentColor: '#C2703E' }}
             />
-            <span className="text-sm" style={{ color: 'var(--color-text)' }}>Via application URL</span>
+            <span className="text-sm text-text-main">Via application URL</span>
           </label>
         </div>
         {form.contact_method === 'email' ? (

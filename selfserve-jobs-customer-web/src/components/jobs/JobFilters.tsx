@@ -64,14 +64,13 @@ export function JobFilters({ filters, onChange, className }: JobFiltersProps) {
     <div className="flex flex-col gap-5">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="font-semibold text-sm uppercase tracking-wide" style={{ color: 'var(--color-text-muted)' }}>
+        <h2 className="font-semibold text-sm uppercase tracking-wide text-text-muted">
           Filters
         </h2>
         {hasActiveFilters && (
           <button
             onClick={clearAll}
-            className="text-xs font-medium cursor-pointer hover:opacity-70"
-            style={{ color: 'var(--color-primary)' }}
+            className="text-xs font-medium cursor-pointer hover:opacity-70 text-primary"
           >
             Clear all
           </button>
@@ -97,7 +96,7 @@ export function JobFilters({ filters, onChange, className }: JobFiltersProps) {
 
       {/* Employment Type */}
       <div className="flex flex-col gap-2">
-        <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
+        <p className="text-sm font-medium text-text-main">
           Employment type
         </p>
         <div className="flex flex-col gap-1.5">
@@ -110,10 +109,9 @@ export function JobFilters({ filters, onChange, className }: JobFiltersProps) {
                 type="checkbox"
                 checked={(filters.employment_type ?? []).includes(et.value)}
                 onChange={() => toggleEmploymentType(et.value)}
-                className="rounded border-[#DDD5C8] text-[#C2703E] focus:ring-[#C2703E] cursor-pointer"
-                style={{ accentColor: '#C2703E' }}
+                className="rounded border-border text-primary focus:ring-primary cursor-pointer"
               />
-              <span className="text-sm group-hover:text-[#C2703E] transition-colors" style={{ color: 'var(--color-text)' }}>
+              <span className="text-sm group-hover:text-primary transition-colors text-text-main">
                 {et.label}
               </span>
             </label>
@@ -123,7 +121,7 @@ export function JobFilters({ filters, onChange, className }: JobFiltersProps) {
 
       {/* Skills */}
       <div className="flex flex-col gap-2">
-        <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
+        <p className="text-sm font-medium text-text-main">
           Skills
         </p>
         <input
@@ -137,8 +135,7 @@ export function JobFilters({ filters, onChange, className }: JobFiltersProps) {
             }
           }}
           placeholder="Type and press Enter"
-          className="w-full rounded-lg border border-[#DDD5C8] bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C2703E] focus:border-transparent"
-          style={{ color: 'var(--color-text)' }}
+          className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-text-main"
         />
         {/* Active skill filters */}
         {(filters.skills?.length ?? 0) > 0 && (
@@ -162,8 +159,7 @@ export function JobFilters({ filters, onChange, className }: JobFiltersProps) {
                 key={skill}
                 type="button"
                 onClick={() => addSkill(skill)}
-                className="text-xs px-2 py-0.5 rounded-full border border-dashed border-[#DDD5C8] hover:border-[#8BA888] hover:bg-[#8BA888]/10 transition-colors cursor-pointer"
-                style={{ color: 'var(--color-text-muted)' }}
+                className="text-xs px-2 py-0.5 rounded-full border border-dashed border-border hover:border-accent hover:bg-accent/10 transition-colors cursor-pointer text-text-muted"
               >
                 {skill}
               </button>
@@ -194,10 +190,7 @@ export function JobFilters({ filters, onChange, className }: JobFiltersProps) {
           </svg>
         </Button>
         {mobileOpen && (
-          <div
-            className="mt-3 rounded-xl border p-5"
-            style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
-          >
+          <div className="mt-3 rounded-xl border border-border bg-surface p-5">
             {filterContent}
           </div>
         )}
@@ -206,10 +199,9 @@ export function JobFilters({ filters, onChange, className }: JobFiltersProps) {
       {/* Desktop sidebar */}
       <div
         className={cn(
-          'hidden lg:block sticky top-24 rounded-xl border p-5',
+          'hidden lg:block sticky top-24 rounded-xl border border-border bg-surface p-5',
           className
         )}
-        style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
       >
         {filterContent}
       </div>

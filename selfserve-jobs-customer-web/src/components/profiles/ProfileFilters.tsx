@@ -88,14 +88,13 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
   const filterContent = (
     <div className="flex flex-col gap-5">
       <div className="flex items-center justify-between">
-        <h2 className="font-semibold text-sm uppercase tracking-wide" style={{ color: 'var(--color-text-muted)' }}>
+        <h2 className="font-semibold text-sm uppercase tracking-wide text-text-muted">
           Filters
         </h2>
         {hasActiveFilters && (
           <button
             onClick={clearAll}
-            className="text-xs font-medium cursor-pointer hover:opacity-70"
-            style={{ color: 'var(--color-primary)' }}
+            className="text-xs font-medium cursor-pointer hover:opacity-70 text-primary"
           >
             Clear all
           </button>
@@ -126,7 +125,7 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
 
       {/* Relocation */}
       <div className="flex flex-col gap-2">
-        <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
+        <p className="text-sm font-medium text-text-main">
           Relocation
         </p>
         <div className="flex flex-col gap-1.5">
@@ -139,9 +138,8 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
                 checked={filters.relocation_preference === rp.value}
                 onChange={() => updateFilter('relocation_preference', rp.value as RelocationPreference)}
                 className="cursor-pointer"
-                style={{ accentColor: '#C2703E' }}
               />
-              <span className="text-sm group-hover:text-[#C2703E] transition-colors" style={{ color: 'var(--color-text)' }}>
+              <span className="text-sm group-hover:text-primary transition-colors text-text-main">
                 {rp.label}
               </span>
             </label>
@@ -149,8 +147,7 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
           {filters.relocation_preference && (
             <button
               onClick={() => updateFilter('relocation_preference', undefined)}
-              className="text-xs text-left cursor-pointer hover:opacity-70"
-              style={{ color: 'var(--color-text-muted)' }}
+              className="text-xs text-left cursor-pointer hover:opacity-70 text-text-muted"
             >
               Clear selection
             </button>
@@ -160,7 +157,7 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
 
       {/* Skills */}
       <div className="flex flex-col gap-2">
-        <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
+        <p className="text-sm font-medium text-text-main">
           Skills
         </p>
         <input
@@ -174,8 +171,7 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
             }
           }}
           placeholder="Type and press Enter"
-          className="w-full rounded-lg border border-[#DDD5C8] bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C2703E] focus:border-transparent"
-          style={{ color: 'var(--color-text)' }}
+          className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-text-main"
         />
         {(filters.skills?.length ?? 0) > 0 && (
           <div className="flex flex-wrap gap-1.5">
@@ -192,8 +188,7 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
                 key={skill}
                 type="button"
                 onClick={() => addSkill(skill)}
-                className="text-xs px-2 py-0.5 rounded-full border border-dashed border-[#DDD5C8] hover:border-[#8BA888] hover:bg-[#8BA888]/10 transition-colors cursor-pointer"
-                style={{ color: 'var(--color-text-muted)' }}
+                className="text-xs px-2 py-0.5 rounded-full border border-dashed border-border hover:border-accent hover:bg-accent/10 transition-colors cursor-pointer text-text-muted"
               >
                 {skill}
               </button>
@@ -223,18 +218,14 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
           </svg>
         </Button>
         {mobileOpen && (
-          <div
-            className="mt-3 rounded-xl border p-5"
-            style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
-          >
+          <div className="mt-3 rounded-xl border border-border bg-surface p-5">
             {filterContent}
           </div>
         )}
       </div>
 
       <div
-        className={cn('hidden lg:block sticky top-24 rounded-xl border p-5', className)}
-        style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
+        className={cn('hidden lg:block sticky top-24 rounded-xl border border-border bg-surface p-5', className)}
       >
         {filterContent}
       </div>

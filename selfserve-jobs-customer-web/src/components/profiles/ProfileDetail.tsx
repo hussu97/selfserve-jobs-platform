@@ -30,8 +30,7 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
       {/* Back link */}
       <Link
         href="/profiles"
-        className="inline-flex items-center gap-1.5 text-sm mb-6 hover:opacity-70 transition-opacity"
-        style={{ color: 'var(--color-text-muted)' }}
+        className="inline-flex items-center gap-1.5 text-sm mb-6 hover:opacity-70 transition-opacity text-text-muted"
       >
         <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
           <path fillRule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" />
@@ -47,24 +46,21 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
           </Badge>
         </div>
 
-        <h1
-          className="text-3xl sm:text-4xl font-bold mb-1"
-          style={{ fontFamily: 'Lora, serif', color: 'var(--color-secondary)' }}
-        >
+        <h1 className="text-3xl sm:text-4xl font-bold mb-1 text-secondary">
           {profile.person_name}
         </h1>
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mb-4">
-          <span className="font-semibold text-lg" style={{ color: 'var(--color-text)' }}>
+          <span className="font-semibold text-lg text-text-main">
             {profile.current_title}
           </span>
-          <span className="flex items-center gap-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+          <span className="flex items-center gap-1 text-sm text-text-muted">
             <svg className="h-4 w-4 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
               <path fillRule="evenodd" d="M9.69 18.933l.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 00.281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 103 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 002.273 1.765 11.842 11.842 0 00.976.544l.062.029.018.008.006.003zM10 11.25a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5z" clipRule="evenodd" />
             </svg>
             {profile.current_city}, {getCountryLabel(profile.current_country)}
           </span>
-          <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+          <span className="text-sm text-text-muted">
             Listed {timeAgo(profile.created_at)}
           </span>
         </div>
@@ -82,14 +78,8 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main content */}
         <div className="lg:col-span-2">
-          <div
-            className="rounded-xl border p-6 mb-6"
-            style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
-          >
-            <h2
-              className="text-xl font-semibold mb-4"
-              style={{ fontFamily: 'Lora, serif', color: 'var(--color-secondary)' }}
-            >
+          <div className="rounded-xl border border-border bg-surface p-6 mb-6">
+            <h2 className="text-xl font-semibold mb-4 text-secondary">
               About
             </h2>
             <div className="prose">
@@ -102,14 +92,8 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
         <aside className="flex flex-col gap-4">
           {/* Contact / LinkedIn */}
           {profile.linkedin_profile_link && (
-            <div
-              className="rounded-xl border p-5"
-              style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
-            >
-              <h3
-                className="font-semibold mb-3"
-                style={{ color: 'var(--color-secondary)', fontFamily: 'Lora, serif' }}
-              >
+            <div className="rounded-xl border border-border bg-surface p-5">
+              <h3 className="font-semibold mb-3 text-secondary">
                 Connect
               </h3>
               <a
@@ -128,33 +112,27 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
           )}
 
           {/* Profile details */}
-          <div
-            className="rounded-xl border p-5 flex flex-col gap-3"
-            style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
-          >
-            <h3
-              className="font-semibold"
-              style={{ color: 'var(--color-secondary)', fontFamily: 'Lora, serif' }}
-            >
+          <div className="rounded-xl border border-border bg-surface p-5 flex flex-col gap-3">
+            <h3 className="font-semibold text-secondary">
               Details
             </h3>
             <dl className="flex flex-col gap-2.5 text-sm">
               <div className="flex justify-between">
-                <dt style={{ color: 'var(--color-text-muted)' }}>Experience</dt>
-                <dd style={{ color: 'var(--color-text)' }}>{formatExperience(profile.years_of_experience)}</dd>
+                <dt className="text-text-muted">Experience</dt>
+                <dd className="text-text-main">{formatExperience(profile.years_of_experience)}</dd>
               </div>
               <div className="flex justify-between">
-                <dt style={{ color: 'var(--color-text-muted)' }}>Location</dt>
-                <dd style={{ color: 'var(--color-text)' }}>
+                <dt className="text-text-muted">Location</dt>
+                <dd className="text-text-main">
                   {profile.current_city}, {getCountryLabel(profile.current_country)}
                 </dd>
               </div>
               <div className="flex justify-between">
-                <dt style={{ color: 'var(--color-text-muted)' }}>Available</dt>
-                <dd style={{ color: 'var(--color-text)' }}>{getNoticePeriodLabel(profile.notice_period)}</dd>
+                <dt className="text-text-muted">Available</dt>
+                <dd className="text-text-main">{getNoticePeriodLabel(profile.notice_period)}</dd>
               </div>
               <div className="flex justify-between items-center">
-                <dt style={{ color: 'var(--color-text-muted)' }}>Relocation</dt>
+                <dt className="text-text-muted">Relocation</dt>
                 <dd>
                   <Badge
                     variant={RELOCATION_BADGE[profile.relocation_preference] ?? 'default'}
@@ -166,15 +144,15 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
               </div>
               {profile.has_resume && (
                 <div className="flex justify-between">
-                  <dt style={{ color: 'var(--color-text-muted)' }}>Resume</dt>
-                  <dd className="text-xs font-medium" style={{ color: 'var(--color-accent)' }}>
+                  <dt className="text-text-muted">Resume</dt>
+                  <dd className="text-xs font-medium text-accent">
                     Available
                   </dd>
                 </div>
               )}
               <div className="flex justify-between">
-                <dt style={{ color: 'var(--color-text-muted)' }}>Listed</dt>
-                <dd style={{ color: 'var(--color-text)' }}>{formatDate(profile.created_at)}</dd>
+                <dt className="text-text-muted">Listed</dt>
+                <dd className="text-text-main">{formatDate(profile.created_at)}</dd>
               </div>
             </dl>
           </div>
