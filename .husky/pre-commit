@@ -1,0 +1,40 @@
+#!/usr/bin/env sh
+
+set -e
+
+STAGED_FILES=$(git diff --cached --name-only)
+
+# --- Backend: lint if any Python files staged ---
+if echo "$STAGED_FILES" | grep -q '^selfserve-jobs-customer-api/.*\.py$'; then
+  echo "Running ruff on staged Python files..."
+  cd selfserve-jobs-customer-api
+  python -m ruff check .
+  python -m ruff format --check .
+  cd ..
+fi
+
+# --- Frontend: lint if any TS/TSX files staged ---
+if echo "$STAGED_FILES" | grep -q '^selfserve-jobs-customer-web/.*\.\(ts\|tsx\)$'; then
+  echo "Running eslint on staged TypeScript files..."
+  cd selfserve-jobs-customer-web
+  npx eslint src/ --max-warnings=0
+  cd ..
+fi
+
+# --- Backend tests if any API files staged ---
+if echo "$STAGED_FILES" | grep -q '^selfserve-jobs-customer-api/'; then
+  echo "Running backend tests..."
+  cd selfserve-jobs-customer-api
+  python -m pytest tests/ -x -q
+  cd ..
+fi
+
+# --- Frontend tests if any web files staged ---
+if echo "$STAGED_FILES" | grep -q '^selfserve-jobs-customer-web/'; then
+  echo "Running frontend tests..."
+  cd selfserve-jobs-customer-web
+  npx vitest run
+  cd ..
+fi
+
+echo "Pre-commit checks passed"
