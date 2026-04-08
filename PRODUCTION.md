@@ -146,23 +146,23 @@ gcloud storage buckets add-iam-policy-binding gs://$BUCKET_NAME \
 
 ```bash
 # From repo root
-docker build -t "${REGISTRY_LOCATION}/${PROJECT_ID}/${REPO_NAME}/selfserve-jobs-customer-api:latest" \
+docker build -t "${REGISTRY_LOCATION}/${PROJECT_ID}/${REPO_NAME}/${API_SERVICE_NAME}:latest" \
   selfserve-jobs-customer-api/
 
-docker push "${REGISTRY_LOCATION}/${PROJECT_ID}/${REPO_NAME}/selfserve-jobs-customer-api:latest"
+docker push "${REGISTRY_LOCATION}/${PROJECT_ID}/${REPO_NAME}/${API_SERVICE_NAME}:latest"
 ```
 
 Or use Cloud Build (no local Docker needed):
 ```bash
 gcloud builds submit selfserve-jobs-customer-api/ \
-  --tag "${REGISTRY_LOCATION}/${PROJECT_ID}/${REPO_NAME}/selfserve-jobs-customer-api:latest"
+  --tag "${REGISTRY_LOCATION}/${PROJECT_ID}/${REPO_NAME}/${API_SERVICE_NAME}:latest"
 ```
 
 ### 6b. Run Alembic migrations (before deploying new image)
 
 ```bash
 gcloud run jobs create selfserve-jobs-migrate \
-  --image "${REGISTRY_LOCATION}/${PROJECT_ID}/${REPO_NAME}/selfserve-jobs-customer-api:latest" \
+  --image "${REGISTRY_LOCATION}/${PROJECT_ID}/${REPO_NAME}/${API_SERVICE_NAME}:latest" \
   --region $REGION \
   --service-account $SA_EMAIL \
   --set-cloudsql-instances $DB_CONNECTION_NAME \
@@ -180,7 +180,7 @@ gcloud run jobs execute selfserve-jobs-migrate --region $REGION --wait
 
 ```bash
 gcloud run deploy $API_SERVICE_NAME \
-  --image "${REGISTRY_LOCATION}/${PROJECT_ID}/${REPO_NAME}/selfserve-jobs-customer-api:latest" \
+  --image "${REGISTRY_LOCATION}/${PROJECT_ID}/${REPO_NAME}/${API_SERVICE_NAME}:latest" \
   --region $REGION \
   --platform managed \
   --allow-unauthenticated \

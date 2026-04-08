@@ -40,7 +40,7 @@ jobs:
         run: ruff format --check .
 
       - name: Run tests
-        run: python -m pytest tests/ -v --tb=short
+        run: uv run pytest tests/ -v --tb=short
         env:
           DATABASE_URL: sqlite+aiosqlite:///:memory:
           ENVIRONMENT: test
