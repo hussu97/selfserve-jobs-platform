@@ -280,17 +280,22 @@ Configure these secrets in your GitHub repo (**Settings → Secrets and variable
 ### Workload Identity Federation (keyless auth for GitHub Actions)
 
 ```bash
+# Set your GitHub repo (org/repo or username/repo)
+export GITHUB_REPO="YOUR_GITHUB_ORG/YOUR_REPO"
+
 # Create Workload Identity Pool
 gcloud iam workload-identity-pools create "github-pool" \
   --location="global" \
   --display-name="GitHub Actions Pool"
 
 # Create OIDC provider
+# --attribute-condition restricts access to your specific repo only (required by GCP)
 gcloud iam workload-identity-pools providers create-oidc "github-provider" \
   --location="global" \
   --workload-identity-pool="github-pool" \
   --display-name="GitHub Actions Provider" \
   --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.repository=assertion.repository" \
+  --attribute-condition="assertion.repository=='${GITHUB_REPO}'" \
   --issuer-uri="https://token.actions.githubusercontent.com"
 
 # Get pool resource name
@@ -299,10 +304,9 @@ export POOL_ID=$(gcloud iam workload-identity-pools describe "github-pool" \
   --format="value(name)")
 
 # Allow GitHub Actions from your repo to impersonate the service account
-# Replace YOUR_GITHUB_ORG/YOUR_REPO with your actual repo
 gcloud iam service-accounts add-iam-policy-binding $SA_EMAIL \
   --role="roles/iam.workloadIdentityUser" \
-  --member="principalSet://iam.googleapis.com/${POOL_ID}/attribute.repository/YOUR_GITHUB_ORG/YOUR_REPO"
+  --member="principalSet://iam.googleapis.com/${POOL_ID}/attribute.repository/${GITHUB_REPO}"
 
 # Get the provider resource name for the GitHub secret
 gcloud iam workload-identity-pools providers describe "github-provider" \
