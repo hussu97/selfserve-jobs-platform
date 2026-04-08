@@ -37,14 +37,16 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
 
   const setExperienceRange = (range: string) => {
     if (!range) {
-      const { min_experience: _min, max_experience: _max, ...rest } = filters;
-      onChange({ ...rest, page: 1 });
+      const next = { ...filters };
+      delete next.min_experience;
+      delete next.max_experience;
+      onChange({ ...next, page: 1 });
       return;
     }
     if (range === '10+') {
-      updateFilter('min_experience', 10);
-      const { max_experience: _max, ...rest } = { ...filters, min_experience: 10 };
-      onChange({ ...rest, page: 1 });
+      const next = { ...filters, min_experience: 10 };
+      delete next.max_experience;
+      onChange({ ...next, page: 1 });
       return;
     }
     const [min, max] = range.split('-').map(Number);

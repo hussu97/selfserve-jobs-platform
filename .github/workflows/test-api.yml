@@ -2,11 +2,6 @@ name: Test API
 
 on:
   workflow_call:
-  push:
-    branches: [main]
-    paths:
-      - 'selfserve-jobs-customer-api/**'
-      - 'docker-compose.yml'
   pull_request:
     branches: [main]
     paths:
