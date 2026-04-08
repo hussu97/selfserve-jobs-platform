@@ -64,7 +64,7 @@ describe('ProfileCard', () => {
       key_skills: ['Python', 'React', 'PostgreSQL', 'Docker', 'AWS', 'TypeScript'],
     };
     render(<ProfileCard profile={profile} />);
-    expect(screen.getByText('+2 more')).toBeInTheDocument();
+    expect(screen.getByText('+2')).toBeInTheDocument();
   });
 
   it('renders the relocation preference badge', () => {

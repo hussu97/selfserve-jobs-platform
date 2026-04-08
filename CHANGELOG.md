@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+- Full frontend visual redesign: modern 2026 aesthetic with depth, motion, and proper mobile-first layout
+- Hero section: left-aligned layout, gradient mesh background, eyebrow label, animated entrance, stats as inline elements with color dots
+- How it Works: removed generic boxed layout; now uses large muted step numbers as decorative accents with icon blocks, mobile-stacked with dividers
+- Section headers: editorial left-aligned treatment with inline "View all" CTA on desktop; mobile gets its own row below the grid
+- Job and Profile cards: top gradient accent bar (terracotta/sage), footer row with divider line, cleaner typographic hierarchy, softer shadow + stronger hover
+- Card base: updated shadow from `shadow-sm` to a more refined multi-property shadow
+- Header: active nav state uses a small underline indicator instead of filled pill background; refined button styles; slightly smaller height
+- Footer: multi-column structured layout with labelled nav groups replacing single horizontal row
+- globals.css: added `fadeInUp`, `fadeIn`, `scaleIn` keyframe animations with delay variants and `prefers-reduced-motion` support; smooth scroll; refined scrollbar
+
 ### Fixed
 - `GET /api/v1/jobs`, `GET /api/v1/profiles`, `POST /api/v1/jobs`, `POST /api/v1/profiles`, `POST /api/v1/verify`, `POST /api/v1/reports` all returned 404 because routes were registered with a trailing slash (`"/"`) while `redirect_slashes=False` is set on the app — changed all collection/root route decorators from `"/"` to `""`
 

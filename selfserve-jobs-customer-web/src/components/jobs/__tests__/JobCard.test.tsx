@@ -51,7 +51,7 @@ describe('JobCard', () => {
       key_skills: ['React', 'TypeScript', 'Next.js', 'GraphQL', 'PostgreSQL', 'Docker'],
     };
     render(<JobCard job={job} />);
-    expect(screen.getByText('+2 more')).toBeInTheDocument();
+    expect(screen.getByText('+2')).toBeInTheDocument();
   });
 
   it('renders the location using country label', () => {
@@ -71,7 +71,7 @@ describe('JobCard', () => {
 
   it('does not render deadline when not provided', () => {
     render(<JobCard job={baseJob} />);
-    expect(screen.queryByText(/Deadline:/)).toBeNull();
+    expect(screen.queryByText(/Due /)).toBeNull();
   });
 
   it('renders the deadline when provided', () => {
@@ -80,7 +80,7 @@ describe('JobCard', () => {
       deadline_date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 5).toISOString(), // 5 days from now
     };
     render(<JobCard job={job} />);
-    expect(screen.getByText(/Deadline:/)).toBeInTheDocument();
+    expect(screen.getByText(/Due /)).toBeInTheDocument();
   });
 
   it('renders no skills section when key_skills is empty', () => {

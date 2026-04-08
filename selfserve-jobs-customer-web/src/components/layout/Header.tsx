@@ -17,19 +17,20 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-30 border-b border-border backdrop-blur-md bg-bg/92">
+      <header className="sticky top-0 z-30 border-b border-border/60 backdrop-blur-xl bg-bg/80">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-[60px]">
+
             {/* Logo */}
             <Link
               href="/"
-              className="flex items-center gap-2 font-bold text-2xl tracking-tight hover:opacity-80 transition-opacity font-heading text-secondary"
+              className="font-bold text-xl tracking-tight font-heading text-secondary hover:opacity-75 transition-opacity"
             >
               jobs4u
             </Link>
 
             {/* Desktop Nav */}
-            <nav className="hidden md:flex items-center gap-1">
+            <nav className="hidden md:flex items-center gap-0.5">
               {NAV_LINKS.map((link) => {
                 const isActive = pathname.startsWith(link.href);
                 return (
@@ -37,13 +38,16 @@ export function Header() {
                     key={link.href}
                     href={link.href}
                     className={cn(
-                      'px-4 py-2 text-sm font-medium rounded-lg transition-colors',
+                      'relative px-4 py-2 text-sm font-medium rounded-lg transition-colors',
                       isActive
-                        ? 'bg-primary/10 text-primary'
-                        : 'hover:bg-surface text-text-main'
+                        ? 'text-text-main'
+                        : 'text-text-muted hover:text-text-main hover:bg-surface/70'
                     )}
                   >
                     {link.label}
+                    {isActive && (
+                      <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full bg-primary" />
+                    )}
                   </Link>
                 );
               })}
@@ -53,13 +57,13 @@ export function Header() {
             <div className="hidden md:flex items-center gap-2">
               <Link
                 href="/jobs/new"
-                className="px-4 py-2 text-sm font-medium rounded-lg border border-border text-text-main transition-all hover:bg-primary hover:text-white hover:border-primary"
+                className="px-4 py-2 text-sm font-medium rounded-lg text-text-muted border border-border transition-all hover:text-text-main hover:border-border/80 hover:bg-surface/60"
               >
                 Post a Job
               </Link>
               <Link
                 href="/profiles/new"
-                className="px-4 py-2 text-sm font-medium rounded-lg text-white bg-primary transition-all hover:opacity-90"
+                className="px-4 py-2 text-sm font-semibold rounded-lg text-white bg-primary shadow-sm transition-all hover:bg-primary-hover hover:shadow"
               >
                 Create Profile
               </Link>
@@ -67,11 +71,11 @@ export function Header() {
 
             {/* Mobile Hamburger */}
             <button
-              className="md:hidden p-2 rounded-lg transition-colors text-text-main"
+              className="md:hidden p-2 -mr-1 rounded-lg transition-colors text-text-muted hover:text-text-main hover:bg-surface"
               onClick={() => setMobileOpen(true)}
               aria-label="Open menu"
             >
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden="true">
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.75} stroke="currentColor" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
               </svg>
             </button>
