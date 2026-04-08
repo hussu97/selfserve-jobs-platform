@@ -145,6 +145,11 @@ gcloud artifacts repositories add-iam-policy-binding $REPO_NAME \
   --location=$REGION \
   --member="serviceAccount:${SA_EMAIL}" \
   --role="roles/artifactregistry.writer"
+
+# Grant Cloud Run access (required for GitHub Actions to deploy/update the service)
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member="serviceAccount:${SA_EMAIL}" \
+  --role="roles/run.developer"
 ```
 
 ## 6. Deploy the API (Cloud Run)
