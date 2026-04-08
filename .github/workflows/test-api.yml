@@ -1,0 +1,49 @@
+name: Test API
+
+on:
+  workflow_call:
+  push:
+    branches: [main]
+    paths:
+      - 'selfserve-jobs-customer-api/**'
+      - 'docker-compose.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'selfserve-jobs-customer-api/**'
+      - 'docker-compose.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: selfserve-jobs-customer-api
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Install dependencies
+        run: uv pip install --system -e ".[dev]"
+
+      - name: Lint with ruff
+        run: ruff check .
+
+      - name: Format check with ruff
+        run: ruff format --check .
+
+      - name: Run tests
+        run: python -m pytest tests/ -v --tb=short
+        env:
+          DATABASE_URL: sqlite+aiosqlite:///:memory:
+          ENVIRONMENT: test
+          FRONTEND_URL: http://localhost:3000
+          GCS_BUCKET_NAME: test-bucket
+          RESEND_API_KEY: test-key
