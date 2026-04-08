@@ -60,7 +60,7 @@ export function JobFilters({ filters, onChange, className }: JobFiltersProps) {
     (filters.employment_type?.length ?? 0) > 0 ||
     (filters.skills?.length ?? 0) > 0;
 
-  const FilterContent = () => (
+  const filterContent = (
     <div className="flex flex-col gap-5">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -198,7 +198,7 @@ export function JobFilters({ filters, onChange, className }: JobFiltersProps) {
             className="mt-3 rounded-xl border p-5"
             style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
           >
-            <FilterContent />
+            {filterContent}
           </div>
         )}
       </div>
@@ -211,7 +211,7 @@ export function JobFilters({ filters, onChange, className }: JobFiltersProps) {
         )}
         style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
       >
-        <FilterContent />
+        {filterContent}
       </div>
     </>
   );

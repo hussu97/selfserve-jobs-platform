@@ -5,31 +5,31 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint src/",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "next": "15.3.0",
+    "next": "^16.2.3",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-markdown": "^9.0.1"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^6.6",
+    "@testing-library/react": "^16.3",
+    "@testing-library/user-event": "^14.5",
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "typescript": "^5",
-    "tailwindcss": "^4",
-    "@tailwindcss/postcss": "^4",
-    "eslint": "^9",
-    "eslint-config-next": "15.3.0",
-    "vitest": "^3.1",
     "@vitejs/plugin-react": "^4.3",
-    "@testing-library/react": "^16.3",
-    "@testing-library/jest-dom": "^6.6",
-    "@testing-library/user-event": "^14.5",
-    "jsdom": "^26.0"
+    "eslint": "^9",
+    "eslint-config-next": "^16.2.3",
+    "jsdom": "^26.0",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "vitest": "^3.1"
   }
 }

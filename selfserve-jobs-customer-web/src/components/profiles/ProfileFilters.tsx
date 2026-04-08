@@ -85,7 +85,7 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
     filters.min_experience !== undefined ||
     (filters.skills?.length ?? 0) > 0;
 
-  const FilterContent = () => (
+  const filterContent = (
     <div className="flex flex-col gap-5">
       <div className="flex items-center justify-between">
         <h2 className="font-semibold text-sm uppercase tracking-wide" style={{ color: 'var(--color-text-muted)' }}>
@@ -227,7 +227,7 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
             className="mt-3 rounded-xl border p-5"
             style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
           >
-            <FilterContent />
+            {filterContent}
           </div>
         )}
       </div>
@@ -236,7 +236,7 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
         className={cn('hidden lg:block sticky top-24 rounded-xl border p-5', className)}
         style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
       >
-        <FilterContent />
+        {filterContent}
       </div>
     </>
   );
