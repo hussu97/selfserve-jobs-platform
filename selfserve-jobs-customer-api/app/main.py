@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 settings = get_settings()
 
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Startup and shutdown lifecycle manager."""
