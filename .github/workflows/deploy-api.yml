@@ -51,5 +51,4 @@ jobs:
             --region "${{ secrets.GCP_REGION }}" \
             --platform managed \
             --allow-unauthenticated \
-            --port 8080 \
-            --set-env-vars "ENVIRONMENT=production"
+            --port 8080
