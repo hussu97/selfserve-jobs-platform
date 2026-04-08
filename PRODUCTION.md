@@ -146,23 +146,23 @@ gcloud storage buckets add-iam-policy-binding gs://$BUCKET_NAME \
 
 ```bash
 # From repo root
-docker build -t "${REGISTRY_LOCATION}/${PROJECT_ID}/${REPO_NAME}/customer-api:latest" \
+docker build -t "${REGISTRY_LOCATION}/${PROJECT_ID}/${REPO_NAME}/selfserve-jobs-customer-api:latest" \
   selfserve-jobs-customer-api/
 
-docker push "${REGISTRY_LOCATION}/${PROJECT_ID}/${REPO_NAME}/customer-api:latest"
+docker push "${REGISTRY_LOCATION}/${PROJECT_ID}/${REPO_NAME}/selfserve-jobs-customer-api:latest"
 ```
 
 Or use Cloud Build (no local Docker needed):
 ```bash
 gcloud builds submit selfserve-jobs-customer-api/ \
-  --tag "${REGISTRY_LOCATION}/${PROJECT_ID}/${REPO_NAME}/customer-api:latest"
+  --tag "${REGISTRY_LOCATION}/${PROJECT_ID}/${REPO_NAME}/selfserve-jobs-customer-api:latest"
 ```
 
 ### 6b. Run Alembic migrations (before deploying new image)
 
 ```bash
 gcloud run jobs create selfserve-jobs-migrate \
-  --image "${REGISTRY_LOCATION}/${PROJECT_ID}/${REPO_NAME}/customer-api:latest" \
+  --image "${REGISTRY_LOCATION}/${PROJECT_ID}/${REPO_NAME}/selfserve-jobs-customer-api:latest" \
   --region $REGION \
   --service-account $SA_EMAIL \
   --set-cloudsql-instances $DB_CONNECTION_NAME \
@@ -180,7 +180,7 @@ gcloud run jobs execute selfserve-jobs-migrate --region $REGION --wait
 
 ```bash
 gcloud run deploy $API_SERVICE_NAME \
-  --image "${REGISTRY_LOCATION}/${PROJECT_ID}/${REPO_NAME}/customer-api:latest" \
+  --image "${REGISTRY_LOCATION}/${PROJECT_ID}/${REPO_NAME}/selfserve-jobs-customer-api:latest" \
   --region $REGION \
   --platform managed \
   --allow-unauthenticated \
@@ -276,7 +276,7 @@ Configure these secrets in your GitHub repo (**Settings → Secrets and variable
 | Secret | Value |
 |--------|-------|
 | `GCP_PROJECT_ID` | Your GCP project ID |
-| `GCP_REGION` | e.g. `us-central1` |
+| `GCP_REGION` | e.g. `me-central1` |
 | `GCP_WORKLOAD_IDENTITY_PROVIDER` | See Workload Identity setup below |
 | `GCP_SERVICE_ACCOUNT` | `${API_SERVICE_NAME}@${PROJECT_ID}.iam.gserviceaccount.com` |
 | `VERCEL_TOKEN` | From vercel.com → Account Settings → Tokens |
