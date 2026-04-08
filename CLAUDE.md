@@ -60,8 +60,8 @@ A free-to-use jobs platform with two core entities: **Jobs** (company listings) 
 | Border | `#DDD5C8` | Dividers, input borders |
 
 **Typography:**
-- Body: Inter (sans-serif)
-- Headings: Lora (serif) — gives warmth without feeling corporate
+- Body: Outfit (sans-serif) — geometric, modern, clean
+- Headings: Instrument Serif (serif) — warm editorial character, distinctive
 
 **Design principles:** Minimalistic, lightweight, easy to browse. No generic AI aesthetics. Subtle earth textures/tones only.
 

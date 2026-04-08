@@ -7,10 +7,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Changed
+- Typography: replaced Inter + Lora with Outfit (body) + Instrument Serif (headings) for a more modern, distinctive feel
+- Center-aligned hero section, section headers, and CTA strip on the home page for better visual balance and mobile readability
 - Full frontend visual redesign: modern 2026 aesthetic with depth, motion, and proper mobile-first layout
-- Hero section: left-aligned layout, gradient mesh background, eyebrow label, animated entrance, stats as inline elements with color dots
+- Hero section: center-aligned layout, gradient mesh background, eyebrow label, animated entrance, stats as inline elements with color dots
 - How it Works: removed generic boxed layout; now uses large muted step numbers as decorative accents with icon blocks, mobile-stacked with dividers
-- Section headers: editorial left-aligned treatment with inline "View all" CTA on desktop; mobile gets its own row below the grid
+- Section headers: center-aligned with "View all" CTA below subtitle on desktop; mobile gets its own row below the grid
 - Job and Profile cards: top gradient accent bar (terracotta/sage), footer row with divider line, cleaner typographic hierarchy, softer shadow + stronger hover
 - Card base: updated shadow from `shadow-sm` to a more refined multi-property shadow
 - Header: active nav state uses a small underline indicator instead of filled pill background; refined button styles; slightly smaller height

@@ -32,7 +32,7 @@ export default async function HomePage() {
         />
 
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-32">
-          <div className="max-w-2xl">
+          <div className="max-w-2xl mx-auto text-center">
             {/* Eyebrow */}
             <div className="anim-fade-up inline-flex items-center gap-2 mb-6 px-3 py-1.5 rounded-full text-xs font-medium bg-bg border border-border/80 text-text-muted shadow-sm">
               <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block" />
@@ -45,12 +45,12 @@ export default async function HomePage() {
             </h1>
 
             {/* Subheading */}
-            <p className="anim-fade-up anim-delay-2 text-base sm:text-lg text-text-muted leading-relaxed mb-8 max-w-lg">
+            <p className="anim-fade-up anim-delay-2 text-base sm:text-lg text-text-muted leading-relaxed mb-8 max-w-lg mx-auto">
               Post jobs and candidate profiles in minutes. No account, no recruiters, no fees.
             </p>
 
             {/* CTAs */}
-            <div className="anim-fade-up anim-delay-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <div className="anim-fade-up anim-delay-3 flex flex-col sm:flex-row items-stretch sm:items-center sm:justify-center gap-3">
               <Link
                 href="/jobs"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-white font-semibold text-sm bg-primary shadow-sm transition-all hover:bg-primary-hover hover:shadow active:scale-[0.98]"
@@ -74,7 +74,7 @@ export default async function HomePage() {
 
             {/* Stats */}
             {stats && (
-              <div className="anim-fade-up anim-delay-4 flex items-center gap-4 mt-8">
+              <div className="anim-fade-up anim-delay-4 flex items-center justify-center gap-4 mt-8">
                 <div className="flex items-center gap-2 text-sm">
                   <span className="w-2 h-2 rounded-full bg-primary/70 inline-block" />
                   <span className="font-semibold text-text-main">{stats.active_jobs.toLocaleString()}</span>
@@ -162,14 +162,12 @@ export default async function HomePage() {
       <section className="py-14 sm:py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Section header */}
-          <div className="flex items-end justify-between mb-8">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold">Recent Opportunities</h2>
-              <p className="mt-1 text-sm text-text-muted">Latest jobs from around the world</p>
-            </div>
+          <div className="text-center mb-8">
+            <h2 className="text-xl sm:text-2xl font-bold">Recent Opportunities</h2>
+            <p className="mt-1 text-sm text-text-muted">Latest jobs from around the world</p>
             <Link
               href="/jobs"
-              className="hidden sm:inline-flex items-center gap-1 text-sm font-medium text-primary hover:opacity-70 transition-opacity flex-shrink-0 ml-4"
+              className="hidden sm:inline-flex items-center gap-1 text-sm font-medium text-primary hover:opacity-70 transition-opacity mt-3"
             >
               View all
               <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -217,14 +215,12 @@ export default async function HomePage() {
       <section className="border-t border-border/60 bg-surface/40 py-14 sm:py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Section header */}
-          <div className="flex items-end justify-between mb-8">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold">Available Talent</h2>
-              <p className="mt-1 text-sm text-text-muted">Professionals open to new opportunities</p>
-            </div>
+          <div className="text-center mb-8">
+            <h2 className="text-xl sm:text-2xl font-bold">Available Talent</h2>
+            <p className="mt-1 text-sm text-text-muted">Professionals open to new opportunities</p>
             <Link
               href="/profiles"
-              className="hidden sm:inline-flex items-center gap-1 text-sm font-medium text-primary hover:opacity-70 transition-opacity flex-shrink-0 ml-4"
+              className="hidden sm:inline-flex items-center gap-1 text-sm font-medium text-primary hover:opacity-70 transition-opacity mt-3"
             >
               View all
               <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -270,26 +266,24 @@ export default async function HomePage() {
 
       {/* ── CTA strip ────────────────────────────────────── */}
       <section className="border-t border-border/60 py-16 sm:py-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-lg">
-            <h2 className="text-xl sm:text-2xl font-bold mb-2">Ready to get started?</h2>
-            <p className="text-sm text-text-muted mb-7">
-              Free forever. No spam. No recruiters.
-            </p>
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <Link
-                href="/jobs/new"
-                className="inline-flex items-center justify-center px-6 py-3 rounded-xl text-white font-semibold text-sm bg-primary shadow-sm transition-all hover:bg-primary-hover hover:shadow active:scale-[0.98]"
-              >
-                Post a Job
-              </Link>
-              <Link
-                href="/profiles/new"
-                className="inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold text-sm border border-secondary/40 text-secondary bg-secondary/5 transition-all hover:bg-secondary hover:text-white hover:border-secondary active:scale-[0.98]"
-              >
-                Create a Profile
-              </Link>
-            </div>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-xl sm:text-2xl font-bold mb-2">Ready to get started?</h2>
+          <p className="text-sm text-text-muted mb-7">
+            Free forever. No spam. No recruiters.
+          </p>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center sm:justify-center gap-3">
+            <Link
+              href="/jobs/new"
+              className="inline-flex items-center justify-center px-6 py-3 rounded-xl text-white font-semibold text-sm bg-primary shadow-sm transition-all hover:bg-primary-hover hover:shadow active:scale-[0.98]"
+            >
+              Post a Job
+            </Link>
+            <Link
+              href="/profiles/new"
+              className="inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold text-sm border border-secondary/40 text-secondary bg-secondary/5 transition-all hover:bg-secondary hover:text-white hover:border-secondary active:scale-[0.98]"
+            >
+              Create a Profile
+            </Link>
           </div>
         </div>
       </section>

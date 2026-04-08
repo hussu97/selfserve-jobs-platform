@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -13,8 +13,8 @@
   --color-accent: #8BA888;
   --color-accent-dark: #4a7547;
   --color-border: #DDD5C8;
-  --font-sans: 'Inter', sans-serif;
-  --font-heading: 'Lora', serif;
+  --font-sans: 'Outfit', sans-serif;
+  --font-heading: 'Instrument Serif', serif;
 }
 
 :root {
@@ -42,7 +42,7 @@ html {
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Outfit', sans-serif;
   background-color: var(--color-bg);
   color: var(--color-text);
   line-height: 1.6;
@@ -50,14 +50,14 @@ body {
 }
 
 h1, h2, h3 {
-  font-family: 'Lora', serif;
+  font-family: 'Instrument Serif', serif;
   font-weight: 600;
   line-height: 1.25;
   color: var(--color-secondary);
 }
 
 h4, h5, h6 {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Outfit', sans-serif;
   font-weight: 600;
   line-height: 1.4;
 }
@@ -131,7 +131,7 @@ a {
 }
 
 .prose h1, .prose h2, .prose h3 {
-  font-family: 'Lora', serif;
+  font-family: 'Instrument Serif', serif;
   color: var(--color-secondary);
   margin-top: 1.5em;
   margin-bottom: 0.5em;
