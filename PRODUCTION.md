@@ -139,6 +139,12 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
 gcloud storage buckets add-iam-policy-binding gs://$BUCKET_NAME \
   --member="serviceAccount:${SA_EMAIL}" \
   --role="roles/storage.objectAdmin"
+
+# Grant Artifact Registry access (required for GitHub Actions to push Docker images)
+gcloud artifacts repositories add-iam-policy-binding $REPO_NAME \
+  --location=$REGION \
+  --member="serviceAccount:${SA_EMAIL}" \
+  --role="roles/artifactregistry.writer"
 ```
 
 ## 6. Deploy the API (Cloud Run)
