@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Changed
+- Homepage, jobs listing, and profiles listing pages updated to "Sage & Stone" design system: Newsreader serif + Manrope body fonts, forest green primary (`#384B3B`), terracotta secondary (`#8C4E32`), `bg-bg`/`bg-surface`/`bg-surface-lowest` tonal shifts replacing border dividers, `rounded-full` pill CTAs, `shadow-ambient` cards, `hero-gradient` page headers, bento-style numbered How-it-Works steps, section eyebrow labels, and a solid `bg-primary` CTA strip
 - Typography: replaced Inter + Lora with Outfit (body) + Instrument Serif (headings) for a more modern, distinctive feel
 - Center-aligned hero section, section headers, and CTA strip on the home page for better visual balance and mobile readability
 - Full frontend visual redesign: modern 2026 aesthetic with depth, motion, and proper mobile-first layout

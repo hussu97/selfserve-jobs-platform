@@ -121,92 +121,97 @@ function ProfilesContent() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div>
       {/* Page header */}
-      <div className="text-center mb-8">
-        <h1 className="text-3xl sm:text-4xl font-bold mb-2 font-heading text-secondary">
-          Browse Talent
-        </h1>
-        <p className="text-sm text-text-muted">
-          {loading ? 'Loading…' : `${total.toLocaleString()} profile${total !== 1 ? 's' : ''} found`}
-        </p>
+      <div className="hero-gradient">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-10">
+          <p className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-3">
+            Talent
+          </p>
+          <div className="flex items-end justify-between gap-4">
+            <h1 className="font-heading text-4xl sm:text-5xl text-primary">
+              Discover <span className="italic">Extraordinary</span> Talent
+            </h1>
+            <span className="text-xs font-semibold uppercase tracking-widest text-text-muted pb-1">
+              {loading ? 'Loading…' : `${total.toLocaleString()} profile${total !== 1 ? 's' : ''} found`}
+            </span>
+          </div>
+        </div>
       </div>
 
-      {/* Search */}
-      <div className="mb-6">
-        <SearchBar
-          value={filters.search ?? ''}
-          onChange={handleSearchChange}
-          placeholder="Search by name, title, or skill…"
-        />
-      </div>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Search */}
+        <div className="mb-8">
+          <SearchBar
+            value={filters.search ?? ''}
+            onChange={handleSearchChange}
+            placeholder="Search by name, title, or skill…"
+          />
+        </div>
 
-      <div className="flex gap-8">
-        {/* Sidebar */}
-        <aside className="hidden lg:block w-64 flex-shrink-0">
-          <ProfileFilters filters={filters} onChange={handleFiltersChange} />
-        </aside>
+        <div className="flex gap-8">
+          {/* Sidebar */}
+          <aside className="hidden lg:block w-64 flex-shrink-0">
+            <ProfileFilters filters={filters} onChange={handleFiltersChange} />
+          </aside>
 
-        {/* Main content */}
-        <div className="flex-1 min-w-0">
-          {error && (
-            <StatusBanner type="error" message={error} className="mb-6" />
-          )}
+          {/* Main content */}
+          <div className="flex-1 min-w-0">
+            {error && (
+              <StatusBanner type="error" message={error} className="mb-6" />
+            )}
 
-          {loading ? (
-            <div className="flex items-center justify-center py-24">
-              <div className="flex flex-col items-center gap-3">
-                <Spinner size="lg" />
-                <p className="text-sm text-text-muted">
-                  Loading profiles…
+            {loading ? (
+              <div className="flex items-center justify-center py-24">
+                <div className="flex flex-col items-center gap-3">
+                  <Spinner size="lg" />
+                  <p className="text-sm text-text-muted">
+                    Loading profiles…
+                  </p>
+                </div>
+              </div>
+            ) : profiles.length === 0 ? (
+              <div className="text-center py-20 rounded-2xl bg-surface-lowest shadow-ambient">
+                <svg
+                  className="h-12 w-12 mx-auto mb-4 text-border"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                <h3 className="text-lg font-semibold mb-2 font-heading text-text-main">
+                  No profiles found
+                </h3>
+                <p className="text-sm mb-4 text-text-muted">
+                  Try adjusting your search or removing some filters.
                 </p>
+                <button
+                  onClick={() => applyFilters({ page: 1 })}
+                  className="text-sm font-semibold text-primary hover:opacity-70 transition-opacity"
+                >
+                  Clear all filters
+                </button>
               </div>
-            </div>
-          ) : profiles.length === 0 ? (
-            <div
-              className="text-center py-20 rounded-2xl border border-border bg-surface"
-            >
-              <svg
-                className="h-12 w-12 mx-auto mb-4 text-border"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-              <h3
-                className="text-lg font-semibold mb-2 font-heading text-text-main"
-              >
-                No profiles found
-              </h3>
-              <p className="text-sm mb-4 text-text-muted">
-                Try adjusting your search or removing some filters.
-              </p>
-              <button
-                onClick={() => applyFilters({ page: 1 })}
-                className="text-sm font-medium hover:opacity-70 text-primary"
-              >
-                Clear all filters
-              </button>
-            </div>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-                {profiles.map((profile) => (
-                  <ProfileCard key={profile.code} profile={profile} />
-                ))}
-              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+                  {profiles.map((profile) => (
+                    <ProfileCard key={profile.code} profile={profile} />
+                  ))}
+                </div>
 
-              <div className="mt-10">
-                <Pagination
-                  page={filters.page ?? 1}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
-              </div>
-            </>
-          )}
+                <div className="mt-10">
+                  <Pagination
+                    page={filters.page ?? 1}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>

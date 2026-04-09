@@ -18,34 +18,22 @@ export default async function HomePage() {
     <div>
 
       {/* ── Hero ─────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-surface">
-        {/* Gradient mesh */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          aria-hidden="true"
-          style={{
-            background: `
-              radial-gradient(ellipse 90% 70% at 60% -10%, rgba(194,112,62,0.13) 0%, transparent 55%),
-              radial-gradient(ellipse 70% 60% at 10% 110%, rgba(45,95,58,0.09) 0%, transparent 55%)
-            `,
-          }}
-        />
-
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-32">
-          <div className="max-w-2xl mx-auto text-center">
+      <section className="hero-gradient relative overflow-hidden">
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32 lg:py-40">
+          <div className="max-w-3xl mx-auto text-center">
             {/* Eyebrow */}
-            <div className="anim-fade-up inline-flex items-center gap-2 mb-6 px-3 py-1.5 rounded-full text-xs font-medium bg-bg border border-border/80 text-text-muted shadow-sm">
+            <div className="anim-fade-up inline-flex items-center gap-2 mb-7 px-4 py-1.5 rounded-full bg-surface shadow-ambient text-xs font-semibold uppercase tracking-widest text-text-muted">
               <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block" />
               Free forever · No signup required
             </div>
 
             {/* Headline */}
-            <h1 className="anim-fade-up anim-delay-1 text-[2.6rem] sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] mb-5 font-heading text-secondary">
-              Find Work.<br />Find Talent.
+            <h1 className="anim-fade-up anim-delay-1 font-heading text-5xl sm:text-6xl lg:text-7xl leading-tight text-primary mb-6">
+              Find <span className="italic">Extraordinary</span> Work.
             </h1>
 
             {/* Subheading */}
-            <p className="anim-fade-up anim-delay-2 text-base sm:text-lg text-text-muted leading-relaxed mb-8 max-w-lg mx-auto">
+            <p className="anim-fade-up anim-delay-2 text-lg text-text-muted leading-relaxed mb-10 max-w-xl mx-auto">
               Post jobs and candidate profiles in minutes. No account, no recruiters, no fees.
             </p>
 
@@ -53,7 +41,7 @@ export default async function HomePage() {
             <div className="anim-fade-up anim-delay-3 flex flex-col sm:flex-row items-stretch sm:items-center sm:justify-center gap-3">
               <Link
                 href="/jobs"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-white font-semibold text-sm bg-primary shadow-sm transition-all hover:bg-primary-hover hover:shadow active:scale-[0.98]"
+                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full text-white font-semibold text-sm bg-primary shadow-ambient transition-all hover:bg-primary-hover hover:shadow-ambient-hover active:scale-[0.98]"
               >
                 <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                   <path fillRule="evenodd" d="M6 3.75A2.75 2.75 0 018.75 1h2.5A2.75 2.75 0 0114 3.75v.443c.572.055 1.14.122 1.706.2C17.053 4.582 18 5.75 18 7.07v3.469c0 1.126-.694 2.191-1.83 2.54-1.952.599-4.024.921-6.17.921s-4.219-.322-6.17-.921C2.694 12.73 2 11.665 2 10.539V7.07c0-1.32.947-2.489 2.294-2.676A41.047 41.047 0 016 4.193V3.75zm6.5 0v.325a41.622 41.622 0 00-5 0V3.75c0-.69.56-1.25 1.25-1.25h2.5c.69 0 1.25.56 1.25 1.25zM10 10a1 1 0 00-1 1v.01a1 1 0 001 1h.01a1 1 0 001-1V11a1 1 0 00-1-1H10z" clipRule="evenodd" />
@@ -63,7 +51,7 @@ export default async function HomePage() {
               </Link>
               <Link
                 href="/profiles"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm border border-secondary/40 text-secondary bg-secondary/5 transition-all hover:bg-secondary hover:text-white hover:border-secondary active:scale-[0.98]"
+                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full font-semibold text-sm text-secondary bg-surface shadow-ambient transition-all hover:bg-secondary hover:text-white hover:shadow-ambient-hover active:scale-[0.98]"
               >
                 <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                   <path d="M7 8a3 3 0 100-6 3 3 0 000 6zM14.5 9a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM1.615 16.428a1.224 1.224 0 01-.569-1.175 6.002 6.002 0 0111.908 0c.058.467-.172.92-.57 1.174A9.953 9.953 0 017 17a9.953 9.953 0 01-5.385-1.572zM14.5 16h-.106c.07-.297.088-.611.048-.933a7.47 7.47 0 00-1.588-3.755 4.502 4.502 0 015.874 2.636.818.818 0 01-.36.98A7.465 7.465 0 0114.5 16z" />
@@ -74,7 +62,7 @@ export default async function HomePage() {
 
             {/* Stats */}
             {stats && (
-              <div className="anim-fade-up anim-delay-4 flex items-center justify-center gap-4 mt-8">
+              <div className="anim-fade-up anim-delay-4 flex items-center justify-center gap-4 mt-10">
                 <div className="flex items-center gap-2 text-sm">
                   <span className="w-2 h-2 rounded-full bg-primary/70 inline-block" />
                   <span className="font-semibold text-text-main">{stats.active_jobs.toLocaleString()}</span>
@@ -90,17 +78,21 @@ export default async function HomePage() {
             )}
           </div>
         </div>
-
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
       </section>
 
       {/* ── How it works ─────────────────────────────────── */}
-      <section className="border-b border-border/60">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-          <p className="text-xs font-semibold uppercase tracking-widest text-text-muted/60 mb-10 text-center">
-            How it works
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-0 sm:divide-x divide-border/60">
+      <section className="bg-surface">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+          <div className="text-center mb-12">
+            <p className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-3">
+              How it works
+            </p>
+            <h2 className="font-heading text-4xl sm:text-5xl text-primary">
+              Simple by <span className="italic">design</span>
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             {[
               {
                 num: '01',
@@ -133,24 +125,18 @@ export default async function HomePage() {
                 title: 'Connect directly',
                 desc: 'Reach out without middlemen. No recruiter fees, ever.',
               },
-            ].map(({ num, icon, title, desc }, i) => (
+            ].map(({ num, icon, title, desc }) => (
               <div
                 key={title}
-                className={`relative flex flex-col sm:items-center gap-4 px-0 sm:px-8 py-6 sm:py-0 sm:text-center ${i > 0 ? 'border-t sm:border-t-0 border-border/60' : ''}`}
+                className="bg-surface-lowest shadow-ambient rounded-2xl p-8 flex flex-col gap-4"
               >
-                <div className="flex sm:flex-col items-center sm:items-center gap-4">
-                  <div className="relative flex-shrink-0">
-                    <span className="absolute -top-3 -left-3 text-[2.5rem] font-bold font-heading text-border/50 leading-none select-none">
-                      {num}
-                    </span>
-                    <div className="relative z-10 w-10 h-10 rounded-xl flex items-center justify-center bg-primary/8 border border-primary/15">
-                      {icon}
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-sm text-text-main">{title}</h3>
-                    <p className="text-sm text-text-muted mt-0.5 leading-relaxed sm:max-w-[180px]">{desc}</p>
-                  </div>
+                <span className="font-heading italic text-secondary text-4xl leading-none">{num}</span>
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-primary/8">
+                  {icon}
+                </div>
+                <div>
+                  <h3 className="font-heading text-xl text-primary mb-1">{title}</h3>
+                  <p className="text-sm text-text-muted leading-relaxed">{desc}</p>
                 </div>
               </div>
             ))}
@@ -159,18 +145,24 @@ export default async function HomePage() {
       </section>
 
       {/* ── Recent Jobs ──────────────────────────────────── */}
-      <section className="py-14 sm:py-20">
+      <section className="bg-bg py-16 sm:py-24">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Section header */}
-          <div className="text-center mb-8">
-            <h2 className="text-xl sm:text-2xl font-bold">Recent Opportunities</h2>
-            <p className="mt-1 text-sm text-text-muted">Latest jobs from around the world</p>
+          <div className="flex items-end justify-between mb-10">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-2">
+                Latest listings
+              </p>
+              <h2 className="font-heading text-3xl sm:text-4xl text-primary">
+                Recent <span className="italic">Opportunities</span>
+              </h2>
+            </div>
             <Link
               href="/jobs"
-              className="hidden sm:inline-flex items-center gap-1 text-sm font-medium text-primary hover:opacity-70 transition-opacity mt-3"
+              className="hidden sm:inline-flex items-center gap-1.5 text-primary font-semibold uppercase tracking-wider text-xs hover:opacity-70 transition-opacity"
             >
               View all
-              <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                 <path fillRule="evenodd" d="M8.22 5.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 010-1.06z" clipRule="evenodd" />
               </svg>
             </Link>
@@ -183,11 +175,11 @@ export default async function HomePage() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-16 rounded-2xl border border-border/60 bg-surface/50">
+            <div className="text-center py-16 rounded-2xl bg-surface-lowest shadow-ambient">
               <p className="text-text-muted text-sm mb-4">No job listings yet.</p>
               <Link
                 href="/jobs/new"
-                className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl text-white font-medium text-sm bg-primary transition-opacity hover:opacity-90"
+                className="inline-flex items-center justify-center px-6 py-2.5 rounded-full text-white font-semibold text-sm bg-primary transition-all hover:bg-primary-hover hover:shadow-ambient-hover active:scale-[0.98]"
               >
                 Post the first job
               </Link>
@@ -196,13 +188,13 @@ export default async function HomePage() {
 
           {/* Mobile view all */}
           {jobs.length > 0 && (
-            <div className="mt-7 sm:hidden text-center">
+            <div className="mt-8 sm:hidden text-center">
               <Link
                 href="/jobs"
-                className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:opacity-70 transition-opacity"
+                className="inline-flex items-center gap-1.5 text-primary font-semibold uppercase tracking-wider text-xs hover:opacity-70 transition-opacity"
               >
                 View all jobs
-                <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                   <path fillRule="evenodd" d="M8.22 5.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 010-1.06z" clipRule="evenodd" />
                 </svg>
               </Link>
@@ -212,18 +204,24 @@ export default async function HomePage() {
       </section>
 
       {/* ── Available Talent ─────────────────────────────── */}
-      <section className="border-t border-border/60 bg-surface/40 py-14 sm:py-20">
+      <section className="bg-surface py-16 sm:py-24">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Section header */}
-          <div className="text-center mb-8">
-            <h2 className="text-xl sm:text-2xl font-bold">Available Talent</h2>
-            <p className="mt-1 text-sm text-text-muted">Professionals open to new opportunities</p>
+          <div className="flex items-end justify-between mb-10">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-2">
+                Open to work
+              </p>
+              <h2 className="font-heading text-3xl sm:text-4xl text-primary">
+                Available <span className="italic">Talent</span>
+              </h2>
+            </div>
             <Link
               href="/profiles"
-              className="hidden sm:inline-flex items-center gap-1 text-sm font-medium text-primary hover:opacity-70 transition-opacity mt-3"
+              className="hidden sm:inline-flex items-center gap-1.5 text-primary font-semibold uppercase tracking-wider text-xs hover:opacity-70 transition-opacity"
             >
               View all
-              <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                 <path fillRule="evenodd" d="M8.22 5.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 010-1.06z" clipRule="evenodd" />
               </svg>
             </Link>
@@ -236,11 +234,11 @@ export default async function HomePage() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-16 rounded-2xl border border-border/60 bg-bg/60">
+            <div className="text-center py-16 rounded-2xl bg-surface-lowest shadow-ambient">
               <p className="text-text-muted text-sm mb-4">No talent profiles yet.</p>
               <Link
                 href="/profiles/new"
-                className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl text-white font-medium text-sm bg-primary transition-opacity hover:opacity-90"
+                className="inline-flex items-center justify-center px-6 py-2.5 rounded-full text-white font-semibold text-sm bg-primary transition-all hover:bg-primary-hover hover:shadow-ambient-hover active:scale-[0.98]"
               >
                 Create the first profile
               </Link>
@@ -249,13 +247,13 @@ export default async function HomePage() {
 
           {/* Mobile view all */}
           {profiles.length > 0 && (
-            <div className="mt-7 sm:hidden text-center">
+            <div className="mt-8 sm:hidden text-center">
               <Link
                 href="/profiles"
-                className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:opacity-70 transition-opacity"
+                className="inline-flex items-center gap-1.5 text-primary font-semibold uppercase tracking-wider text-xs hover:opacity-70 transition-opacity"
               >
                 View all profiles
-                <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                   <path fillRule="evenodd" d="M8.22 5.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 010-1.06z" clipRule="evenodd" />
                 </svg>
               </Link>
@@ -265,22 +263,24 @@ export default async function HomePage() {
       </section>
 
       {/* ── CTA strip ────────────────────────────────────── */}
-      <section className="border-t border-border/60 py-16 sm:py-20">
+      <section className="bg-primary py-16 sm:py-24">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-xl sm:text-2xl font-bold mb-2">Ready to get started?</h2>
-          <p className="text-sm text-text-muted mb-7">
+          <h2 className="font-heading text-4xl sm:text-5xl text-white mb-4">
+            Ready to get <span className="italic">started?</span>
+          </h2>
+          <p className="text-white/70 mb-10 text-lg">
             Free forever. No spam. No recruiters.
           </p>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center sm:justify-center gap-3">
             <Link
               href="/jobs/new"
-              className="inline-flex items-center justify-center px-6 py-3 rounded-xl text-white font-semibold text-sm bg-primary shadow-sm transition-all hover:bg-primary-hover hover:shadow active:scale-[0.98]"
+              className="inline-flex items-center justify-center px-7 py-3.5 rounded-full text-primary font-semibold text-sm bg-white shadow-ambient transition-all hover:bg-surface hover:shadow-ambient-hover active:scale-[0.98]"
             >
               Post a Job
             </Link>
             <Link
               href="/profiles/new"
-              className="inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold text-sm border border-secondary/40 text-secondary bg-secondary/5 transition-all hover:bg-secondary hover:text-white hover:border-secondary active:scale-[0.98]"
+              className="inline-flex items-center justify-center px-7 py-3.5 rounded-full font-semibold text-sm text-white bg-white/10 transition-all hover:bg-white/20 active:scale-[0.98]"
             >
               Create a Profile
             </Link>
