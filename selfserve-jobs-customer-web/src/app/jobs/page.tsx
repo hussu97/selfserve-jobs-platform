@@ -146,9 +146,9 @@ function JobsContent() {
           />
         </div>
 
-        <div className="flex gap-8">
+        <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar filters */}
-          <aside className="hidden lg:block w-64 flex-shrink-0">
+          <aside className="w-full lg:w-64 lg:flex-shrink-0">
             <JobFilters filters={filters} onChange={handleFiltersChange} />
           </aside>
 

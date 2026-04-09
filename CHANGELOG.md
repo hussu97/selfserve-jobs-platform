@@ -7,6 +7,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Fixed
+- **Mobile filters not visible** — `<aside>` wrapper on `/jobs` and `/profiles` pages used `hidden lg:block`, suppressing the mobile filter toggle that already existed inside `JobFilters`/`ProfileFilters`; fixed by using `w-full lg:w-64 lg:flex-shrink-0` on the aside and `flex-col lg:flex-row` on the container so the filter components control their own responsive rendering
+
+### Fixed
 - **MarkdownEditor TypeScript errors** — cast `editor.storage` to `any` to resolve TS2339 (`markdown` property not on `Storage` type); replaced `setContent(value, false)` with `setContent(value, { emitUpdate: false })` to fix TS2559
 - **API lint** — removed unused `AuthSession` import from `verification_service.py`; removed unused `pytest` import and fixed import ordering in `tests/test_auth.py`
 
