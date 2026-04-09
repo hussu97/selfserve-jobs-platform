@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
-  description: 'How jobs4u collects, uses, and protects your personal data.',
+  description: 'How hirebridge collects, uses, and protects your personal data.',
 };
 
 const LAST_UPDATED = 'April 2025';
@@ -31,7 +31,7 @@ export default function PrivacyPage() {
             <div>
               <h2 className="font-heading text-2xl text-primary mb-3">Overview</h2>
               <p className="text-sm leading-relaxed text-text-muted">
-                jobs4u is a no-signup jobs platform connecting employers and candidates. We are
+                hirebridge is a no-signup jobs platform connecting employers and candidates. We are
                 committed to handling your personal data responsibly. This policy explains what we
                 collect, how we use it, and your rights.
               </p>
@@ -63,7 +63,7 @@ export default function PrivacyPage() {
               <ul className="flex flex-col gap-2 text-sm text-text-muted list-disc list-inside">
                 <li>To send a one-time email verification link when you create a listing.</li>
                 <li>To send your management link so you can edit or remove your listing.</li>
-                <li>To display your listing publicly on jobs4u (your email is never shown publicly).</li>
+                <li>To display your listing publicly on hirebridge (your email is never shown publicly).</li>
                 <li>To store your resume securely and make it available for download by employers who view your profile.</li>
                 <li>To enforce rate limits and prevent spam submissions.</li>
               </ul>
@@ -105,7 +105,7 @@ export default function PrivacyPage() {
             <div>
               <h2 className="font-heading text-2xl text-primary mb-3">Cookies</h2>
               <p className="text-sm leading-relaxed text-text-muted">
-                jobs4u does not use tracking cookies or analytics cookies. We use browser{' '}
+                hirebridge does not use tracking cookies or analytics cookies. We use browser{' '}
                 <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono">localStorage</code>{' '}
                 to save bookmarks locally on your device — this data never leaves your browser.
               </p>
@@ -114,7 +114,7 @@ export default function PrivacyPage() {
             <div>
               <h2 className="font-heading text-2xl text-primary mb-3">Changes to this policy</h2>
               <p className="text-sm leading-relaxed text-text-muted">
-                We may update this policy from time to time. The date at the top of this page will reflect the most recent update. Continued use of jobs4u after changes constitutes acceptance of the updated policy.
+                We may update this policy from time to time. The date at the top of this page will reflect the most recent update. Continued use of hirebridge after changes constitutes acceptance of the updated policy.
               </p>
             </div>
 

@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+- **Rebrand: jobs4u → hirebridge** — renamed the platform to hirebridge across the entire frontend; updated all page metadata, OG images, legal pages (Privacy Policy, Terms of Service), layout components (Header, Footer, MobileNav), and SEO files (sitemap, robots); replaced text-only logo in header/footer/mobile nav with the new `logo.png` image asset; added `icon.png` (favicon) from `design-system/favicon.png` for the browser tab; fallback domain URLs updated from `jobs4u.app` to `hirebridgeuae.com`; about and contact pages use "hirebridge UAE" where referencing the regional UAE/Middle East focus
+
 ### Added
 - **About page "Our Story" section** — new section at the bottom of `/about` explaining the motivation behind jobs4u (economic impact of Middle East conflict, platform as a focused alternative), credits Hussain and Tejasvie with a link to `/contact`, and notes the platform has no monetization plans
 - **Umami Cloud analytics** — integrated via Next.js proxy rewrites (`/stats/script.js` and `/stats/api/send` forward to `cloud.umami.is`) to bypass adblockers; script loads only when `NEXT_PUBLIC_UMAMI_WEBSITE_ID` env var is set; setup documented in PRODUCTION.md §12

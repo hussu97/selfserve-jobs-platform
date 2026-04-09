@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og';
 import { getProfile } from '@/lib/api';
 
 export const runtime = 'edge';
-export const alt = 'Candidate profile on jobs4u';
+export const alt = 'Candidate profile on hirebridge';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -52,7 +52,7 @@ export default async function Image({ params }: Props) {
         {/* Top bar */}
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '48px' }}>
           <span style={{ fontSize: 28, fontStyle: 'italic', color: '#384B3B', fontFamily: 'serif' }}>
-            jobs4u
+            hirebridge
           </span>
           <div style={{ flex: 1 }} />
           <span
@@ -181,7 +181,7 @@ export default async function Image({ params }: Props) {
           }}
         >
           <span style={{ fontSize: 13, color: '#434843', fontFamily: 'sans-serif' }}>
-            jobs4u.app · No signup required · No middlemen
+            hirebridgeuae.com · No signup required · No middlemen
           </span>
         </div>
       </div>

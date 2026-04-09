@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Contact',
-  description: 'Get in touch with the team behind jobs4u.',
+  description: 'Get in touch with the team behind hirebridge.',
 };
 
 const FOUNDERS = [
@@ -44,7 +44,7 @@ export default function ContactPage() {
             Say <em>hello</em>
           </h1>
           <p className="text-lg leading-relaxed text-text-muted max-w-xl mx-auto">
-            jobs4u is built by a small team. We read every message — whether it&rsquo;s feedback, a bug report, or just a question.
+            hirebridge UAE is built by a small team. We read every message — whether it&rsquo;s feedback, a bug report, or just a question.
           </p>
         </div>
       </section>

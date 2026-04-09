@@ -7,24 +7,24 @@ import { AuthProvider } from '@/context/AuthContext';
 
 export const metadata: Metadata = {
   title: {
-    default: 'jobs4u — Find Your Next Opportunity',
-    template: '%s | jobs4u',
+    default: 'hirebridge — Find Your Next Opportunity',
+    template: '%s | hirebridge',
   },
   description:
-    'jobs4u is a no-signup jobs platform connecting talent with opportunities. Browse jobs and candidate profiles worldwide.',
-  keywords: ['jobs', 'careers', 'hiring', 'remote work', 'freelance', 'talent'],
+    'hirebridge is a no-signup jobs platform connecting talent with opportunities. Browse jobs and candidate profiles in the UAE and beyond.',
+  keywords: ['jobs', 'careers', 'hiring', 'UAE', 'Middle East', 'remote work', 'freelance', 'talent'],
   openGraph: {
     type: 'website',
-    siteName: 'jobs4u',
-    title: 'jobs4u — Find Your Next Opportunity',
+    siteName: 'hirebridge',
+    title: 'hirebridge — Find Your Next Opportunity',
     description:
-      'A no-signup jobs platform connecting talent with opportunities worldwide.',
+      'A no-signup jobs platform connecting talent with opportunities in the UAE and beyond.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'jobs4u — Find Your Next Opportunity',
+    title: 'hirebridge — Find Your Next Opportunity',
     description:
-      'A no-signup jobs platform connecting talent with opportunities worldwide.',
+      'A no-signup jobs platform connecting talent with opportunities in the UAE and beyond.',
   },
   robots: {
     index: true,

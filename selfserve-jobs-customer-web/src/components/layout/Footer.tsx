@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 
 export function Footer() {
@@ -7,9 +8,7 @@ export function Footer() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
 
           <div className="flex flex-col gap-1.5">
-            <span className="text-lg font-heading italic text-primary tracking-tight">
-              jobs4u
-            </span>
+            <Image src="/logo.png" alt="hirebridge" width={120} height={30} />
             <p className="text-xs text-text-muted leading-relaxed">
               No signup required · No middlemen
             </p>
@@ -33,7 +32,7 @@ export function Footer() {
 
         <div className="mt-10 pt-6">
           <p className="text-[10px] uppercase tracking-widest text-text-muted/60">
-            &copy; {new Date().getFullYear()} jobs4u
+            &copy; {new Date().getFullYear()} hirebridge
           </p>
         </div>
       </div>

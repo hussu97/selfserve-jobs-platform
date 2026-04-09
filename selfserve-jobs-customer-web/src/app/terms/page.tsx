@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Terms of Service',
-  description: 'The rules for using jobs4u — a self-serve jobs platform for employers and candidates.',
+  description: 'The rules for using hirebridge — a self-serve jobs platform for employers and candidates.',
 };
 
 const LAST_UPDATED = 'April 2025';
@@ -31,14 +31,14 @@ export default function TermsPage() {
             <div>
               <h2 className="font-heading text-2xl text-primary mb-3">Acceptance</h2>
               <p className="text-sm leading-relaxed text-text-muted">
-                By using jobs4u — whether to browse, post a job, or create a candidate profile — you agree to these Terms of Service. If you do not agree, please do not use the platform. We reserve the right to update these terms at any time; continued use constitutes acceptance.
+                By using hirebridge — whether to browse, post a job, or create a candidate profile — you agree to these Terms of Service. If you do not agree, please do not use the platform. We reserve the right to update these terms at any time; continued use constitutes acceptance.
               </p>
             </div>
 
             <div>
-              <h2 className="font-heading text-2xl text-primary mb-3">What jobs4u is</h2>
+              <h2 className="font-heading text-2xl text-primary mb-3">What hirebridge is</h2>
               <p className="text-sm leading-relaxed text-text-muted">
-                jobs4u is a self-serve jobs board. We act as a neutral platform that displays listings submitted by users. We do not verify the accuracy of listings, do not act as a recruiter or employment agency, and are not a party to any hiring arrangement between employers and candidates.
+                hirebridge is a self-serve jobs board. We act as a neutral platform that displays listings submitted by users. We do not verify the accuracy of listings, do not act as a recruiter or employment agency, and are not a party to any hiring arrangement between employers and candidates.
               </p>
             </div>
 
@@ -92,7 +92,7 @@ export default function TermsPage() {
             <div>
               <h2 className="font-heading text-2xl text-primary mb-3">Prohibited use</h2>
               <p className="text-sm leading-relaxed text-text-muted mb-4">
-                You may not use jobs4u to:
+                You may not use hirebridge to:
               </p>
               <ul className="flex flex-col gap-2 text-sm text-text-muted list-disc list-inside">
                 <li>Scrape, crawl, or systematically download content in bulk.</li>
@@ -106,14 +106,14 @@ export default function TermsPage() {
             <div>
               <h2 className="font-heading text-2xl text-primary mb-3">No warranty</h2>
               <p className="text-sm leading-relaxed text-text-muted">
-                jobs4u is provided &ldquo;as is&rdquo; without any warranty, express or implied. We do not guarantee the accuracy, completeness, or availability of any listing. We make no representations about the suitability of any job or candidate. Use the platform at your own risk.
+                hirebridge is provided &ldquo;as is&rdquo; without any warranty, express or implied. We do not guarantee the accuracy, completeness, or availability of any listing. We make no representations about the suitability of any job or candidate. Use the platform at your own risk.
               </p>
             </div>
 
             <div>
               <h2 className="font-heading text-2xl text-primary mb-3">Limitation of liability</h2>
               <p className="text-sm leading-relaxed text-text-muted">
-                To the maximum extent permitted by law, jobs4u and its operators shall not be liable for any indirect, incidental, special, or consequential damages arising out of your use of the platform, including but not limited to loss of data, lost profits, or any harm resulting from reliance on a listing. Our total liability in any matter shall not exceed zero, as the service is currently provided at no cost.
+                To the maximum extent permitted by law, hirebridge and its operators shall not be liable for any indirect, incidental, special, or consequential damages arising out of your use of the platform, including but not limited to loss of data, lost profits, or any harm resulting from reliance on a listing. Our total liability in any matter shall not exceed zero, as the service is currently provided at no cost.
               </p>
             </div>
 

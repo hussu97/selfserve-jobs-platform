@@ -128,7 +128,7 @@ function ReportContent() {
         Report a <em>listing</em>
       </h1>
       <p className="text-sm mb-8 text-text-muted">
-        Help us keep jobs4u safe and spam-free. We review all reports manually.
+        Help us keep hirebridge safe and spam-free. We review all reports manually.
       </p>
 
       {error && (

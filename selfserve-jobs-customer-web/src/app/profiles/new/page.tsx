@@ -3,7 +3,7 @@ import { ProfileForm } from '@/components/profiles/ProfileForm';
 
 export const metadata: Metadata = {
   title: 'Create a Profile',
-  description: 'Create a talent profile on jobs4u. Let employers find you. No signup required.',
+  description: 'Create a talent profile on hirebridge. Let employers find you. No signup required.',
 };
 
 export default function NewProfilePage() {

@@ -4,7 +4,7 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'About',
   description:
-    'jobs4u is a no-signup jobs board connecting talent with opportunity. Learn how it works.',
+    'hirebridge is a no-signup jobs board connecting talent with opportunity in the UAE and Middle East. Learn how it works.',
 };
 
 const JOB_SEEKER_STEPS = [
@@ -80,13 +80,13 @@ export default function AboutPage() {
       <section className="hero-gradient">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 text-center">
           <span className="text-xs font-semibold uppercase tracking-widest text-secondary mb-4 block">
-            About jobs4u
+            About hirebridge
           </span>
           <h1 className="font-heading text-4xl sm:text-5xl text-primary mb-6">
             Jobs without the <em>noise</em>
           </h1>
           <p className="text-lg leading-relaxed text-text-muted max-w-2xl mx-auto">
-            jobs4u is a minimalist jobs platform built for people who are tired of bloated job boards.
+            hirebridge is a minimalist jobs platform built for people who are tired of bloated job boards.
             No accounts, no algorithms, no recruiter fees. Just jobs and talent, directly connected.
           </p>
         </div>
@@ -111,14 +111,14 @@ export default function AboutPage() {
               families, and careers.
             </p>
             <p>
-              We built jobs4u as a small, focused response. Major job platforms are noisy —
+              We built hirebridge UAE as a small, focused response. Major job platforms are noisy —
               buried in algorithms, recruiter spam, and pay-to-play rankings. We wanted
               something simpler: a concentrated space where real companies post real jobs,
               and talented people can be found without the clutter. No middlemen, no
               hidden fees, no endless scrolling.
             </p>
             <p>
-              jobs4u is a personal project by{' '}
+              hirebridge is a personal project by{' '}
               <strong className="text-text-main">Hussain</strong> and{' '}
               <strong className="text-text-main">Tejasvie</strong> — two people who
               wanted to do something useful with the tools they have. There are no plans to

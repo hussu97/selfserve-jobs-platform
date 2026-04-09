@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { MobileNav } from './MobileNav';
@@ -71,9 +72,10 @@ export function Header() {
 
             <Link
               href="/"
-              className="text-2xl tracking-tight font-heading italic text-primary hover:opacity-75 transition-opacity"
+              className="hover:opacity-75 transition-opacity"
+              aria-label="hirebridge home"
             >
-              jobs4u
+              <Image src="/logo.png" alt="hirebridge" width={140} height={36} priority />
             </Link>
 
             <nav className="hidden md:flex items-center gap-6">

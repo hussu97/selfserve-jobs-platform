@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
@@ -67,9 +68,9 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
           <Link
             href="/"
             onClick={onClose}
-            className="text-xl font-heading italic text-primary"
+            aria-label="hirebridge home"
           >
-            jobs4u
+            <Image src="/logo.png" alt="hirebridge" width={110} height={28} />
           </Link>
           <button
             onClick={onClose}

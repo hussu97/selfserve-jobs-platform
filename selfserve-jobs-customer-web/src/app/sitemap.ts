@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { getJobs, getProfiles } from '@/lib/api';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://jobs4u.app';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://hirebridgeuae.com';
 const PAGE_SIZE = 200;
 
 // ID encoding:

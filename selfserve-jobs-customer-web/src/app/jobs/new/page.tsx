@@ -3,7 +3,7 @@ import { JobForm } from '@/components/jobs/JobForm';
 
 export const metadata: Metadata = {
   title: 'Post a Job',
-  description: 'Post a job listing on jobs4u. No signup required — just verify your email.',
+  description: 'Post a job listing on hirebridge. No signup required — just verify your email.',
 };
 
 export default function NewJobPage() {
