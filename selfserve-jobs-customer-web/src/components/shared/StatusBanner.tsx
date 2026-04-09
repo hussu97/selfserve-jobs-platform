@@ -9,25 +9,25 @@ interface StatusBannerProps {
 
 const BANNER_STYLES = {
   success: {
-    wrapper: 'bg-green-50 border-green-200',
+    wrapper: 'bg-green-50',
     icon: 'text-green-600',
     title: 'text-green-900',
     text: 'text-green-800',
   },
   error: {
-    wrapper: 'bg-red-50 border-red-200',
+    wrapper: 'bg-red-50',
     icon: 'text-red-600',
     title: 'text-red-900',
     text: 'text-red-800',
   },
   warning: {
-    wrapper: 'bg-amber-50 border-amber-200',
+    wrapper: 'bg-amber-50',
     icon: 'text-amber-600',
     title: 'text-amber-900',
     text: 'text-amber-800',
   },
   info: {
-    wrapper: 'bg-blue-50 border-blue-200',
+    wrapper: 'bg-blue-50',
     icon: 'text-blue-600',
     title: 'text-blue-900',
     text: 'text-blue-800',
@@ -63,7 +63,7 @@ export function StatusBanner({ type, title, message, className }: StatusBannerPr
   return (
     <div
       className={cn(
-        'flex gap-3 rounded-xl border p-4',
+        'flex gap-3 rounded-2xl p-4',
         styles.wrapper,
         className
       )}

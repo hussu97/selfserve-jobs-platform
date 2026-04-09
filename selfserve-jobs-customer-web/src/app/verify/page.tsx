@@ -14,14 +14,16 @@ type VerifyState = 'idle' | 'loading' | 'success' | 'error' | 'no_code';
 
 export default function VerifyPage() {
   return (
-    <Suspense fallback={
-      <div className="max-w-lg mx-auto px-4 sm:px-6 py-20 text-center">
-        <Spinner size="lg" className="mx-auto mb-4" />
-        <p className="text-base font-medium text-text-main">Loading…</p>
-      </div>
-    }>
-      <VerifyContent />
-    </Suspense>
+    <div className="hero-gradient min-h-screen">
+      <Suspense fallback={
+        <div className="max-w-lg mx-auto px-4 sm:px-6 py-20 text-center">
+          <Spinner size="lg" className="mx-auto mb-4" />
+          <p className="text-base font-medium text-text-main">Loading…</p>
+        </div>
+      }>
+        <VerifyContent />
+      </Suspense>
+    </div>
   );
 }
 
@@ -83,16 +85,12 @@ function VerifyContent() {
   if (state === 'no_code') {
     return (
       <div className="max-w-lg mx-auto px-4 sm:px-6 py-20 text-center">
-        <div
-          className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5 bg-surface"
-        >
+        <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5 bg-surface">
           <svg className="h-8 w-8 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
           </svg>
         </div>
-        <h1
-          className="text-2xl font-bold mb-3 font-heading text-secondary"
-        >
+        <h1 className="font-heading text-3xl text-primary mb-3">
           Check your email
         </h1>
         <p className="text-sm text-text-muted">
@@ -135,10 +133,8 @@ function VerifyContent() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h1
-          className="text-2xl font-bold mb-3 font-heading text-secondary"
-        >
-          Your listing is now live!
+        <h1 className="font-heading text-3xl text-primary mb-3">
+          Your listing is <em>live</em>!
         </h1>
         <p className="text-sm mb-8 text-text-muted">
           {result.message || 'Your listing has been verified and published successfully.'}
@@ -147,14 +143,14 @@ function VerifyContent() {
           {listingHref && (
             <Link
               href={listingHref}
-              className="inline-flex items-center justify-center px-6 py-3 rounded-xl text-white font-semibold transition-opacity hover:opacity-90 bg-primary"
+              className="inline-flex items-center justify-center px-6 py-3 rounded-full text-white font-semibold transition-opacity hover:opacity-90 bg-primary"
             >
               View your listing →
             </Link>
           )}
           <Link
             href="/"
-            className="inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold border-2 transition-colors hover:bg-[#2D5F3A] hover:text-white border-secondary text-secondary"
+            className="inline-flex items-center justify-center px-6 py-3 rounded-full font-semibold transition-colors hover:bg-primary hover:text-white bg-surface-lowest shadow-ambient text-primary"
           >
             Back to home
           </Link>
@@ -167,17 +163,13 @@ function VerifyContent() {
   return (
     <div className="max-w-lg mx-auto px-4 sm:px-6 py-16">
       <div className="text-center mb-10">
-        <div
-          className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5 bg-yellow-100"
-        >
+        <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5 bg-yellow-100">
           <svg className="h-8 w-8 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
         </div>
-        <h1
-          className="text-2xl font-bold mb-3 font-heading text-secondary"
-        >
-          Verification link expired
+        <h1 className="font-heading text-3xl text-primary mb-3">
+          Verification link <em>expired</em>
         </h1>
         <p className="text-sm text-text-muted">
           {errorMessage || 'This verification link has expired or is invalid.'}
@@ -185,12 +177,8 @@ function VerifyContent() {
       </div>
 
       {/* Resend form */}
-      <div
-        className="rounded-2xl border p-6 bg-surface border-border"
-      >
-        <h2
-          className="font-semibold text-lg mb-1 font-heading text-text-main"
-        >
+      <div className="rounded-2xl bg-surface-lowest shadow-ambient p-6">
+        <h2 className="font-heading text-xl text-primary mb-1">
           Resend Verification Email
         </h2>
         <p className="text-sm mb-5 text-text-muted">
@@ -242,7 +230,7 @@ function VerifyContent() {
               </label>
             </div>
           </div>
-          <Button type="submit" loading={resendLoading} className="self-start">
+          <Button type="submit" loading={resendLoading} className="self-start rounded-full">
             Send verification email
           </Button>
         </form>

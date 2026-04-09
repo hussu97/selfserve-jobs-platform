@@ -47,23 +47,49 @@ A free-to-use jobs platform with two core entities: **Jobs** (company listings) 
 - Client-side session dedup for view counts.
 
 ## Design System
-**Earth-tone palette — always use these values:**
-| Token | Hex | Use |
-|-------|-----|-----|
-| Primary (CTA) | `#C2703E` | Buttons, active states |
-| Secondary | `#2D5F3A` | Headers, important text |
-| Background | `#FAF7F2` | Page background |
-| Surface | `#F0EBE1` | Card backgrounds |
-| Text Primary | `#2C2825` | Main text |
-| Text Secondary | `#7A7067` | Muted text |
-| Accent | `#8BA888` | Tags, badges |
-| Border | `#DDD5C8` | Dividers, input borders |
+Full spec: `design-system/DESIGN.md`. HTML mockups: `design-system/DESKTOP_WEB.html` and `design-system/MOBILE_WEB.html`.
+
+**"Sage & Stone" palette — always use these values:**
+| Token | CSS Var | Hex | Use |
+|-------|---------|-----|-----|
+| Primary (CTA) | `--color-primary` | `#384B3B` | Buttons, active states, headings |
+| Primary Hover | `--color-primary-hover` | `#2d3e2f` | Button/link hover |
+| Secondary | `--color-secondary` | `#8C4E32` | Accent text, secondary CTAs, company names |
+| Secondary Hover | `--color-secondary-hover` | `#6e3d27` | Secondary hover |
+| Background | `--color-bg` | `#fcf9f5` | Page background |
+| Surface | `--color-surface` | `#f6f3ef` | Section backgrounds, input fills |
+| Surface Lowest | `--color-surface-lowest` | `#ffffff` | Card backgrounds (white on cream) |
+| Text Primary | `--color-text-main` | `#1c1c1a` | Main body text |
+| Text Muted | `--color-text-muted` | `#434843` | Secondary/muted text |
+| Accent | `--color-accent` | `#8BA888` | Tags, badges (sage green) |
+| Accent Dark | `--color-accent-dark` | `#4a7547` | Accent hover/text |
+| Border | `--color-border` | `#c3c8c0` | Minimal use — focus rings, form errors only |
 
 **Typography:**
-- Body: Outfit (sans-serif) — geometric, modern, clean
-- Headings: Instrument Serif (serif) — warm editorial character, distinctive
+- Body/UI: Manrope (sans-serif) — clean, modern
+- Headings: Newsreader (serif) — editorial, italic-capable
 
-**Design principles:** Minimalistic, lightweight, easy to browse. No generic AI aesthetics. Subtle earth textures/tones only.
+**Editorial typography patterns (ALWAYS follow):**
+- Headlines: Use italic Newsreader for one emphasis word (e.g., `Find <em>Extraordinary</em> Talent`)
+- Section labels/eyebrows: Uppercase, `tracking-widest`, tiny font size (`text-xs`), Manrope
+- Numbered form sections: `01`, `02`, `03` in large italic serif numerals with left accent border
+- Logo: Newsreader italic
+
+**Surface Hierarchy — "No-Line Rule" (CRITICAL):**
+- **NO** `1px` solid borders for sectioning cards or layout regions
+- Differentiate surfaces by background color: `bg (#fcf9f5)` → `surface (#f6f3ef)` → `surface-lowest (#ffffff)`
+- Use ambient dual-layer shadows for card elevation: `box-shadow: 0 1px 3px rgba(28,28,26,0.03), 0 8px 16px rgba(28,28,26,0.02)`
+- Borders **only** allowed for: form focus rings, error state inputs, horizontal rules inside markdown prose, explicit `<hr>` elements
+- Use `.shadow-ambient` / `.shadow-ambient-hover` CSS classes (defined in globals.css)
+
+**Component patterns:**
+- Buttons: Pill-shaped (`rounded-full`), primary = forest green, secondary = outline terracotta
+- Cards: White on cream (`bg-surface-lowest`), `rounded-2xl`, ambient shadow, `hover:-translate-y-1`
+- Inputs: Borderless (`border-0 bg-surface`), `rounded-xl`, uppercase `tracking-[0.1em]` labels
+- Tags/skills: Pill-shaped (`rounded-full`), `uppercase tracking-wider`, sage green background
+- Shadows: Always dual-layer ambient — never hard `drop-shadow` or `box-shadow` with dark color/opacity
+
+**Design principles:** Editorial, high-contrast serif/sans pairing, intentional whitespace, asymmetric grids (7/5 or 8/4 spans). No generic AI aesthetics.
 
 ## Deployment Architecture
 - **Frontend (Vercel):** Root directory = `selfserve-jobs-customer-web/`, env: `NEXT_PUBLIC_API_URL`
@@ -144,3 +170,42 @@ A free-to-use jobs platform with two core entities: **Jobs** (company listings) 
 - **PRODUCTION.md:** Update in the same commit whenever deployment steps, infrastructure setup, IAM grants, or required secrets change
 - **README.md:** Update when architecture, local dev setup, or project structure changes materially
 - **CLAUDE.md:** Update when adding new conventions, changing tech stack, or when given new directions that should apply to future sessions
+
+<!-- code-review-graph MCP tools -->
+## MCP Tools: code-review-graph
+
+**IMPORTANT: This project has a knowledge graph. ALWAYS use the
+code-review-graph MCP tools BEFORE using Grep/Glob/Read to explore
+the codebase.** The graph is faster, cheaper (fewer tokens), and gives
+you structural context (callers, dependents, test coverage) that file
+scanning cannot.
+
+### When to use graph tools FIRST
+
+- **Exploring code**: `semantic_search_nodes` or `query_graph` instead of Grep
+- **Understanding impact**: `get_impact_radius` instead of manually tracing imports
+- **Code review**: `detect_changes` + `get_review_context` instead of reading entire files
+- **Finding relationships**: `query_graph` with callers_of/callees_of/imports_of/tests_for
+- **Architecture questions**: `get_architecture_overview` + `list_communities`
+
+Fall back to Grep/Glob/Read **only** when the graph doesn't cover what you need.
+
+### Key Tools
+
+| Tool | Use when |
+|------|----------|
+| `detect_changes` | Reviewing code changes — gives risk-scored analysis |
+| `get_review_context` | Need source snippets for review — token-efficient |
+| `get_impact_radius` | Understanding blast radius of a change |
+| `get_affected_flows` | Finding which execution paths are impacted |
+| `query_graph` | Tracing callers, callees, imports, tests, dependencies |
+| `semantic_search_nodes` | Finding functions/classes by name or keyword |
+| `get_architecture_overview` | Understanding high-level codebase structure |
+| `refactor_tool` | Planning renames, finding dead code |
+
+### Workflow
+
+1. The graph auto-updates on file changes (via hooks).
+2. Use `detect_changes` for code review.
+3. Use `get_affected_flows` to understand impact.
+4. Use `query_graph` pattern="tests_for" to check coverage.

@@ -35,11 +35,11 @@ export function Pagination({ page, totalPages, onPageChange, className }: Pagina
         onClick={() => onPageChange(page - 1)}
         disabled={page === 1}
         className={cn(
-          'flex items-center gap-1 px-3 py-2 text-sm rounded-lg transition-colors text-text-muted',
-          'border border-border hover:border-primary/50',
+          'flex items-center gap-1 px-3 py-2 text-sm rounded-full transition-all text-text-muted',
+          'bg-surface-lowest shadow-ambient',
           page === 1
             ? 'opacity-40 cursor-not-allowed'
-            : 'hover:bg-surface cursor-pointer'
+            : 'hover:bg-surface hover:shadow-ambient-hover cursor-pointer'
         )}
         aria-label="Previous page"
       >
@@ -63,10 +63,10 @@ export function Pagination({ page, totalPages, onPageChange, className }: Pagina
               key={p}
               onClick={() => onPageChange(p)}
               className={cn(
-                'min-w-[36px] h-9 px-2 text-sm rounded-lg transition-colors cursor-pointer',
+                'min-w-[36px] h-9 px-2 text-sm rounded-full transition-all cursor-pointer',
                 p === page
-                  ? 'bg-primary text-white font-medium'
-                  : 'border border-border hover:bg-surface hover:border-primary/50 text-text-main'
+                  ? 'bg-primary text-white font-medium shadow-ambient'
+                  : 'bg-surface-lowest shadow-ambient hover:bg-surface hover:shadow-ambient-hover text-text-main'
               )}
               aria-current={p === page ? 'page' : undefined}
             >
@@ -80,11 +80,11 @@ export function Pagination({ page, totalPages, onPageChange, className }: Pagina
         onClick={() => onPageChange(page + 1)}
         disabled={page === totalPages}
         className={cn(
-          'flex items-center gap-1 px-3 py-2 text-sm rounded-lg transition-colors text-text-muted',
-          'border border-border hover:border-primary/50',
+          'flex items-center gap-1 px-3 py-2 text-sm rounded-full transition-all text-text-muted',
+          'bg-surface-lowest shadow-ambient',
           page === totalPages
             ? 'opacity-40 cursor-not-allowed'
-            : 'hover:bg-surface cursor-pointer'
+            : 'hover:bg-surface hover:shadow-ambient-hover cursor-pointer'
         )}
         aria-label="Next page"
       >

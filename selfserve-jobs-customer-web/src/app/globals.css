@@ -1,31 +1,33 @@
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=Manrope:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #C2703E;
-  --color-primary-hover: #a85c30;
-  --color-secondary: #2D5F3A;
-  --color-secondary-hover: #234a2d;
-  --color-bg: #FAF7F2;
-  --color-surface: #F0EBE1;
-  --color-text-main: #2C2825;
-  --color-text-muted: #7A7067;
+  --color-primary: #384B3B;
+  --color-primary-hover: #2d3e2f;
+  --color-secondary: #8C4E32;
+  --color-secondary-hover: #6e3d27;
+  --color-bg: #fcf9f5;
+  --color-surface: #f6f3ef;
+  --color-surface-lowest: #ffffff;
+  --color-text-main: #1c1c1a;
+  --color-text-muted: #434843;
   --color-accent: #8BA888;
   --color-accent-dark: #4a7547;
-  --color-border: #DDD5C8;
-  --font-sans: 'Outfit', sans-serif;
-  --font-heading: 'Instrument Serif', serif;
+  --color-border: #c3c8c0;
+  --font-sans: 'Manrope', sans-serif;
+  --font-heading: 'Newsreader', serif;
 }
 
 :root {
-  --color-primary: #C2703E;
-  --color-secondary: #2D5F3A;
-  --color-bg: #FAF7F2;
-  --color-surface: #F0EBE1;
-  --color-text: #2C2825;
-  --color-text-muted: #7A7067;
+  --color-primary: #384B3B;
+  --color-secondary: #8C4E32;
+  --color-bg: #fcf9f5;
+  --color-surface: #f6f3ef;
+  --color-surface-lowest: #ffffff;
+  --color-text: #1c1c1a;
+  --color-text-muted: #434843;
   --color-accent: #8BA888;
-  --color-border: #DDD5C8;
+  --color-border: #c3c8c0;
 }
 
 * {
@@ -42,7 +44,7 @@ html {
 }
 
 body {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Manrope', sans-serif;
   background-color: var(--color-bg);
   color: var(--color-text);
   line-height: 1.6;
@@ -50,14 +52,14 @@ body {
 }
 
 h1, h2, h3 {
-  font-family: 'Instrument Serif', serif;
+  font-family: 'Newsreader', serif;
   font-weight: 600;
-  line-height: 1.25;
-  color: var(--color-secondary);
+  line-height: 1.2;
+  color: var(--color-primary);
 }
 
 h4, h5, h6 {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Manrope', sans-serif;
   font-weight: 600;
   line-height: 1.4;
 }
@@ -65,6 +67,20 @@ h4, h5, h6 {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+/* ─── Ambient Shadow Utilities ────────────────────────────── */
+
+.shadow-ambient {
+  box-shadow: 0 1px 3px rgba(28, 28, 26, 0.03), 0 8px 16px rgba(28, 28, 26, 0.02);
+}
+
+.shadow-ambient-hover {
+  box-shadow: 0 4px 12px rgba(28, 28, 26, 0.05), 0 20px 40px rgba(28, 28, 26, 0.04);
+}
+
+.hero-gradient {
+  background: radial-gradient(circle at center, #fcf9f5 0%, #f6f3ef 100%);
 }
 
 /* ─── Animations ──────────────────────────────────────────── */
@@ -131,8 +147,8 @@ a {
 }
 
 .prose h1, .prose h2, .prose h3 {
-  font-family: 'Instrument Serif', serif;
-  color: var(--color-secondary);
+  font-family: 'Newsreader', serif;
+  color: var(--color-primary);
   margin-top: 1.5em;
   margin-bottom: 0.5em;
 }
@@ -167,7 +183,6 @@ a {
 
 .prose code {
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
   border-radius: 4px;
   padding: 0.15em 0.35em;
   font-size: 0.875em;
@@ -176,7 +191,6 @@ a {
 
 .prose pre {
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 1.25em;
   overflow-x: auto;
@@ -185,7 +199,6 @@ a {
 
 .prose pre code {
   background: none;
-  border: none;
   padding: 0;
 }
 

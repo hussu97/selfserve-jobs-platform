@@ -88,13 +88,13 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
   const filterContent = (
     <div className="flex flex-col gap-5">
       <div className="flex items-center justify-between">
-        <h2 className="font-semibold text-sm uppercase tracking-wide text-text-muted">
+        <h2 className="font-heading text-lg text-primary">
           Filters
         </h2>
         {hasActiveFilters && (
           <button
             onClick={clearAll}
-            className="text-xs font-medium cursor-pointer hover:opacity-70 text-primary"
+            className="text-xs font-medium cursor-pointer hover:opacity-70 text-primary rounded-full px-3 py-1 bg-surface"
           >
             Clear all
           </button>
@@ -125,7 +125,7 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
 
       {/* Relocation */}
       <div className="flex flex-col gap-2">
-        <p className="text-sm font-medium text-text-main">
+        <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-text-muted">
           Relocation
         </p>
         <div className="flex flex-col gap-1.5">
@@ -157,7 +157,7 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
 
       {/* Skills */}
       <div className="flex flex-col gap-2">
-        <p className="text-sm font-medium text-text-main">
+        <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-text-muted">
           Skills
         </p>
         <input
@@ -171,7 +171,7 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
             }
           }}
           placeholder="Type and press Enter"
-          className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-text-main"
+          className="w-full rounded-xl bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary text-text-main"
         />
         {(filters.skills?.length ?? 0) > 0 && (
           <div className="flex flex-wrap gap-1.5">
@@ -188,7 +188,7 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
                 key={skill}
                 type="button"
                 onClick={() => addSkill(skill)}
-                className="text-xs px-2 py-0.5 rounded-full border border-dashed border-border hover:border-accent hover:bg-accent/10 transition-colors cursor-pointer text-text-muted"
+                className="text-xs px-2.5 py-0.5 rounded-full uppercase tracking-wider bg-surface hover:bg-accent/10 transition-colors cursor-pointer text-text-muted"
               >
                 {skill}
               </button>
@@ -205,7 +205,7 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
           variant="outline"
           size="sm"
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="w-full justify-between"
+          className="w-full justify-between rounded-full"
         >
           <span>Filters {hasActiveFilters && '(active)'}</span>
           <svg
@@ -218,14 +218,14 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
           </svg>
         </Button>
         {mobileOpen && (
-          <div className="mt-3 rounded-xl border border-border bg-surface p-5">
+          <div className="mt-3 bg-surface-lowest rounded-2xl shadow-ambient p-5">
             {filterContent}
           </div>
         )}
       </div>
 
       <div
-        className={cn('hidden lg:block sticky top-24 rounded-xl border border-border bg-surface p-5', className)}
+        className={cn('hidden lg:block sticky top-24 bg-surface-lowest shadow-ambient rounded-2xl p-5', className)}
       >
         {filterContent}
       </div>

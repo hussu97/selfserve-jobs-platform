@@ -45,10 +45,9 @@ export function SearchBar({ value = '', onChange, placeholder = 'Search…', cla
         onChange={handleChange}
         placeholder={placeholder}
         className={cn(
-          'w-full rounded-xl border border-border bg-white pl-9 pr-9 py-2.5 text-sm text-text-main',
-          'placeholder:text-text-muted',
-          'focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent',
-          'hover:border-primary/50 transition-colors'
+          'w-full rounded-2xl border-0 bg-surface-lowest shadow-ambient pl-9 pr-9 py-3 text-sm text-text-main',
+          'placeholder:text-text-muted/60',
+          'focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all'
         )}
       />
       {internal && (

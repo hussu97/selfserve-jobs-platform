@@ -15,11 +15,13 @@ import type { ReportReason, EntityType } from '@/lib/types';
 
 export default function ReportPage() {
   return (
-    <Suspense fallback={
-      <div className="flex justify-center py-20"><Spinner size="lg" /></div>
-    }>
-      <ReportContent />
-    </Suspense>
+    <div className="hero-gradient min-h-screen">
+      <Suspense fallback={
+        <div className="flex justify-center py-20"><Spinner size="lg" /></div>
+      }>
+        <ReportContent />
+      </Suspense>
+    </div>
   );
 }
 
@@ -39,9 +41,7 @@ function ReportContent() {
   if (!entityCode) {
     return (
       <div className="max-w-lg mx-auto px-4 sm:px-6 py-20 text-center">
-        <h1
-          className="text-2xl font-bold mb-3 font-heading text-secondary"
-        >
+        <h1 className="font-heading text-3xl text-primary mb-3">
           Nothing to report
         </h1>
         <p className="text-sm mb-6 text-text-muted">
@@ -93,17 +93,15 @@ function ReportContent() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h1
-          className="text-2xl font-bold mb-3 font-heading text-secondary"
-        >
-          Report submitted
+        <h1 className="font-heading text-3xl text-primary mb-3">
+          Report <em>submitted</em>
         </h1>
         <p className="text-sm mb-8 text-text-muted">
           Thank you for your report. We&apos;ll review it shortly and take appropriate action.
         </p>
         <Link
           href={`/${entityType}/${entityCode}`}
-          className="inline-flex items-center justify-center px-6 py-3 rounded-xl text-white font-semibold transition-opacity hover:opacity-90 bg-primary"
+          className="inline-flex items-center justify-center px-6 py-3 rounded-full text-white font-semibold transition-opacity hover:opacity-90 bg-primary"
         >
           ← Back to listing
         </Link>
@@ -112,7 +110,7 @@ function ReportContent() {
   }
 
   return (
-    <div className="max-w-xl mx-auto px-4 sm:px-6 py-12">
+    <div className="max-w-xl mx-auto px-4 sm:px-6 py-16">
       <Link
         href={`/${entityType}/${entityCode}`}
         className="inline-flex items-center gap-1.5 text-sm mb-8 hover:opacity-70 text-text-muted"
@@ -123,10 +121,11 @@ function ReportContent() {
         Back to listing
       </Link>
 
-      <h1
-        className="text-3xl font-bold mb-2 font-heading text-secondary"
-      >
-        Report a listing
+      <span className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-4 block">
+        Content moderation
+      </span>
+      <h1 className="font-heading text-4xl text-primary mb-2">
+        Report a <em>listing</em>
       </h1>
       <p className="text-sm mb-8 text-text-muted">
         Help us keep jobs4u safe and spam-free. We review all reports manually.
@@ -167,16 +166,14 @@ function ReportContent() {
           rows={5}
         />
 
-        <div
-          className="rounded-xl border p-4 text-sm bg-surface border-border"
-        >
+        <div className="rounded-2xl bg-surface p-4 text-sm">
           <p className="text-text-muted">
             <span className="font-medium text-text-main">Listing: </span>
             {entityCode} ({entityType === 'jobs' ? 'job' : 'profile'})
           </p>
         </div>
 
-        <Button type="submit" size="lg" loading={loading} className="self-start">
+        <Button type="submit" size="lg" loading={loading} className="self-start rounded-full">
           Submit report
         </Button>
       </form>

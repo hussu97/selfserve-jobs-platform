@@ -44,7 +44,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
       {/* Drawer */}
       <div
         className={cn(
-          'fixed top-0 right-0 z-50 h-full w-72 shadow-xl transition-transform duration-300 ease-in-out',
+          'fixed top-0 right-0 z-50 h-full w-72 shadow-ambient-hover transition-transform duration-300 ease-in-out',
           'flex flex-col bg-bg',
           open ? 'translate-x-0' : 'translate-x-full'
         )}
@@ -53,17 +53,17 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
         aria-label="Navigation menu"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+        <div className="flex items-center justify-between px-5 py-4 bg-surface">
           <Link
             href="/"
             onClick={onClose}
-            className="font-bold text-xl font-heading text-secondary"
+            className="text-xl font-heading italic text-primary"
           >
             jobs4u
           </Link>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg transition-colors text-text-muted"
+            className="p-2 rounded-full transition-colors text-text-muted hover:bg-surface-lowest"
             aria-label="Close menu"
           >
             <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -79,7 +79,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
               key={link.href}
               href={link.href}
               onClick={onClose}
-              className="px-4 py-3 rounded-xl text-sm font-medium transition-colors hover:bg-surface text-text-main"
+              className="px-4 py-3 rounded-full text-xs font-semibold uppercase tracking-widest transition-colors hover:bg-surface text-text-main"
             >
               {link.label}
             </Link>
@@ -87,7 +87,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
         </nav>
 
         {/* Footer */}
-        <div className="px-5 py-4 border-t border-border text-xs text-text-muted">
+        <div className="px-5 py-4 bg-surface text-[10px] uppercase tracking-widest text-text-muted">
           Free to use · No signup required
         </div>
       </div>

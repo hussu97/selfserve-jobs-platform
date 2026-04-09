@@ -243,84 +243,78 @@ function ManageContent() {
 
   if (pageState === 'deleted') {
     return (
-      <div className="max-w-lg mx-auto px-4 sm:px-6 py-20 text-center">
-        <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-5">
-          <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-          </svg>
+      <div className="hero-gradient min-h-screen">
+        <div className="max-w-lg mx-auto px-4 sm:px-6 py-20 text-center">
+          <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-5">
+            <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h1 className="font-heading text-3xl text-primary mb-3">
+            Listing <em>removed</em>
+          </h1>
+          <p className="text-sm mb-8 text-text-muted">
+            Your listing has been permanently deleted.
+          </p>
+          <Link
+            href={`/${entityType}`}
+            className="inline-flex items-center justify-center px-6 py-3 rounded-full text-white font-semibold transition-opacity hover:opacity-90 bg-primary"
+          >
+            ← Browse {entityType === 'jobs' ? 'Jobs' : 'Profiles'}
+          </Link>
         </div>
-        <h1
-          className="text-2xl font-bold mb-3 font-heading text-secondary"
-        >
-          Listing removed
-        </h1>
-        <p className="text-sm mb-8 text-text-muted">
-          Your listing has been permanently deleted.
-        </p>
-        <Link
-          href={`/${entityType}`}
-          className="inline-flex items-center justify-center px-6 py-3 rounded-xl text-white font-semibold transition-opacity hover:opacity-90 bg-primary"
-        >
-          ← Browse {entityType === 'jobs' ? 'Jobs' : 'Profiles'}
-        </Link>
       </div>
     );
   }
 
   if (pageState === 'invalid') {
     return (
-      <div className="max-w-lg mx-auto px-4 sm:px-6 py-16">
-        <div className="text-center mb-10">
-          <div
-            className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5 bg-yellow-100"
-          >
-            <svg className="h-8 w-8 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
+      <div className="hero-gradient min-h-screen">
+        <div className="max-w-lg mx-auto px-4 sm:px-6 py-16">
+          <div className="text-center mb-10">
+            <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5 bg-yellow-100">
+              <svg className="h-8 w-8 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <h1 className="font-heading text-3xl text-primary mb-3">
+              Invalid management <em>link</em>
+            </h1>
+            <p className="text-sm text-text-muted">
+              {tokenError || 'This management link is invalid or has expired.'}
+            </p>
           </div>
-          <h1
-            className="text-2xl font-bold mb-3 font-heading text-secondary"
-          >
-            Invalid management link
-          </h1>
-          <p className="text-sm text-text-muted">
-            {tokenError || 'This management link is invalid or has expired.'}
-          </p>
-        </div>
 
-        {/* Request new link */}
-        <div
-          className="rounded-2xl border p-6 bg-surface border-border"
-        >
-          <h2
-            className="font-semibold text-lg mb-1 font-heading text-text-main"
-          >
-            Request a new link
-          </h2>
-          <p className="text-sm mb-5 text-text-muted">
-            Enter your email to receive new management links for all your listings.
-          </p>
+          {/* Request new link */}
+          <div className="rounded-2xl bg-surface-lowest shadow-ambient p-6">
+            <h2 className="font-heading text-xl text-primary mb-1">
+              Request a new link
+            </h2>
+            <p className="text-sm mb-5 text-text-muted">
+              Enter your email to receive new management links for all your listings.
+            </p>
 
-          {requestMessage && (
-            <StatusBanner type="success" message={requestMessage} className="mb-4" />
-          )}
-          {requestError && (
-            <StatusBanner type="error" message={requestError} className="mb-4" />
-          )}
+            {requestMessage && (
+              <StatusBanner type="success" message={requestMessage} className="mb-4" />
+            )}
+            {requestError && (
+              <StatusBanner type="error" message={requestError} className="mb-4" />
+            )}
 
-          <form onSubmit={handleRequestLinks} className="flex flex-col gap-4">
-            <Input
-              type="email"
-              label="Email address"
-              placeholder="you@example.com"
-              value={requestEmail}
-              onChange={(e) => setRequestEmail(e.target.value)}
-              required
-            />
-            <Button type="submit" loading={requestLoading} className="self-start">
-              Send management links
-            </Button>
-          </form>
+            <form onSubmit={handleRequestLinks} className="flex flex-col gap-4">
+              <Input
+                type="email"
+                label="Email address"
+                placeholder="you@example.com"
+                value={requestEmail}
+                onChange={(e) => setRequestEmail(e.target.value)}
+                required
+              />
+              <Button type="submit" loading={requestLoading} className="self-start rounded-full">
+                Send management links
+              </Button>
+            </form>
+          </div>
         </div>
       </div>
     );
@@ -343,10 +337,11 @@ function ManageContent() {
           View listing
         </Link>
       </div>
-      <h1
-        className="text-3xl sm:text-4xl font-bold mb-2 font-heading text-secondary"
-      >
-        Manage {isJobs ? 'Job Listing' : 'Profile'}
+      <span className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-4 block">
+        Listing management
+      </span>
+      <h1 className="font-heading text-3xl sm:text-4xl text-primary mb-2">
+        Manage {isJobs ? <em>Job Listing</em> : <em>Profile</em>}
       </h1>
       <p className="text-sm mb-10 text-text-muted">
         {isJobs
@@ -364,130 +359,148 @@ function ManageContent() {
       {/* Job edit form */}
       {isJobs && (
         <form onSubmit={handleSaveJob} className="flex flex-col gap-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Input
-              label="Job title"
-              value={jobForm.job_title ?? ''}
-              onChange={(e) => setJobField('job_title', e.target.value)}
-              required
-            />
-            <Select
-              label="Employment type"
-              options={EMPLOYMENT_TYPES}
-              value={jobForm.employment_type ?? 'full_time'}
-              onChange={(e) => setJobField('employment_type', e.target.value as UpdateJobRequest['employment_type'])}
-            />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Input
-              label="Company name"
-              value={jobForm.company_name ?? ''}
-              onChange={(e) => setJobField('company_name', e.target.value)}
-              required
-            />
-            <Input
-              label="City"
-              value={jobForm.company_city ?? ''}
-              onChange={(e) => setJobField('company_city', e.target.value)}
-              required
-            />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <CountrySelect
-              value={jobForm.company_country ?? ''}
-              onChange={(e) => setJobField('company_country', e.target.value)}
-            />
-            <Input
-              label="Application deadline (optional)"
-              type="date"
-              value={jobForm.deadline_date ?? ''}
-              onChange={(e) => setJobField('deadline_date', e.target.value || undefined)}
-            />
-          </div>
-          <Textarea
-            label="Job description"
-            value={jobForm.description ?? ''}
-            onChange={(e) => setJobField('description', e.target.value)}
-            rows={10}
-            hint="Markdown formatting supported."
-            required
-          />
-
-          {/* Skills */}
-          <div className="flex flex-col gap-2">
-            <p className="text-sm font-medium text-text-main">Key skills</p>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={jobSkillInput}
-                onChange={(e) => setJobSkillInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ',') {
-                    e.preventDefault();
-                    addJobSkill(jobSkillInput);
-                  }
-                }}
-                placeholder="Type a skill and press Enter"
-                className="flex-1 rounded-lg border border-border bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-text-main"
-              />
-              <Button type="button" variant="outline" size="md" onClick={() => addJobSkill(jobSkillInput)}>
-                Add
-              </Button>
+          {/* Section 01 */}
+          <div>
+            <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-6">
+              <span className="font-heading text-2xl italic text-secondary">01</span>
+              <h2 className="font-heading text-xl text-primary">Role Details</h2>
             </div>
-            {(jobForm.key_skills?.length ?? 0) > 0 && (
-              <div className="flex flex-wrap gap-2 p-3 rounded-lg border border-border">
-                {jobForm.key_skills?.map((skill) => (
-                  <SkillTag key={skill} skill={skill} removable onRemove={removeJobSkill} size="md" />
-                ))}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Input
+                label="Job title"
+                value={jobForm.job_title ?? ''}
+                onChange={(e) => setJobField('job_title', e.target.value)}
+                required
+              />
+              <Select
+                label="Employment type"
+                options={EMPLOYMENT_TYPES}
+                value={jobForm.employment_type ?? 'full_time'}
+                onChange={(e) => setJobField('employment_type', e.target.value as UpdateJobRequest['employment_type'])}
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+              <Input
+                label="Company name"
+                value={jobForm.company_name ?? ''}
+                onChange={(e) => setJobField('company_name', e.target.value)}
+                required
+              />
+              <Input
+                label="City"
+                value={jobForm.company_city ?? ''}
+                onChange={(e) => setJobField('company_city', e.target.value)}
+                required
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+              <CountrySelect
+                value={jobForm.company_country ?? ''}
+                onChange={(e) => setJobField('company_country', e.target.value)}
+              />
+              <Input
+                label="Application deadline (optional)"
+                type="date"
+                value={jobForm.deadline_date ?? ''}
+                onChange={(e) => setJobField('deadline_date', e.target.value || undefined)}
+              />
+            </div>
+          </div>
+
+          {/* Section 02 */}
+          <div>
+            <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-6">
+              <span className="font-heading text-2xl italic text-secondary">02</span>
+              <h2 className="font-heading text-xl text-primary">Description & Skills</h2>
+            </div>
+            <Textarea
+              label="Job description"
+              value={jobForm.description ?? ''}
+              onChange={(e) => setJobField('description', e.target.value)}
+              rows={10}
+              hint="Markdown formatting supported."
+              required
+            />
+            <div className="flex flex-col gap-2 mt-4">
+              <p className="text-sm font-medium text-text-main">Key skills</p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={jobSkillInput}
+                  onChange={(e) => setJobSkillInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ',') {
+                      e.preventDefault();
+                      addJobSkill(jobSkillInput);
+                    }
+                  }}
+                  placeholder="Type a skill and press Enter"
+                  className="flex-1 rounded-lg bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary text-text-main"
+                />
+                <Button type="button" variant="outline" size="md" onClick={() => addJobSkill(jobSkillInput)}>
+                  Add
+                </Button>
               </div>
-            )}
-          </div>
-
-          {/* Contact */}
-          <div className="flex flex-col gap-3">
-            <p className="text-sm font-medium text-text-main">Contact method</p>
-            <div className="flex gap-4">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="contact_method"
-                  value="email"
-                  checked={jobForm.contact_method === 'email'}
-                  onChange={() => setJobField('contact_method', 'email')}
-                  className="accent-primary"
-                />
-                <span className="text-sm text-text-main">Via email</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="contact_method"
-                  value="url"
-                  checked={jobForm.contact_method === 'url'}
-                  onChange={() => setJobField('contact_method', 'url')}
-                  className="accent-primary"
-                />
-                <span className="text-sm text-text-main">Via URL</span>
-              </label>
+              {(jobForm.key_skills?.length ?? 0) > 0 && (
+                <div className="flex flex-wrap gap-2 p-3 rounded-xl bg-surface">
+                  {jobForm.key_skills?.map((skill) => (
+                    <SkillTag key={skill} skill={skill} removable onRemove={removeJobSkill} size="md" />
+                  ))}
+                </div>
+              )}
             </div>
-            {jobForm.contact_method === 'email' ? (
-              <Input
-                label="Contact email"
-                type="email"
-                value={jobForm.contact_email ?? ''}
-                onChange={(e) => setJobField('contact_email', e.target.value)}
-              />
-            ) : (
-              <Input
-                label="Application URL"
-                type="url"
-                value={jobForm.contact_url ?? ''}
-                onChange={(e) => setJobField('contact_url', e.target.value)}
-              />
-            )}
           </div>
 
-          <Button type="submit" size="lg" loading={saving} className="self-start">
+          {/* Section 03 */}
+          <div>
+            <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-6">
+              <span className="font-heading text-2xl italic text-secondary">03</span>
+              <h2 className="font-heading text-xl text-primary">Contact Method</h2>
+            </div>
+            <div className="flex flex-col gap-3">
+              <div className="flex gap-4">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="contact_method"
+                    value="email"
+                    checked={jobForm.contact_method === 'email'}
+                    onChange={() => setJobField('contact_method', 'email')}
+                    className="accent-primary"
+                  />
+                  <span className="text-sm text-text-main">Via email</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="contact_method"
+                    value="url"
+                    checked={jobForm.contact_method === 'url'}
+                    onChange={() => setJobField('contact_method', 'url')}
+                    className="accent-primary"
+                  />
+                  <span className="text-sm text-text-main">Via URL</span>
+                </label>
+              </div>
+              {jobForm.contact_method === 'email' ? (
+                <Input
+                  label="Contact email"
+                  type="email"
+                  value={jobForm.contact_email ?? ''}
+                  onChange={(e) => setJobField('contact_email', e.target.value)}
+                />
+              ) : (
+                <Input
+                  label="Application URL"
+                  type="url"
+                  value={jobForm.contact_url ?? ''}
+                  onChange={(e) => setJobField('contact_url', e.target.value)}
+                />
+              )}
+            </div>
+          </div>
+
+          <Button type="submit" size="lg" loading={saving} className="self-start rounded-full">
             Save changes
           </Button>
         </form>
@@ -496,114 +509,123 @@ function ManageContent() {
       {/* Profile edit form */}
       {!isJobs && (
         <form onSubmit={handleSaveProfile} className="flex flex-col gap-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Input
-              label="Full name"
-              value={profileForm.person_name ?? ''}
-              onChange={(e) => setProfileField('person_name', e.target.value)}
-              required
-            />
-            <Input
-              label="Current title"
-              value={profileForm.current_title ?? ''}
-              onChange={(e) => setProfileField('current_title', e.target.value)}
-              required
-            />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Input
-              label="Current city"
-              value={profileForm.current_city ?? ''}
-              onChange={(e) => setProfileField('current_city', e.target.value)}
-              required
-            />
-            <CountrySelect
-              value={profileForm.current_country ?? ''}
-              onChange={(e) => setProfileField('current_country', e.target.value)}
-            />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Input
-              label="Years of experience"
-              type="number"
-              min={0}
-              max={50}
-              value={profileForm.years_of_experience !== undefined ? String(profileForm.years_of_experience) : ''}
-              onChange={(e) => setProfileField('years_of_experience', parseInt(e.target.value) || 0)}
-            />
-            <Input
-              label="LinkedIn profile (optional)"
-              type="url"
-              value={profileForm.linkedin_profile_link ?? ''}
-              onChange={(e) => setProfileField('linkedin_profile_link', e.target.value || undefined)}
-            />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Select
-              label="Notice period"
-              options={NOTICE_PERIODS}
-              value={profileForm.notice_period ?? 'immediate'}
-              onChange={(e) => setProfileField('notice_period', e.target.value as UpdateProfileRequest['notice_period'])}
-            />
-            <Select
-              label="Open to relocation?"
-              options={RELOCATION_PREFERENCES}
-              value={profileForm.relocation_preference ?? 'open'}
-              onChange={(e) => setProfileField('relocation_preference', e.target.value as UpdateProfileRequest['relocation_preference'])}
-            />
-          </div>
-          <Textarea
-            label="Professional brief"
-            value={profileForm.brief ?? ''}
-            onChange={(e) => setProfileField('brief', e.target.value)}
-            rows={8}
-            hint="Markdown formatting supported."
-            required
-          />
-
-          {/* Skills */}
-          <div className="flex flex-col gap-2">
-            <p className="text-sm font-medium text-text-main">Key skills</p>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={profileSkillInput}
-                onChange={(e) => setProfileSkillInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ',') {
-                    e.preventDefault();
-                    addProfileSkill(profileSkillInput);
-                  }
-                }}
-                placeholder="Type a skill and press Enter"
-                className="flex-1 rounded-lg border border-border bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-text-main"
-              />
-              <Button type="button" variant="outline" size="md" onClick={() => addProfileSkill(profileSkillInput)}>
-                Add
-              </Button>
+          {/* Section 01 */}
+          <div>
+            <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-6">
+              <span className="font-heading text-2xl italic text-secondary">01</span>
+              <h2 className="font-heading text-xl text-primary">Personal Details</h2>
             </div>
-            {(profileForm.key_skills?.length ?? 0) > 0 && (
-              <div className="flex flex-wrap gap-2 p-3 rounded-lg border border-border">
-                {profileForm.key_skills?.map((skill) => (
-                  <SkillTag key={skill} skill={skill} removable onRemove={removeProfileSkill} size="md" />
-                ))}
-              </div>
-            )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Input
+                label="Full name"
+                value={profileForm.person_name ?? ''}
+                onChange={(e) => setProfileField('person_name', e.target.value)}
+                required
+              />
+              <Input
+                label="Current title"
+                value={profileForm.current_title ?? ''}
+                onChange={(e) => setProfileField('current_title', e.target.value)}
+                required
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+              <Input
+                label="Current city"
+                value={profileForm.current_city ?? ''}
+                onChange={(e) => setProfileField('current_city', e.target.value)}
+                required
+              />
+              <CountrySelect
+                value={profileForm.current_country ?? ''}
+                onChange={(e) => setProfileField('current_country', e.target.value)}
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+              <Input
+                label="Years of experience"
+                type="number"
+                min={0}
+                max={50}
+                value={profileForm.years_of_experience !== undefined ? String(profileForm.years_of_experience) : ''}
+                onChange={(e) => setProfileField('years_of_experience', parseInt(e.target.value) || 0)}
+              />
+              <Input
+                label="LinkedIn profile (optional)"
+                type="url"
+                value={profileForm.linkedin_profile_link ?? ''}
+                onChange={(e) => setProfileField('linkedin_profile_link', e.target.value || undefined)}
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+              <Select
+                label="Notice period"
+                options={NOTICE_PERIODS}
+                value={profileForm.notice_period ?? 'immediate'}
+                onChange={(e) => setProfileField('notice_period', e.target.value as UpdateProfileRequest['notice_period'])}
+              />
+              <Select
+                label="Open to relocation?"
+                options={RELOCATION_PREFERENCES}
+                value={profileForm.relocation_preference ?? 'open'}
+                onChange={(e) => setProfileField('relocation_preference', e.target.value as UpdateProfileRequest['relocation_preference'])}
+              />
+            </div>
           </div>
 
-          <Button type="submit" size="lg" loading={saving} className="self-start">
+          {/* Section 02 */}
+          <div>
+            <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-6">
+              <span className="font-heading text-2xl italic text-secondary">02</span>
+              <h2 className="font-heading text-xl text-primary">Professional Brief & Skills</h2>
+            </div>
+            <Textarea
+              label="Professional brief"
+              value={profileForm.brief ?? ''}
+              onChange={(e) => setProfileField('brief', e.target.value)}
+              rows={8}
+              hint="Markdown formatting supported."
+              required
+            />
+            <div className="flex flex-col gap-2 mt-4">
+              <p className="text-sm font-medium text-text-main">Key skills</p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={profileSkillInput}
+                  onChange={(e) => setProfileSkillInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ',') {
+                      e.preventDefault();
+                      addProfileSkill(profileSkillInput);
+                    }
+                  }}
+                  placeholder="Type a skill and press Enter"
+                  className="flex-1 rounded-lg bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary text-text-main"
+                />
+                <Button type="button" variant="outline" size="md" onClick={() => addProfileSkill(profileSkillInput)}>
+                  Add
+                </Button>
+              </div>
+              {(profileForm.key_skills?.length ?? 0) > 0 && (
+                <div className="flex flex-wrap gap-2 p-3 rounded-xl bg-surface">
+                  {profileForm.key_skills?.map((skill) => (
+                    <SkillTag key={skill} skill={skill} removable onRemove={removeProfileSkill} size="md" />
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <Button type="submit" size="lg" loading={saving} className="self-start rounded-full">
             Save changes
           </Button>
         </form>
       )}
 
       {/* Delete section */}
-      <div
-        className="mt-16 pt-8 border-t border-border"
-      >
-        <h2
-          className="text-xl font-bold mb-2 font-heading text-red-600"
-        >
+      <div className="mt-16 pt-12 bg-surface rounded-2xl p-8">
+        <h2 className="font-heading text-xl text-red-600 mb-2">
           Delete Listing
         </h2>
         <p className="text-sm mb-6 text-text-muted">
@@ -615,13 +637,11 @@ function ManageContent() {
         )}
 
         {!showDeleteConfirm ? (
-          <Button variant="danger" onClick={() => setShowDeleteConfirm(true)}>
+          <Button variant="danger" onClick={() => setShowDeleteConfirm(true)} className="rounded-full">
             Delete this listing
           </Button>
         ) : (
-          <div
-            className="rounded-xl border p-5 border-red-300 bg-red-50"
-          >
+          <div className="rounded-xl p-5 bg-red-50">
             <p className="text-sm font-medium mb-4 text-red-800">
               Are you sure? This cannot be undone.
             </p>
@@ -630,12 +650,14 @@ function ManageContent() {
                 variant="danger"
                 loading={deleteLoading}
                 onClick={handleDelete}
+                className="rounded-full"
               >
                 Yes, delete permanently
               </Button>
               <Button
                 variant="ghost"
                 onClick={() => setShowDeleteConfirm(false)}
+                className="rounded-full"
               >
                 Cancel
               </Button>

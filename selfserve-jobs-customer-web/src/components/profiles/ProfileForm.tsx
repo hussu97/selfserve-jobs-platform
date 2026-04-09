@@ -95,12 +95,12 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
   if (success) {
     return (
       <div className="max-w-lg mx-auto py-12 px-4 text-center">
-        <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
-          <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+        <div className="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center mx-auto mb-4">
+          <svg className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h2 className="text-2xl mb-2 text-secondary">
+        <h2 className="font-heading text-2xl mb-2 text-secondary">
           Profile created!
         </h2>
         <p className="mb-6 text-sm text-text-muted">
@@ -124,9 +124,10 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
 
       {/* Personal info */}
       <div className="flex flex-col gap-4">
-        <h3 className="font-semibold text-text-main">
-          Personal information
-        </h3>
+        <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-6">
+          <span className="font-heading text-2xl italic text-secondary">01</span>
+          <h2 className="font-heading text-xl text-primary">Personal information</h2>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input
             label="Full name"
@@ -202,6 +203,11 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
       </div>
 
       {/* Availability */}
+      <div className="flex flex-col gap-4">
+      <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-2">
+        <span className="font-heading text-2xl italic text-secondary">02</span>
+        <h2 className="font-heading text-xl text-primary">Availability</h2>
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Select
           label="Notice period"
@@ -218,23 +224,34 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
           required
         />
       </div>
+      </div>
 
       {/* Brief */}
-      <Textarea
-        label="Professional brief"
-        placeholder="Tell employers about yourself, your experience, and what you're looking for. Markdown is supported."
-        value={form.brief ?? ''}
-        onChange={(e) => set('brief', e.target.value)}
-        error={errors.brief}
-        rows={8}
-        hint="Markdown formatting supported."
-        required
-      />
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-2">
+          <span className="font-heading text-2xl italic text-secondary">03</span>
+          <h2 className="font-heading text-xl text-primary">Professional brief</h2>
+        </div>
+        <Textarea
+          label="Professional brief"
+          placeholder="Tell employers about yourself, your experience, and what you're looking for. Markdown is supported."
+          value={form.brief ?? ''}
+          onChange={(e) => set('brief', e.target.value)}
+          error={errors.brief}
+          rows={8}
+          hint="Markdown formatting supported."
+          required
+        />
+      </div>
 
       {/* Skills */}
-      <div className="flex flex-col gap-2">
-        <p className="text-sm font-medium text-text-main">
-          Key skills <span className="text-primary">*</span>
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-2">
+          <span className="font-heading text-2xl italic text-secondary">04</span>
+          <h2 className="font-heading text-xl text-primary">Key skills</h2>
+        </div>
+        <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-text-muted -mt-2">
+          Required <span className="text-primary">*</span>
         </p>
         <div className="flex gap-2">
           <input
@@ -248,15 +265,15 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
               }
             }}
             placeholder="Type a skill and press Enter"
-            className="flex-1 rounded-lg border border-border bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-text-main"
+            className="flex-1 rounded-xl bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary text-text-main"
           />
-          <Button type="button" variant="outline" size="md" onClick={() => addSkill(skillInput)}>
+          <Button type="button" variant="outline" size="md" className="rounded-full" onClick={() => addSkill(skillInput)}>
             Add
           </Button>
         </div>
         {errors.key_skills && <p className="text-xs text-red-600">{errors.key_skills}</p>}
         {(form.key_skills?.length ?? 0) > 0 && (
-          <div className="flex flex-wrap gap-2 p-3 rounded-lg border border-border">
+          <div className="flex flex-wrap gap-2 bg-surface rounded-2xl p-4">
             {form.key_skills?.map((skill) => (
               <SkillTag key={skill} skill={skill} removable onRemove={removeSkill} size="md" />
             ))}
@@ -265,12 +282,16 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
       </div>
 
       {/* Resume */}
-      <div className="flex flex-col gap-2">
-        <p className="text-sm font-medium text-text-main">
-          Resume (optional, PDF only)
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-2">
+          <span className="font-heading text-2xl italic text-secondary">05</span>
+          <h2 className="font-heading text-xl text-primary">Resume</h2>
+        </div>
+        <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-text-muted -mt-2">
+          Optional — PDF only
         </p>
         <div
-          className={`rounded-xl border-2 border-dashed p-6 text-center transition-colors hover:border-primary/50 ${resumeFile ? 'border-primary' : 'border-border'}`}
+          className={`bg-surface rounded-2xl p-8 border-2 border-dashed text-center transition-colors hover:border-primary/50 ${resumeFile ? 'border-primary' : 'border-border'}`}
         >
           {resumeFile ? (
             <div className="flex items-center justify-center gap-3">
@@ -316,7 +337,7 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
         {errors.resume && <p className="text-xs text-red-600">{errors.resume}</p>}
       </div>
 
-      <Button type="submit" size="lg" loading={loading} className="self-start">
+      <Button type="submit" size="lg" loading={loading} className="self-start rounded-full">
         Create Profile
       </Button>
     </form>

@@ -14,15 +14,12 @@ export function JobCard({ job }: JobCardProps) {
 
   return (
     <Link href={`/jobs/${job.code}`} className="block group">
-      <article className="h-full flex flex-col bg-bg rounded-xl border border-border/70 shadow-[0_1px_4px_rgba(44,40,37,0.06)] overflow-hidden transition-all duration-200 hover:shadow-[0_6px_20px_rgba(44,40,37,0.10)] hover:-translate-y-0.5 hover:border-border">
-        {/* Top accent bar */}
-        <div className="h-0.5 w-full bg-gradient-to-r from-primary/40 via-primary/20 to-transparent" />
-
+      <article className="h-full flex flex-col bg-surface-lowest rounded-2xl shadow-ambient overflow-hidden transition-all duration-300 hover:shadow-ambient-hover hover:-translate-y-1">
         <div className="flex flex-col gap-3 p-5 flex-1">
           {/* Header */}
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-[15px] leading-snug text-text-main group-hover:text-primary transition-colors line-clamp-2">
+              <h3 className="font-heading text-lg leading-snug text-text-main group-hover:text-primary transition-colors line-clamp-2">
                 {job.job_title}
               </h3>
               <p className="text-sm mt-0.5 font-medium text-secondary truncate">
@@ -49,7 +46,7 @@ export function JobCard({ job }: JobCardProps) {
                 <SkillTag key={skill} skill={skill} />
               ))}
               {extraSkills > 0 && (
-                <span className="text-xs px-2 py-0.5 rounded-full text-text-muted bg-surface border border-border/50">
+                <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-full text-text-muted bg-surface">
                   +{extraSkills}
                 </span>
               )}
@@ -57,12 +54,12 @@ export function JobCard({ job }: JobCardProps) {
           )}
 
           {/* Footer */}
-          <div className="flex items-center justify-between mt-auto pt-3 border-t border-border/50">
+          <div className="flex items-center justify-between mt-auto pt-3">
             <span className="text-xs text-text-muted">
               {timeAgo(job.created_at)}
             </span>
             {job.deadline_date && (
-              <span className="text-xs font-medium text-primary/80">
+              <span className="text-xs font-medium text-secondary/80">
                 Due {formatDeadline(job.deadline_date)}
               </span>
             )}

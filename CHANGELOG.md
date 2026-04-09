@@ -7,17 +7,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Changed
-- Homepage, jobs listing, and profiles listing pages updated to "Sage & Stone" design system: Newsreader serif + Manrope body fonts, forest green primary (`#384B3B`), terracotta secondary (`#8C4E32`), `bg-bg`/`bg-surface`/`bg-surface-lowest` tonal shifts replacing border dividers, `rounded-full` pill CTAs, `shadow-ambient` cards, `hero-gradient` page headers, bento-style numbered How-it-Works steps, section eyebrow labels, and a solid `bg-primary` CTA strip
-- Typography: replaced Inter + Lora with Outfit (body) + Instrument Serif (headings) for a more modern, distinctive feel
-- Center-aligned hero section, section headers, and CTA strip on the home page for better visual balance and mobile readability
-- Full frontend visual redesign: modern 2026 aesthetic with depth, motion, and proper mobile-first layout
-- Hero section: center-aligned layout, gradient mesh background, eyebrow label, animated entrance, stats as inline elements with color dots
-- How it Works: removed generic boxed layout; now uses large muted step numbers as decorative accents with icon blocks, mobile-stacked with dividers
-- Section headers: center-aligned with "View all" CTA below subtitle on desktop; mobile gets its own row below the grid
-- Job and Profile cards: top gradient accent bar (terracotta/sage), footer row with divider line, cleaner typographic hierarchy, softer shadow + stronger hover
-- Card base: updated shadow from `shadow-sm` to a more refined multi-property shadow
-- Header: active nav state uses a small underline indicator instead of filled pill background; refined button styles; slightly smaller height
-- Footer: multi-column structured layout with labelled nav groups replacing single horizontal row
+- **Full "Sage & Stone" design system implementation across all 13 pages and all components:**
+  - **Fonts:** switched from Outfit + Instrument Serif → Newsreader (serif headlines) + Manrope (body/UI)
+  - **Color palette:** forest green primary `#384B3B`, terracotta secondary `#8C4E32`, warm cream background `#fcf9f5`, tonal surface hierarchy (`bg-bg` → `bg-surface` → `bg-surface-lowest`)
+  - **No-Line Rule:** removed all 1px structural borders from cards, sections, layouts; replaced with ambient dual-layer shadow (`shadow-ambient`) and tonal background shifts
+  - **Buttons:** pill-shaped (`rounded-full`) across all components
+  - **Cards:** white on cream (`bg-surface-lowest shadow-ambient rounded-2xl`), hover lift and ambient shadow intensification
+  - **Forms:** borderless inputs (`bg-surface rounded-xl`), numbered sections (01–05) with left accent, uppercase tracking-widest labels
+  - **Typography:** editorial italic serif emphasis words in all headlines, uppercase tracking-widest section labels/eyebrows, large serif step numbers in bento grids
+  - **Navigation:** serif italic logo, pill-shaped CTAs, no bottom border (ambient shadow instead), uppercase tracking-widest nav links
+  - **Hero sections:** `hero-gradient` radial backgrounds on all page headers
+  - **CLAUDE.md:** updated design system section with full Sage & Stone spec, font table, no-line rule, shadow classes, and component patterns
 - globals.css: added `fadeInUp`, `fadeIn`, `scaleIn` keyframe animations with delay variants and `prefers-reduced-motion` support; smooth scroll; refined scrollbar
 
 ### Fixed

@@ -1,0 +1,1356 @@
+<!-- Job Listings (Light) -->
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Elevated Portal | Discover Talent</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface": "#1c1c1a",
+                        "surface-dim": "#dcdad6",
+                        "surface-bright": "#fcf9f5",
+                        "on-secondary-fixed": "#360f00",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed-variant": "#524436",
+                        "on-primary-fixed": "#0d1f12",
+                        "error-container": "#ffdad6",
+                        "inverse-on-surface": "#f3f0ec",
+                        "surface-container-low": "#f6f3ef",
+                        "surface": "#fcf9f5",
+                        "inverse-surface": "#31302e",
+                        "error": "#ba1a1a",
+                        "secondary-container": "#feae8c",
+                        "secondary-fixed-dim": "#ffb596",
+                        "primary-fixed": "#d2e8d3",
+                        "surface-variant": "#e5e2de",
+                        "on-primary-container": "#c8dec9",
+                        "tertiary-fixed-dim": "#d7c3b0",
+                        "on-surface-variant": "#434843",
+                        "background": "#fcf9f5",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#4f6352",
+                        "on-secondary-container": "#793f25",
+                        "inverse-primary": "#b6ccb7",
+                        "outline": "#737872",
+                        "tertiary-container": "#6b5c4d",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "surface-container": "#f0ede9",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#ebe8e4",
+                        "on-tertiary-container": "#ead5c2",
+                        "primary": "#384b3b",
+                        "tertiary": "#524536",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed": "#241a0e",
+                        "on-primary-fixed-variant": "#384b3b",
+                        "outline-variant": "#c3c8c0",
+                        "surface-container-highest": "#e5e2de",
+                        "on-secondary-fixed-variant": "#6f371d",
+                        "tertiary-fixed": "#f4dfcb",
+                        "secondary-fixed": "#ffdbcd",
+                        "primary-fixed-dim": "#b6ccb7",
+                        "secondary": "#8c4e32",
+                        "primary-container": "#4f6352",
+                        "on-background": "#1c1c1a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "1.5rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Newsreader"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .ambient-shadow {
+            box-shadow: 0 20px 40px rgba(28, 28, 26, 0.04), 0 8px 16px rgba(28, 28, 26, 0.02);
+        }
+        .editorial-focus:focus {
+            outline: none;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 1px #384b3b33;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary-fixed selection:text-primary">
+<!-- Top Navigation Bar -->
+<nav class="bg-[#fcf9f5]/80 dark:bg-[#1c1c1a]/80 backdrop-blur-xl docked full-width top-0 z-50 sticky transition-all duration-300">
+<div class="flex justify-between items-center px-8 py-4 max-w-screen-2xl mx-auto w-full">
+<div class="flex items-center gap-12">
+<a class="text-2xl font-serif italic text-[#384b3b] dark:text-[#fcf9f5] font-['Newsreader'] tracking-tight" href="#">The Elevated Portal</a>
+<div class="hidden md:flex gap-8 items-center font-['Newsreader'] tracking-tight">
+<a class="text-[#4f6352] dark:text-[#e5e2de] opacity-80 hover:opacity-100 transition-opacity hover:text-[#384b3b] dark:hover:text-[#ffffff] duration-300" href="#">Discover</a>
+<a class="text-[#384b3b] dark:text-[#fcf9f5] font-semibold border-b-2 border-[#384b3b] dark:border-[#fcf9f5] pb-1" href="#">Jobs</a>
+<a class="text-[#4f6352] dark:text-[#e5e2de] opacity-80 hover:opacity-100 transition-opacity hover:text-[#384b3b] dark:hover:text-[#ffffff] duration-300" href="#">Talent</a>
+<a class="text-[#4f6352] dark:text-[#e5e2de] opacity-80 hover:opacity-100 transition-opacity hover:text-[#384b3b] dark:hover:text-[#ffffff] duration-300" href="#">Story</a>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="text-[#4f6352] font-['Manrope'] text-sm tracking-wide uppercase hover:underline transition-all">Sign In</button>
+<button class="bg-[#384b3b] text-white px-8 py-3 rounded-xl font-['Manrope'] text-sm tracking-wide uppercase font-semibold hover:scale-95 duration-200 ease-in-out transition-all">
+                    Post a Job
+                </button>
+</div>
+</div>
+</nav>
+<main class="max-w-screen-2xl mx-auto px-8 py-12">
+<!-- Hero Section: Search & Title -->
+<header class="text-center mb-20">
+<h1 class="font-headline text-6xl md:text-7xl mb-6 tracking-tight italic">Find your next masterpiece.</h1>
+<p class="font-body text-outline max-w-xl mx-auto mb-12 text-lg">Curated opportunities for high-impact professionals in design, technology, and leadership.</p>
+<div class="max-w-3xl mx-auto flex gap-4 p-2 bg-surface-container-low rounded-xl">
+<div class="flex-1 flex items-center px-4 gap-3">
+<span class="material-symbols-outlined text-outline">search</span>
+<input class="w-full bg-transparent border-none focus:ring-0 font-body text-on-surface editorial-focus rounded-lg py-3" placeholder="Title, expertise, or keyword..." type="text"/>
+</div>
+<div class="w-px bg-outline-variant/20 my-2"></div>
+<div class="flex-1 flex items-center px-4 gap-3">
+<span class="material-symbols-outlined text-outline">location_on</span>
+<input class="w-full bg-transparent border-none focus:ring-0 font-body text-on-surface editorial-focus rounded-lg py-3" placeholder="Location or Remote" type="text"/>
+</div>
+<button class="bg-primary text-on-primary px-8 py-3 rounded-xl hover:opacity-90 transition-all font-semibold uppercase tracking-wider text-sm">Search</button>
+</div>
+</header>
+<div class="flex flex-col lg:flex-row gap-16">
+<!-- Sidebar Filters -->
+<aside class="w-full lg:w-72 space-y-12">
+<section>
+<h3 class="font-headline text-xl mb-6">Employment Type</h3>
+<div class="space-y-4">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary/20" type="checkbox"/>
+<span class="font-body text-sm text-on-surface-variant group-hover:text-on-surface transition-colors">Full-time Roles</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary/20" type="checkbox"/>
+<span class="font-body text-sm text-on-surface-variant group-hover:text-on-surface transition-colors">Contract &amp; Consulting</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary/20" type="checkbox"/>
+<span class="font-body text-sm text-on-surface-variant group-hover:text-on-surface transition-colors">Freelance</span>
+</label>
+</div>
+</section>
+<section>
+<h3 class="font-headline text-xl mb-6">Work Environment</h3>
+<div class="space-y-4">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary/20" type="checkbox"/>
+<span class="font-body text-sm text-on-surface-variant group-hover:text-on-surface transition-colors">Remote First</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary/20" type="checkbox"/>
+<span class="font-body text-sm text-on-surface-variant group-hover:text-on-surface transition-colors">Hybrid Presence</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary/20" type="checkbox"/>
+<span class="font-body text-sm text-on-surface-variant group-hover:text-on-surface transition-colors">On-site Mandatory</span>
+</label>
+</div>
+</section>
+<section>
+<h3 class="font-headline text-xl mb-6">Annual Compensation</h3>
+<div class="space-y-6">
+<input class="w-full h-1 bg-surface-container-highest rounded-lg appearance-none cursor-pointer accent-primary" max="300" min="50" type="range" value="120"/>
+<div class="flex justify-between font-body text-xs text-outline uppercase tracking-widest">
+<span>$50k</span>
+<span>$120k+</span>
+<span>$300k</span>
+</div>
+</div>
+</section>
+<div class="pt-8">
+<img class="w-full h-48 object-cover rounded-xl grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-700" data-alt="minimalist architectural interior with soft shadows and warm sand tones in an editorial aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQWfgG1znljI8vdzLiUI6HUXYxGw-fN62DT-j7uxOb-PcNL_ArNTyUkbag8ZaA_zJVKzuPRMZLtNo25TDlSyS0E7WqQBBD6495k5Qanmty2EdIQcRAD_elGSyG0yps_dV5SV2cI4px23kd496bqb-j9nkzbpjeLmZHV3TlSubvIkvmqFQE6A8zjr-pfva13StVOPCzDx5CdW-Xl2182yFg-Pk6ew2FVo6U_XmKHhxNNE1kaNkUO7nM21nYTxcf0tzHJ1ZGnDrZiyg"/>
+<p class="mt-4 font-headline italic text-outline-variant text-sm">Curating the future of work, one connection at a time.</p>
+</div>
+</aside>
+<!-- Job Listings -->
+<div class="flex-1 space-y-8">
+<div class="flex justify-between items-end mb-8">
+<span class="font-body text-sm text-outline uppercase tracking-widest">Showing 148 Selective Roles</span>
+<div class="flex gap-4">
+<button class="flex items-center gap-2 text-sm font-body text-on-surface">
+<span>Sort: Relevant</span>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+</div>
+</div>
+<!-- Job Card 1 -->
+<div class="bg-surface-container-lowest p-10 rounded-xl transition-all duration-300 ambient-shadow hover:translate-y-[-4px] group">
+<div class="flex items-start justify-between mb-8">
+<div class="flex items-center gap-6">
+<div class="w-16 h-16 rounded-xl bg-surface-container-low flex items-center justify-center p-3">
+<img class="w-full h-full object-contain opacity-80 group-hover:opacity-100 transition-opacity" data-alt="modern minimalist circular abstract logo for a design firm with olive green accents" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSrm1zFOPXrh1RuZMnGz02sUtdw5od5eLmABjpCyUjgvOUU8L6eblhM_-53qzB-zzDFjRU-2rveAcOGjg9b11ePwX7PtjjMYZrlLwGIFwQHD_DOMzIu4aH8b0hSVzgtBOnsw9wfilovMZP3P6j4uAik9iUpCCFal7cQXg4SOw9BaNxfI8CfAzE1KT70VlCTLeRB_5GidemePlU-KHmQ2-5OTQ86Pi6YHNMbC4z0W9-y8vA2iuusSG95_XXRHsyHQrWN5qtb-_aUKU"/>
+</div>
+<div>
+<h2 class="font-headline text-2xl mb-1">Principal Product Designer</h2>
+<p class="font-body text-on-surface-variant">Lumina Architecture Studio</p>
+</div>
+</div>
+<span class="bg-primary-fixed text-on-primary-fixed px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">New</span>
+</div>
+<div class="flex flex-wrap gap-3 mb-8">
+<span class="px-4 py-1.5 bg-secondary-fixed text-on-secondary-fixed-variant rounded-full text-xs font-medium font-body uppercase tracking-wider">Leadership</span>
+<span class="px-4 py-1.5 bg-tertiary-fixed text-on-tertiary-fixed-variant rounded-full text-xs font-medium font-body uppercase tracking-wider">Remote</span>
+<span class="px-4 py-1.5 bg-surface-container-low text-outline rounded-full text-xs font-medium font-body uppercase tracking-wider">$180k - $240k</span>
+</div>
+<p class="font-body text-on-surface-variant leading-relaxed mb-8 max-w-2xl">We are seeking a visionary Principal Designer to lead our digital transformation. You will shape the intersection of spatial computing and architectural visualization for global high-end clientele.</p>
+<div class="flex items-center justify-between pt-8 border-t border-outline-variant/10">
+<div class="flex items-center gap-4 text-outline text-sm">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-lg">location_on</span> Oslo, Norway</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-lg">schedule</span> 2 days ago</span>
+</div>
+<button class="bg-secondary text-white px-8 py-3 rounded-xl font-semibold uppercase text-xs tracking-widest hover:opacity-90 transition-all">View Details</button>
+</div>
+</div>
+<!-- Job Card 2 -->
+<div class="bg-surface-container-lowest p-10 rounded-xl transition-all duration-300 ambient-shadow hover:translate-y-[-4px] group">
+<div class="flex items-start justify-between mb-8">
+<div class="flex items-center gap-6">
+<div class="w-16 h-16 rounded-xl bg-surface-container-low flex items-center justify-center p-3">
+<img class="w-full h-full object-contain opacity-80 group-hover:opacity-100 transition-opacity" data-alt="elegant sans serif wordmark logo for a luxury concierge service in deep charcoal" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLjfXsYciubR7CP1TLA0I2RQkA1XquDl1PUrDfqqwLwJROMph8XcdVgcuccOPCpWA6vxn2TPL8WD1fz-_GbS9RqscAgDjcfUXT1dFvdYHde3AROUxudVLFFgR-SyV0Xrx4geJ90TWto7qeUcsPhJcM5usDkURiO6dF6_TIe0hdYfWmItFZAao51t_rXdoMLYS2ORDDIlOMxQQwmXFc1zgbQV8RcUibaRN2PkHL-NkanvLG5jtFvAFVjQq4xLp2P68MWPhRwtO0iMQ"/>
+</div>
+<div>
+<h2 class="font-headline text-2xl mb-1">Director of Brand Strategy</h2>
+<p class="font-body text-on-surface-variant">Aeon Private Office</p>
+</div>
+</div>
+<button class="text-outline hover:text-primary transition-colors"><span class="material-symbols-outlined" data-weight="fill">bookmark</span></button>
+</div>
+<div class="flex flex-wrap gap-3 mb-8">
+<span class="px-4 py-1.5 bg-secondary-fixed text-on-secondary-fixed-variant rounded-full text-xs font-medium font-body uppercase tracking-wider">Marketing</span>
+<span class="px-4 py-1.5 bg-tertiary-fixed text-on-tertiary-fixed-variant rounded-full text-xs font-medium font-body uppercase tracking-wider">Hybrid</span>
+<span class="px-4 py-1.5 bg-surface-container-low text-outline rounded-full text-xs font-medium font-body uppercase tracking-wider">$150k+ Equity</span>
+</div>
+<p class="font-body text-on-surface-variant leading-relaxed mb-8 max-w-2xl">Define the narrative for the world's most exclusive lifestyle management firm. This role requires a master storyteller with a background in luxury heritage and digital ecosystem building.</p>
+<div class="flex items-center justify-between pt-8 border-t border-outline-variant/10">
+<div class="flex items-center gap-4 text-outline text-sm">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-lg">location_on</span> London, UK</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-lg">schedule</span> 4 days ago</span>
+</div>
+<button class="bg-primary text-white px-8 py-3 rounded-xl font-semibold uppercase text-xs tracking-widest hover:opacity-90 transition-all">View Details</button>
+</div>
+</div>
+<!-- Job Card 3 (Featured Bento Style) -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="bg-surface-container-highest p-10 rounded-xl flex flex-col justify-between">
+<div>
+<span class="text-xs font-bold uppercase tracking-[0.2em] text-secondary mb-4 block">Hot Listing</span>
+<h2 class="font-headline text-3xl mb-4 leading-tight italic">Head of AI Engineering</h2>
+<p class="font-body text-on-surface-variant text-sm leading-relaxed mb-8">Join an elite team building ethical AI for the creative industry. High equity, full remote, radical transparency.</p>
+</div>
+<div class="flex items-center justify-between">
+<span class="font-body text-sm font-semibold">$220k - $310k</span>
+<button class="w-12 h-12 rounded-full border border-primary/20 flex items-center justify-center hover:bg-primary hover:text-white transition-all">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+<div class="bg-primary p-10 rounded-xl text-on-primary flex flex-col justify-between overflow-hidden relative">
+<div class="relative z-10">
+<h2 class="font-headline text-3xl mb-4 leading-tight italic">Creative Technologist</h2>
+<p class="font-body text-on-primary-container text-sm leading-relaxed mb-8">Bridge the gap between pure code and high-end aesthetics. Experimental lab setting.</p>
+</div>
+<div class="relative z-10">
+<button class="bg-on-primary text-primary px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest">Apply Now</button>
+</div>
+<!-- Abstract decorative shape -->
+<div class="absolute -bottom-10 -right-10 w-48 h-48 bg-white/5 rounded-full blur-3xl"></div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full opacity-10 pointer-events-none">
+<img class="w-full h-full object-cover" data-alt="abstract swirling textures of sand and light, high contrast editorial photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAE1-qOLQ2louC1jpeolUa4OxjJsjv30y3xQCMJRXOchlt4Lr3icTWQCQzW4OdVOFJtQTEBVfpcHf42nlAvgd3oagNbbFwjDmU4shBlk08TME6Ig-LJ5swZ1jkoWaksDN2w2rmuhEaot6YKFtqoXMwiewy_AOcD3l8Wq45lyQePA3TxddFuaz7mWOd_hOfn_k5Bf2QIcP28tqGUAGknSWghN3XI2m3F7ydV6kJ5OaWdUjTiwjqin1FwTxoL65H2zcT4iJlo92h_zCo"/>
+</div>
+</div>
+</div>
+<!-- Job Card 4 -->
+<div class="bg-surface-container-lowest p-10 rounded-xl transition-all duration-300 ambient-shadow hover:translate-y-[-4px] group">
+<div class="flex items-start justify-between mb-8">
+<div class="flex items-center gap-6">
+<div class="w-16 h-16 rounded-xl bg-surface-container-low flex items-center justify-center p-3">
+<img class="w-full h-full object-contain opacity-80 group-hover:opacity-100 transition-opacity" data-alt="sophisticated minimalist logo for a sustainability tech company using organic leaf forms in muted sage" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3Jq7Mq1R8ucNf8QAhUQlR_CKBrALr8SH0nAIm6HOsNqJcEPlUBJxD1Fahai5xkCvznmNMkz4UTEbMzpGijUKLbRcrDrqjEtd-lTo5UcvxQXxmDGWGC5czftkiS3_kPCBYNN_Faug0hXNgvvUPXk_IyOwBfcIBZe7XWtPQBMvlCWrgRqDTdp_Y7Qq68GLycnT0WnN_Gdm1rbJEg_DH_9y8GmBIBcEGbqVkr4ZDTrE4pmxN9OwNxF3KBjS-R0GrO_5EGdIJOkTtYGU"/>
+</div>
+<div>
+<h2 class="font-headline text-2xl mb-1">Lead Systems Engineer</h2>
+<p class="font-body text-on-surface-variant">Terraform Systems</p>
+</div>
+</div>
+</div>
+<div class="flex flex-wrap gap-3 mb-8">
+<span class="px-4 py-1.5 bg-secondary-fixed text-on-secondary-fixed-variant rounded-full text-xs font-medium font-body uppercase tracking-wider">Engineering</span>
+<span class="px-4 py-1.5 bg-tertiary-fixed text-on-tertiary-fixed-variant rounded-full text-xs font-medium font-body uppercase tracking-wider">Remote</span>
+<span class="px-4 py-1.5 bg-surface-container-low text-outline rounded-full text-xs font-medium font-body uppercase tracking-wider">$190k - $260k</span>
+</div>
+<div class="flex items-center justify-between pt-8 border-t border-outline-variant/10">
+<div class="flex items-center gap-4 text-outline text-sm">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-lg">location_on</span> New York, NY</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-lg">schedule</span> 1 week ago</span>
+</div>
+<button class="bg-primary text-white px-8 py-3 rounded-xl font-semibold uppercase text-xs tracking-widest hover:opacity-90 transition-all">View Details</button>
+</div>
+</div>
+<div class="pt-12 text-center">
+<button class="font-headline text-2xl italic text-primary hover:translate-x-2 transition-all inline-flex items-center gap-4">
+                        Discover more roles
+                        <span class="material-symbols-outlined">east</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-[#e5e2de] dark:bg-[#121211] full-width py-16">
+<div class="flex flex-col md:flex-row justify-between items-center px-12 space-y-8 md:space-y-0 w-full max-w-screen-2xl mx-auto">
+<div class="flex flex-col items-center md:items-start space-y-4">
+<span class="text-lg font-serif text-[#384b3b] dark:text-[#fcf9f5] font-['Newsreader']">The Elevated Portal</span>
+<p class="text-[#4f6352] dark:text-[#8c4e32] font-['Manrope'] text-sm tracking-wide uppercase">© 2026 The Elevated Portal. Curated for the exceptional.</p>
+</div>
+<div class="flex gap-8 font-['Manrope'] text-sm tracking-wide uppercase">
+<a class="text-[#4f6352] dark:text-[#8c4e32] opacity-80 hover:opacity-100 hover:underline transition-all" href="#">Privacy Policy</a>
+<a class="text-[#4f6352] dark:text-[#8c4e32] opacity-80 hover:opacity-100 hover:underline transition-all" href="#">Terms of Service</a>
+<a class="text-[#4f6352] dark:text-[#8c4e32] opacity-80 hover:opacity-100 hover:underline transition-all" href="#">Editorial Guidelines</a>
+<a class="text-[#4f6352] dark:text-[#8c4e32] opacity-80 hover:opacity-100 hover:underline transition-all" href="#">Contact</a>
+<a class="text-[#4f6352] dark:text-[#8c4e32] opacity-80 hover:opacity-100 hover:underline transition-all" href="#">Careers</a>
+</div>
+</div>
+</footer>
+</body></html>
+
+<!-- Post a Job (Light) -->
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Post a Job | The Elevated Portal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface": "#1c1c1a",
+                        "surface-dim": "#dcdad6",
+                        "surface-bright": "#fcf9f5",
+                        "on-secondary-fixed": "#360f00",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed-variant": "#524436",
+                        "on-primary-fixed": "#0d1f12",
+                        "error-container": "#ffdad6",
+                        "inverse-on-surface": "#f3f0ec",
+                        "surface-container-low": "#f6f3ef",
+                        "surface": "#fcf9f5",
+                        "inverse-surface": "#31302e",
+                        "error": "#ba1a1a",
+                        "secondary-container": "#feae8c",
+                        "secondary-fixed-dim": "#ffb596",
+                        "primary-fixed": "#d2e8d3",
+                        "surface-variant": "#e5e2de",
+                        "on-primary-container": "#c8dec9",
+                        "tertiary-fixed-dim": "#d7c3b0",
+                        "on-surface-variant": "#434843",
+                        "background": "#fcf9f5",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#4f6352",
+                        "on-secondary-container": "#793f25",
+                        "inverse-primary": "#b6ccb7",
+                        "outline": "#737872",
+                        "tertiary-container": "#6b5c4d",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "surface-container": "#f0ede9",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#ebe8e4",
+                        "on-tertiary-container": "#ead5c2",
+                        "primary": "#384b3b",
+                        "tertiary": "#524536",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed": "#241a0e",
+                        "on-primary-fixed-variant": "#384b3b",
+                        "outline-variant": "#c3c8c0",
+                        "surface-container-highest": "#e5e2de",
+                        "on-secondary-fixed-variant": "#6f371d",
+                        "tertiary-fixed": "#f4dfcb",
+                        "secondary-fixed": "#ffdbcd",
+                        "primary-fixed-dim": "#b6ccb7",
+                        "secondary": "#8c4e32",
+                        "primary-container": "#4f6352",
+                        "on-background": "#1c1c1a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Newsreader"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .ambient-shadow {
+            box-shadow: 0 20px 40px rgba(28, 28, 26, 0.04), 0 8px 16px rgba(28, 28, 26, 0.02);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            box-shadow: none;
+        }
+        body {
+            background-color: #fcf9f5;
+            color: #1c1c1a;
+        }
+    </style>
+</head>
+<body class="font-body selection:bg-primary-fixed selection:text-primary">
+<nav class="bg-[#fcf9f5]/80 backdrop-blur-xl font-['Newsreader'] tracking-tight docked full-width top-0 z-50 sticky no-line tonal-transition flat no shadows">
+<div class="flex justify-between items-center px-8 py-4 max-w-screen-2xl mx-auto w-full">
+<div class="text-2xl font-serif italic text-[#384b3b]">The Elevated Portal</div>
+<div class="hidden md:flex items-center space-x-12">
+<a class="text-[#4f6352] opacity-80 hover:opacity-100 transition-opacity hover:text-[#384b3b] duration-300" href="#">Discover</a>
+<a class="text-[#384b3b] font-semibold border-b-2 border-[#384b3b] pb-1" href="#">Jobs</a>
+<a class="text-[#4f6352] opacity-80 hover:opacity-100 transition-opacity hover:text-[#384b3b] duration-300" href="#">Talent</a>
+<a class="text-[#4f6352] opacity-80 hover:opacity-100 transition-opacity hover:text-[#384b3b] duration-300" href="#">Story</a>
+</div>
+<div class="flex items-center space-x-6">
+<a class="text-[#4f6352] font-label text-sm uppercase tracking-widest hover:text-[#384b3b] transition-colors" href="#">Sign In</a>
+<button class="bg-primary text-on-primary px-8 py-3 rounded-2xl font-label text-sm uppercase tracking-widest hover:scale-95 duration-200 ease-in-out">
+                    Post a Job
+                </button>
+</div>
+</div>
+</nav>
+<main class="min-h-screen py-24 px-6">
+<div class="max-w-4xl mx-auto">
+<div class="text-center mb-16">
+<h1 class="font-headline text-5xl md:text-6xl text-primary tracking-tight mb-4">Craft an Exceptional Role</h1>
+<p class="font-body text-on-surface-variant text-lg max-w-xl mx-auto leading-relaxed">
+                    Connect with visionary talent by outlining the unique trajectory of your position.
+                </p>
+</div>
+<div class="bg-surface-container-lowest ambient-shadow rounded-2xl p-8 md:p-16">
+<form action="#" class="space-y-12" method="POST">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+<div class="space-y-3">
+<label class="font-label text-xs uppercase tracking-[0.1em] text-on-surface-variant ml-1">Job Title</label>
+<input class="w-full bg-surface-container-low border-none rounded-xl px-6 py-4 text-on-surface placeholder:text-outline-variant focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary/20 transition-all duration-300" placeholder="Creative Director" type="text"/>
+</div>
+<div class="space-y-3">
+<label class="font-label text-xs uppercase tracking-[0.1em] text-on-surface-variant ml-1">Company</label>
+<input class="w-full bg-surface-container-low border-none rounded-xl px-6 py-4 text-on-surface placeholder:text-outline-variant focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary/20 transition-all duration-300" placeholder="Arcadia Design Lab" type="text"/>
+</div>
+</div>
+<div class="space-y-3">
+<label class="font-label text-xs uppercase tracking-[0.1em] text-on-surface-variant ml-1">City or Remote</label>
+<div class="relative group">
+<input class="w-full bg-surface-container-low border-none rounded-xl pl-12 pr-6 py-4 text-on-surface placeholder:text-outline-variant focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary/20 transition-all duration-300" placeholder="Copenhagen / Remote" type="text"/>
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary opacity-40 group-focus-within:opacity-100 transition-opacity">location_on</span>
+</div>
+</div>
+<div class="space-y-3">
+<label class="font-label text-xs uppercase tracking-[0.1em] text-on-surface-variant ml-1">Description</label>
+<textarea class="w-full bg-surface-container-low border-none rounded-xl px-6 py-4 text-on-surface placeholder:text-outline-variant focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary/20 transition-all duration-300 resize-none" placeholder="Outline the vision, the daily craft, and the impact this role will have..." rows="8"></textarea>
+</div>
+<div class="space-y-6">
+<label class="font-label text-xs uppercase tracking-[0.1em] text-on-surface-variant ml-1">Key Skills &amp; Disciplines</label>
+<div class="bg-surface-container-low rounded-xl p-6 min-h-[120px]">
+<div class="flex flex-wrap gap-3 mb-4">
+<span class="bg-secondary-fixed text-on-secondary-fixed-variant px-4 py-1.5 rounded-full text-sm font-medium flex items-center gap-2">
+                                    Product Design
+                                    <span class="material-symbols-outlined text-sm cursor-pointer">close</span>
+</span>
+<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant px-4 py-1.5 rounded-full text-sm font-medium flex items-center gap-2">
+                                    Brand Strategy
+                                    <span class="material-symbols-outlined text-sm cursor-pointer">close</span>
+</span>
+<span class="bg-primary-fixed text-on-primary-fixed-variant px-4 py-1.5 rounded-full text-sm font-medium flex items-center gap-2">
+                                    Systems Thinking
+                                    <span class="material-symbols-outlined text-sm cursor-pointer">close</span>
+</span>
+</div>
+<input class="w-full bg-transparent border-none p-0 text-on-surface placeholder:text-outline-variant focus:ring-0" placeholder="Add a skill..." type="text"/>
+</div>
+</div>
+<div class="pt-8 flex flex-col md:flex-row items-center justify-between gap-8">
+<p class="text-on-surface-variant text-sm font-body italic max-w-sm">
+                            * Postings are curated before going live to ensure a premium ecosystem for our members.
+                        </p>
+<div class="flex items-center gap-6">
+<button class="font-label text-xs uppercase tracking-widest text-primary opacity-60 hover:opacity-100 transition-opacity" type="button">
+                                Save Draft
+                            </button>
+<button class="bg-secondary text-on-secondary px-12 py-4 rounded-2xl font-label text-sm uppercase tracking-widest hover:scale-95 duration-200 ease-in-out shadow-lg shadow-secondary/10" type="submit">
+                                Review &amp; Publish
+                            </button>
+</div>
+</div>
+</form>
+</div>
+<div class="mt-24 grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="p-8 rounded-2xl bg-surface-container-low">
+<span class="material-symbols-outlined text-secondary mb-4" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<h3 class="font-headline text-xl text-primary mb-2">Editorial Reach</h3>
+<p class="font-body text-sm text-on-surface-variant leading-relaxed">Your listing is professionally formatted to match our editorial standards.</p>
+</div>
+<div class="p-8 rounded-2xl bg-surface-container-low">
+<span class="material-symbols-outlined text-secondary mb-4" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+<h3 class="font-headline text-xl text-primary mb-2">Curated Talent</h3>
+<p class="font-body text-sm text-on-surface-variant leading-relaxed">Skip the noise. Connect with vetted professionals from around the globe.</p>
+</div>
+<div class="p-8 rounded-2xl bg-surface-container-low">
+<span class="material-symbols-outlined text-secondary mb-4" style="font-variation-settings: 'FILL' 1;">schedule</span>
+<h3 class="font-headline text-xl text-primary mb-2">30-Day Feature</h3>
+<p class="font-body text-sm text-on-surface-variant leading-relaxed">Stay prominent on our front page and newsletters for the duration.</p>
+</div>
+</div>
+</div>
+</main>
+<footer class="bg-[#e5e2de] full-width py-16 bg-surface-dim tonal-grounding">
+<div class="flex flex-col md:flex-row justify-between items-center px-12 space-y-8 md:space-y-0 w-full max-w-screen-2xl mx-auto">
+<div class="text-lg font-serif text-[#384b3b]">The Elevated Portal</div>
+<div class="flex flex-wrap justify-center gap-8 font-['Manrope'] text-sm tracking-wide uppercase">
+<a class="text-[#4f6352] opacity-80 hover:opacity-100 hover:underline transition-all" href="#">Privacy Policy</a>
+<a class="text-[#4f6352] opacity-80 hover:opacity-100 hover:underline transition-all" href="#">Terms of Service</a>
+<a class="text-[#4f6352] opacity-80 hover:opacity-100 hover:underline transition-all" href="#">Editorial Guidelines</a>
+<a class="text-[#4f6352] opacity-80 hover:opacity-100 hover:underline transition-all" href="#">Contact</a>
+<a class="text-[#4f6352] opacity-80 hover:opacity-100 hover:underline transition-all" href="#">Careers</a>
+</div>
+<div class="text-xs font-label uppercase tracking-widest text-[#4f6352]">
+                © 2026 The Elevated Portal. Curated for the exceptional.
+            </div>
+</div>
+</footer>
+</body></html>
+
+<!-- Talent Grid (Light) -->
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Elevated Portal | Talent Discovery</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface": "#1c1c1a",
+                        "surface-dim": "#dcdad6",
+                        "surface-bright": "#fcf9f5",
+                        "on-secondary-fixed": "#360f00",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed-variant": "#524436",
+                        "on-primary-fixed": "#0d1f12",
+                        "error-container": "#ffdad6",
+                        "inverse-on-surface": "#f3f0ec",
+                        "surface-container-low": "#f6f3ef",
+                        "surface": "#fcf9f5",
+                        "inverse-surface": "#31302e",
+                        "error": "#ba1a1a",
+                        "secondary-container": "#feae8c",
+                        "secondary-fixed-dim": "#ffb596",
+                        "primary-fixed": "#d2e8d3",
+                        "surface-variant": "#e5e2de",
+                        "on-primary-container": "#c8dec9",
+                        "tertiary-fixed-dim": "#d7c3b0",
+                        "on-surface-variant": "#434843",
+                        "background": "#fcf9f5",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#4f6352",
+                        "on-secondary-container": "#793f25",
+                        "inverse-primary": "#b6ccb7",
+                        "outline": "#737872",
+                        "tertiary-container": "#6b5c4d",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "surface-container": "#f0ede9",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#ebe8e4",
+                        "on-tertiary-container": "#ead5c2",
+                        "primary": "#384b3b",
+                        "tertiary": "#524536",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed": "#241a0e",
+                        "on-primary-fixed-variant": "#384b3b",
+                        "outline-variant": "#c3c8c0",
+                        "surface-container-highest": "#e5e2de",
+                        "on-secondary-fixed-variant": "#6f371d",
+                        "tertiary-fixed": "#f4dfcb",
+                        "secondary-fixed": "#ffdbcd",
+                        "primary-fixed-dim": "#b6ccb7",
+                        "secondary": "#8c4e32",
+                        "primary-container": "#4f6352",
+                        "on-background": "#1c1c1a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "1.5rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Newsreader", "serif"],
+                        "body": ["Manrope", "sans-serif"],
+                        "label": ["Manrope", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .ambient-card-shadow {
+            box-shadow: 0 20px 40px rgba(28, 28, 26, 0.04), 0 8px 16px rgba(28, 28, 26, 0.02);
+        }
+        .glass-nav {
+            background: rgba(252, 249, 245, 0.8);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary-fixed">
+<nav class="bg-[#fcf9f5]/80 dark:bg-[#1c1c1a]/80 backdrop-blur-xl docked full-width top-0 z-50 sticky transition-all">
+<div class="flex justify-between items-center px-8 py-4 max-w-screen-2xl mx-auto w-full">
+<div class="flex items-center gap-12">
+<span class="text-2xl font-serif italic text-[#384b3b] dark:text-[#fcf9f5] font-['Newsreader'] tracking-tight">The Elevated Portal</span>
+<div class="hidden md:flex items-center space-x-8 font-['Newsreader'] tracking-tight">
+<a class="text-[#4f6352] dark:text-[#e5e2de] opacity-80 hover:opacity-100 transition-opacity hover:text-[#384b3b] dark:hover:text-[#ffffff] duration-300" href="#">Discover</a>
+<a class="text-[#4f6352] dark:text-[#e5e2de] opacity-80 hover:opacity-100 transition-opacity hover:text-[#384b3b] dark:hover:text-[#ffffff] duration-300" href="#">Jobs</a>
+<a class="text-[#384b3b] dark:text-[#fcf9f5] font-semibold border-b-2 border-[#384b3b] dark:border-[#fcf9f5] pb-1" href="#">Talent</a>
+<a class="text-[#4f6352] dark:text-[#e5e2de] opacity-80 hover:opacity-100 transition-opacity hover:text-[#384b3b] dark:hover:text-[#ffffff] duration-300" href="#">Story</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-[#4f6352] px-4 py-2 hover:text-[#384b3b] font-medium transition-all">Sign In</button>
+<button class="bg-primary text-on-primary px-8 py-3 rounded-xl font-medium hover:scale-95 duration-200 ease-in-out">Post a Job</button>
+</div>
+</div>
+</nav>
+<main class="max-w-screen-2xl mx-auto px-8 pt-16 pb-24">
+<header class="max-w-3xl mx-auto text-center mb-20">
+<h1 class="font-headline text-6xl text-primary tracking-tight mb-6">Discover Extraordinary Talent</h1>
+<p class="text-lg text-on-surface-variant font-light max-w-xl mx-auto">A curated gallery of industry-defining professionals, designers, and engineers waiting for their next great challenge.</p>
+</header>
+<div class="flex flex-col lg:flex-row gap-12">
+<aside class="w-full lg:w-72 space-y-10">
+<div class="space-y-6">
+<h3 class="font-headline text-xl text-primary">Refine Search</h3>
+<div class="space-y-4">
+<label class="block text-sm font-label uppercase tracking-widest text-on-surface-variant">Expertise</label>
+<div class="relative">
+<input class="w-full bg-surface-container-low border-none rounded-md py-3 pl-4 pr-10 focus:ring-1 focus:ring-primary focus:bg-surface-container-lowest transition-all" placeholder="Search skills..." type="text"/>
+<span class="material-symbols-outlined absolute right-3 top-3 text-on-surface-variant text-xl">search</span>
+</div>
+</div>
+<div class="space-y-4">
+<label class="block text-sm font-label uppercase tracking-widest text-on-surface-variant">Experience Level</label>
+<div class="flex flex-wrap gap-2">
+<button class="px-4 py-2 rounded-full text-sm bg-surface-container-highest text-primary font-medium hover:bg-primary hover:text-on-primary transition-colors">Senior+</button>
+<button class="px-4 py-2 rounded-full text-sm bg-primary text-on-primary font-medium">Lead</button>
+<button class="px-4 py-2 rounded-full text-sm bg-surface-container-highest text-primary font-medium hover:bg-primary hover:text-on-primary transition-colors">Director</button>
+<button class="px-4 py-2 rounded-full text-sm bg-surface-container-highest text-primary font-medium hover:bg-primary hover:text-on-primary transition-colors">Founder</button>
+</div>
+</div>
+<div class="space-y-4">
+<label class="block text-sm font-label uppercase tracking-widest text-on-surface-variant">Location Preference</label>
+<div class="space-y-3">
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="w-5 h-5 rounded border border-outline-variant group-hover:border-primary transition-colors flex items-center justify-center">
+<div class="w-3 h-3 bg-primary rounded-sm opacity-0 group-hover:opacity-20"></div>
+</div>
+<span class="text-on-surface">Remote First</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="w-5 h-5 rounded border border-primary flex items-center justify-center">
+<div class="w-3 h-3 bg-primary rounded-sm"></div>
+</div>
+<span class="text-on-surface font-medium">Hybrid Preferred</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="w-5 h-5 rounded border border-outline-variant group-hover:border-primary transition-colors"></div>
+<span class="text-on-surface">On-site Only</span>
+</label>
+</div>
+</div>
+<div class="pt-6">
+<button class="w-full py-3 bg-surface-container-highest text-primary font-medium rounded-xl hover:bg-surface-dim transition-colors">Clear All Filters</button>
+</div>
+</div>
+</aside>
+<div class="flex-1">
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-8">
+<div class="group bg-surface-container-lowest rounded-xl p-8 ambient-card-shadow border border-outline-variant/10 hover:border-primary/20 transition-all duration-300 flex flex-col h-full">
+<div class="flex items-start justify-between mb-8">
+<div class="flex items-center gap-4">
+<img alt="Portrait" class="w-16 h-16 rounded-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="professional portrait of a creative director in a neutral-toned studio setting with soft side lighting and modern aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB4PhpMH6xMkduZb5GX2yMLcMeiNYmAnSidLbWSsCvyA3RZKgUNJP6KSWHImO1lKagaN0Gd3zENNw7rqPgzw_6rq7U7SmwC3lBjY4c8cx1rBjTUcpDj2_XcTwq8TNZn5qQYACPI1YEgMUrZP8n4KktOny0V365KNNzkpw8ffK_pKVoVma2UJGTUf9EmZKZ_ymhBTFNdNocReBIrvVJIlXU3rNy5TsI2qBSP585OC740zuSUcN8pgDV9Ns1svVaP8x79iZ4w8aRGv8g"/>
+<div>
+<h2 class="font-headline text-2xl text-on-surface">Julian Aris</h2>
+<p class="text-secondary font-medium tracking-tight text-sm">Product Design Director</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant hover:text-primary cursor-pointer transition-colors" data-icon="bookmark">bookmark</span>
+</div>
+<p class="text-on-surface-variant text-base leading-relaxed mb-8 flex-grow">Defining the intersection of tactile design systems and spatial computing. Previously led experience at Aether and Helix Labs.</p>
+<div class="flex flex-wrap gap-2 mb-8">
+<span class="px-3 py-1 bg-secondary-fixed text-on-secondary-fixed-variant text-xs rounded-full font-medium tracking-wide uppercase">Figma</span>
+<span class="px-3 py-1 bg-tertiary-fixed text-on-tertiary-fixed-variant text-xs rounded-full font-medium tracking-wide uppercase">Systems Architecture</span>
+<span class="px-3 py-1 bg-surface-container-high text-on-surface-variant text-xs rounded-full font-medium tracking-wide uppercase">WebGL</span>
+</div>
+<div class="flex items-center justify-between pt-6 border-t border-outline-variant/10">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-lg">location_on</span>
+<span class="text-sm font-medium">Paris, FR / Remote</span>
+</div>
+<button class="text-primary font-bold text-sm flex items-center gap-1 group/btn">
+                                View Portfolio
+                                <span class="material-symbols-outlined text-lg group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+</div>
+<div class="group bg-surface-container-lowest rounded-xl p-8 ambient-card-shadow border border-outline-variant/10 hover:border-primary/20 transition-all duration-300 flex flex-col h-full">
+<div class="flex items-start justify-between mb-8">
+<div class="flex items-center gap-4">
+<img alt="Portrait" class="w-16 h-16 rounded-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="high-quality studio portrait of a woman tech lead with a confident expression, soft warm background lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBA91MQRORrYgPBCBtPuxrZ9b9w-dTUJkrF6hQBJgUOy6r4_0r3D1EVvJR6DBowhy_wTgwrqoxLCHa17eMFy2RQWev1yg1FwpfiLPDKSMkXnYtsUAp0KIUomf6Xb0_C8mSFcAkgcTVBBRmdrLvYW3HgNK-lTNN0N-NIN7B9KrgCzLGLYBLRYXT-rKIRoNaeZlrlrRS5oAMidS5Nwx0zhLhx-FiiMCnOOLP6wQImGV8RCgI5Iu_1ssRiljsIsgMDvE0dL2_boY2XkCw"/>
+<div>
+<h2 class="font-headline text-2xl text-on-surface">Elena Vance</h2>
+<p class="text-secondary font-medium tracking-tight text-sm">Lead Frontend Architect</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant hover:text-primary cursor-pointer transition-colors" data-icon="bookmark">bookmark</span>
+</div>
+<p class="text-on-surface-variant text-base leading-relaxed mb-8 flex-grow">Building high-performance, accessible web infrastructures for global scale applications. Deep focus on React and Next.js ecosystems.</p>
+<div class="flex flex-wrap gap-2 mb-8">
+<span class="px-3 py-1 bg-secondary-fixed text-on-secondary-fixed-variant text-xs rounded-full font-medium tracking-wide uppercase">React</span>
+<span class="px-3 py-1 bg-tertiary-fixed text-on-tertiary-fixed-variant text-xs rounded-full font-medium tracking-wide uppercase">TypeScript</span>
+<span class="px-3 py-1 bg-surface-container-high text-on-surface-variant text-xs rounded-full font-medium tracking-wide uppercase">Performance</span>
+</div>
+<div class="flex items-center justify-between pt-6 border-t border-outline-variant/10">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-lg">location_on</span>
+<span class="text-sm font-medium">New York, US / Hybrid</span>
+</div>
+<button class="text-primary font-bold text-sm flex items-center gap-1 group/btn">
+                                View Resume
+                                <span class="material-symbols-outlined text-lg group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+</div>
+<div class="group bg-surface-container-lowest rounded-xl p-8 ambient-card-shadow border border-outline-variant/10 hover:border-primary/20 transition-all duration-300 flex flex-col h-full">
+<div class="flex items-start justify-between mb-8">
+<div class="flex items-center gap-4">
+<img alt="Portrait" class="w-16 h-16 rounded-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="cinematic close-up portrait of a thoughtful man in a minimalist professional setting with window light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuATp8fo-MC2faAhayh_ukO95F_ue1_2zliFfhe36P_eV9oHdBHiV_dEUdVB9oo5PAEZzO6EWO5Rm0pJANtk8OS1TuapyoOUv5dKI37GT1cJVR_S3h99xfIVCPFiU-f-zYGg1EmMXr7LZtw-iSzCSfCryIPRxLJavaNIBrWCmsRhL4ZURMe-FMwuUm7a9tfsBxmhuNUrw2mot6if67FhqXjQnNe6KhwdGneYE_BJDVW78SJNcZBWRJmAyxQ8CEDx4pLiex7lTEmfdXU"/>
+<div>
+<h2 class="font-headline text-2xl text-on-surface">Marcus Thorne</h2>
+<p class="text-secondary font-medium tracking-tight text-sm">Principal UX Researcher</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant hover:text-primary cursor-pointer transition-colors" data-icon="bookmark">bookmark</span>
+</div>
+<p class="text-on-surface-variant text-base leading-relaxed mb-8 flex-grow">Bridging the gap between human behavior and complex digital workflows. Expert in ethnography and rapid prototyping.</p>
+<div class="flex flex-wrap gap-2 mb-8">
+<span class="px-3 py-1 bg-secondary-fixed text-on-secondary-fixed-variant text-xs rounded-full font-medium tracking-wide uppercase">UX Research</span>
+<span class="px-3 py-1 bg-tertiary-fixed text-on-tertiary-fixed-variant text-xs rounded-full font-medium tracking-wide uppercase">Strategy</span>
+<span class="px-3 py-1 bg-surface-container-high text-on-surface-variant text-xs rounded-full font-medium tracking-wide uppercase">Insights</span>
+</div>
+<div class="flex items-center justify-between pt-6 border-t border-outline-variant/10">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-lg">location_on</span>
+<span class="text-sm font-medium">London, UK / Remote</span>
+</div>
+<button class="text-primary font-bold text-sm flex items-center gap-1 group/btn">
+                                View Case Studies
+                                <span class="material-symbols-outlined text-lg group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+</div>
+<div class="group bg-surface-container-lowest rounded-xl p-8 ambient-card-shadow border border-outline-variant/10 hover:border-primary/20 transition-all duration-300 flex flex-col h-full">
+<div class="flex items-start justify-between mb-8">
+<div class="flex items-center gap-4">
+<img alt="Portrait" class="w-16 h-16 rounded-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="artistic profile portrait of a woman looking sideways, soft focus, bright airy studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBl-9AE9khiwsmcCxJp8QEGeA_E-pdk7QuKsrp_ayZ7BgphLbp9yo1jyz5h9-y-AcbWYogOTrdDvAJEWvP2XajWn8hwld4Uk0WvmhzC6JP3KoIgukHVp3M-t_poQiyfsYFTHY_3KgAaKwjgzkQsfbywHUCbKC4HngCV7yhe_2b5f10tcaqqWxDcMA3hJ4OJtGSwCv1KIcko2svuAeduzGw6KoiLEHu2svywS64oUK0Rfi_W5HqshneU2_vdjua9Ov4CnlkQUpIGUYE"/>
+<div>
+<h2 class="font-headline text-2xl text-on-surface">Sana Kapoor</h2>
+<p class="text-secondary font-medium tracking-tight text-sm">Visual Identity Lead</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant hover:text-primary cursor-pointer transition-colors" data-icon="bookmark">bookmark</span>
+</div>
+<p class="text-on-surface-variant text-base leading-relaxed mb-8 flex-grow">Crafting visual narratives for high-growth tech startups. Specialist in brand evolution and digital storytelling.</p>
+<div class="flex flex-wrap gap-2 mb-8">
+<span class="px-3 py-1 bg-secondary-fixed text-on-secondary-fixed-variant text-xs rounded-full font-medium tracking-wide uppercase">Branding</span>
+<span class="px-3 py-1 bg-tertiary-fixed text-on-tertiary-fixed-variant text-xs rounded-full font-medium tracking-wide uppercase">Motion</span>
+<span class="px-3 py-1 bg-surface-container-high text-on-surface-variant text-xs rounded-full font-medium tracking-wide uppercase">Typography</span>
+</div>
+<div class="flex items-center justify-between pt-6 border-t border-outline-variant/10">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-lg">location_on</span>
+<span class="text-sm font-medium">Mumbai, IN / Remote</span>
+</div>
+<button class="text-primary font-bold text-sm flex items-center gap-1 group/btn">
+                                View Portfolio
+                                <span class="material-symbols-outlined text-lg group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<div class="mt-16 flex justify-center">
+<button class="flex items-center gap-3 bg-surface-container-low text-primary px-10 py-4 rounded-full font-medium hover:bg-surface-container-high transition-all">
+                        Load More Exceptional Talent
+                        <span class="material-symbols-outlined">expand_more</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<footer class="bg-[#e5e2de] dark:bg-[#121211] full-width py-16">
+<div class="flex flex-col md:flex-row justify-between items-center px-12 space-y-8 md:space-y-0 w-full max-w-screen-2xl mx-auto">
+<div class="flex flex-col items-center md:items-start space-y-4">
+<span class="text-lg font-serif text-[#384b3b] dark:text-[#fcf9f5]">The Elevated Portal</span>
+<p class="font-['Manrope'] text-sm tracking-wide uppercase text-[#4f6352] dark:text-[#fcf9f5]/60">© 2026 The Elevated Portal. Curated for the exceptional.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-8 font-['Manrope'] text-sm tracking-wide uppercase text-[#4f6352] dark:text-[#8c4e32]">
+<a class="hover:underline transition-all opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
+<a class="hover:underline transition-all opacity-80 hover:opacity-100" href="#">Terms of Service</a>
+<a class="hover:underline transition-all opacity-80 hover:opacity-100" href="#">Editorial Guidelines</a>
+<a class="hover:underline transition-all opacity-80 hover:opacity-100" href="#">Contact</a>
+<a class="hover:underline transition-all opacity-80 hover:opacity-100" href="#">Careers</a>
+</div>
+</div>
+</footer>
+</body></html>
+
+<!-- Post a Profile (Light) -->
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Create Your Profile | The Elevated Portal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface": "#1c1c1a",
+                        "surface-dim": "#dcdad6",
+                        "surface-bright": "#fcf9f5",
+                        "on-secondary-fixed": "#360f00",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed-variant": "#524436",
+                        "on-primary-fixed": "#0d1f12",
+                        "error-container": "#ffdad6",
+                        "inverse-on-surface": "#f3f0ec",
+                        "surface-container-low": "#f6f3ef",
+                        "surface": "#fcf9f5",
+                        "inverse-surface": "#31302e",
+                        "error": "#ba1a1a",
+                        "secondary-container": "#feae8c",
+                        "secondary-fixed-dim": "#ffb596",
+                        "primary-fixed": "#d2e8d3",
+                        "surface-variant": "#e5e2de",
+                        "on-primary-container": "#c8dec9",
+                        "tertiary-fixed-dim": "#d7c3b0",
+                        "on-surface-variant": "#434843",
+                        "background": "#fcf9f5",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#4f6352",
+                        "on-secondary-container": "#793f25",
+                        "inverse-primary": "#b6ccb7",
+                        "outline": "#737872",
+                        "tertiary-container": "#6b5c4d",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "surface-container": "#f0ede9",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#ebe8e4",
+                        "on-tertiary-container": "#ead5c2",
+                        "primary": "#384b3b",
+                        "tertiary": "#524536",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed": "#241a0e",
+                        "on-primary-fixed-variant": "#384b3b",
+                        "outline-variant": "#c3c8c0",
+                        "surface-container-highest": "#e5e2de",
+                        "on-secondary-fixed-variant": "#6f371d",
+                        "tertiary-fixed": "#f4dfcb",
+                        "secondary-fixed": "#ffdbcd",
+                        "primary-fixed-dim": "#b6ccb7",
+                        "secondary": "#8c4e32",
+                        "primary-container": "#4f6352",
+                        "on-background": "#1c1c1a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Newsreader"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .ambient-card-shadow {
+            box-shadow: 0 20px 40px rgba(28, 28, 26, 0.04), 0 8px 16px rgba(28, 28, 26, 0.02);
+        }
+        .glass-nav {
+            background: rgba(252, 249, 245, 0.8);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary-fixed-dim selection:text-primary">
+<!-- Top Navigation Bar -->
+<nav class="docked full-width top-0 z-50 sticky bg-[#fcf9f5]/80 backdrop-blur-xl transition-all duration-300">
+<div class="flex justify-between items-center px-8 py-4 max-w-screen-2xl mx-auto w-full">
+<div class="flex items-center gap-12">
+<a class="text-2xl font-serif italic text-[#384b3b] font-['Newsreader'] tracking-tight" href="#">The Elevated Portal</a>
+<div class="hidden md:flex items-center gap-8 font-['Newsreader'] tracking-tight">
+<a class="text-[#4f6352] opacity-80 hover:opacity-100 transition-opacity hover:text-[#384b3b]" href="#">Discover</a>
+<a class="text-[#4f6352] opacity-80 hover:opacity-100 transition-opacity hover:text-[#384b3b]" href="#">Jobs</a>
+<a class="text-[#384b3b] font-semibold border-b-2 border-[#384b3b] pb-1" href="#">Talent</a>
+<a class="text-[#4f6352] opacity-80 hover:opacity-100 transition-opacity hover:text-[#384b3b]" href="#">Story</a>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="text-[#4f6352] font-['Manrope'] text-sm tracking-wide uppercase hover:text-[#384b3b] transition-all">Sign In</button>
+<button class="bg-primary text-on-primary px-8 py-3 rounded-xl font-['Manrope'] font-medium hover:scale-95 duration-200 transition-transform">Post a Job</button>
+</div>
+</div>
+</nav>
+<main class="max-w-4xl mx-auto px-6 py-20">
+<!-- Header Section -->
+<header class="text-center mb-24">
+<h1 class="font-headline text-6xl md:text-7xl text-primary tracking-tight mb-6">Curate Your Professional Identity</h1>
+<p class="font-body text-on-surface-variant text-lg max-w-xl mx-auto leading-relaxed">Present your story through a lens of sophistication. We value depth, character, and the subtle nuances of your craft.</p>
+</header>
+<!-- Form Journey -->
+<form class="space-y-32">
+<!-- Section 1: The Narrative -->
+<section class="space-y-12">
+<div class="flex items-center gap-4 border-l-2 border-primary/20 pl-6">
+<span class="font-headline text-2xl text-secondary italic">01</span>
+<h2 class="font-headline text-3xl text-primary">The Professional Brief</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="flex flex-col gap-2">
+<label class="font-label text-xs uppercase tracking-[0.1em] text-on-surface-variant ml-1">Full Identity</label>
+<input class="bg-surface-container-low border-none rounded-xl p-5 focus:ring-1 focus:ring-primary focus:bg-surface-container-lowest transition-all placeholder:text-outline-variant" placeholder="Julianna Vane" type="text"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label text-xs uppercase tracking-[0.1em] text-on-surface-variant ml-1">Current Focus</label>
+<input class="bg-surface-container-low border-none rounded-xl p-5 focus:ring-1 focus:ring-primary focus:bg-surface-container-lowest transition-all placeholder:text-outline-variant" placeholder="Creative Director &amp; Strategist" type="text"/>
+</div>
+<div class="md:col-span-2 flex flex-col gap-2">
+<label class="font-label text-xs uppercase tracking-[0.1em] text-on-surface-variant ml-1">Your Narrative</label>
+<textarea class="bg-surface-container-low border-none rounded-xl p-5 focus:ring-1 focus:ring-primary focus:bg-surface-container-lowest transition-all placeholder:text-outline-variant resize-none" placeholder="A brief reflection on your journey and the value you bring to exceptional teams..." rows="5"></textarea>
+</div>
+</div>
+</section>
+<!-- Section 2: Portfolio & Artifacts -->
+<section class="space-y-12">
+<div class="flex items-center gap-4 border-l-2 border-primary/20 pl-6">
+<span class="font-headline text-2xl text-secondary italic">02</span>
+<h2 class="font-headline text-3xl text-primary">Artifacts &amp; Proof</h2>
+</div>
+<!-- Drag and Drop Resume -->
+<div class="relative group">
+<div class="border-2 border-dashed border-outline-variant/30 rounded-[2rem] p-16 flex flex-col items-center justify-center text-center bg-surface-container-low/50 hover:bg-surface-container-low transition-all duration-500">
+<div class="w-20 h-20 bg-surface-container-lowest rounded-full flex items-center justify-center ambient-card-shadow mb-6 group-hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined text-primary text-3xl">upload_file</span>
+</div>
+<p class="font-headline text-2xl text-primary mb-2">Deposit Your Resume</p>
+<p class="font-body text-on-surface-variant text-sm mb-8">PDF or Word preferred. Maximum 10MB.</p>
+<button class="px-8 py-3 bg-white text-primary border border-outline-variant/20 rounded-full font-label text-sm uppercase tracking-widest hover:bg-primary hover:text-white transition-all shadow-sm" type="button">Select File</button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="p-6 bg-surface-container-lowest ambient-card-shadow rounded-2xl flex items-center gap-4">
+<span class="material-symbols-outlined text-secondary">language</span>
+<input class="w-full bg-transparent border-none p-0 focus:ring-0 text-sm font-body" placeholder="Portfolio URL" type="text"/>
+</div>
+<div class="p-6 bg-surface-container-lowest ambient-card-shadow rounded-2xl flex items-center gap-4">
+<span class="material-symbols-outlined text-secondary">work_history</span>
+<input class="w-full bg-transparent border-none p-0 focus:ring-0 text-sm font-body" placeholder="LinkedIn" type="text"/>
+</div>
+<div class="p-6 bg-surface-container-lowest ambient-card-shadow rounded-2xl flex items-center gap-4">
+<span class="material-symbols-outlined text-secondary">brush</span>
+<input class="w-full bg-transparent border-none p-0 focus:ring-0 text-sm font-body" placeholder="Dribbble / Behance" type="text"/>
+</div>
+</div>
+</section>
+<!-- Section 3: Mastery & Nuance -->
+<section class="space-y-12">
+<div class="flex items-center gap-4 border-l-2 border-primary/20 pl-6">
+<span class="font-headline text-2xl text-secondary italic">03</span>
+<h2 class="font-headline text-3xl text-primary">Mastery &amp; Nuance</h2>
+</div>
+<div class="space-y-8">
+<div class="flex flex-col gap-4">
+<label class="font-label text-xs uppercase tracking-[0.1em] text-on-surface-variant ml-1">Core Expertise Tags</label>
+<div class="flex flex-wrap gap-3">
+<span class="px-4 py-2 bg-secondary-fixed text-on-secondary-fixed-variant rounded-full text-sm font-medium flex items-center gap-2">Art Direction <span class="material-symbols-outlined text-xs cursor-pointer">close</span></span>
+<span class="px-4 py-2 bg-tertiary-fixed text-on-tertiary-fixed-variant rounded-full text-sm font-medium flex items-center gap-2">User Psychology <span class="material-symbols-outlined text-xs cursor-pointer">close</span></span>
+<span class="px-4 py-2 bg-primary-fixed text-on-primary-fixed-variant rounded-full text-sm font-medium flex items-center gap-2">Brand Strategy <span class="material-symbols-outlined text-xs cursor-pointer">close</span></span>
+<button class="px-4 py-2 border border-outline-variant/30 rounded-full text-sm font-medium text-on-surface-variant hover:bg-surface-container-high transition-colors">+ Add Expertise</button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="flex flex-col gap-2">
+<label class="font-label text-xs uppercase tracking-[0.1em] text-on-surface-variant ml-1">Desired Remuneration</label>
+<div class="relative">
+<span class="absolute left-5 top-1/2 -translate-y-1/2 text-on-surface-variant">$</span>
+<input class="w-full bg-surface-container-low border-none rounded-xl p-5 pl-10 focus:ring-1 focus:ring-primary focus:bg-surface-container-lowest transition-all" placeholder="140k - 180k" type="text"/>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label text-xs uppercase tracking-[0.1em] text-on-surface-variant ml-1">Availability</label>
+<select class="bg-surface-container-low border-none rounded-xl p-5 focus:ring-1 focus:ring-primary focus:bg-surface-container-lowest transition-all appearance-none">
+<option>Immediate</option>
+<option>2 Weeks Notice</option>
+<option>30 Days Notice</option>
+<option>Open to Discussion</option>
+</select>
+</div>
+</div>
+</div>
+</section>
+<!-- Final Action -->
+<footer class="pt-20 border-t border-outline-variant/10 flex flex-col items-center">
+<div class="flex items-center gap-4 mb-8">
+<input class="rounded-md border-outline-variant text-primary focus:ring-primary" id="terms" type="checkbox"/>
+<label class="text-sm text-on-surface-variant" for="terms">I agree to the <a class="text-primary underline underline-offset-4 decoration-primary/30" href="#">Terms of Curation</a> and Privacy Policy.</label>
+</div>
+<button class="bg-primary text-on-primary px-16 py-5 rounded-full font-headline text-xl hover:scale-95 transition-transform duration-300 ambient-card-shadow" type="submit">
+                    Enshrine Profile
+                </button>
+<p class="mt-6 text-on-surface-variant font-body text-sm italic">You can refine your narrative at any time from your portal.</p>
+</footer>
+</form>
+</main>
+<!-- Visual Anchor Side Element -->
+<div class="hidden lg:block fixed right-12 top-1/2 -translate-y-1/2 space-y-4">
+<div class="w-1 h-12 bg-primary/10 rounded-full overflow-hidden">
+<div class="w-full h-1/3 bg-primary"></div>
+</div>
+<p class="[writing-mode:vertical-lr] text-xs uppercase tracking-[0.3em] font-label text-primary/30">Candidate Onboarding 2026</p>
+</div>
+<!-- Decorative Image Card Floating -->
+<div class="hidden xl:block fixed left-12 bottom-12 max-w-[280px] group">
+<div class="relative rounded-2xl overflow-hidden ambient-card-shadow group-hover:-translate-y-2 transition-transform duration-500">
+<img class="w-full h-40 object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700" data-alt="minimalist interior of a high-end designer office with soft morning light, a single designer chair, and neutral beige tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAas4h2HUWr3xLYAAnmE3KEvKlKiV5W1CiYAvAUWWwcDrSYRNaphE3WnCtPTR5X7ICK52fhYSka1cwPnE2q4vwnaX9WvjB5t_eIU2f4AyL5gXnwOe86F7p5bjs77PUn85wqF3dcXLDVGdcmeCmrPq08MXE79jp8OlXjNq0udWnv6TqNeO_SF-4chhMMAcyPCLw6MVqB5T03gts2ecc1kwqT_aq__5VNMpymAJp6y2HLDCTQHugrSdUUs3KeuMDS3zwzZXjP0zdBzk"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+<div class="absolute bottom-4 left-4 right-4">
+<p class="text-white font-headline text-lg leading-tight">Excellence is never an accident.</p>
+<p class="text-white/60 text-[10px] uppercase tracking-widest mt-1">— Aristotle</p>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="bg-[#e5e2de] py-16 mt-32 w-full">
+<div class="flex flex-col md:flex-row justify-between items-center px-12 space-y-8 md:space-y-0 w-full max-w-screen-2xl mx-auto">
+<div class="flex flex-col items-center md:items-start gap-4">
+<span class="text-lg font-serif text-[#384b3b] font-['Newsreader']">The Elevated Portal</span>
+<p class="font-['Manrope'] text-sm tracking-wide text-[#384b3b]/60">© 2026 The Elevated Portal. Curated for the exceptional.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-8 font-['Manrope'] text-sm tracking-wide uppercase">
+<a class="text-[#4f6352] hover:underline transition-all" href="#">Privacy Policy</a>
+<a class="text-[#4f6352] hover:underline transition-all" href="#">Terms of Service</a>
+<a class="text-[#4f6352] hover:underline transition-all" href="#">Editorial Guidelines</a>
+<a class="text-[#4f6352] hover:underline transition-all" href="#">Contact</a>
+<a class="text-[#4f6352] hover:underline transition-all" href="#">Careers</a>
+</div>
+</div>
+</footer>
+</body></html>
+
+<!-- Homepage (Light) -->
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Elevated Portal | Curated Talent Discovery</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface": "#1c1c1a",
+                        "surface-dim": "#dcdad6",
+                        "surface-bright": "#fcf9f5",
+                        "on-secondary-fixed": "#360f00",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed-variant": "#524436",
+                        "on-primary-fixed": "#0d1f12",
+                        "error-container": "#ffdad6",
+                        "inverse-on-surface": "#f3f0ec",
+                        "surface-container-low": "#f6f3ef",
+                        "surface": "#fcf9f5",
+                        "inverse-surface": "#31302e",
+                        "error": "#ba1a1a",
+                        "secondary-container": "#feae8c",
+                        "secondary-fixed-dim": "#ffb596",
+                        "primary-fixed": "#d2e8d3",
+                        "surface-variant": "#e5e2de",
+                        "on-primary-container": "#c8dec9",
+                        "tertiary-fixed-dim": "#d7c3b0",
+                        "on-surface-variant": "#434843",
+                        "background": "#fcf9f5",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#4f6352",
+                        "on-secondary-container": "#793f25",
+                        "inverse-primary": "#b6ccb7",
+                        "outline": "#737872",
+                        "tertiary-container": "#6b5c4d",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "surface-container": "#f0ede9",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#ebe8e4",
+                        "on-tertiary-container": "#ead5c2",
+                        "primary": "#384b3b",
+                        "tertiary": "#524536",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed": "#241a0e",
+                        "on-primary-fixed-variant": "#384b3b",
+                        "outline-variant": "#c3c8c0",
+                        "surface-container-highest": "#e5e2de",
+                        "on-secondary-fixed-variant": "#6f371d",
+                        "tertiary-fixed": "#f4dfcb",
+                        "secondary-fixed": "#ffdbcd",
+                        "primary-fixed-dim": "#b6ccb7",
+                        "secondary": "#8c4e32",
+                        "primary-container": "#4f6352",
+                        "on-background": "#1c1c1a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Newsreader"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .editorial-shadow {
+            box-shadow: 0 20px 40px rgba(28, 28, 26, 0.04), 0 8px 16px rgba(28, 28, 26, 0.02);
+        }
+        .hero-gradient {
+            background: radial-gradient(circle at center, #fcf9f5 0%, #f6f3ef 100%);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary-fixed selection:text-primary">
+<!-- Top Navigation Bar -->
+<nav class="bg-[#fcf9f5]/80 dark:bg-[#1c1c1a]/80 backdrop-blur-xl font-['Newsreader'] tracking-tight docked full-width top-0 z-50 sticky no-line tonal-transition">
+<div class="flex justify-between items-center px-8 py-4 max-w-screen-2xl mx-auto w-full">
+<div class="text-2xl font-serif italic text-[#384b3b] dark:text-[#fcf9f5]">
+                The Elevated Portal
+            </div>
+<div class="hidden md:flex items-center space-x-12">
+<a class="text-[#384b3b] dark:text-[#fcf9f5] font-semibold border-b-2 border-[#384b3b] dark:border-[#fcf9f5] pb-1" href="#">Discover</a>
+<a class="text-[#4f6352] dark:text-[#e5e2de] opacity-80 hover:opacity-100 transition-opacity hover:text-[#384b3b] dark:hover:text-[#ffffff] duration-300" href="#">Jobs</a>
+<a class="text-[#4f6352] dark:text-[#e5e2de] opacity-80 hover:opacity-100 transition-opacity hover:text-[#384b3b] dark:hover:text-[#ffffff] duration-300" href="#">Talent</a>
+<a class="text-[#4f6352] dark:text-[#e5e2de] opacity-80 hover:opacity-100 transition-opacity hover:text-[#384b3b] dark:hover:text-[#ffffff] duration-300" href="#">Story</a>
+</div>
+<div class="flex items-center space-x-6">
+<button class="text-[#4f6352] dark:text-[#e5e2de] opacity-80 hover:opacity-100 transition-opacity scale-95 duration-200 ease-in-out">Sign In</button>
+<button class="bg-primary text-on-primary px-8 py-2.5 rounded-full font-label text-sm font-semibold hover:bg-primary-container transition-colors scale-95 duration-200 ease-in-out">
+                    Post a Job
+                </button>
+</div>
+</div>
+</nav>
+<main>
+<!-- Hero Section -->
+<section class="hero-gradient pt-24 pb-32 px-6">
+<div class="max-w-4xl mx-auto text-center">
+<div class="inline-flex items-center px-4 py-1.5 mb-8 rounded-full bg-surface-container-high text-primary-container text-xs font-label uppercase tracking-widest">
+                    Exceptional careers for the elite
+                </div>
+<h1 class="font-headline text-6xl md:text-8xl text-on-surface leading-[1.05] tracking-tight mb-10">
+                    The Curated Space for <br/>
+<span class="italic text-primary">Extraordinary</span> Talent.
+                </h1>
+<p class="font-body text-xl text-on-surface-variant max-w-2xl mx-auto mb-12 leading-relaxed">
+                    Bridging the gap between visionary companies and the world's most distinguished professionals through an editorial-first recruitment experience.
+                </p>
+<div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-6">
+<button class="w-full md:w-auto bg-primary text-on-primary px-12 py-5 rounded-2xl text-lg font-label font-bold tracking-tight hover:shadow-lg transition-all">
+                        Post a Job
+                    </button>
+<button class="w-full md:w-auto bg-secondary text-on-secondary px-12 py-5 rounded-2xl text-lg font-label font-bold tracking-tight hover:shadow-lg transition-all">
+                        Create Profile
+                    </button>
+</div>
+</div>
+<!-- Featured Visual -->
+<div class="max-w-6xl mx-auto mt-24">
+<div class="relative aspect-[21/9] rounded-2xl overflow-hidden editorial-shadow bg-surface-container-low">
+<img alt="High-end studio" class="w-full h-full object-cover opacity-90" data-alt="Minimalist high-end creative studio office with large windows, sage green accents, warm wooden desk, and soft natural morning light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCrW4UlV7YcimqoxSBTs7531ytufvwhrJglRGRocyzboUS-BStMq76TyspVEvKj-1bucS6CdL5mUn3aRW11TdDQlAoNn0OBL56Mqx2iqRNeT-aH434QXXU0U-mkh5Y7JA86ik620xgF0jLMJsXwOD3KBnFMG0pJYXU48eJLjaE0To7Ycd3rB4580InIVZEopqA88ZFFYobGjRuHKGHChynX6ijSqrJl51fU6tt9wh7ytA1QoAby_qzYOp6DJebH4lumCYesiXhQUgo"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/20 to-transparent"></div>
+</div>
+</div>
+</section>
+<!-- How It Works Section - Bento Grid Layout -->
+<section class="py-32 px-8 bg-surface-container-low">
+<div class="max-w-7xl mx-auto">
+<div class="text-center mb-24">
+<h2 class="font-headline text-5xl text-on-surface mb-6">The Elevated Journey</h2>
+<p class="font-body text-on-surface-variant max-w-xl mx-auto">Our process is designed for precision, favoring quality over quantity to ensure every connection is meaningful.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+<!-- Step 1 -->
+<div class="md:col-span-7 bg-surface-container-lowest p-12 rounded-2xl editorial-shadow flex flex-col justify-between group">
+<div>
+<span class="text-secondary font-serif italic text-4xl mb-6 block">01</span>
+<h3 class="font-headline text-3xl mb-4">Curated Curation</h3>
+<p class="font-body text-on-surface-variant leading-relaxed mb-8">
+                                We don't just list jobs; we tell stories. Every opportunity is vetted for vision and cultural alignment before it enters our portal.
+                            </p>
+</div>
+<div class="rounded-xl overflow-hidden h-64">
+<img alt="Storytelling" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Close-up of elegant hands sketching a brand concept on heavy grain paper with a vintage fountain pen and soft side lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXHRRpd7gF1eYNnyPGTh0rb3bUQkcT0zYiBMB4TnUQb6bWG193jEpinFysskJ2LYpunULADQdF0XnghIF59r7BzAlbbcxwLLr4QSQo3m8li4dWA66qLWKJhjdkJOCsjNYEtftu08s0eE6M-_4ESLFucbyxK1EUR0c9WX40xdTlP40g2dOBEd8iy1UBLw-QtbUf1Y0Cf5EyfHj_2yBFkqxOSg0dC-zRJu6a4lvkxYhMYyx_Os0Wr3aB5I5o_iigvs1kK2VoKsMNMWY"/>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="md:col-span-5 bg-surface-container-lowest p-12 rounded-2xl editorial-shadow group">
+<span class="text-secondary font-serif italic text-4xl mb-6 block">02</span>
+<h3 class="font-headline text-3xl mb-4">Direct Connection</h3>
+<p class="font-body text-on-surface-variant leading-relaxed mb-8">
+                            Bypass the algorithm. Our platform facilitates direct dialogue between visionaries and creators.
+                        </p>
+<div class="rounded-xl overflow-hidden h-80">
+<img alt="Meeting" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Two professionals in a deep, focused conversation across a minimalist marble table in a bright, modern interior space" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCa2nnyPV4GnBt-DB_UICV_29zX7itCWoqv5B5Kvxr2VJdwcb8YDcsk3sFXY21GYqbNu6TEHJWvZ7a2mfHwuMgFt7Nf_N8wnysh1u6RJ_BW1_maWS8kHcoTQip605iv5mpwFHgbGh2zocTQBolqlUBKBZrNYDO3zdO352rm1QaK5dk9kia8VoXnK-Utlxfec3ABstdEUbinlMk1W4yWrYSv1SqvLyWLCnl81egsVIfV12ky9TWb-XQ4qqRxRsU8T9xY_desZb4Xcs0"/>
+</div>
+</div>
+<!-- Step 3 -->
+<div class="md:col-span-4 bg-surface-container-lowest p-12 rounded-2xl editorial-shadow group">
+<span class="text-secondary font-serif italic text-4xl mb-6 block">03</span>
+<h3 class="font-headline text-3xl mb-4">Seamless Flow</h3>
+<p class="font-body text-on-surface-variant leading-relaxed">
+                            A refined application process that respects your time and honors your craft.
+                        </p>
+<div class="mt-8 flex items-center justify-center">
+<span class="material-symbols-outlined text-7xl text-primary-fixed-dim" style="font-variation-settings: 'FILL' 0;">all_inclusive</span>
+</div>
+</div>
+<!-- Step 4 -->
+<div class="md:col-span-8 bg-primary text-on-primary p-12 rounded-2xl editorial-shadow flex flex-col md:flex-row items-center gap-12">
+<div class="flex-1">
+<span class="text-primary-fixed font-serif italic text-4xl mb-6 block">04</span>
+<h3 class="font-headline text-3xl mb-4 text-on-primary">The Result</h3>
+<p class="font-body opacity-80 leading-relaxed text-lg">
+                                Partnerships that define industries. Join the ranks of the most innovative studios and top-tier talent in the global market.
+                            </p>
+</div>
+<div class="w-full md:w-1/3 bg-white/10 backdrop-blur-md p-8 rounded-xl border border-white/5">
+<div class="flex flex-col space-y-4">
+<div class="h-2 w-3/4 bg-on-primary/20 rounded"></div>
+<div class="h-2 w-full bg-on-primary/20 rounded"></div>
+<div class="h-2 w-1/2 bg-on-primary/20 rounded"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="py-32 px-8 bg-surface">
+<div class="max-w-5xl mx-auto rounded-3xl bg-surface-container-highest p-16 text-center">
+<h2 class="font-headline text-5xl mb-8">Ready to Elevate Your Future?</h2>
+<div class="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-8">
+<button class="bg-primary text-on-primary px-16 py-5 rounded-2xl font-bold hover:bg-primary-container transition-colors">
+                        Discover Roles
+                    </button>
+<button class="outline-variant border border-opacity-20 px-16 py-5 rounded-2xl font-bold hover:bg-surface-container-low transition-colors">
+                        Post Your Story
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-[#e5e2de] dark:bg-[#121211] full-width py-16 bg-surface-dim tonal-grounding">
+<div class="flex flex-col md:flex-row justify-between items-center px-12 space-y-8 md:space-y-0 w-full max-w-screen-2xl mx-auto">
+<div class="text-lg font-serif text-[#384b3b] dark:text-[#fcf9f5]">
+                The Elevated Portal
+            </div>
+<div class="flex flex-wrap justify-center gap-8 font-['Manrope'] text-sm tracking-wide uppercase">
+<a class="text-[#4f6352] dark:text-[#8c4e32] hover:underline transition-all opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
+<a class="text-[#4f6352] dark:text-[#8c4e32] hover:underline transition-all opacity-80 hover:opacity-100" href="#">Terms of Service</a>
+<a class="text-[#4f6352] dark:text-[#8c4e32] hover:underline transition-all opacity-80 hover:opacity-100" href="#">Editorial Guidelines</a>
+<a class="text-[#4f6352] dark:text-[#8c4e32] hover:underline transition-all opacity-80 hover:opacity-100" href="#">Contact</a>
+<a class="text-[#4f6352] dark:text-[#8c4e32] hover:underline transition-all opacity-80 hover:opacity-100" href="#">Careers</a>
+</div>
+<div class="text-[#384b3b] dark:text-[#fcf9f5] font-['Manrope'] text-xs opacity-60">
+                © 2026 The Elevated Portal. Curated for the exceptional.
+            </div>
+</div>
+</footer>
+</body></html>

@@ -44,6 +44,7 @@ export default async function ProfileDetailPage({ params }: PageProps) {
     recentProfilesResult?.items.filter((p) => p.code !== profileCode).slice(0, 3) ?? [];
 
   return (
+    <div className="hero-gradient">
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <ProfileDetail profile={profile} />
 
@@ -51,7 +52,7 @@ export default async function ProfileDetailPage({ params }: PageProps) {
         <section className="mt-16">
           <div className="flex items-center justify-between mb-6">
             <h2
-              className="text-xl font-bold font-heading text-secondary"
+              className="font-heading text-xl text-primary"
             >
               More Talent
             </h2>
@@ -69,6 +70,7 @@ export default async function ProfileDetailPage({ params }: PageProps) {
           </div>
         </section>
       )}
+    </div>
     </div>
   );
 }

@@ -46,12 +46,12 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
           </Badge>
         </div>
 
-        <h1 className="text-3xl sm:text-4xl font-bold mb-1 text-secondary">
+        <h1 className="font-heading text-3xl sm:text-4xl text-primary leading-tight mb-1">
           {profile.person_name}
         </h1>
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mb-4">
-          <span className="font-semibold text-lg text-text-main">
+          <span className="text-secondary font-medium text-lg">
             {profile.current_title}
           </span>
           <span className="flex items-center gap-1 text-sm text-text-muted">
@@ -78,8 +78,8 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main content */}
         <div className="lg:col-span-2">
-          <div className="rounded-xl border border-border bg-surface p-6 mb-6">
-            <h2 className="text-xl font-semibold mb-4 text-secondary">
+          <div className="bg-surface-lowest rounded-2xl shadow-ambient p-6 mb-6">
+            <h2 className="font-heading text-xl text-primary mb-4">
               About
             </h2>
             <div className="prose">
@@ -92,15 +92,15 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
         <aside className="flex flex-col gap-4">
           {/* Contact / LinkedIn */}
           {profile.linkedin_profile_link && (
-            <div className="rounded-xl border border-border bg-surface p-5">
-              <h3 className="font-semibold mb-3 text-secondary">
+            <div className="bg-surface-lowest rounded-2xl shadow-ambient p-5">
+              <h3 className="font-heading text-xl text-primary mb-3">
                 Connect
               </h3>
               <a
                 href={profile.linkedin_profile_link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center w-full gap-2 px-4 py-3 rounded-xl text-white font-medium transition-opacity hover:opacity-90"
+                className="inline-flex items-center justify-center w-full gap-2 px-4 py-3 rounded-full text-white font-medium transition-all hover:opacity-90 shadow-ambient-hover"
                 style={{ backgroundColor: '#0A66C2' }}
               >
                 <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -112,8 +112,8 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
           )}
 
           {/* Profile details */}
-          <div className="rounded-xl border border-border bg-surface p-5 flex flex-col gap-3">
-            <h3 className="font-semibold text-secondary">
+          <div className="bg-surface-lowest rounded-2xl shadow-ambient p-5 flex flex-col gap-3">
+            <h3 className="font-heading text-xl text-primary">
               Details
             </h3>
             <dl className="flex flex-col gap-2.5 text-sm">

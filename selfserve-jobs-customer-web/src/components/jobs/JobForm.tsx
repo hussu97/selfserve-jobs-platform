@@ -108,7 +108,7 @@ export function JobForm({ onSuccess }: JobFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-6 max-w-2xl">
+    <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-8 max-w-2xl">
       {/* Honeypot */}
       <input type="text" name="website" className="hidden" tabIndex={-1} aria-hidden="true" onChange={(e) => set('honeypot', e.target.value)} />
 
@@ -116,10 +116,14 @@ export function JobForm({ onSuccess }: JobFormProps) {
         <StatusBanner type="error" message={errors.general} />
       )}
 
-      {/* Contact email for verification */}
-      <div className="p-4 rounded-xl border border-border bg-surface">
-        <p className="text-sm font-medium mb-3 text-text-main">
-          Your email (for verification & management)
+      {/* Section 01 — Verification */}
+      <div className="bg-surface-lowest shadow-ambient rounded-2xl p-6 flex flex-col gap-4">
+        <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-2">
+          <span className="font-heading text-2xl italic text-secondary">01</span>
+          <h2 className="font-heading text-xl text-primary">Your Email</h2>
+        </div>
+        <p className="text-sm text-text-muted -mt-2">
+          Used for verification and managing your listing — never shown publicly.
         </p>
         <Input
           type="email"
@@ -131,11 +135,12 @@ export function JobForm({ onSuccess }: JobFormProps) {
         />
       </div>
 
-      {/* Job Details */}
-      <div className="flex flex-col gap-4">
-        <h3 className="font-semibold text-text-main">
-          Job details
-        </h3>
+      {/* Section 02 — Job Details */}
+      <div className="bg-surface-lowest shadow-ambient rounded-2xl p-6 flex flex-col gap-4">
+        <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-2">
+          <span className="font-heading text-2xl italic text-secondary">02</span>
+          <h2 className="font-heading text-xl text-primary">Job Details</h2>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input
             label="Job title"
@@ -187,8 +192,12 @@ export function JobForm({ onSuccess }: JobFormProps) {
         </div>
       </div>
 
-      {/* Description */}
-      <div className="flex flex-col gap-4">
+      {/* Section 03 — Description */}
+      <div className="bg-surface-lowest shadow-ambient rounded-2xl p-6 flex flex-col gap-4">
+        <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-2">
+          <span className="font-heading text-2xl italic text-secondary">03</span>
+          <h2 className="font-heading text-xl text-primary">Description</h2>
+        </div>
         <Textarea
           label="Job description"
           placeholder="Describe the role, responsibilities, requirements, and benefits. Markdown is supported."
@@ -201,11 +210,12 @@ export function JobForm({ onSuccess }: JobFormProps) {
         />
       </div>
 
-      {/* Skills */}
-      <div className="flex flex-col gap-2">
-        <p className="text-sm font-medium text-text-main">
-          Key skills <span className="text-primary">*</span>
-        </p>
+      {/* Section 04 — Skills */}
+      <div className="bg-surface-lowest shadow-ambient rounded-2xl p-6 flex flex-col gap-4">
+        <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-2">
+          <span className="font-heading text-2xl italic text-secondary">04</span>
+          <h2 className="font-heading text-xl text-primary">Key Skills</h2>
+        </div>
         <div className="flex gap-2">
           <input
             type="text"
@@ -218,7 +228,7 @@ export function JobForm({ onSuccess }: JobFormProps) {
               }
             }}
             placeholder="Type a skill and press Enter"
-            className="flex-1 rounded-lg border border-border bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-text-main"
+            className="flex-1 rounded-xl bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary text-text-main"
           />
           <Button type="button" variant="outline" size="md" onClick={() => addSkill(skillInput)}>
             Add
@@ -226,7 +236,7 @@ export function JobForm({ onSuccess }: JobFormProps) {
         </div>
         {errors.key_skills && <p className="text-xs text-red-600">{errors.key_skills}</p>}
         {(form.key_skills?.length ?? 0) > 0 && (
-          <div className="flex flex-wrap gap-2 p-3 rounded-lg border border-border">
+          <div className="flex flex-wrap gap-2 bg-surface rounded-2xl p-4">
             {form.key_skills?.map((skill) => (
               <SkillTag key={skill} skill={skill} removable onRemove={removeSkill} size="md" />
             ))}
@@ -234,11 +244,12 @@ export function JobForm({ onSuccess }: JobFormProps) {
         )}
       </div>
 
-      {/* Contact */}
-      <div className="flex flex-col gap-3">
-        <p className="text-sm font-medium text-text-main">
-          How should candidates apply?
-        </p>
+      {/* Section 05 — Contact */}
+      <div className="bg-surface-lowest shadow-ambient rounded-2xl p-6 flex flex-col gap-4">
+        <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-2">
+          <span className="font-heading text-2xl italic text-secondary">05</span>
+          <h2 className="font-heading text-xl text-primary">How to Apply</h2>
+        </div>
         <div className="flex gap-4">
           <label className="flex items-center gap-2 cursor-pointer">
             <input

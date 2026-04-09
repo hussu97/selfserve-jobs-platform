@@ -12,9 +12,9 @@ export function SkillTag({ skill, removable = false, onRemove, className, size =
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1 rounded-full font-medium',
-        'bg-accent/15 text-accent-dark border border-accent/30',
-        size === 'sm' ? 'px-2 py-0.5 text-xs' : 'px-3 py-1 text-sm',
+        'inline-flex items-center gap-1 rounded-full font-semibold uppercase tracking-wider',
+        'bg-accent/20 text-accent-dark',
+        size === 'sm' ? 'px-2.5 py-0.5 text-[10px]' : 'px-3 py-1 text-xs',
         className
       )}
     >
