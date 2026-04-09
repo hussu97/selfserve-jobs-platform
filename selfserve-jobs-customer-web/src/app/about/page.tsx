@@ -207,6 +207,46 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+
+      {/* Our Story */}
+      <section className="bg-surface">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+          <span className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-4 block">
+            Our story
+          </span>
+          <h2 className="font-heading text-3xl sm:text-4xl text-primary mb-8">
+            Why we built <em>this</em>
+          </h2>
+
+          <div className="space-y-5 text-base leading-relaxed text-text-muted text-left sm:text-center">
+            <p>
+              The ongoing conflict in the Middle East has had a real and painful impact on
+              everyday lives. Across the region, people are losing their jobs, facing salary
+              cuts, and watching the stability they built over years erode. The economic
+              ripple effects don&apos;t stay on the news — they show up in households,
+              families, and careers.
+            </p>
+            <p>
+              We built jobs4u as a small, focused response. Major job platforms are noisy —
+              buried in algorithms, recruiter spam, and pay-to-play rankings. We wanted
+              something simpler: a concentrated space where real companies post real jobs,
+              and talented people can be found without the clutter. No middlemen, no
+              hidden fees, no endless scrolling.
+            </p>
+            <p>
+              jobs4u is a personal project by{' '}
+              <strong className="text-text-main">Hussain</strong> and{' '}
+              <strong className="text-text-main">Tejasvie</strong> — two people who
+              wanted to do something useful with the tools they have. There are no plans to
+              introduce paid tiers or monetize the platform. If you&apos;d like to learn
+              more about us or get in touch, visit the{' '}
+              <Link href="/contact" className="text-secondary font-medium hover:text-secondary-hover transition-colors underline underline-offset-2">
+                contact page
+              </Link>.
+            </p>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
