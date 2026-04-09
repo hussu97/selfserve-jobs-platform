@@ -37,7 +37,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             ref={ref}
             id={selectId}
             className={cn(
-              'w-full appearance-none rounded-xl border-0 bg-surface px-4 py-3 text-sm transition-all pr-9 text-text-main',
+              'w-full appearance-none rounded-xl border-0 bg-surface px-5 py-3.5 text-sm transition-all pr-10 text-text-main',
               'focus:outline-none focus:ring-1 focus:ring-primary/30 focus:bg-surface-lowest',
               error
                 ? 'bg-red-50 ring-1 ring-red-400'
