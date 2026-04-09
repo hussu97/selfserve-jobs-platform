@@ -192,6 +192,8 @@ export function JobForm({ onSuccess }: JobFormProps) {
             label="Application deadline (optional)"
             type="date"
             value={form.deadline_date ?? ''}
+            min={new Date().toISOString().split('T')[0]}
+            max={new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}
             onChange={(e) => set('deadline_date', e.target.value || undefined)}
           />
         </div>

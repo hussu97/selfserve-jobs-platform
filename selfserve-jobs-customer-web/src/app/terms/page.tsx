@@ -74,7 +74,7 @@ export default function TermsPage() {
             <div>
               <h2 className="font-heading text-2xl text-primary mb-3">Listing lifecycle</h2>
               <ul className="flex flex-col gap-2 text-sm text-text-muted list-disc list-inside">
-                <li>Job listings are active for 60 days and candidate profiles for 90 days from the date of verification.</li>
+                <li>Job listings are active for 60 days and candidate profiles for 180 days from the date of verification.</li>
                 <li>After expiry, listings are hidden from public view automatically.</li>
                 <li>You may remove your listing at any time using the management link sent to your email.</li>
                 <li>Listings that receive 3 or more reports may be temporarily hidden pending review.</li>

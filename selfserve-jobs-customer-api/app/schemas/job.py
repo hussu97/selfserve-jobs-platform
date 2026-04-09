@@ -1,7 +1,9 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from typing import Literal
 
 from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
+
+JOB_EXPIRY_DAYS = 60  # must match job_service.JOB_EXPIRY_DAYS
 
 EMPLOYMENT_TYPES = Literal["full_time", "part_time", "contract", "consulting", "internship", "freelance", "remote"]
 CONTACT_METHODS = Literal["email", "url"]
@@ -23,6 +25,19 @@ class JobCreate(BaseModel):
     contact_url: str | None = Field(None, max_length=2048)
     # Honeypot field — must be empty
     website: str | None = Field(None, exclude=True)
+
+    @field_validator("deadline_date", mode="before")
+    @classmethod
+    def validate_deadline(cls, v: date | None) -> date | None:
+        if v is None:
+            return v
+        today = date.today()
+        if v < today:
+            raise ValueError("Application deadline cannot be in the past")
+        max_date = today + timedelta(days=JOB_EXPIRY_DAYS)
+        if v > max_date:
+            raise ValueError(f"Application deadline cannot exceed the listing expiry ({JOB_EXPIRY_DAYS} days)")
+        return v
 
     @field_validator("email", mode="before")
     @classmethod

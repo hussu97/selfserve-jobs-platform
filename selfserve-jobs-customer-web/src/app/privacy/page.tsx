@@ -74,33 +74,15 @@ export default function PrivacyPage() {
 
             <div>
               <h2 className="font-heading text-2xl text-primary mb-3">Third-party services</h2>
-              <p className="text-sm leading-relaxed text-text-muted mb-4">
-                We use a small number of trusted third-party providers to operate jobs4u:
+              <p className="text-sm leading-relaxed text-text-muted">
+                We use trusted third-party providers for email delivery, file storage, and hosting. These providers only process your data to the extent necessary to operate the platform, and are bound by their own privacy policies. We do not share your personal data with any third party for marketing or advertising purposes.
               </p>
-              <div className="flex flex-col gap-3">
-                <div className="flex items-start gap-3">
-                  <div className="w-1.5 h-1.5 rounded-full bg-secondary mt-2 shrink-0"></div>
-                  <p className="text-sm text-text-muted"><span className="font-medium text-text-main">Resend</span> — transactional email delivery (verification and management emails only).</p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-1.5 h-1.5 rounded-full bg-secondary mt-2 shrink-0"></div>
-                  <p className="text-sm text-text-muted"><span className="font-medium text-text-main">Google Cloud Storage</span> — secure storage for uploaded resume PDFs.</p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-1.5 h-1.5 rounded-full bg-secondary mt-2 shrink-0"></div>
-                  <p className="text-sm text-text-muted"><span className="font-medium text-text-main">Google Cloud SQL</span> — hosted database for storing listings and verification records.</p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-1.5 h-1.5 rounded-full bg-secondary mt-2 shrink-0"></div>
-                  <p className="text-sm text-text-muted"><span className="font-medium text-text-main">Vercel</span> — hosting and serving the website frontend.</p>
-                </div>
-              </div>
             </div>
 
             <div>
               <h2 className="font-heading text-2xl text-primary mb-3">Data retention</h2>
               <p className="text-sm leading-relaxed text-text-muted">
-                Job listings are active for 60 days and candidate profiles for 90 days, after which they expire automatically. You can remove your listing at any time using the management link sent to your email. When a listing is removed or expires, it is hidden from public view. We may retain minimal records (email address, creation date) for abuse prevention for up to 12 months.
+                Job listings are active for 60 days and candidate profiles for 180 days, after which they expire automatically. You can remove your listing at any time using the management link sent to your email. When a listing is removed or expires, it is hidden from public view. We may retain minimal records (email address, creation date) for abuse prevention for up to 12 months.
               </p>
             </div>
 

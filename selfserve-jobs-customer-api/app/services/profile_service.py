@@ -12,7 +12,7 @@ from app.services.code_generator import generate_code, generate_token
 
 logger = logging.getLogger(__name__)
 
-PROFILE_EXPIRY_DAYS = 90
+PROFILE_EXPIRY_DAYS = 180
 MAX_ACTIVE_PROFILES_PER_EMAIL = 2
 
 

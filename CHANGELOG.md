@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+- `privacy/page.tsx`: replaced named third-party services list (Resend, GCS, Cloud SQL, Vercel) with a generic statement — no tech stack exposed publicly
+- `privacy/page.tsx`, `terms/page.tsx`: updated candidate profile retention from 90 days to 180 days
+- `profile_service.py`: `PROFILE_EXPIRY_DAYS` changed from 90 to 180
+- `schemas/job.py`: added `validate_deadline` field validator — rejects deadlines in the past or beyond the 60-day listing life; also extracted `JOB_EXPIRY_DAYS = 60` constant
+- `JobForm`: application deadline input now enforces `min=today` and `max=today+60d` via native HTML date constraints
+
 ### Added
 - `app/contact/page.tsx`: new Contact page with founder profile cards (name, initials avatar, headline, LinkedIn link) and two info cards for listing reports and privacy requests
 - `app/privacy/page.tsx`: Privacy Policy page covering data collected, purposes, third-party services (Resend, GCS, Cloud SQL, Vercel), retention, user rights, and cookie policy
