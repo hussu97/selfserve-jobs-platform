@@ -1,17 +1,16 @@
 """Tests for auth endpoints: login, verify, logout, me, entities, activate/deactivate."""
-from datetime import UTC, datetime, timedelta
 
-import pytest
+from datetime import UTC, datetime, timedelta
 
 from app.models.auth_session import AuthSession
 from app.models.job import Job
 from app.models.login_token import LoginToken
 from app.services.code_generator import generate_token
 
-
 # ---------------------------------------------------------------------------
 # POST /auth/login (non-production auto-login)
 # ---------------------------------------------------------------------------
+
 
 async def test_login_non_production_returns_session_token(client):
     """Non-production: login with email returns session_token immediately."""
@@ -37,6 +36,7 @@ async def test_login_invalid_email_rejected(client):
 # ---------------------------------------------------------------------------
 # POST /auth/verify — login token flow
 # ---------------------------------------------------------------------------
+
 
 async def test_verify_valid_login_token(client, db_session):
     """Consuming a valid login token creates a session."""
@@ -113,6 +113,7 @@ async def test_verify_token_marked_used(client, db_session):
 # GET /auth/me
 # ---------------------------------------------------------------------------
 
+
 async def test_me_with_valid_session(client, db_session):
     now = datetime.now(UTC)
     session = AuthSession(
@@ -157,6 +158,7 @@ async def test_me_expired_session_unauthorized(client, db_session):
 # POST /auth/logout
 # ---------------------------------------------------------------------------
 
+
 async def test_logout_deletes_session(client, db_session):
     from sqlalchemy import select
 
@@ -176,15 +178,14 @@ async def test_logout_deletes_session(client, db_session):
     )
     assert response.status_code == 200
 
-    result = await db_session.execute(
-        select(AuthSession).where(AuthSession.session_token == token)
-    )
+    result = await db_session.execute(select(AuthSession).where(AuthSession.session_token == token))
     assert result.scalar_one_or_none() is None
 
 
 # ---------------------------------------------------------------------------
 # GET /auth/entities
 # ---------------------------------------------------------------------------
+
 
 async def test_entities_returns_jobs_and_profiles(client, db_session):
     """Entities endpoint returns jobs and profiles for the session's email."""
@@ -234,6 +235,7 @@ async def test_entities_returns_jobs_and_profiles(client, db_session):
 # ---------------------------------------------------------------------------
 # Job deactivate / activate
 # ---------------------------------------------------------------------------
+
 
 async def test_job_deactivate_activate_cycle(client, db_session):
     now = datetime.now(UTC)

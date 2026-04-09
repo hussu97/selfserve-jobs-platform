@@ -216,16 +216,16 @@ function MarkdownEditorContent({
       },
     },
     onUpdate({ editor: e }) {
-      onChange(e.storage.markdown.getMarkdown());
+      onChange((e.storage as any).markdown.getMarkdown());
     },
   });
 
   // Controlled sync — only update when value differs to avoid cursor reset
   useEffect(() => {
     if (!editor) return;
-    const current = editor.storage.markdown.getMarkdown();
+    const current = (editor.storage as any).markdown.getMarkdown();
     if (current !== value) {
-      editor.commands.setContent(value, false);
+      editor.commands.setContent(value, { emitUpdate: false });
     }
   }, [value, editor]);
 

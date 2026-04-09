@@ -5,7 +5,6 @@ from fastapi import HTTPException, status
 from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.auth_session import AuthSession
 from app.models.email_verification import EmailVerification
 from app.models.job import Job
 from app.models.profile import Profile

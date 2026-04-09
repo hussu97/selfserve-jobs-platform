@@ -103,9 +103,7 @@ async def validate_session(db: AsyncSession, session_token: str) -> AuthSession 
 
 async def delete_session(db: AsyncSession, session_token: str) -> None:
     """Delete a session (logout)."""
-    result = await db.execute(
-        select(AuthSession).where(AuthSession.session_token == session_token)
-    )
+    result = await db.execute(select(AuthSession).where(AuthSession.session_token == session_token))
     session = result.scalar_one_or_none()
     if session:
         await db.delete(session)
@@ -115,22 +113,26 @@ async def delete_session(db: AsyncSession, session_token: str) -> None:
 async def get_entities_for_session(db: AsyncSession, email: str) -> dict:
     """Return all jobs and profiles for the given email with edit_tokens."""
     jobs_result = await db.execute(
-        select(Job).where(
+        select(Job)
+        .where(
             and_(
                 Job.email == email,
                 Job.status.notin_(["removed"]),
             )
-        ).order_by(Job.created_at.desc())
+        )
+        .order_by(Job.created_at.desc())
     )
     jobs = jobs_result.scalars().all()
 
     profiles_result = await db.execute(
-        select(Profile).where(
+        select(Profile)
+        .where(
             and_(
                 Profile.email == email,
                 Profile.status.notin_(["removed"]),
             )
-        ).order_by(Profile.created_at.desc())
+        )
+        .order_by(Profile.created_at.desc())
     )
     profiles = profiles_result.scalars().all()
 
