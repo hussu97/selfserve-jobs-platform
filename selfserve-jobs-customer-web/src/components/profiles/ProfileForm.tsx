@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Input } from '@/components/ui/Input';
-import { Textarea } from '@/components/ui/Textarea';
+import { MarkdownEditor } from '@/components/ui/MarkdownEditor';
 import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
 import { SkillTag } from '@/components/shared/SkillTag';
@@ -246,12 +246,11 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
         <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-text-muted -mt-2">
           Optional — Markdown supported
         </p>
-        <Textarea
+        <MarkdownEditor
           label="Professional brief"
           placeholder="Tell employers about yourself, your experience, and what you're looking for. Markdown is supported."
           value={form.brief ?? ''}
-          onChange={(e) => set('brief', e.target.value)}
-          rows={8}
+          onChange={(val) => set('brief', val)}
           hint="Markdown formatting is rendered when employers view your profile."
         />
       </div>

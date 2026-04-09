@@ -244,6 +244,25 @@
   margin: 2em 0;
 }
 
+/* ─── Tiptap / ProseMirror editor ────────────────────────── */
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: var(--color-text-muted);
+  opacity: 0.6;
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.ProseMirror {
+  min-height: inherit;
+}
+
+.ProseMirror > * + * {
+  margin-top: 0;
+}
+
 /* ─── Form controls ───────────────────────────────────────── */
 
 input[type="radio"],

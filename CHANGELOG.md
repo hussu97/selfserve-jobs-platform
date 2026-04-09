@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+- **MarkdownEditor component** (`src/components/ui/MarkdownEditor.tsx`) — WYSIWYG markdown editor (JIRA/Confluence-style) replacing the plain textarea for job descriptions and professional briefs:
+  - Powered by Tiptap (`@tiptap/react`, `@tiptap/starter-kit`, `@tiptap/extension-placeholder`, `tiptap-markdown`)
+  - Live markdown shortcuts: type `## ` → heading renders in place, `**text**` → bold, `- ` → bullet list, etc.
+  - Toolbar at the bottom with Bold, Italic, Heading H2, Bullet List, Ordered List, Code Block buttons (SVG icons, no icon library)
+  - Controlled component (`value: string` / `onChange: (val: string) => void`); emits plain markdown string — no change to backend storage
+  - Replaced `<Textarea>` in `JobForm.tsx`, `ProfileForm.tsx`, and `manage/[entityType]/[code]/page.tsx` (both job description and profile brief fields)
+
+### Changed
+- **JobCard layout redesign** (`src/components/jobs/JobCard.tsx`) — fixed overflow and crowding at 2-column grid widths:
+  - Removed company initial avatar (`w-16 h-16` box) — title and company name now use the full card width
+  - Employment type badge moved to its own top row; time posted displayed inline at top-right
+  - Footer restructured from a single cramped flex row to `flex-col`: location on line 1, deadline + "View Details →" on line 2 — eliminates overflow at all card widths
+  - Reduced padding `p-8 → p-6` and gap `gap-6 → gap-4`
+
 ### Fixed
 - **Hydration mismatch in Header** — `AuthProvider` was reading `localStorage` in the `useState` lazy initializer, which runs on the client but not the server, causing the Header to render different elements (logged-out links vs. `CreateListingDropdown`) between SSR and client hydration. Moved the `localStorage` read to a `useEffect`, added `isHydrated` to `AuthContextValue`, and guarded the logged-in header branch with `isHydrated && isLoggedIn` so the initial client render always matches the server-rendered output.
 

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Input } from '@/components/ui/Input';
-import { Textarea } from '@/components/ui/Textarea';
+import { MarkdownEditor } from '@/components/ui/MarkdownEditor';
 import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
 import { SkillTag } from '@/components/shared/SkillTag';
@@ -205,13 +205,12 @@ export function JobForm({ onSuccess }: JobFormProps) {
           <span className="font-heading text-2xl italic text-secondary">03</span>
           <h2 className="font-heading text-xl text-primary">Description</h2>
         </div>
-        <Textarea
+        <MarkdownEditor
           label="Job description"
           placeholder="Describe the role, responsibilities, requirements, and benefits. Markdown is supported."
           value={form.description ?? ''}
-          onChange={(e) => set('description', e.target.value)}
+          onChange={(val) => set('description', val)}
           error={errors.description}
-          rows={10}
           hint="Markdown formatting supported (bold, lists, headings etc.)"
           required
         />

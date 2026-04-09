@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Spinner } from '@/components/ui/Spinner';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Textarea } from '@/components/ui/Textarea';
+import { MarkdownEditor } from '@/components/ui/MarkdownEditor';
 import { Select } from '@/components/ui/Select';
 import { StatusBanner } from '@/components/shared/StatusBanner';
 import { SkillTag } from '@/components/shared/SkillTag';
@@ -413,11 +413,10 @@ function ManageContent() {
               <span className="font-heading text-2xl italic text-secondary">02</span>
               <h2 className="font-heading text-xl text-primary">Description & Skills</h2>
             </div>
-            <Textarea
+            <MarkdownEditor
               label="Job description"
               value={jobForm.description ?? ''}
-              onChange={(e) => setJobField('description', e.target.value)}
-              rows={10}
+              onChange={(val) => setJobField('description', val)}
               hint="Markdown formatting supported."
               required
             />
@@ -579,11 +578,10 @@ function ManageContent() {
               <span className="font-heading text-2xl italic text-secondary">02</span>
               <h2 className="font-heading text-xl text-primary">Professional Brief & Skills</h2>
             </div>
-            <Textarea
+            <MarkdownEditor
               label="Professional brief"
               value={profileForm.brief ?? ''}
-              onChange={(e) => setProfileField('brief', e.target.value)}
-              rows={8}
+              onChange={(val) => setProfileField('brief', val)}
               hint="Markdown formatting supported."
               required
             />
