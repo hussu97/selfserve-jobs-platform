@@ -59,7 +59,10 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
     if (!form.current_country) errs.current_country = 'Country is required';
     if (form.years_of_experience === undefined || form.years_of_experience < 0) errs.years_of_experience = 'Experience is required';
     if ((form.key_skills?.length ?? 0) === 0) errs.key_skills = 'At least one skill is required';
-    if (resumeFile && resumeFile.type !== 'application/pdf') errs.resume = 'Only PDF files are accepted';
+    if (resumeFile) {
+      if (resumeFile.type !== 'application/pdf') errs.resume = 'Only PDF files are accepted';
+      else if (resumeFile.size > 5 * 1024 * 1024) errs.resume = 'File must be under 5 MB';
+    }
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -319,7 +322,7 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
                   Click to upload PDF
                 </span>
                 <span className="text-xs text-text-muted">
-                  PDF only, max 10MB
+                  PDF only, max 5 MB
                 </span>
               </div>
               <input

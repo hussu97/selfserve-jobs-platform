@@ -44,12 +44,12 @@ Prioritized list of issues and improvements identified from a full codebase audi
 
 > Quality, SEO, and developer confidence.
 
-- [ ] **Add error boundaries** — No `error.tsx` files exist. Create in `app/`, `app/jobs/`, `app/profiles/` with user-friendly fallback UI.
+- [x] **Add error boundaries** — No `error.tsx` files exist. Create in `app/`, `app/jobs/`, `app/profiles/` with user-friendly fallback UI.
 - [ ] **Expand test coverage** — 11 backend tests, 5 frontend test files. Missing: verification flow, email failure handling, update validators, view count, form components, error boundaries.
-- [ ] **Add OG images for social sharing** — No `opengraph-image.tsx` files. Use Next.js `ImageResponse` for dynamic social cards on job and profile detail pages.
-- [ ] **Paginate sitemap** — `sitemap.ts` fetches max 500 items with no pagination. Refactor to use `generateSitemaps()` for sitemap index with paginated children.
-- [ ] **Replace hardcoded color values** — Some components (e.g. `verify/page.tsx`) use raw hex like `hover:bg-[#2D5F3A]` instead of design tokens. Audit and replace with CSS custom properties.
-- [ ] **Add frontend file upload size validation** — Only checks MIME type. Add 5MB size check before upload begins (backend already validates server-side).
+- [x] **Add OG images for social sharing** — No `opengraph-image.tsx` files. Use Next.js `ImageResponse` for dynamic social cards on job and profile detail pages.
+- [x] **Paginate sitemap** — `sitemap.ts` fetches max 500 items with no pagination. Refactor to use `generateSitemaps()` for sitemap index with paginated children.
+- [x] **Replace hardcoded color values** — Some components (e.g. `verify/page.tsx`) use raw hex like `hover:bg-[#2D5F3A]` instead of design tokens. Audit and replace with CSS custom properties.
+- [x] **Add frontend file upload size validation** — Only checks MIME type. Add 5MB size check before upload begins (backend already validates server-side).
 
 ---
 

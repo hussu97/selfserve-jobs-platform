@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+- `app/error.tsx`, `app/jobs/error.tsx`, `app/profiles/error.tsx`: root and section-level error boundaries with on-brand fallback UI and reset/home actions
+- `app/jobs/[jobCode]/opengraph-image.tsx`, `app/profiles/[profileCode]/opengraph-image.tsx`: dynamic OG social cards using Next.js `ImageResponse` (1200×630); job card shows title, company, location, employment type, and skills; profile card shows name, title, avatar initials, location, experience, and skills
+- `ProfileForm`: 5 MB client-side file size check before resume upload (previously only MIME type was validated); UI hint corrected from "max 10MB" to "max 5 MB"
+
+### Changed
+- `sitemap.ts`: refactored from a single default export fetching 500 items to a paginated sitemap index using `generateSitemaps()` + `sitemap({ id })` — static routes at id 0, jobs pages at ids 1–50 (200 items each), profiles pages at ids 51–100
+- `Footer`: replaced hardcoded `bg-[#e5e2de]` with design token `bg-surface-dim`
+- `ProfileDetail`: extracted inline `'#0A66C2'` LinkedIn brand color to a named constant `LINKEDIN_BLUE`
+
 ### Changed
 - `JobForm`, `ProfileForm`: increased section card padding from `p-6` to `p-8`; replaced `<Button>` submit with an inline `<button>` using secondary color (`bg-secondary`) and `rounded-xl` to match the design system CTA style; `ProfileForm` sections also promoted to full card treatment (`bg-surface-lowest shadow-ambient rounded-2xl`) to align with `JobForm`
 - `page.tsx` (home), `jobs/page.tsx`, `profiles/page.tsx`: widened all containers from `max-w-6xl` to `max-w-7xl`; increased hero vertical padding on browse pages (`pt-14 pb-10` → `pt-16 pb-12`) and section padding on home page (`py-16 sm:py-24` → `py-20 sm:py-28`); home hero padding increased to `py-28 sm:py-36 lg:py-48`; card grids updated from `gap-4`/`gap-5` to `gap-6`; browse page grids changed from `xl:grid-cols-3` to `xl:grid-cols-2` to prevent cramping with larger `p-8` cards
