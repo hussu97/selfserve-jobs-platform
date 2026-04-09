@@ -46,3 +46,5 @@ Thumbs.db
 *.key
 service-account*.json
 gcloud-credentials*.json
+
+.claude/launch.json
