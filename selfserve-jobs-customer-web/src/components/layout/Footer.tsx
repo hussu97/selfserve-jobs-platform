@@ -8,7 +8,7 @@ export function Footer() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
 
           <div className="flex flex-col gap-1.5">
-            <Image src="/logo.png" alt="hirebridge" width={120} height={30} />
+            <Image src="/logo.png" alt="hirebridge" width={120} height={54} unoptimized />
             <p className="text-xs text-text-muted leading-relaxed">
               No signup required · No middlemen
             </p>

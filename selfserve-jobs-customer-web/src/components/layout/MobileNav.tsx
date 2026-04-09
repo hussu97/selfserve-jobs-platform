@@ -70,7 +70,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
             onClick={onClose}
             aria-label="hirebridge home"
           >
-            <Image src="/logo.png" alt="hirebridge" width={110} height={28} />
+            <Image src="/logo.png" alt="hirebridge" width={110} height={50} unoptimized />
           </Link>
           <button
             onClick={onClose}

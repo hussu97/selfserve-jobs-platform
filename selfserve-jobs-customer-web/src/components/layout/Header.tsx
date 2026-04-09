@@ -75,7 +75,7 @@ export function Header() {
               className="hover:opacity-75 transition-opacity"
               aria-label="hirebridge home"
             >
-              <Image src="/logo.png" alt="hirebridge" width={140} height={36} priority />
+              <Image src="/logo.png" alt="hirebridge" width={140} height={64} priority unoptimized />
             </Link>
 
             <nav className="hidden md:flex items-center gap-6">
