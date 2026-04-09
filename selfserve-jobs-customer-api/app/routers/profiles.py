@@ -96,6 +96,14 @@ async def get_profile(
     return ProfileResponse.from_orm_with_resume(profile)
 
 
+@router.post("/{code}/view", status_code=status.HTTP_204_NO_CONTENT)
+async def track_profile_view(
+    code: str,
+    db: AsyncSession = Depends(get_session),
+):
+    await profile_service.increment_view_count(db, code)
+
+
 @router.post("", response_model=ProfileCreateResponse, status_code=status.HTTP_201_CREATED)
 async def create_profile(
     data: ProfileCreate,

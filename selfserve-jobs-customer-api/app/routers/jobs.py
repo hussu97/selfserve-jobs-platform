@@ -59,6 +59,14 @@ async def get_job(
     return JobResponse.model_validate(job)
 
 
+@router.post("/{code}/view", status_code=status.HTTP_204_NO_CONTENT)
+async def track_job_view(
+    code: str,
+    db: AsyncSession = Depends(get_session),
+):
+    await job_service.increment_view_count(db, code)
+
+
 @router.post("", response_model=JobCreateResponse, status_code=status.HTTP_201_CREATED)
 async def create_job(
     data: JobCreate,

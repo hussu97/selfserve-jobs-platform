@@ -93,11 +93,10 @@ async def increment_view_count(db: AsyncSession, profile_code: str) -> None:
 
 
 async def get_profile_detail(db: AsyncSession, profile_code: str) -> Profile:
-    """Get profile detail and automatically increment view count."""
+    """Get profile detail without incrementing view count."""
     profile = await get_profile_by_code(db, profile_code)
     if profile.status not in ("active", "pending_verification"):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
-    await increment_view_count(db, profile_code)
     return profile
 
 

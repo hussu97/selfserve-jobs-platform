@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+- View counts were being incremented multiple times per page load: `generateMetadata()` and the page component each called `getJob`/`getProfile`, and the view increment was baked into the GET handler — resulting in 2+ increments per visit. Moved increment to dedicated `POST /api/v1/jobs/{code}/view` and `POST /api/v1/profiles/{code}/view` endpoints; added `ViewTracker` client component that fires once per session using `sessionStorage` dedup.
+
+### Added
+- `routers/jobs.py`: `POST /api/v1/jobs/{code}/view` — dedicated endpoint to atomically increment job view count
+- `routers/profiles.py`: `POST /api/v1/profiles/{code}/view` — dedicated endpoint to atomically increment profile view count
+- `components/shared/ViewTracker.tsx`: client component that calls the view endpoint once per browser session (keyed by entity type + code in `sessionStorage`)
+- `lib/api.ts`: `trackJobView(code)` and `trackProfileView(code)` API helpers
+
+### Changed
+- `services/job_service.py`: `get_job_detail` no longer calls `increment_view_count`; GET is now read-only
+- `services/profile_service.py`: `get_profile_detail` no longer calls `increment_view_count`; GET is now read-only
+
 ### Changed
 - `privacy/page.tsx`: replaced named third-party services list (Resend, GCS, Cloud SQL, Vercel) with a generic statement — no tech stack exposed publicly
 - `privacy/page.tsx`, `terms/page.tsx`: updated candidate profile retention from 90 days to 180 days

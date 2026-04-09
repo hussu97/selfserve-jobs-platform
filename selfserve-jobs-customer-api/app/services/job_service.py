@@ -93,11 +93,10 @@ async def increment_view_count(db: AsyncSession, job_code: str) -> None:
 
 
 async def get_job_detail(db: AsyncSession, job_code: str) -> Job:
-    """Get job detail and increment view count automatically."""
+    """Get job detail without incrementing view count."""
     job = await get_job_by_code(db, job_code)
     if job.status not in ("active", "pending_verification"):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
-    await increment_view_count(db, job_code)
     return job
 
 

@@ -3,7 +3,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ProfileDetail } from '@/components/profiles/ProfileDetail';
 import { ProfileCard } from '@/components/profiles/ProfileCard';
-import { getProfile, getProfiles } from '@/lib/api';
+import { ViewTracker } from '@/components/shared/ViewTracker';
+import { getProfile, getProfiles, trackProfileView } from '@/lib/api';
 import { truncate } from '@/lib/utils';
 
 interface PageProps {
@@ -44,6 +45,8 @@ export default async function ProfileDetailPage({ params }: PageProps) {
     recentProfilesResult?.items.filter((p) => p.code !== profileCode).slice(0, 3) ?? [];
 
   return (
+    <>
+      <ViewTracker entityType="profile" code={profileCode} trackFn={trackProfileView} />
     <div className="hero-gradient">
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <ProfileDetail profile={profile} />
@@ -72,5 +75,6 @@ export default async function ProfileDetailPage({ params }: PageProps) {
       )}
     </div>
     </div>
+    </>
   );
 }
