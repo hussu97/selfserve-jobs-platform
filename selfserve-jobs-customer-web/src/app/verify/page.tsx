@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { StatusBanner } from '@/components/shared/StatusBanner';
 import { verifyEmail, resendVerification } from '@/lib/api';
+import { useAuth } from '@/context/AuthContext';
 import type { VerificationResponse } from '@/lib/types';
 
 type VerifyState = 'idle' | 'loading' | 'success' | 'error' | 'no_code';
@@ -30,6 +31,7 @@ export default function VerifyPage() {
 function VerifyContent() {
   const searchParams = useSearchParams();
   const code = searchParams.get('code');
+  const { login } = useAuth();
 
   const [state, setState] = useState<VerifyState>('idle');
   const [result, setResult] = useState<VerificationResponse | null>(null);
@@ -57,6 +59,10 @@ function VerifyContent() {
     verifyEmail(code)
       .then((res) => {
         setResult(res);
+        // Auto-login: verification activates the listing and creates a session
+        if (res.session_token && res.email) {
+          login(res.session_token, res.email);
+        }
         setState('success');
       })
       .catch((err) => {

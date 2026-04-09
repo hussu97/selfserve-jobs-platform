@@ -6,6 +6,42 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+- **User account & dashboard system** — email magic-link authentication with session management, dashboard page, and header avatar:
+  - `alembic/versions/0002_auth_session.py`: new migration adding `login_token` and `auth_session` tables
+  - `app/models/login_token.py`, `app/models/auth_session.py`: ORM models for both tables
+  - `app/schemas/auth.py`: Pydantic schemas — `LoginRequest`, `LoginResponse`, `LoginVerifyResponse`, `MeResponse`, `EntityItem`, `EntitiesResponse`
+  - `app/services/auth_service.py`: `create_login_token` (rate-limited 5/email/hour, 15-min expiry), `verify_login_token`, `create_session` (30-day expiry), `validate_session`, `delete_session`, `get_entities_for_session`
+  - `app/routers/auth.py`: `POST /api/v1/auth/login`, `POST /api/v1/auth/verify`, `POST /api/v1/auth/logout`, `GET /api/v1/auth/me`, `GET /api/v1/auth/entities`
+  - `context/AuthContext.tsx`: React context storing session token + email in `localStorage`; provides `login()`, `logout()`, `isLoggedIn`, `initial` (first char of email) to all client components
+  - `app/login/page.tsx`: login page — non-production auto-creates session immediately; production shows "check your email" screen
+  - `app/login/callback/page.tsx`: magic-link callback — consumes `?token=`, stores session, redirects to `/account`
+  - `app/account/page.tsx`: dashboard — protected page listing all jobs and profiles for the logged-in email with status badges, view counts, expiry dates, Edit/Activate/Deactivate/Delete actions per entity and CTAs to create new listings
+- `POST /api/v1/jobs/{code}/deactivate` and `POST /api/v1/jobs/{code}/activate`: toggle job status between `active` ↔ `inactive` (requires `X-Edit-Token`)
+- `POST /api/v1/profiles/{code}/deactivate` and `POST /api/v1/profiles/{code}/activate`: same for profiles
+- `app/dependencies.py`: `get_current_session` dependency — parses `Authorization: Bearer {token}` header and validates session
+- `app/services/email_service.py`: `send_login_email` — magic login link email template (15-min expiry, single-use)
+
+### Changed
+- `app/main.py`: registered `auth` router
+- `app/models/__init__.py`: registered `LoginToken` and `AuthSession` models
+- `app/services/verification_service.py`: `verify_code()` now also creates an `auth_session` and returns `session_token` + `email` alongside entity data — user is auto-logged in on email verification
+- `app/routers/verification.py`: `POST /verify` response now includes `session_token` and `email` fields
+- `app/schemas/verification.py`: `VerificationResponse` gains `session_token: str | None` and `email: str | None`
+- `lib/types.ts`: `VerificationResponse` updated with `session_token` and `email` fields; added `LoginResponse`, `LoginVerifyResponse`, `AuthEntity`, `EntitiesResponse` types
+- `lib/api.ts`: added `loginRequest`, `loginVerify`, `logout`, `getMyEntities`, `deactivateJob`, `activateJob`, `deactivateProfile`, `activateProfile` API helpers
+- `app/layout.tsx`: wrapped app in `<AuthProvider>`
+- `components/layout/Header.tsx`: when logged in shows "Create Listing" dropdown (Post a Job / Create Profile) + circular avatar with first letter of email linking to `/account`; when logged out shows original "Post a Job" + "Create Profile" CTAs
+- `components/layout/MobileNav.tsx`: when logged in shows "My Account" link at top and "Sign Out" at bottom; when logged out shows "Sign In" link
+- `app/verify/page.tsx`: auto-logs in user when verification response contains `session_token`
+- `app/services/job_service.py`: added `deactivate_job` and `reactivate_job`
+- `app/services/profile_service.py`: added `deactivate_profile` and `reactivate_profile`
+- `app/routers/jobs.py`: added deactivate/activate endpoints
+- `app/routers/profiles.py`: added deactivate/activate endpoints
+
+### Fixed
+- `tests/test_auth.py`: 14 new tests covering login auto-session (non-production), login token verify/expiry/reuse, session validation, logout, entities endpoint, and job deactivate/activate cycle
+
 ### Fixed
 - `globals.css`: move `*:focus-visible` rule into `@layer base` so Tailwind utility classes (e.g. `focus-visible:outline-none`) can override it — previously, the unlayered rule had higher cascade priority than all Tailwind utilities, causing duplicate focus outlines on any element that suppressed focus-visible via a utility class
 - `upload.py`: `POST /upload/resume` was requiring `profile_code` and `edit_token` as form fields, but the frontend uploads the resume before the profile exists — 422 on every profile creation. Endpoint now accepts only the file; GCS path is `resumes/{uuid}.pdf`. `create_profile` service now sets `resume_gcs_path` from `data.resume_key`.

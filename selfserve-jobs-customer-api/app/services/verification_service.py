@@ -5,6 +5,7 @@ from fastapi import HTTPException, status
 from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.models.auth_session import AuthSession
 from app.models.email_verification import EmailVerification
 from app.models.job import Job
 from app.models.profile import Profile
@@ -88,9 +89,16 @@ async def verify_code(
 
     await db.flush()
 
+    # Auto-create an auth session so the user is logged in immediately after verifying
+    from app.services.auth_service import create_session
+
+    session = await create_session(db, verification.email)
+
     return {
         "entity_type": verification.entity_type,
         "entity_code": verification.entity_code,
+        "email": verification.email,
+        "session_token": session.session_token,
     }
 
 

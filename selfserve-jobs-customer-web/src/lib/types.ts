@@ -164,6 +164,35 @@ export interface VerificationResponse {
   message: string;
   entity_type?: EntityType;
   code?: string;
+  session_token?: string;
+  email?: string;
+}
+
+// Auth
+export interface LoginResponse {
+  message: string;
+  session_token?: string;
+}
+
+export interface LoginVerifyResponse {
+  session_token: string;
+  email: string;
+}
+
+export interface AuthEntity {
+  entity_type: 'job' | 'profile';
+  code: string;
+  title: string;
+  status: string;
+  edit_token: string;
+  view_count: number;
+  created_at: string;
+  expires_at: string;
+}
+
+export interface EntitiesResponse {
+  jobs: AuthEntity[];
+  profiles: AuthEntity[];
 }
 
 export interface ManageValidationResponse {

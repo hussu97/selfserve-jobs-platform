@@ -29,6 +29,8 @@ async def verify_email(
         message="Email verified successfully. Your listing is now active.",
         entity_type=result["entity_type"],
         code=result["entity_code"],
+        session_token=result.get("session_token"),
+        email=result.get("email"),
     )
 
 

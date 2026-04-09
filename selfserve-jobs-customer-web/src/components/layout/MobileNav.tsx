@@ -3,21 +3,23 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/context/AuthContext';
+import { logout as apiLogout } from '@/lib/api';
 
 interface MobileNavProps {
   open: boolean;
   onClose: () => void;
 }
 
-const NAV_LINKS = [
+const BASE_NAV_LINKS = [
   { href: '/jobs', label: 'Browse Jobs' },
   { href: '/profiles', label: 'Browse Profiles' },
-  { href: '/jobs/new', label: 'Post a Job' },
-  { href: '/profiles/new', label: 'Create Profile' },
   { href: '/about', label: 'About' },
 ];
 
 export function MobileNav({ open, onClose }: MobileNavProps) {
+  const { isLoggedIn, initial, sessionToken, logout } = useAuth();
+
   useEffect(() => {
     if (open) {
       document.body.style.overflow = 'hidden';
@@ -28,6 +30,14 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
       document.body.style.overflow = '';
     };
   }, [open]);
+
+  const handleLogout = async () => {
+    if (sessionToken) {
+      apiLogout(sessionToken).catch(() => {});
+    }
+    logout();
+    onClose();
+  };
 
   return (
     <>
@@ -74,7 +84,20 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
 
         {/* Links */}
         <nav className="flex flex-col p-4 gap-1 flex-1">
-          {NAV_LINKS.map((link) => (
+          {isLoggedIn && (
+            <Link
+              href="/account"
+              onClick={onClose}
+              className="flex items-center gap-3 px-4 py-3 rounded-full text-xs font-semibold uppercase tracking-widest transition-colors hover:bg-surface text-primary mb-1"
+            >
+              <span className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-bold shrink-0">
+                {initial}
+              </span>
+              My Account
+            </Link>
+          )}
+
+          {BASE_NAV_LINKS.map((link) => (
             <Link
               key={link.href}
               href={link.href}
@@ -84,12 +107,53 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
               {link.label}
             </Link>
           ))}
+
+          <div className="border-t border-border/20 my-2" />
+
+          <Link
+            href="/jobs/new"
+            onClick={onClose}
+            className="px-4 py-3 rounded-full text-xs font-semibold uppercase tracking-widest transition-colors hover:bg-surface text-text-main"
+          >
+            Post a Job
+          </Link>
+          <Link
+            href="/profiles/new"
+            onClick={onClose}
+            className="px-4 py-3 rounded-full text-xs font-semibold uppercase tracking-widest transition-colors hover:bg-surface text-text-main"
+          >
+            Create Profile
+          </Link>
+
+          {!isLoggedIn && (
+            <>
+              <div className="border-t border-border/20 my-2" />
+              <Link
+                href="/login"
+                onClick={onClose}
+                className="px-4 py-3 rounded-full text-xs font-semibold uppercase tracking-widest transition-colors hover:bg-surface text-text-muted"
+              >
+                Sign In
+              </Link>
+            </>
+          )}
         </nav>
 
         {/* Footer */}
-        <div className="px-5 py-4 bg-surface text-[10px] uppercase tracking-widest text-text-muted">
-          Free to use · No signup required
-        </div>
+        {isLoggedIn ? (
+          <div className="px-5 py-4 bg-surface">
+            <button
+              onClick={handleLogout}
+              className="text-[10px] uppercase tracking-widest text-text-muted hover:text-secondary transition-colors"
+            >
+              Sign Out
+            </button>
+          </div>
+        ) : (
+          <div className="px-5 py-4 bg-surface text-[10px] uppercase tracking-widest text-text-muted">
+            Free to use · No signup required
+          </div>
+        )}
       </div>
     </>
   );

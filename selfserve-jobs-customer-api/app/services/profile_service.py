@@ -232,6 +232,34 @@ async def activate_profile(db: AsyncSession, profile_code: str) -> None:
     )
 
 
+async def deactivate_profile(db: AsyncSession, profile_code: str, edit_token: str) -> Profile:
+    """Set an active profile to inactive."""
+    profile = await get_profile_by_code_and_token(db, profile_code, edit_token)
+    if profile.status != "active":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Only active profiles can be deactivated",
+        )
+    profile.status = "inactive"
+    profile.updated_at = datetime.now(UTC)
+    await db.flush()
+    return profile
+
+
+async def reactivate_profile(db: AsyncSession, profile_code: str, edit_token: str) -> Profile:
+    """Set an inactive profile back to active."""
+    profile = await get_profile_by_code_and_token(db, profile_code, edit_token)
+    if profile.status != "inactive":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Only inactive profiles can be reactivated",
+        )
+    profile.status = "active"
+    profile.updated_at = datetime.now(UTC)
+    await db.flush()
+    return profile
+
+
 async def validate_token(
     db: AsyncSession,
     entity_code: str,

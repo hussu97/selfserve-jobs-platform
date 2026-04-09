@@ -12,13 +12,15 @@ class VerificationRequest(BaseModel):
 class VerificationResponse(BaseModel):
     """
     Response for POST /verify.
-    Frontend expects: { success, message, entity_type?, code? }
+    Frontend expects: { success, message, entity_type?, code?, session_token? }
     """
 
     success: bool
     message: str
     entity_type: str | None = None
     code: str | None = None
+    session_token: str | None = None
+    email: str | None = None
 
 
 class ResendVerificationRequest(BaseModel):

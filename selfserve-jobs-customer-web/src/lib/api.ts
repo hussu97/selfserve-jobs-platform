@@ -16,6 +16,9 @@ import type {
   ReportRequest,
   JobFilters,
   ProfileFilters,
+  LoginResponse,
+  LoginVerifyResponse,
+  EntitiesResponse,
 } from './types';
 import { buildQueryString } from './utils';
 
@@ -236,6 +239,70 @@ export async function submitReport(data: ReportRequest): Promise<{ message: stri
   return request<{ message: string }>('/reports', {
     method: 'POST',
     body: JSON.stringify(data),
+  });
+}
+
+// Auth
+export async function loginRequest(email: string): Promise<LoginResponse> {
+  return request<LoginResponse>('/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ email }),
+  });
+}
+
+export async function loginVerify(token: string): Promise<LoginVerifyResponse> {
+  const url = `${API_URL}/api/v1/auth/verify?token=${encodeURIComponent(token)}`;
+  const response = await fetch(url, { method: 'POST' });
+  if (!response.ok) {
+    let errorMessage = `Request failed with status ${response.status}`;
+    try {
+      const errorData = await response.json();
+      errorMessage = errorData.detail ?? errorData.message ?? errorMessage;
+    } catch { /* ignore */ }
+    throw new ApiError(response.status, errorMessage);
+  }
+  return response.json();
+}
+
+export async function logout(sessionToken: string): Promise<void> {
+  return request<void>('/auth/logout', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${sessionToken}` },
+  });
+}
+
+export async function getMyEntities(sessionToken: string): Promise<EntitiesResponse> {
+  return request<EntitiesResponse>('/auth/entities', {
+    headers: { Authorization: `Bearer ${sessionToken}` },
+  });
+}
+
+// Activate / Deactivate
+export async function deactivateJob(code: string, editToken: string): Promise<Job> {
+  return request<Job>(`/jobs/${code}/deactivate`, {
+    method: 'POST',
+    headers: { 'X-Edit-Token': editToken },
+  });
+}
+
+export async function activateJob(code: string, editToken: string): Promise<Job> {
+  return request<Job>(`/jobs/${code}/activate`, {
+    method: 'POST',
+    headers: { 'X-Edit-Token': editToken },
+  });
+}
+
+export async function deactivateProfile(code: string, editToken: string): Promise<Profile> {
+  return request<Profile>(`/profiles/${code}/deactivate`, {
+    method: 'POST',
+    headers: { 'X-Edit-Token': editToken },
+  });
+}
+
+export async function activateProfile(code: string, editToken: string): Promise<Profile> {
+  return request<Profile>(`/profiles/${code}/activate`, {
+    method: 'POST',
+    headers: { 'X-Edit-Token': editToken },
   });
 }
 

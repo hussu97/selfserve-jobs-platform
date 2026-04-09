@@ -153,6 +153,26 @@ async def update_profile(
     return ProfileResponse.from_orm_with_resume(profile)
 
 
+@router.post("/{code}/deactivate", response_model=ProfileResponse)
+async def deactivate_profile(
+    code: str,
+    edit_token: str = Depends(require_edit_token),
+    db: AsyncSession = Depends(get_session),
+):
+    profile = await profile_service.deactivate_profile(db, code, edit_token)
+    return ProfileResponse.from_orm_with_resume(profile)
+
+
+@router.post("/{code}/activate", response_model=ProfileResponse)
+async def activate_profile_endpoint(
+    code: str,
+    edit_token: str = Depends(require_edit_token),
+    db: AsyncSession = Depends(get_session),
+):
+    profile = await profile_service.reactivate_profile(db, code, edit_token)
+    return ProfileResponse.from_orm_with_resume(profile)
+
+
 @router.delete("/{code}", response_model=ProfileResponse)
 async def delete_profile(
     code: str,

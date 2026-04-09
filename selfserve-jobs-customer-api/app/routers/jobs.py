@@ -118,6 +118,26 @@ async def update_job(
     return JobResponse.model_validate(job)
 
 
+@router.post("/{code}/deactivate", response_model=JobResponse)
+async def deactivate_job(
+    code: str,
+    edit_token: str = Depends(require_edit_token),
+    db: AsyncSession = Depends(get_session),
+):
+    job = await job_service.deactivate_job(db, code, edit_token)
+    return JobResponse.model_validate(job)
+
+
+@router.post("/{code}/activate", response_model=JobResponse)
+async def activate_job_endpoint(
+    code: str,
+    edit_token: str = Depends(require_edit_token),
+    db: AsyncSession = Depends(get_session),
+):
+    job = await job_service.reactivate_job(db, code, edit_token)
+    return JobResponse.model_validate(job)
+
+
 @router.delete("/{code}", response_model=JobResponse)
 async def delete_job(
     code: str,

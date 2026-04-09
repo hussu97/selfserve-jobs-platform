@@ -100,6 +100,72 @@ async def send_verification_email(
         return False
 
 
+async def send_login_email(
+    email: str,
+    login_token: str,
+    frontend_url: str,
+) -> bool:
+    """Send a magic login link email."""
+    login_url = f"{frontend_url}/login/callback?token={login_token}"
+    subject = "Sign in to jobs4u"
+
+    html_body = f"""
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <h1 style="color: #384B3B;">Sign in to jobs4u</h1>
+      <p>Click the link below to sign in. This link expires in 15 minutes and can only be used once.</p>
+
+      <div style="margin: 30px 0;">
+        <a href="{login_url}"
+           style="background-color: #384B3B; color: white; padding: 12px 24px;
+                  text-decoration: none; border-radius: 24px; display: inline-block;">
+          Sign in to jobs4u
+        </a>
+      </div>
+
+      <p>Or copy this link: <a href="{login_url}">{login_url}</a></p>
+      <p><strong>This link expires in 15 minutes.</strong></p>
+
+      <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+      <p style="color: #888; font-size: 12px;">If you did not request this, you can safely ignore this email.</p>
+    </div>
+    """
+
+    text_body = f"""
+    Sign in to jobs4u
+
+    Click the link below to sign in (expires in 15 minutes):
+    {login_url}
+
+    If you did not request this, you can safely ignore this email.
+    """
+
+    if not settings.resend_api_key:
+        logger.info(
+            "DEV MODE - Login email (would send to %s):\nSubject: %s\nLogin URL: %s",
+            email,
+            subject,
+            login_url,
+        )
+        return True
+
+    try:
+        import resend
+
+        resend.api_key = settings.resend_api_key
+        params: dict[str, Any] = {
+            "from": "jobs4u <noreply@jobs4u.io>",
+            "to": [email],
+            "subject": subject,
+            "html": html_body,
+            "text": text_body,
+        }
+        resend.Emails.send(params)
+        return True
+    except Exception as exc:
+        logger.error("Failed to send login email to %s: %s", email, exc)
+        return False
+
+
 async def send_management_links_email(
     email: str,
     entities: list[dict],

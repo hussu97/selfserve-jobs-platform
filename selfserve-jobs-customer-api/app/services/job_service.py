@@ -232,6 +232,34 @@ async def activate_job(db: AsyncSession, job_code: str) -> None:
     )
 
 
+async def deactivate_job(db: AsyncSession, job_code: str, edit_token: str) -> Job:
+    """Set an active job to inactive (hidden from public browse)."""
+    job = await get_job_by_code_and_token(db, job_code, edit_token)
+    if job.status != "active":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Only active jobs can be deactivated",
+        )
+    job.status = "inactive"
+    job.updated_at = datetime.now(UTC)
+    await db.flush()
+    return job
+
+
+async def reactivate_job(db: AsyncSession, job_code: str, edit_token: str) -> Job:
+    """Set an inactive job back to active."""
+    job = await get_job_by_code_and_token(db, job_code, edit_token)
+    if job.status != "inactive":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Only inactive jobs can be reactivated",
+        )
+    job.status = "active"
+    job.updated_at = datetime.now(UTC)
+    await db.flush()
+    return job
+
+
 async def validate_token(
     db: AsyncSession,
     entity_code: str,
