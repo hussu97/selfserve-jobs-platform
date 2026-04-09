@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+- **JSONB skills filter** — `key_skills` filtering on both jobs and profiles now generates a proper PostgreSQL `@>` containment operator instead of a broken `LIKE '%' || $2::JSONB || '%'` query; root cause was calling `.contains()` on a `JSON`-typed column (the base type of `JSONB_COMPAT`); fixed by casting to `JSONB` at query time before calling `.contains()` in both `profile_service.py` and `job_service.py`
+
 ### Added
 - **Email logging (`email_log` table)** — new DB table and SQLAlchemy model that records every email send attempt (type, recipient, entity type/code, success flag, Resend-assigned ID on success, full error message on failure); migration `0003_email_log` runs automatically on startup; all three email functions (`send_verification_email`, `send_login_email`, `send_management_links_email`) now accept a `db: AsyncSession` parameter and write a log row after every attempt including dev-mode no-ops
 

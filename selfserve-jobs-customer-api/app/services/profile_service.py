@@ -4,6 +4,7 @@ from datetime import UTC, datetime, timedelta
 
 from fastapi import HTTPException, status
 from sqlalchemy import and_, func, select, update
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.profile import Profile
@@ -130,7 +131,7 @@ async def list_profiles(
 
     if skills:
         for skill in skills:
-            filters.append(Profile.key_skills.contains([skill]))
+            filters.append(Profile.key_skills.cast(JSONB).contains([skill]))
 
     if min_experience is not None:
         filters.append(Profile.years_of_experience >= min_experience)

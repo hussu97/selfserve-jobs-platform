@@ -4,6 +4,7 @@ from datetime import UTC, datetime, timedelta
 
 from fastapi import HTTPException, status
 from sqlalchemy import and_, func, select, update
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.job import Job
@@ -143,7 +144,7 @@ async def list_jobs(
 
     if skills:
         for skill in skills:
-            filters.append(Job.key_skills.contains([skill]))
+            filters.append(Job.key_skills.cast(JSONB).contains([skill]))
 
     base_query = select(Job).where(and_(*filters))
 
