@@ -19,7 +19,7 @@ export default async function HomePage() {
 
       {/* ── Hero ─────────────────────────────────────────── */}
       <section className="hero-gradient relative overflow-hidden">
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32 lg:py-40">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-28 sm:py-36 lg:py-48">
           <div className="max-w-3xl mx-auto text-center">
             {/* Eyebrow */}
             <div className="anim-fade-up inline-flex items-center gap-2 mb-7 px-4 py-1.5 rounded-full bg-surface shadow-ambient text-xs font-semibold uppercase tracking-widest text-text-muted">
@@ -82,7 +82,7 @@ export default async function HomePage() {
 
       {/* ── How it works ─────────────────────────────────── */}
       <section className="bg-surface">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
           <div className="text-center mb-12">
             <p className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-3">
               How it works
@@ -145,8 +145,8 @@ export default async function HomePage() {
       </section>
 
       {/* ── Recent Jobs ──────────────────────────────────── */}
-      <section className="bg-bg py-16 sm:py-24">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="bg-bg py-20 sm:py-28">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Section header */}
           <div className="flex items-end justify-between mb-10">
             <div>
@@ -169,7 +169,7 @@ export default async function HomePage() {
           </div>
 
           {jobs.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {jobs.map((job) => (
                 <JobCard key={job.code} job={job} />
               ))}
@@ -204,8 +204,8 @@ export default async function HomePage() {
       </section>
 
       {/* ── Available Talent ─────────────────────────────── */}
-      <section className="bg-surface py-16 sm:py-24">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="bg-surface py-20 sm:py-28">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Section header */}
           <div className="flex items-end justify-between mb-10">
             <div>
@@ -228,7 +228,7 @@ export default async function HomePage() {
           </div>
 
           {profiles.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {profiles.map((profile) => (
                 <ProfileCard key={profile.code} profile={profile} />
               ))}
@@ -263,8 +263,8 @@ export default async function HomePage() {
       </section>
 
       {/* ── CTA strip ────────────────────────────────────── */}
-      <section className="bg-primary py-16 sm:py-24">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <section className="bg-primary py-20 sm:py-28">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="font-heading text-4xl sm:text-5xl text-white mb-4">
             Ready to get <span className="italic">started?</span>
           </h2>

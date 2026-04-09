@@ -124,7 +124,7 @@ function ProfilesContent() {
     <div>
       {/* Page header */}
       <div className="hero-gradient">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12">
           <p className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-3">
             Talent
           </p>
@@ -139,7 +139,7 @@ function ProfilesContent() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Search */}
         <div className="mb-8">
           <SearchBar
@@ -196,7 +196,7 @@ function ProfilesContent() {
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-6">
                   {profiles.map((profile) => (
                     <ProfileCard key={profile.code} profile={profile} />
                   ))}
