@@ -16,11 +16,13 @@ if echo "$STAGED_FILES" | grep -q '^selfserve-jobs-customer-api/.*\.py$'; then
   cd ..
 fi
 
-# --- Frontend: lint if any TS/TSX files staged ---
+# --- Frontend: lint + typecheck if any TS/TSX files staged ---
 if echo "$STAGED_FILES" | grep -q '^selfserve-jobs-customer-web/.*\.\(ts\|tsx\)$'; then
   echo "Running eslint on staged TypeScript files..."
   cd selfserve-jobs-customer-web
   npx eslint src/ --max-warnings=0
+  echo "Running TypeScript typecheck..."
+  npx tsc --noEmit
   cd ..
 fi
 

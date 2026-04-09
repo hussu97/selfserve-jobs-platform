@@ -19,7 +19,7 @@ export type NoticePeriod =
 
 export type RelocationPreference = 'yes' | 'no' | 'open';
 
-export type EntityType = 'jobs' | 'profiles';
+export type EntityType = 'job' | 'profile';
 
 export type ReportReason =
   | 'spam'

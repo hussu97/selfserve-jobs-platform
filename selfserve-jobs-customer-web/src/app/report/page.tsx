@@ -169,7 +169,7 @@ function ReportContent() {
         <div className="rounded-2xl bg-surface p-4 text-sm">
           <p className="text-text-muted">
             <span className="font-medium text-text-main">Listing: </span>
-            {entityCode} ({entityType === 'jobs' ? 'job' : 'profile'})
+            {entityCode} ({entityType})
           </p>
         </div>
 

@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Fixed
+- **`tsc --noEmit` added to pre-commit hook** — TypeScript type errors were not caught before commit because the pre-commit hook ran only ESLint (style/lint) and not the TypeScript compiler; `npx tsc --noEmit` now runs alongside ESLint whenever `.ts`/`.tsx` files are staged
+- **`EntityType` corrected to singular values** — `EntityType` was `'jobs' | 'profiles'` but the API uses `'job' | 'profile'`; corrected the type alias, fixed stale `=== 'jobs'` comparison in `report/page.tsx`, and the three `TS2820`/`TS2367` typecheck errors now resolve cleanly
 - **Report submissions silently broken** — `ReportButton` passed `entityType="jobs"`/`"profiles"` (plural) into the URL; the backend's `/reports` endpoint expects `Literal["job", "profile"]` (singular) and was rejecting all reports with a validation error; fixed `ReportButton` call sites in `JobDetail` and `ProfileDetail` to pass singular values and updated the `EntityType` type alias from `'jobs' | 'profiles'` to `'job' | 'profile'`
 - **Removed legacy proxy resume upload endpoint** — `POST /api/v1/upload/resume` (multipart proxy through backend) deleted; only the signed-url flow remains; removed `uploadResume()` from `api.ts`, `UploadResumeResponse` type, and the proxy fallback branch in `ProfileForm`; in dev mode (no GCS bucket) the upload step is skipped and a placeholder `resume_key` is used
 
