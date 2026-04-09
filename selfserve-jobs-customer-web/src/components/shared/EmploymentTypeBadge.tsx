@@ -11,6 +11,7 @@ const TYPE_COLORS: Record<EmploymentType, 'primary' | 'secondary' | 'accent' | '
   full_time: 'secondary',
   part_time: 'accent',
   contract: 'primary',
+  consulting: 'primary',
   freelance: 'warning',
   internship: 'default',
   remote: 'accent',
