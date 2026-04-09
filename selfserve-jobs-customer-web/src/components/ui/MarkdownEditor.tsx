@@ -212,7 +212,7 @@ function MarkdownEditorContent({
     editorProps: {
       attributes: {
         id: editorId ?? '',
-        class: 'prose outline-none px-4 py-3 text-sm text-text-main',
+        class: 'prose outline-none px-4 py-3 text-text-main',
       },
     },
     onUpdate({ editor: e }) {

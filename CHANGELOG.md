@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   - Uses a `mounted` gate (`MarkdownEditorContent` child component) to keep `useEditor` off the server — avoids Tiptap v3 SSR error in Next.js App Router
 
 ### Changed
+- **MarkdownEditor font size** — removed `text-sm` from the Tiptap editor's ProseMirror attributes so the editor renders at 16px (browser default), matching the `react-markdown` rendered output on job/profile detail pages
 - **JobCard layout redesign** (`src/components/jobs/JobCard.tsx`) — fixed overflow and crowding at 2-column grid widths:
   - Removed company initial avatar (`w-16 h-16` box) — title and company name now use the full card width
   - Employment type badge moved to its own top row; time posted displayed inline at top-right
