@@ -329,3 +329,35 @@ After completing setup, verify everything works:
 - [ ] Submit a report — check it creates a report record
 - [ ] GitHub Actions workflows appear in GitHub → Actions tab
 - [ ] Push a change to `selfserve-jobs-customer-api/` — CI runs automatically
+
+## 12. Umami Analytics
+
+Umami Cloud is integrated with adblock bypass via a proxy rewrite. The proxy is already configured in `selfserve-jobs-customer-web/next.config.ts` — requests to `/stats/script.js` and `/stats/api/send` are transparently forwarded to Umami Cloud, so adblockers have no known pattern to block.
+
+### Setup steps
+
+1. Create an account at [cloud.umami.is](https://cloud.umami.is)
+2. Add your website: **Settings → Websites → Add Website** → enter your domain
+3. Copy the **Website ID** shown after creation
+
+### Vercel environment variables
+
+In your Vercel project → **Settings → Environment Variables**, add:
+
+| Variable | Value |
+|---|---|
+| `NEXT_PUBLIC_UMAMI_WEBSITE_ID` | Website ID from Umami Cloud (e.g. `abc123-...`) |
+| `NEXT_PUBLIC_SITE_URL` | Your production domain, no trailing slash (e.g. `https://yourdomain.com`) |
+
+`NEXT_PUBLIC_SITE_URL` is used as `data-host-url` so Umami sends tracking events through your domain's `/stats/api/send` proxy instead of directly to `cloud.umami.is`.
+
+### Verification
+
+After deploying:
+1. Visit your site — Umami Cloud dashboard should show a live pageview within ~30 seconds
+2. Test adblock bypass: enable uBlock Origin, reload the page — the pageview should still register
+3. Confirm in browser DevTools → Network: tracking requests go to `yourdomain.com/stats/api/send`, not `cloud.umami.is`
+
+### Local development
+
+The analytics script only loads when `NEXT_PUBLIC_UMAMI_WEBSITE_ID` is set. Leave it unset locally to skip analytics entirely.

@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+- **Umami Cloud analytics** — integrated via Next.js proxy rewrites (`/stats/script.js` and `/stats/api/send` forward to `cloud.umami.is`) to bypass adblockers; script loads only when `NEXT_PUBLIC_UMAMI_WEBSITE_ID` env var is set; setup documented in PRODUCTION.md §12
+
 ### Changed
 - **Primary button hover contrast** — added `--color-primary-btn: #506E54` (medium forest green) as a lighter default button background; hover now darkens to `--color-primary` (`#384B3B`), giving a clearly visible transition instead of the previous near-invisible dark→darker shift
 

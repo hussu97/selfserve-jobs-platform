@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import './globals.css';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
@@ -44,6 +45,18 @@ export default function RootLayout({
           <main className="flex-1">{children}</main>
           <Footer />
         </AuthProvider>
+        {process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID && (
+          <Script
+            src="/stats/script.js"
+            data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID}
+            data-host-url={
+              process.env.NEXT_PUBLIC_SITE_URL
+                ? `${process.env.NEXT_PUBLIC_SITE_URL}/stats`
+                : undefined
+            }
+            strategy="afterInteractive"
+          />
+        )}
       </body>
     </html>
   );
