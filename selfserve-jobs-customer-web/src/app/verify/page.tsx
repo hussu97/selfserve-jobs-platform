@@ -70,7 +70,7 @@ function VerifyContent() {
         setErrorMessage(msg);
         setState('error');
       });
-  }, [code]);
+  }, [code, login]);
 
   const handleResend = async (e: React.FormEvent) => {
     e.preventDefault();

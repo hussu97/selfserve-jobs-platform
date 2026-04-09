@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback } from 'react';
 
 interface AuthState {
   email: string | null;
@@ -19,21 +19,18 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 const STORAGE_KEY = 'auth_session';
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [auth, setAuth] = useState<AuthState>({ email: null, sessionToken: null });
-
-  useEffect(() => {
+  const [auth, setAuth] = useState<AuthState>(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored) as AuthState;
-        if (parsed.sessionToken && parsed.email) {
-          setAuth(parsed);
-        }
+        if (parsed.sessionToken && parsed.email) return parsed;
       }
     } catch {
       // ignore corrupt storage
     }
-  }, []);
+    return { email: null, sessionToken: null };
+  });
 
   const login = useCallback((sessionToken: string, email: string) => {
     const state = { sessionToken, email };

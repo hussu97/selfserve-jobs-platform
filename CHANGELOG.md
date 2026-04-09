@@ -41,6 +41,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 - `tests/test_auth.py`: 14 new tests covering login auto-session (non-production), login token verify/expiry/reuse, session validation, logout, entities endpoint, and job deactivate/activate cycle
+- `app/manage/[entityType]/[code]/page.tsx`: "Invalid management link" error when editing a job from the account dashboard — manage page compared `entityType === 'jobs'` (plural) but all URLs (email links and dashboard edit links) use `'job'` (singular), causing the job to be looked up as a profile. Changed all comparisons to use singular `'job'`/`'profile'`.
 
 ### Fixed
 - `globals.css`: move `*:focus-visible` rule into `@layer base` so Tailwind utility classes (e.g. `focus-visible:outline-none`) can override it — previously, the unlayered rule had higher cascade priority than all Tailwind utilities, causing duplicate focus outlines on any element that suppressed focus-visible via a utility class

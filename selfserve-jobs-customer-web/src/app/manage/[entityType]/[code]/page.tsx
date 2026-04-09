@@ -86,7 +86,7 @@ function ManageContent() {
     validateToken(entityType, code, token)
       .then(async () => {
         try {
-          if (entityType === 'jobs') {
+          if (entityType === 'job') {
             const j = await getJob(code);
             setJob(j);
             setJobForm({
@@ -217,7 +217,7 @@ function ManageContent() {
     setDeleteLoading(true);
     setDeleteError('');
     try {
-      if (entityType === 'jobs') {
+      if (entityType === 'job') {
         await deleteJob(code, token);
       } else {
         await deleteProfile(code, token);
@@ -257,10 +257,10 @@ function ManageContent() {
             Your listing has been permanently deleted.
           </p>
           <Link
-            href={`/${entityType}`}
+            href={`/${entityType === 'job' ? 'jobs' : 'profiles'}`}
             className="inline-flex items-center justify-center px-6 py-3 rounded-full text-white font-semibold transition-opacity hover:opacity-90 bg-primary"
           >
-            ← Browse {entityType === 'jobs' ? 'Jobs' : 'Profiles'}
+            ← Browse {entityType === 'job' ? 'Jobs' : 'Profiles'}
           </Link>
         </div>
       </div>
@@ -321,8 +321,8 @@ function ManageContent() {
   }
 
   // Valid — show edit form
-  const listingHref = `/${entityType}/${code}`;
-  const isJobs = entityType === 'jobs';
+  const listingHref = `/${entityType === 'job' ? 'jobs' : 'profiles'}/${code}`;
+  const isJobs = entityType === 'job';
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

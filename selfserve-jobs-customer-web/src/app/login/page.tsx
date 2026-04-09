@@ -49,7 +49,7 @@ export default function LoginPage() {
             Sign <em>in</em>
           </h1>
           <p className="text-sm text-text-muted">
-            Enter your email and we'll send you a magic link.
+            Enter your email and we&apos;ll send you a magic link.
           </p>
         </div>
 

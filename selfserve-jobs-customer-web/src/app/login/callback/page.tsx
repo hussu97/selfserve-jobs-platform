@@ -13,17 +13,14 @@ function CallbackContent() {
   const { login } = useAuth();
   const token = searchParams.get('token');
 
-  const [error, setError] = useState('');
+  const [error, setError] = useState(() =>
+    !token ? 'No login token found. Please request a new sign-in link.' : ''
+  );
   const hasRun = useRef(false);
 
   useEffect(() => {
-    if (hasRun.current) return;
+    if (hasRun.current || !token) return;
     hasRun.current = true;
-
-    if (!token) {
-      setError('No login token found. Please request a new sign-in link.');
-      return;
-    }
 
     loginVerify(token)
       .then((res) => {
