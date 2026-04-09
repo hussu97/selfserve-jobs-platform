@@ -7,6 +7,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Fixed
+- **Verify page "View your listing" link → 404** — backend returns `entity_type` as singular (`"job"` / `"profile"`) but frontend routes are plural (`/jobs/[code]`, `/profiles/[code]`); verify page now maps singular to plural before constructing the href
+- **Resend verification form sends wrong entity_type** — radio buttons on the resend form used `"jobs"`/`"profiles"` (plural) which the backend rejects with "Invalid entity type"; changed state type and radio values to `"job"`/`"profile"` (singular)
+- **Email verification only activates the directly verified listing** — `verification_service.verify_code()` now bulk-activates all `pending_verification` jobs and profiles under the verified email address, so older unverified listings go live at the same time
+
+### Added
+- **Direct browser-to-GCS resume upload** — new `POST /api/v1/upload/resume/signed-url` endpoint returns a v4 GCS signed PUT URL so the browser uploads the PDF directly to GCS without routing through the backend; `ProfileForm` calls the signed-url endpoint first and falls back to the legacy proxy upload only in dev mode (where no GCS bucket is configured); reduces profile creation latency by eliminating the backend-as-proxy hop for file uploads
+- **`storage_service.generate_signed_upload_url()`** — new async function generates a GCS v4 signed PUT URL for a given path and content-type; returns `None` in dev mode so callers can detect and fall back gracefully
+
+### Fixed
 - **Job deadline validation 500/422** — `validate_deadline` used `mode="before"` so `v` was a raw string when a date was provided; comparing `str < date` raises `TypeError`, causing a 500 (or 422 depending on Pydantic's error path); changed to `mode="after"` so Pydantic parses the string to `date` first and the comparison is always `date < date`
 - **JSONB skills filter** — `key_skills` filtering on both jobs and profiles now generates a proper PostgreSQL `@>` containment operator instead of a broken `LIKE '%' || $2::JSONB || '%'` query; root cause was calling `.contains()` on a `JSON`-typed column (the base type of `JSONB_COMPAT`); fixed by casting to `JSONB` at query time before calling `.contains()` in both `profile_service.py` and `job_service.py`
 

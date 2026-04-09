@@ -61,3 +61,31 @@ async def upload_resume(
         resume_key=gcs_path,
         message="Resume uploaded successfully.",
     )
+
+
+class ResumeSignedUrlResponse(BaseModel):
+    """Response for POST /upload/resume/signed-url.
+
+    upload_url is None in dev mode — frontend must fall back to the proxy endpoint.
+    """
+
+    resume_key: str
+    upload_url: str | None
+
+
+@router.post("/resume/signed-url", response_model=ResumeSignedUrlResponse)
+async def get_resume_signed_upload_url():
+    """Return a pre-signed GCS PUT URL so the browser can upload a resume directly.
+
+    In dev mode (no GCS bucket configured) upload_url is None and the frontend
+    should fall back to POST /upload/resume.
+    """
+    unique_id = generate_code(12)
+    gcs_path = f"resumes/{unique_id}.pdf"
+
+    upload_url = await storage_service.generate_signed_upload_url(
+        gcs_path=gcs_path,
+        content_type="application/pdf",
+    )
+
+    return ResumeSignedUrlResponse(resume_key=gcs_path, upload_url=upload_url)

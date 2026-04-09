@@ -72,6 +72,38 @@ async def generate_signed_url(
         raise
 
 
+async def generate_signed_upload_url(
+    gcs_path: str,
+    content_type: str = "application/pdf",
+    expiration_minutes: int = 15,
+) -> str | None:
+    """Generate a v4 signed PUT URL for direct browser-to-GCS upload.
+
+    Returns None in dev mode (caller should fall back to the proxy upload endpoint).
+    """
+    if not settings.gcs_bucket_name or settings.is_development:
+        logger.info("DEV MODE - signed upload URL not available, caller should use proxy upload")
+        return None
+
+    try:
+        from google.cloud import storage
+
+        client = storage.Client()
+        bucket = client.bucket(settings.gcs_bucket_name)
+        blob = bucket.blob(gcs_path)
+        expiration = timedelta(minutes=expiration_minutes)
+        url = blob.generate_signed_url(
+            version="v4",
+            expiration=expiration,
+            method="PUT",
+            content_type=content_type,
+        )
+        return url
+    except Exception as exc:
+        logger.error("Failed to generate signed upload URL for %s: %s", gcs_path, exc)
+        raise
+
+
 async def delete_file(gcs_path: str) -> bool:
     """Delete a file from GCS or local filesystem."""
     if not settings.gcs_bucket_name or settings.is_development:

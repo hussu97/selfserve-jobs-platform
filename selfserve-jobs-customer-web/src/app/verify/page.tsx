@@ -39,7 +39,7 @@ function VerifyContent() {
 
   // Resend form state
   const [resendEmail, setResendEmail] = useState('');
-  const [resendEntityType, setResendEntityType] = useState<'jobs' | 'profiles'>('jobs');
+  const [resendEntityType, setResendEntityType] = useState<'job' | 'profile'>('job');
   const [resendLoading, setResendLoading] = useState(false);
   const [resendMessage, setResendMessage] = useState('');
   const [resendError, setResendError] = useState('');
@@ -127,9 +127,10 @@ function VerifyContent() {
   }
 
   if (state === 'success' && result) {
+    const pluralType = result.entity_type === 'job' ? 'jobs' : 'profiles';
     const listingHref =
       result.entity_type && result.code
-        ? `/${result.entity_type}/${result.code}`
+        ? `/${pluralType}/${result.code}`
         : null;
 
     return (
@@ -216,9 +217,9 @@ function VerifyContent() {
                 <input
                   type="radio"
                   name="entity_type"
-                  value="jobs"
-                  checked={resendEntityType === 'jobs'}
-                  onChange={() => setResendEntityType('jobs')}
+                  value="job"
+                  checked={resendEntityType === 'job'}
+                  onChange={() => setResendEntityType('job')}
                   className="accent-primary"
                 />
                 <span className="text-sm text-text-main">Job listing</span>
@@ -227,9 +228,9 @@ function VerifyContent() {
                 <input
                   type="radio"
                   name="entity_type"
-                  value="profiles"
-                  checked={resendEntityType === 'profiles'}
-                  onChange={() => setResendEntityType('profiles')}
+                  value="profile"
+                  checked={resendEntityType === 'profile'}
+                  onChange={() => setResendEntityType('profile')}
                   className="accent-primary"
                 />
                 <span className="text-sm text-text-main">Talent profile</span>

@@ -2,7 +2,7 @@ import logging
 from datetime import UTC, datetime, timedelta
 
 from fastapi import HTTPException, status
-from sqlalchemy import and_, func, select
+from sqlalchemy import and_, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.email_verification import EmailVerification
@@ -65,26 +65,24 @@ async def verify_code(
     # Mark verification as done
     verification.verified_at = now
 
-    # Activate the entity
-    if verification.entity_type == "job":
-        result = await db.execute(select(Job).where(Job.job_code == verification.entity_code))
-        entity = result.scalar_one_or_none()
-        if entity:
-            entity.email_verified = True
-            entity.status = "active"
-            entity.updated_at = now
-    elif verification.entity_type == "profile":
-        result = await db.execute(select(Profile).where(Profile.profile_code == verification.entity_code))
-        entity = result.scalar_one_or_none()
-        if entity:
-            entity.email_verified = True
-            entity.status = "active"
-            entity.updated_at = now
-    else:
+    if verification.entity_type not in ("job", "profile"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Unknown entity type",
         )
+
+    # Activate ALL pending jobs and profiles for this email — one verified email
+    # confirms ownership of the address, so all pending listings under it go live.
+    await db.execute(
+        update(Job)
+        .where(and_(Job.email == verification.email, Job.status == "pending_verification"))
+        .values(email_verified=True, status="active", updated_at=now)
+    )
+    await db.execute(
+        update(Profile)
+        .where(and_(Profile.email == verification.email, Profile.status == "pending_verification"))
+        .values(email_verified=True, status="active", updated_at=now)
+    )
 
     await db.flush()
 

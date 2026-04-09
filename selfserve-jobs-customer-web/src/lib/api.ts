@@ -192,6 +192,24 @@ export async function getResumeUrl(profileCode: string): Promise<ResumeUrlRespon
   return request<ResumeUrlResponse>(`/profiles/${profileCode}/resume`);
 }
 
+export async function getResumeUploadUrl(): Promise<{ resume_key: string; upload_url: string | null }> {
+  return request<{ resume_key: string; upload_url: string | null }>('/upload/resume/signed-url', {
+    method: 'POST',
+  });
+}
+
+/** Upload a file directly to GCS using a signed PUT URL. */
+export async function uploadResumeDirect(file: File, uploadUrl: string): Promise<void> {
+  const response = await fetch(uploadUrl, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/pdf' },
+    body: file,
+  });
+  if (!response.ok) {
+    throw new Error(`Direct upload failed with status ${response.status}`);
+  }
+}
+
 // Verification
 export async function verifyEmail(code: string): Promise<VerificationResponse> {
   return request<VerificationResponse>('/verify', {

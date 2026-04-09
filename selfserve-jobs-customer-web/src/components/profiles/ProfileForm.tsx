@@ -10,7 +10,7 @@ import { CountrySelect } from '@/components/shared/CountrySelect';
 import { PhoneInput } from '@/components/ui/PhoneInput';
 import { StatusBanner } from '@/components/shared/StatusBanner';
 import { NOTICE_PERIODS, RELOCATION_PREFERENCES } from '@/lib/constants';
-import { createProfile, uploadResume } from '@/lib/api';
+import { createProfile, uploadResume, getResumeUploadUrl, uploadResumeDirect } from '@/lib/api';
 import type { CreateProfileRequest } from '@/lib/types';
 
 interface ProfileFormProps {
@@ -79,8 +79,17 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
 
     setLoading(true);
     try {
-      const uploadResult = await uploadResume(resumeFile!);
-      const resumeKey = uploadResult.resume_key;
+      // Try direct browser→GCS signed URL upload first (faster — skips BE proxy).
+      // Falls back to the legacy proxy endpoint when upload_url is null (dev mode).
+      let resumeKey: string;
+      const signedUrlResult = await getResumeUploadUrl();
+      if (signedUrlResult.upload_url) {
+        resumeKey = signedUrlResult.resume_key;
+        await uploadResumeDirect(resumeFile!, signedUrlResult.upload_url);
+      } else {
+        const uploadResult = await uploadResume(resumeFile!);
+        resumeKey = uploadResult.resume_key;
+      }
 
       const payload: CreateProfileRequest = {
         ...(form as CreateProfileRequest),
