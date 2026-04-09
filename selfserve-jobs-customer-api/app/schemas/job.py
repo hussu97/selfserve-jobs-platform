@@ -26,7 +26,7 @@ class JobCreate(BaseModel):
     # Honeypot field — must be empty
     website: str | None = Field(None, exclude=True)
 
-    @field_validator("deadline_date", mode="before")
+    @field_validator("deadline_date", mode="after")
     @classmethod
     def validate_deadline(cls, v: date | None) -> date | None:
         if v is None:

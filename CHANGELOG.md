@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Fixed
+- **Job deadline validation 500/422** — `validate_deadline` used `mode="before"` so `v` was a raw string when a date was provided; comparing `str < date` raises `TypeError`, causing a 500 (or 422 depending on Pydantic's error path); changed to `mode="after"` so Pydantic parses the string to `date` first and the comparison is always `date < date`
 - **JSONB skills filter** — `key_skills` filtering on both jobs and profiles now generates a proper PostgreSQL `@>` containment operator instead of a broken `LIKE '%' || $2::JSONB || '%'` query; root cause was calling `.contains()` on a `JSON`-typed column (the base type of `JSONB_COMPAT`); fixed by casting to `JSONB` at query time before calling `.contains()` in both `profile_service.py` and `job_service.py`
 
 ### Added
