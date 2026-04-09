@@ -7,6 +7,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Changed
+- **ProfileDetail resume actions** — replaced single "Open / Download" text link with two icon buttons (download arrow + external link) in the top-right of the Resume card header; fallback `<object>` message updated to use a proper download link
+
+
 - **Removed "free" from all marketing copy** — replaced with "no middlemen" / "no account required" messaging across homepage, about, jobs/new, profiles/new, footer, mobile nav, OG images, privacy, and terms pages; terms liability clause updated to "currently provided at no cost"
 - **JobDetail redesign** (`src/components/jobs/JobDetail.tsx`) — simplified layout:
   - Removed "How to apply" sidebar card and "Details" sidebar card (both were redundant with header info)

@@ -96,18 +96,31 @@ export function ProfileDetail({ profile, resumeUrl }: ProfileDetailProps) {
             <div className="bg-surface-lowest rounded-2xl shadow-ambient p-6 mb-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-heading text-xl text-primary">Resume</h2>
-                <a
-                  href={resumeUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:opacity-70 transition-opacity"
-                >
-                  Open / Download
-                  <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                    <path fillRule="evenodd" d="M4.25 5.5a.75.75 0 00-.75.75v8.5c0 .414.336.75.75.75h8.5a.75.75 0 00.75-.75v-4a.75.75 0 011.5 0v4A2.25 2.25 0 0112.75 17h-8.5A2.25 2.25 0 012 14.75v-8.5A2.25 2.25 0 014.25 4h5a.75.75 0 010 1.5h-5z" clipRule="evenodd" />
-                    <path fillRule="evenodd" d="M6.194 12.753a.75.75 0 001.06.053L16.5 4.44v2.81a.75.75 0 001.5 0v-4.5a.75.75 0 00-.75-.75h-4.5a.75.75 0 000 1.5h2.553l-9.056 8.194a.75.75 0 00-.053 1.06z" clipRule="evenodd" />
-                  </svg>
-                </a>
+                <div className="flex items-center gap-1">
+                  <a
+                    href={resumeUrl}
+                    download
+                    className="p-1.5 rounded-lg text-text-muted hover:text-primary hover:bg-surface transition-colors"
+                    title="Download resume"
+                  >
+                    <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path d="M10.75 2.75a.75.75 0 00-1.5 0v8.614L6.295 8.235a.75.75 0 10-1.09 1.03l4.25 4.5a.75.75 0 001.09 0l4.25-4.5a.75.75 0 00-1.09-1.03l-2.955 3.129V2.75z" />
+                      <path d="M3.5 12.75a.75.75 0 00-1.5 0v2.5A2.75 2.75 0 004.75 18h10.5A2.75 2.75 0 0018 15.25v-2.5a.75.75 0 00-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5z" />
+                    </svg>
+                  </a>
+                  <a
+                    href={resumeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-1.5 rounded-lg text-text-muted hover:text-primary hover:bg-surface transition-colors"
+                    title="Open in new tab"
+                  >
+                    <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fillRule="evenodd" d="M4.25 5.5a.75.75 0 00-.75.75v8.5c0 .414.336.75.75.75h8.5a.75.75 0 00.75-.75v-4a.75.75 0 011.5 0v4A2.25 2.25 0 0112.75 17h-8.5A2.25 2.25 0 012 14.75v-8.5A2.25 2.25 0 014.25 4h5a.75.75 0 010 1.5h-5z" clipRule="evenodd" />
+                      <path fillRule="evenodd" d="M6.194 12.753a.75.75 0 001.06.053L16.5 4.44v2.81a.75.75 0 001.5 0v-4.5a.75.75 0 00-.75-.75h-4.5a.75.75 0 000 1.5h2.553l-9.056 8.194a.75.75 0 00-.053 1.06z" clipRule="evenodd" />
+                    </svg>
+                  </a>
+                </div>
               </div>
               <div className="w-full rounded-xl overflow-hidden">
                 <object
@@ -116,14 +129,16 @@ export function ProfileDetail({ profile, resumeUrl }: ProfileDetailProps) {
                   className="w-full"
                   style={{ height: '700px' }}
                 >
-                  <a
-                    href={resumeUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-primary hover:opacity-70 transition-opacity"
-                  >
-                    Download Resume
-                  </a>
+                  <p className="text-sm text-text-muted">
+                    Unable to display PDF.{' '}
+                    <a
+                      href={resumeUrl}
+                      download
+                      className="text-primary hover:opacity-70 transition-opacity underline"
+                    >
+                      Download resume
+                    </a>
+                  </p>
                 </object>
               </div>
             </div>
