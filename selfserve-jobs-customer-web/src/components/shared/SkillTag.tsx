@@ -6,14 +6,26 @@ interface SkillTagProps {
   onRemove?: (skill: string) => void;
   className?: string;
   size?: 'sm' | 'md';
+  colorIndex?: number;
 }
 
-export function SkillTag({ skill, removable = false, onRemove, className, size = 'sm' }: SkillTagProps) {
+const COLOR_FAMILIES = [
+  'bg-secondary-fixed text-on-secondary-fixed-variant',
+  'bg-tertiary-fixed text-on-tertiary-fixed-variant',
+  'bg-surface-container-high text-on-surface-variant',
+];
+
+export function SkillTag({ skill, removable = false, onRemove, className, size = 'sm', colorIndex }: SkillTagProps) {
+  const colorClass =
+    colorIndex !== undefined
+      ? COLOR_FAMILIES[colorIndex % 3]
+      : 'bg-accent/20 text-accent-dark';
+
   return (
     <span
       className={cn(
         'inline-flex items-center gap-1 rounded-full font-semibold uppercase tracking-wider',
-        'bg-accent/20 text-accent-dark',
+        colorClass,
         size === 'sm' ? 'px-2.5 py-0.5 text-[10px]' : 'px-3 py-1 text-xs',
         className
       )}

@@ -16,6 +16,14 @@
   --color-border: #c3c8c0;
   --font-sans: 'Manrope', sans-serif;
   --font-heading: 'Newsreader', serif;
+  --color-secondary-fixed: #ffdbcd;
+  --color-tertiary-fixed: #f4dfcb;
+  --color-surface-container-high: #ebe8e4;
+  --color-surface-dim: #e5e2de;
+  --color-primary-fixed: #d2e8d3;
+  --color-on-secondary-fixed-variant: #6f371d;
+  --color-on-tertiary-fixed-variant: #524436;
+  --color-on-surface-variant: #434843;
 }
 
 :root {
@@ -28,6 +36,14 @@
   --color-text-muted: #434843;
   --color-accent: #8BA888;
   --color-border: #c3c8c0;
+  --color-secondary-fixed: #ffdbcd;
+  --color-tertiary-fixed: #f4dfcb;
+  --color-surface-container-high: #ebe8e4;
+  --color-surface-dim: #e5e2de;
+  --color-primary-fixed: #d2e8d3;
+  --color-on-secondary-fixed-variant: #6f371d;
+  --color-on-tertiary-fixed-variant: #524436;
+  --color-on-surface-variant: #434843;
 }
 
 * {
@@ -72,7 +88,7 @@ a {
 /* ─── Ambient Shadow Utilities ────────────────────────────── */
 
 .shadow-ambient {
-  box-shadow: 0 1px 3px rgba(28, 28, 26, 0.03), 0 8px 16px rgba(28, 28, 26, 0.02);
+  box-shadow: 0 20px 40px rgba(28, 28, 26, 0.04), 0 8px 16px rgba(28, 28, 26, 0.02);
 }
 
 .shadow-ambient-hover {
