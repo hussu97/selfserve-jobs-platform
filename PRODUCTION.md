@@ -247,13 +247,14 @@ From now on, every push to `main` that touches `selfserve-jobs-customer-web/` wi
 
 ### For the API (Cloud Run custom domain, optional):
 ```bash
-gcloud run domain-mappings create \
+# Note: --region requires the beta track
+gcloud beta run domain-mappings create \
   --service $API_SERVICE_NAME \
   --domain api.${FRONTEND_URL#https://} \
   --region $REGION
 
 # Get DNS records to configure
-gcloud run domain-mappings describe \
+gcloud beta run domain-mappings describe \
   --domain api.${FRONTEND_URL#https://} \
   --region $REGION
 ```
