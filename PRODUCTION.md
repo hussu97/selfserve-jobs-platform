@@ -17,6 +17,7 @@ export BUCKET_NAME="selfserve-jobs-resumes"
 export API_SERVICE_NAME="selfserve-jobs-customer-api"
 export FRONTEND_URL="https://yourdomain.com"
 export RESEND_API_KEY="re_your_resend_api_key"
+export RESEND_FROM_EMAIL="hirebridge <noreply@hirebridgeuae.com>"
 export REPO_NAME="selfserve-jobs-platform"
 export REGISTRY_LOCATION="${REGION}-docker.pkg.dev"
 export DB_CONNECTION_NAME="${PROJECT_ID}:${REGION}:${DB_INSTANCE}"
@@ -196,6 +197,7 @@ gcloud run deploy $API_SERVICE_NAME \
   --set-env-vars "DATABASE_URL=postgresql+asyncpg://${DB_USER}:${DB_PASSWORD}@/${DB_NAME}?host=/cloudsql/${DB_CONNECTION_NAME}" \
   --set-env-vars "GCS_BUCKET_NAME=${BUCKET_NAME}" \
   --set-env-vars "RESEND_API_KEY=${RESEND_API_KEY}" \
+  --set-env-vars "RESEND_FROM_EMAIL=${RESEND_FROM_EMAIL}" \
   --set-env-vars "FRONTEND_URL=${FRONTEND_URL}" \
   --set-env-vars "ENVIRONMENT=production" \
   --min-instances=0 \
@@ -211,18 +213,21 @@ echo "API URL: $API_URL"
 ## 7. Resend Email Setup
 
 1. Create account at https://resend.com
-2. Go to **Domains** → **Add Domain** → enter your domain (e.g. `yourdomain.com`)
-3. Add the DNS records shown (MX, TXT, DKIM) to your DNS provider
-4. Wait for verification (usually a few minutes)
+2. Go to **Domains** → **Add Domain** → enter your sending domain (e.g. `hirebridgeuae.com`)
+3. Add the DNS records shown (SPF, DKIM, DMARC) to your DNS provider
+4. Wait for domain verification (usually a few minutes)
 5. Go to **API Keys** → **Create API Key** → copy the key
-6. Use this key as `RESEND_API_KEY` in your Cloud Run env vars
+6. Set `RESEND_API_KEY` and `RESEND_FROM_EMAIL` in Cloud Run — the `from` address must use your verified domain
 
 ```bash
-# Update the Cloud Run service with your Resend key
+# Update the Cloud Run service with your Resend credentials
 gcloud run services update $API_SERVICE_NAME \
   --region $REGION \
-  --update-env-vars "RESEND_API_KEY=${RESEND_API_KEY}"
+  --update-env-vars "RESEND_API_KEY=${RESEND_API_KEY}" \
+  --update-env-vars "RESEND_FROM_EMAIL=${RESEND_FROM_EMAIL}"
 ```
+
+> **Note:** `RESEND_FROM_EMAIL` must match a domain you have verified in Resend (e.g. `hirebridge <noreply@hirebridgeuae.com>`). Emails will silently fail if the sending domain is unverified.
 
 ## 8. Deploy the Web App (Vercel)
 
