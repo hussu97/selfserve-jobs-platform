@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Fixed
+- `globals.css`: move `*:focus-visible` rule into `@layer base` so Tailwind utility classes (e.g. `focus-visible:outline-none`) can override it — previously, the unlayered rule had higher cascade priority than all Tailwind utilities, causing duplicate focus outlines on any element that suppressed focus-visible via a utility class
+- `upload.py`: `POST /upload/resume` was requiring `profile_code` and `edit_token` as form fields, but the frontend uploads the resume before the profile exists — 422 on every profile creation. Endpoint now accepts only the file; GCS path is `resumes/{uuid}.pdf`. `create_profile` service now sets `resume_gcs_path` from `data.resume_key`.
 - `PhoneInput`: global `*:focus-visible` CSS rule was adding a second green outline around the number `<input>` element, appearing as an extra border on the right side of the component — added `focus-visible:outline-none` to both the dial-code button and number input to suppress the duplicate ring (the container's `focus-within:ring-2` already provides the focus indicator)
 - `EmploymentTypeBadge`: missing `consulting` entry in `TYPE_COLORS` map caused TypeScript error (TS2741)
 - View counts were being incremented multiple times per page load: `generateMetadata()` and the page component each called `getJob`/`getProfile`, and the view increment was baked into the GET handler — resulting in 2+ increments per visit. Moved increment to dedicated `POST /api/v1/jobs/{code}/view` and `POST /api/v1/profiles/{code}/view` endpoints; added `ViewTracker` client component that fires once per session using `sessionStorage` dedup.

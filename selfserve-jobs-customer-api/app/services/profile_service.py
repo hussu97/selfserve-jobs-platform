@@ -53,6 +53,7 @@ async def create_profile(db: AsyncSession, data: ProfileCreate) -> Profile:
         relocation_preference=data.relocation_preference,
         linkedin_profile_link=data.linkedin_profile_link,
         key_skills=data.key_skills or [],
+        resume_gcs_path=data.resume_key or None,
         status="pending_verification",
         view_count=0,
         expires_at=now + timedelta(days=PROFILE_EXPIRY_DAYS),

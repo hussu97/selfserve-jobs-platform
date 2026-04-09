@@ -251,9 +251,11 @@ input[type="checkbox"] {
   accent-color: var(--color-primary);
 }
 
-*:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
+@layer base {
+  *:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
 }
 
 /* ─── Scrollbar ───────────────────────────────────────────── */
