@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { JobDetail } from '@/components/jobs/JobDetail';
 import { JobCard } from '@/components/jobs/JobCard';
 import { ViewTracker } from '@/components/shared/ViewTracker';
-import { getJob, getJobs, trackJobView } from '@/lib/api';
+import { getJob, getJobs } from '@/lib/api';
 import { truncate } from '@/lib/utils';
 
 interface PageProps {
@@ -74,7 +74,7 @@ export default async function JobDetailPage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <ViewTracker entityType="job" code={jobCode} trackFn={trackJobView} />
+      <ViewTracker entityType="job" code={jobCode} />
       <div className="hero-gradient">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <JobDetail job={job} />

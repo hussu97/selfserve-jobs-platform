@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { ProfileDetail } from '@/components/profiles/ProfileDetail';
 import { ProfileCard } from '@/components/profiles/ProfileCard';
 import { ViewTracker } from '@/components/shared/ViewTracker';
-import { getProfile, getProfiles, trackProfileView } from '@/lib/api';
+import { getProfile, getProfiles } from '@/lib/api';
 import { truncate } from '@/lib/utils';
 
 interface PageProps {
@@ -46,7 +46,7 @@ export default async function ProfileDetailPage({ params }: PageProps) {
 
   return (
     <>
-      <ViewTracker entityType="profile" code={profileCode} trackFn={trackProfileView} />
+      <ViewTracker entityType="profile" code={profileCode} />
     <div className="hero-gradient">
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <ProfileDetail profile={profile} />
