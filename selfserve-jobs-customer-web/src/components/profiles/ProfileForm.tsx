@@ -123,7 +123,7 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
       {errors.general && <StatusBanner type="error" message={errors.general} />}
 
       {/* Personal info */}
-      <div className="flex flex-col gap-4">
+      <div className="bg-surface-lowest shadow-ambient rounded-2xl p-8 flex flex-col gap-4">
         <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-6">
           <span className="font-heading text-2xl italic text-secondary">01</span>
           <h2 className="font-heading text-xl text-primary">Personal information</h2>
@@ -203,7 +203,7 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
       </div>
 
       {/* Availability */}
-      <div className="flex flex-col gap-4">
+      <div className="bg-surface-lowest shadow-ambient rounded-2xl p-8 flex flex-col gap-4">
       <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-2">
         <span className="font-heading text-2xl italic text-secondary">02</span>
         <h2 className="font-heading text-xl text-primary">Availability</h2>
@@ -227,7 +227,7 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
       </div>
 
       {/* Brief */}
-      <div className="flex flex-col gap-4">
+      <div className="bg-surface-lowest shadow-ambient rounded-2xl p-8 flex flex-col gap-4">
         <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-2">
           <span className="font-heading text-2xl italic text-secondary">03</span>
           <h2 className="font-heading text-xl text-primary">Professional brief</h2>
@@ -245,7 +245,7 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
       </div>
 
       {/* Skills */}
-      <div className="flex flex-col gap-4">
+      <div className="bg-surface-lowest shadow-ambient rounded-2xl p-8 flex flex-col gap-4">
         <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-2">
           <span className="font-heading text-2xl italic text-secondary">04</span>
           <h2 className="font-heading text-xl text-primary">Key skills</h2>
@@ -282,7 +282,7 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
       </div>
 
       {/* Resume */}
-      <div className="flex flex-col gap-4">
+      <div className="bg-surface-lowest shadow-ambient rounded-2xl p-8 flex flex-col gap-4">
         <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-2">
           <span className="font-heading text-2xl italic text-secondary">05</span>
           <h2 className="font-heading text-xl text-primary">Resume</h2>
@@ -337,9 +337,15 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
         {errors.resume && <p className="text-xs text-red-600">{errors.resume}</p>}
       </div>
 
-      <Button type="submit" size="lg" loading={loading} className="self-start rounded-full">
+      <button type="submit" disabled={loading} className="self-start bg-secondary text-white px-10 py-4 rounded-xl font-label text-sm uppercase tracking-widest hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer inline-flex items-center gap-2">
+        {loading && (
+          <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
+        )}
         Create Profile
-      </Button>
+      </button>
     </form>
   );
 }

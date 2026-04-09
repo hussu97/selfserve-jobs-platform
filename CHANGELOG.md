@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Changed
+- `JobForm`, `ProfileForm`: increased section card padding from `p-6` to `p-8`; replaced `<Button>` submit with an inline `<button>` using secondary color (`bg-secondary`) and `rounded-xl` to match the design system CTA style; `ProfileForm` sections also promoted to full card treatment (`bg-surface-lowest shadow-ambient rounded-2xl`) to align with `JobForm`
 - `page.tsx` (home), `jobs/page.tsx`, `profiles/page.tsx`: widened all containers from `max-w-6xl` to `max-w-7xl`; increased hero vertical padding on browse pages (`pt-14 pb-10` → `pt-16 pb-12`) and section padding on home page (`py-16 sm:py-24` → `py-20 sm:py-28`); home hero padding increased to `py-28 sm:py-36 lg:py-48`; card grids updated from `gap-4`/`gap-5` to `gap-6`; browse page grids changed from `xl:grid-cols-3` to `xl:grid-cols-2` to prevent cramping with larger `p-8` cards
 - `JobCard`, `ProfileCard`: editorial overhaul to match design mockups — increased padding to `p-8`, enlarged titles to `font-heading text-2xl`, added 64×64 company/person initial avatar, multi-color `SkillTag` cycling via `colorIndex`, optional description/brief 2-line excerpt, border-t footer separator, and "View Details →" / "View Profile →" CTA links
 - `Input`, `Select`: increased padding from `px-4 py-3` to `px-5 py-3.5` to better match design system mockup; also increased `Select` right padding from `pr-9` to `pr-10` to accommodate the larger horizontal padding
