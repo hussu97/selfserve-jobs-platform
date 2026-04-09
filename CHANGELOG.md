@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+- **Primary button hover contrast** — added `--color-primary-btn: #506E54` (medium forest green) as a lighter default button background; hover now darkens to `--color-primary` (`#384B3B`), giving a clearly visible transition instead of the previous near-invisible dark→darker shift
+
 ### Fixed
 - **Mobile filters not visible** — `<aside>` wrapper on `/jobs` and `/profiles` pages used `hidden lg:block`, suppressing the mobile filter toggle that already existed inside `JobFilters`/`ProfileFilters`; fixed by using `w-full lg:w-64 lg:flex-shrink-0` on the aside and `flex-col lg:flex-row` on the container so the filter components control their own responsive rendering
 

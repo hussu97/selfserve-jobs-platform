@@ -21,7 +21,7 @@ export function Button({
 
   const variants = {
     primary:
-      'bg-primary text-white hover:bg-primary-hover focus-visible:ring-primary',
+      'bg-primary-btn text-white hover:bg-primary focus-visible:ring-primary',
     outline:
       'border border-primary text-primary bg-transparent hover:bg-primary hover:text-white focus-visible:ring-primary',
     ghost:
