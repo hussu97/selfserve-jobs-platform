@@ -25,12 +25,15 @@ async def lifespan(app: FastAPI):
     logger.info("Running Alembic migrations...")
     try:
         import asyncio
+        import os
 
         from alembic.config import Config
 
         from alembic import command
 
-        alembic_cfg = Config("alembic.ini")
+        _api_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        alembic_cfg = Config(os.path.join(_api_root, "alembic.ini"))
+        alembic_cfg.set_main_option("script_location", os.path.join(_api_root, "alembic"))
         loop = asyncio.get_event_loop()
         await loop.run_in_executor(None, lambda: command.upgrade(alembic_cfg, "head"))
         logger.info("Alembic migrations completed successfully")
