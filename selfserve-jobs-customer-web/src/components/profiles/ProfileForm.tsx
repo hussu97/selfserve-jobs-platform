@@ -7,6 +7,7 @@ import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
 import { SkillTag } from '@/components/shared/SkillTag';
 import { CountrySelect } from '@/components/shared/CountrySelect';
+import { PhoneInput } from '@/components/ui/PhoneInput';
 import { StatusBanner } from '@/components/shared/StatusBanner';
 import { NOTICE_PERIODS, RELOCATION_PREFERENCES } from '@/lib/constants';
 import { createProfile, uploadResume } from '@/lib/api';
@@ -22,12 +23,13 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
   const [form, setForm] = useState<Partial<CreateProfileRequest>>({
     notice_period: 'immediate',
     relocation_preference: 'open',
+    contact_number: '+971 ',
   });
   const [skillInput, setSkillInput] = useState('');
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [successData, setSuccessData] = useState<{ code: string; message: string } | null>(null);
 
   const set = <K extends keyof CreateProfileRequest>(key: K, value: CreateProfileRequest[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -54,14 +56,18 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
     if (!form.email?.trim()) errs.email = 'Email is required';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = 'Please enter a valid email';
     if (!form.current_title?.trim()) errs.current_title = 'Current title is required';
-    if (!form.brief?.trim()) errs.brief = 'Brief is required';
     if (!form.current_city?.trim()) errs.current_city = 'City is required';
     if (!form.current_country) errs.current_country = 'Country is required';
     if (form.years_of_experience === undefined || form.years_of_experience < 0) errs.years_of_experience = 'Experience is required';
     if ((form.key_skills?.length ?? 0) === 0) errs.key_skills = 'At least one skill is required';
-    if (resumeFile) {
-      if (resumeFile.type !== 'application/pdf') errs.resume = 'Only PDF files are accepted';
-      else if (resumeFile.size > 5 * 1024 * 1024) errs.resume = 'File must be under 5 MB';
+    const phoneVal = form.contact_number?.replace(/[\s\-()]/g, '') ?? '';
+    if (!phoneVal || phoneVal.length < 5) errs.contact_number = 'Contact number is required';
+    if (!resumeFile) {
+      errs.resume = 'Resume is required';
+    } else if (resumeFile.type !== 'application/pdf') {
+      errs.resume = 'Only PDF files are accepted';
+    } else if (resumeFile.size > 5 * 1024 * 1024) {
+      errs.resume = 'File must be under 5 MB';
     }
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -73,11 +79,8 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
 
     setLoading(true);
     try {
-      let resumeKey: string | undefined;
-      if (resumeFile) {
-        const uploadResult = await uploadResume(resumeFile);
-        resumeKey = uploadResult.resume_key;
-      }
+      const uploadResult = await uploadResume(resumeFile!);
+      const resumeKey = uploadResult.resume_key;
 
       const payload: CreateProfileRequest = {
         ...(form as CreateProfileRequest),
@@ -85,7 +88,7 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
       };
 
       const result = await createProfile(payload);
-      setSuccess(result.code);
+      setSuccessData({ code: result.code, message: result.message });
       onSuccess?.(result.code);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
@@ -95,7 +98,8 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
     }
   };
 
-  if (success) {
+  if (successData) {
+    const isLive = successData.message.includes('now live');
     return (
       <div className="max-w-lg mx-auto py-12 px-4 text-center">
         <div className="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center mx-auto mb-4">
@@ -107,13 +111,17 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
           Profile created!
         </h2>
         <p className="mb-6 text-sm text-text-muted">
-          Check your email and click the verification link to publish your profile. It won&apos;t appear publicly until verified.
+          {isLive
+            ? 'Your profile is now live and visible to employers.'
+            : "Check your email and click the verification link to publish your profile. It won't appear publicly until verified."}
         </p>
-        <StatusBanner
-          type="info"
-          title="Next steps"
-          message="A verification email has been sent to the address you provided. The link expires in 24 hours."
-        />
+        {!isLive && (
+          <StatusBanner
+            type="info"
+            title="Next steps"
+            message="A verification email has been sent to the address you provided. The link expires in 24 hours."
+          />
+        )}
       </div>
     );
   }
@@ -159,18 +167,18 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
             error={errors.current_title}
             required
           />
-          <Input
-            label="Contact number (optional)"
-            type="tel"
-            placeholder="+1 555 000 0000"
-            value={form.contact_number ?? ''}
-            onChange={(e) => set('contact_number', e.target.value || undefined)}
+          <PhoneInput
+            label="Contact number"
+            value={form.contact_number ?? '+971 '}
+            onChange={(val) => set('contact_number', val)}
+            error={errors.contact_number}
+            required
           />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input
             label="Current city"
-            placeholder="San Francisco"
+            placeholder="Dubai"
             value={form.current_city ?? ''}
             onChange={(e) => set('current_city', e.target.value)}
             error={errors.current_city}
@@ -235,15 +243,16 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
           <span className="font-heading text-2xl italic text-secondary">03</span>
           <h2 className="font-heading text-xl text-primary">Professional brief</h2>
         </div>
+        <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-text-muted -mt-2">
+          Optional — Markdown supported
+        </p>
         <Textarea
           label="Professional brief"
           placeholder="Tell employers about yourself, your experience, and what you're looking for. Markdown is supported."
           value={form.brief ?? ''}
           onChange={(e) => set('brief', e.target.value)}
-          error={errors.brief}
           rows={8}
-          hint="Markdown formatting supported."
-          required
+          hint="Markdown formatting is rendered when employers view your profile."
         />
       </div>
 
@@ -291,10 +300,10 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
           <h2 className="font-heading text-xl text-primary">Resume</h2>
         </div>
         <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-text-muted -mt-2">
-          Optional — PDF only
+          Required <span className="text-primary">*</span> — PDF only, max 5 MB
         </p>
         <div
-          className={`bg-surface rounded-2xl p-8 border-2 border-dashed text-center transition-colors hover:border-primary/50 ${resumeFile ? 'border-primary' : 'border-border'}`}
+          className={`bg-surface rounded-2xl p-8 border-2 border-dashed text-center transition-colors hover:border-primary/50 ${resumeFile ? 'border-primary' : errors.resume ? 'border-red-400' : 'border-border'}`}
         >
           {resumeFile ? (
             <div className="flex items-center justify-center gap-3">
@@ -331,7 +340,10 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
                 className="sr-only"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
-                  if (file) setResumeFile(file);
+                  if (file) {
+                    setResumeFile(file);
+                    setErrors((prev) => ({ ...prev, resume: undefined }));
+                  }
                 }}
               />
             </label>

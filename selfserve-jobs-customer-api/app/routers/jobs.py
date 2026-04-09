@@ -74,28 +74,29 @@ async def create_job(
 
     job = await job_service.create_job(db, data)
 
-    # Create verification record
-    verification = await verification_service.create_verification(
-        db=db,
-        email=job.email,
-        entity_type="job",
-        entity_code=job.job_code,
-    )
+    if settings.is_production:
+        # Create verification record and send email
+        verification = await verification_service.create_verification(
+            db=db,
+            email=job.email,
+            entity_type="job",
+            entity_code=job.job_code,
+        )
+        await email_service.send_verification_email(
+            email=job.email,
+            entity_type="job",
+            entity_code=job.job_code,
+            verification_code=verification.verification_code,
+            edit_token=job.edit_token,
+            frontend_url=settings.frontend_url,
+        )
+        message = "Job listing created. Please check your email to verify and activate your listing."
+    else:
+        # Non-production: auto-activate immediately (email_verified=False stays as audit flag)
+        await job_service.activate_job(db, job.job_code)
+        message = "Job listing created and is now live."
 
-    # Send verification email
-    await email_service.send_verification_email(
-        email=job.email,
-        entity_type="job",
-        entity_code=job.job_code,
-        verification_code=verification.verification_code,
-        edit_token=job.edit_token,
-        frontend_url=settings.frontend_url,
-    )
-
-    return JobCreateResponse(
-        code=job.job_code,
-        message="Job listing created. Please check your email to verify and activate your listing.",
-    )
+    return JobCreateResponse(code=job.job_code, message=message)
 
 
 @router.put("/{code}", response_model=JobResponse)

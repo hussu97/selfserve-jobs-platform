@@ -3,7 +3,7 @@ from typing import Literal
 
 from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
 
-EMPLOYMENT_TYPES = Literal["full_time", "part_time", "contract", "internship", "freelance", "remote"]
+EMPLOYMENT_TYPES = Literal["full_time", "part_time", "contract", "consulting", "internship", "freelance", "remote"]
 CONTACT_METHODS = Literal["email", "url"]
 JOB_STATUSES = Literal["pending_verification", "active", "removed", "expired", "under_review"]
 

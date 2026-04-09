@@ -109,26 +109,29 @@ async def create_profile(
 
     profile = await profile_service.create_profile(db, data)
 
-    verification = await verification_service.create_verification(
-        db=db,
-        email=profile.email,
-        entity_type="profile",
-        entity_code=profile.profile_code,
-    )
+    if settings.is_production:
+        # Create verification record and send email
+        verification = await verification_service.create_verification(
+            db=db,
+            email=profile.email,
+            entity_type="profile",
+            entity_code=profile.profile_code,
+        )
+        await email_service.send_verification_email(
+            email=profile.email,
+            entity_type="profile",
+            entity_code=profile.profile_code,
+            verification_code=verification.verification_code,
+            edit_token=profile.edit_token,
+            frontend_url=settings.frontend_url,
+        )
+        message = "Profile created. Please check your email to verify and activate your profile."
+    else:
+        # Non-production: auto-activate immediately (email_verified=False stays as audit flag)
+        await profile_service.activate_profile(db, profile.profile_code)
+        message = "Profile created and is now live."
 
-    await email_service.send_verification_email(
-        email=profile.email,
-        entity_type="profile",
-        entity_code=profile.profile_code,
-        verification_code=verification.verification_code,
-        edit_token=profile.edit_token,
-        frontend_url=settings.frontend_url,
-    )
-
-    return ProfileCreateResponse(
-        code=profile.profile_code,
-        message="Profile created. Please check your email to verify and activate your profile.",
-    )
+    return ProfileCreateResponse(code=profile.profile_code, message=message)
 
 
 @router.put("/{code}", response_model=ProfileResponse)

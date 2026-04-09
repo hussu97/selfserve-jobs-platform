@@ -218,6 +218,20 @@ async def update_resume(
     return profile
 
 
+async def activate_profile(db: AsyncSession, profile_code: str) -> None:
+    """Auto-activate a profile without email verification (non-production only)."""
+    now = datetime.now(UTC)
+    await db.execute(
+        update(Profile)
+        .where(Profile.profile_code == profile_code)
+        .values(
+            email_verified=True,
+            status="active",
+            updated_at=now,
+        )
+    )
+
+
 async def validate_token(
     db: AsyncSession,
     entity_code: str,

@@ -26,7 +26,7 @@ export function JobForm({ onSuccess }: JobFormProps) {
   const [skillInput, setSkillInput] = useState('');
   const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [successData, setSuccessData] = useState<{ code: string; message: string } | null>(null);
 
   const set = <K extends keyof CreateJobRequest>(key: K, value: CreateJobRequest[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -74,7 +74,7 @@ export function JobForm({ onSuccess }: JobFormProps) {
     setLoading(true);
     try {
       const result = await createJob(form as CreateJobRequest);
-      setSuccess(result.code);
+      setSuccessData({ code: result.code, message: result.message });
       onSuccess?.(result.code);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
@@ -84,25 +84,30 @@ export function JobForm({ onSuccess }: JobFormProps) {
     }
   };
 
-  if (success) {
+  if (successData) {
+    const isLive = successData.message.includes('now live');
     return (
       <div className="max-w-lg mx-auto py-12 px-4 text-center">
-        <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
-          <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+        <div className="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center mx-auto mb-4">
+          <svg className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h2 className="text-2xl mb-2 text-secondary">
+        <h2 className="font-heading text-2xl mb-2 text-secondary">
           Job posted!
         </h2>
         <p className="mb-6 text-sm text-text-muted">
-          Check your email and click the verification link to publish your listing. It won&apos;t appear publicly until verified.
+          {isLive
+            ? 'Your listing is now live and visible to candidates.'
+            : "Check your email and click the verification link to publish your listing. It won't appear publicly until verified."}
         </p>
-        <StatusBanner
-          type="info"
-          title="Next steps"
-          message="A verification email has been sent to the address you provided. The link expires in 24 hours."
-        />
+        {!isLive && (
+          <StatusBanner
+            type="info"
+            title="Next steps"
+            message="A verification email has been sent to the address you provided. The link expires in 24 hours."
+          />
+        )}
       </div>
     );
   }
@@ -169,7 +174,7 @@ export function JobForm({ onSuccess }: JobFormProps) {
           />
           <Input
             label="City"
-            placeholder="San Francisco"
+            placeholder="Dubai"
             value={form.company_city ?? ''}
             onChange={(e) => set('company_city', e.target.value)}
             error={errors.company_city}

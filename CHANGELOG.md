@@ -6,6 +6,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+- `app/contact/page.tsx`: new Contact page with founder profile cards (name, initials avatar, headline, LinkedIn link) and two info cards for listing reports and privacy requests
+- `app/privacy/page.tsx`: Privacy Policy page covering data collected, purposes, third-party services (Resend, GCS, Cloud SQL, Vercel), retention, user rights, and cookie policy
+- `app/terms/page.tsx`: Terms of Service page covering acceptable use, posting rules, listing lifecycle, resume uploads, prohibited use, no-warranty clause, and governing law (UAE)
+- `components/ui/PhoneInput.tsx`: new phone input component with searchable country dial code dropdown (default UAE +971), flag emoji, and combined value output; used in profile creation form
+- `lib/constants.ts`: `DIAL_CODES` constant — 55 countries with ISO code, flag emoji, country name, and dial code
+
+### Changed
+- `ProfileForm`: contact number is now mandatory (was optional); replaced plain text input with `PhoneInput` (dial code dropdown + local number); city placeholder changed to "Dubai"; resume is now required (was optional); professional brief is now optional (was required); success screen shows context-aware message based on API response (immediate live vs. email verification required)
+- `JobForm`: city placeholder changed to "Dubai"; added "Consulting" to employment type options; success screen updated to match `ProfileForm` — context-aware message and design-system colours
+- `schemas/job.py` (API): added `consulting` to `EMPLOYMENT_TYPES` Literal
+- `schemas/profile.py` (API): `contact_number` is now required (`str`, min 3 chars); `brief` is now optional (defaults to empty string, no minimum length)
+- `routers/jobs.py` (API): when `ENVIRONMENT != production`, newly created jobs are auto-activated (`email_verified=True`, `status=active`) without sending a verification email; in production the existing flow is unchanged
+- `routers/profiles.py` (API): same non-production auto-activation bypass as jobs router
+- `services/job_service.py` (API): added `activate_job()` helper for non-production auto-activation
+- `services/profile_service.py` (API): added `activate_profile()` helper for non-production auto-activation
+- `config.py` (API): added `is_production` property (complement of existing `is_development`)
+- `lib/types.ts`: added `'consulting'` to `EmploymentType` union
+- `lib/constants.ts`: added `'consulting'` entry to `EMPLOYMENT_TYPES`
+
 ### Fixed
 - `globals.css`: wrapped element-level base resets (`*`, `html`, `body`, headings, `a`) in `@layer base {}` — in Tailwind v4 unlayered styles have higher cascade priority than `@layer utilities`, causing the `* { padding: 0; margin: 0 }` reset to override every `px-*`/`py-*`/`mx-*`/`my-*` utility class, making all spacing zero
 

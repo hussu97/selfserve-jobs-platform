@@ -219,6 +219,20 @@ async def remove_job(
     return job
 
 
+async def activate_job(db: AsyncSession, job_code: str) -> None:
+    """Auto-activate a job without email verification (non-production only)."""
+    now = datetime.now(UTC)
+    await db.execute(
+        update(Job)
+        .where(Job.job_code == job_code)
+        .values(
+            email_verified=True,
+            status="active",
+            updated_at=now,
+        )
+    )
+
+
 async def validate_token(
     db: AsyncSession,
     entity_code: str,

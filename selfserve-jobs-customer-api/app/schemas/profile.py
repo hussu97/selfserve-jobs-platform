@@ -14,8 +14,8 @@ NOTICE_PERIODS = Literal["immediate", "1_week", "2_weeks", "1_month", "3_months"
 class ProfileCreate(BaseModel):
     person_name: str = Field(..., min_length=2, max_length=200)
     email: EmailStr
-    contact_number: str | None = Field(None, max_length=30)
-    brief: str = Field(..., min_length=50)
+    contact_number: str = Field(..., min_length=3, max_length=30)
+    brief: str = Field(default="", min_length=0)
     current_city: str = Field(..., min_length=1, max_length=100)
     current_country: str = Field(..., min_length=2, max_length=100)
     years_of_experience: int = Field(..., ge=0, le=50)

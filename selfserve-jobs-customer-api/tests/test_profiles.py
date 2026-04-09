@@ -1,6 +1,7 @@
 VALID_PROFILE_PAYLOAD = {
     "person_name": "Jane Smith",
     "email": "jane@example.com",
+    "contact_number": "+44 7700 900123",
     "brief": "Experienced software engineer with 8 years of experience building scalable "
     "web applications and APIs. Passionate about clean code and best practices.",
     "current_city": "Manchester",
