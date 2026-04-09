@@ -124,7 +124,7 @@ export default function AboutPage() {
           <div className="mt-10 flex justify-center gap-3">
             <Link
               href="/jobs"
-              className="inline-flex items-center justify-center px-6 py-3 rounded-full text-white font-medium transition-opacity hover:opacity-90 text-sm bg-primary"
+              className="inline-flex items-center justify-center px-6 py-3 rounded-full text-white font-medium transition-opacity hover:opacity-90 text-sm bg-primary-btn"
             >
               Browse jobs
             </Link>
@@ -170,7 +170,7 @@ export default function AboutPage() {
           <div className="mt-10 flex justify-center">
             <Link
               href="/jobs/new"
-              className="inline-flex items-center justify-center px-6 py-3 rounded-full text-white font-medium transition-opacity hover:opacity-90 text-sm bg-primary"
+              className="inline-flex items-center justify-center px-6 py-3 rounded-full text-white font-medium transition-opacity hover:opacity-90 text-sm bg-primary-btn"
             >
               Post a job
             </Link>

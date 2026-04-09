@@ -47,7 +47,7 @@ export function JobDetail({ job }: JobDetailProps) {
               href={applyHref}
               target={job.contact_method !== 'email' ? '_blank' : undefined}
               rel={job.contact_method !== 'email' ? 'noopener noreferrer' : undefined}
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold text-white bg-primary hover:opacity-90 transition-opacity flex-shrink-0 shadow-ambient"
+              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold text-white bg-primary-btn hover:bg-primary transition-all flex-shrink-0 shadow-ambient"
             >
               Apply now
               <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">

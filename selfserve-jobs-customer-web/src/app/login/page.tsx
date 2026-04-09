@@ -86,7 +86,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading || !email.trim()}
-                className="w-full py-3.5 rounded-full text-sm font-semibold uppercase tracking-widest text-white bg-primary transition-all hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3.5 rounded-full text-sm font-semibold uppercase tracking-widest text-white bg-primary-btn transition-all hover:bg-primary disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? 'Sending…' : 'Send Magic Link'}
               </button>

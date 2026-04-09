@@ -41,7 +41,7 @@ export default async function HomePage() {
             <div className="anim-fade-up anim-delay-3 flex flex-col sm:flex-row items-stretch sm:items-center sm:justify-center gap-3">
               <Link
                 href="/jobs"
-                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full text-white font-semibold text-sm bg-primary shadow-ambient transition-all hover:bg-primary-hover hover:shadow-ambient-hover active:scale-[0.98]"
+                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full text-white font-semibold text-sm bg-primary-btn shadow-ambient transition-all hover:bg-primary hover:shadow-ambient-hover active:scale-[0.98]"
               >
                 <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                   <path fillRule="evenodd" d="M6 3.75A2.75 2.75 0 018.75 1h2.5A2.75 2.75 0 0114 3.75v.443c.572.055 1.14.122 1.706.2C17.053 4.582 18 5.75 18 7.07v3.469c0 1.126-.694 2.191-1.83 2.54-1.952.599-4.024.921-6.17.921s-4.219-.322-6.17-.921C2.694 12.73 2 11.665 2 10.539V7.07c0-1.32.947-2.489 2.294-2.676A41.047 41.047 0 016 4.193V3.75zm6.5 0v.325a41.622 41.622 0 00-5 0V3.75c0-.69.56-1.25 1.25-1.25h2.5c.69 0 1.25.56 1.25 1.25zM10 10a1 1 0 00-1 1v.01a1 1 0 001 1h.01a1 1 0 001-1V11a1 1 0 00-1-1H10z" clipRule="evenodd" />
@@ -179,7 +179,7 @@ export default async function HomePage() {
               <p className="text-text-muted text-sm mb-4">No job listings yet.</p>
               <Link
                 href="/jobs/new"
-                className="inline-flex items-center justify-center px-6 py-2.5 rounded-full text-white font-semibold text-sm bg-primary transition-all hover:bg-primary-hover hover:shadow-ambient-hover active:scale-[0.98]"
+                className="inline-flex items-center justify-center px-6 py-2.5 rounded-full text-white font-semibold text-sm bg-primary-btn transition-all hover:bg-primary hover:shadow-ambient-hover active:scale-[0.98]"
               >
                 Post the first job
               </Link>
@@ -238,7 +238,7 @@ export default async function HomePage() {
               <p className="text-text-muted text-sm mb-4">No talent profiles yet.</p>
               <Link
                 href="/profiles/new"
-                className="inline-flex items-center justify-center px-6 py-2.5 rounded-full text-white font-semibold text-sm bg-primary transition-all hover:bg-primary-hover hover:shadow-ambient-hover active:scale-[0.98]"
+                className="inline-flex items-center justify-center px-6 py-2.5 rounded-full text-white font-semibold text-sm bg-primary-btn transition-all hover:bg-primary hover:shadow-ambient-hover active:scale-[0.98]"
               >
                 Create the first profile
               </Link>

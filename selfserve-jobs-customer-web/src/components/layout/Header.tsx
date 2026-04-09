@@ -134,7 +134,7 @@ export function Header() {
                   </Link>
                   <Link
                     href="/profiles/new"
-                    className="px-5 py-2 text-sm font-semibold uppercase tracking-widest rounded-xl text-white bg-primary shadow-ambient transition-all hover:bg-primary-hover hover:shadow-ambient-hover"
+                    className="px-5 py-2 text-sm font-semibold uppercase tracking-widest rounded-xl text-white bg-primary-btn shadow-ambient transition-all hover:bg-primary hover:shadow-ambient-hover"
                   >
                     Create Profile
                   </Link>

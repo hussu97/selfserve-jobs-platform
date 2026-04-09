@@ -211,7 +211,7 @@ export default function AccountPage() {
                 <h2 className="font-heading text-2xl text-primary">Jobs</h2>
                 <Link
                   href="/jobs/new"
-                  className="px-4 py-2 text-xs font-semibold uppercase tracking-widest rounded-full text-white bg-primary hover:bg-primary-hover transition-colors"
+                  className="px-4 py-2 text-xs font-semibold uppercase tracking-widest rounded-full text-white bg-primary-btn hover:bg-primary transition-colors"
                 >
                   + Post a Job
                 </Link>
@@ -238,7 +238,7 @@ export default function AccountPage() {
                 <h2 className="font-heading text-2xl text-primary">Profiles</h2>
                 <Link
                   href="/profiles/new"
-                  className="px-4 py-2 text-xs font-semibold uppercase tracking-widest rounded-full text-white bg-primary hover:bg-primary-hover transition-colors"
+                  className="px-4 py-2 text-xs font-semibold uppercase tracking-widest rounded-full text-white bg-primary-btn hover:bg-primary transition-colors"
                 >
                   + Create Profile
                 </Link>

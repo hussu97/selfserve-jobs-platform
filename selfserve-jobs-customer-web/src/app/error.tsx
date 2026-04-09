@@ -26,7 +26,7 @@ export default function GlobalError({ error, reset }: ErrorProps) {
         <div className="flex flex-wrap justify-center gap-3">
           <button
             onClick={reset}
-            className="px-6 py-3 rounded-full bg-primary text-white text-sm font-medium uppercase tracking-widest hover:bg-primary-hover transition-colors"
+            className="px-6 py-3 rounded-full bg-primary-btn text-white text-sm font-medium uppercase tracking-widest hover:bg-primary transition-colors"
           >
             Try again
           </button>

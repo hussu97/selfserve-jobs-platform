@@ -44,7 +44,7 @@ function CallbackContent() {
         <p className="text-sm text-text-muted mb-6">{error}</p>
         <Link
           href="/login"
-          className="inline-flex items-center justify-center px-6 py-3 rounded-full text-white font-semibold bg-primary hover:bg-primary-hover transition-colors"
+          className="inline-flex items-center justify-center px-6 py-3 rounded-full text-white font-semibold bg-primary-btn hover:bg-primary transition-colors"
         >
           Try again
         </Link>
