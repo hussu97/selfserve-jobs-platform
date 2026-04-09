@@ -6,7 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+- **Email logging (`email_log` table)** — new DB table and SQLAlchemy model that records every email send attempt (type, recipient, entity type/code, success flag, Resend-assigned ID on success, full error message on failure); migration `0003_email_log` runs automatically on startup; all three email functions (`send_verification_email`, `send_login_email`, `send_management_links_email`) now accept a `db: AsyncSession` parameter and write a log row after every attempt including dev-mode no-ops
+
 ### Changed
+- **Email templates redesigned (Sage & Stone)** — all three email templates (verification, login, management links) completely rebuilt to match the hirebridge design system: Newsreader-equivalent Georgia serif headings in forest green, Manrope-equivalent Helvetica Neue body, `#506E54` pill CTA button, `#fcf9f5` background, white card with ambient shadow, terracotta link colour, uppercase Manrope-style eyebrow labels — no borders, no generic Arial/brown palette
+- **Email sender address** — changed from hardcoded `jobs4u <noreply@jobs4u.io>` to configurable `RESEND_FROM_EMAIL` env var (default: `hirebridge <noreply@hirebridgeuae.com>`); added `resend_from_email` to `Settings` in `config.py`
+- **Email subjects** — updated to say "hirebridge" throughout (e.g. "Verify your job listing on hirebridge", "Sign in to hirebridge")
 - **Rebrand: jobs4u → hirebridge** — renamed the platform to hirebridge across the entire frontend; updated all page metadata, OG images, legal pages (Privacy Policy, Terms of Service), layout components (Header, Footer, MobileNav), and SEO files (sitemap, robots); replaced text-only logo in header/footer/mobile nav with the new `logo.png` image asset; added `icon.png` (favicon) from `design-system/favicon.png` for the browser tab; fallback domain URLs updated from `jobs4u.app` to `hirebridgeuae.com`; about and contact pages use "hirebridge UAE" where referencing the regional UAE/Middle East focus; logo PNG converted from palette mode to RGBA and resized to 560×254 for reliable rendering; `unoptimized` prop added to all logo Image components to bypass Next.js optimization pipeline
 
 ### Added

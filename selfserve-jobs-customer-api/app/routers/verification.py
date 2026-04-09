@@ -101,6 +101,7 @@ async def resend_verification(
 
     # Send email
     await email_service.send_verification_email(
+        db=db,
         email=data.email,
         entity_type=data.entity_type,
         entity_code=entity_code,

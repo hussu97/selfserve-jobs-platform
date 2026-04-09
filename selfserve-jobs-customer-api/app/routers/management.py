@@ -32,6 +32,7 @@ async def request_management_links(
         )
 
     await email_service.send_management_links_email(
+        db=db,
         email=data.email,
         entities=entities,
     )

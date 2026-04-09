@@ -27,6 +27,7 @@ async def login(
     if settings.is_production:
         token = await auth_service.create_login_token(db, data.email)
         await email_service.send_login_email(
+            db=db,
             email=data.email,
             login_token=token.token,
             frontend_url=settings.frontend_url,

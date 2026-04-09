@@ -91,6 +91,7 @@ async def create_job(
             entity_code=job.job_code,
         )
         await email_service.send_verification_email(
+            db=db,
             email=job.email,
             entity_type="job",
             entity_code=job.job_code,

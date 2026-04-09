@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     frontend_url: str = "http://localhost:3000"
     gcs_bucket_name: str = ""
     resend_api_key: str = ""
+    resend_from_email: str = "hirebridge <noreply@hirebridgeuae.com>"
     environment: str = "development"
 
     model_config = SettingsConfigDict(

@@ -126,6 +126,7 @@ async def create_profile(
             entity_code=profile.profile_code,
         )
         await email_service.send_verification_email(
+            db=db,
             email=profile.email,
             entity_type="profile",
             entity_code=profile.profile_code,
