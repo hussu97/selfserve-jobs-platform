@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+- **Hydration mismatch in Header** — `AuthProvider` was reading `localStorage` in the `useState` lazy initializer, which runs on the client but not the server, causing the Header to render different elements (logged-out links vs. `CreateListingDropdown`) between SSR and client hydration. Moved the `localStorage` read to a `useEffect`, added `isHydrated` to `AuthContextValue`, and guarded the logged-in header branch with `isHydrated && isLoggedIn` so the initial client render always matches the server-rendered output.
+
 ### Added
 - **User account & dashboard system** — email magic-link authentication with session management, dashboard page, and header avatar:
   - `alembic/versions/0002_auth_session.py`: new migration adding `login_token` and `auth_session` tables

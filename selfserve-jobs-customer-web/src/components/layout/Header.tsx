@@ -61,7 +61,7 @@ function CreateListingDropdown() {
 export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
-  const { isLoggedIn, initial } = useAuth();
+  const { isLoggedIn, isHydrated, initial } = useAuth();
 
   return (
     <>
@@ -108,7 +108,7 @@ export function Header() {
             </nav>
 
             <div className="hidden md:flex items-center gap-2">
-              {isLoggedIn ? (
+              {isHydrated && isLoggedIn ? (
                 <>
                   <CreateListingDropdown />
                   <Link
