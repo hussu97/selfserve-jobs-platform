@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- **About page "Our Story" section** — new section at the bottom of `/about` explaining the motivation behind jobs4u (economic impact of Middle East conflict, platform as a focused alternative), credits Hussain and Tejasvie with a link to `/contact`, and notes the platform has no monetization plans
 - **Umami Cloud analytics** — integrated via Next.js proxy rewrites (`/stats/script.js` and `/stats/api/send` forward to `cloud.umami.is`) to bypass adblockers; script loads only when `NEXT_PUBLIC_UMAMI_WEBSITE_ID` env var is set; setup documented in PRODUCTION.md §12
 
 ### Changed
