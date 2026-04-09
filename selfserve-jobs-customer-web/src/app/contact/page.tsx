@@ -10,14 +10,14 @@ const FOUNDERS = [
   {
     name: 'Hussain Abbasi',
     initials: 'HA',
-    headline: 'Co-founder, jobs4u',
+    headline: 'Head of Product · noon',
     linkedin: 'https://www.linkedin.com/in/hussainabbasi/',
     color: 'bg-primary',
   },
   {
     name: 'Tejasvie Subrahmanyam',
     initials: 'TS',
-    headline: 'Co-founder, jobs4u',
+    headline: 'Q-commerce Lead, Middle East · Amazon Now UAE',
     linkedin: 'https://www.linkedin.com/in/tejasvie-subrahmanyam/',
     color: 'bg-secondary',
   },
