@@ -27,7 +27,7 @@ export default function ReportPage() {
 
 function ReportContent() {
   const searchParams = useSearchParams();
-  const entityType = (searchParams.get('type') ?? 'jobs') as EntityType;
+  const entityType = (searchParams.get('type') ?? 'job') as EntityType;
   const entityCode = searchParams.get('code') ?? '';
 
   const [reporterEmail, setReporterEmail] = useState('');

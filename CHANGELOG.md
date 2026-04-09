@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Fixed
+- **Report submissions silently broken** — `ReportButton` passed `entityType="jobs"`/`"profiles"` (plural) into the URL; the backend's `/reports` endpoint expects `Literal["job", "profile"]` (singular) and was rejecting all reports with a validation error; fixed `ReportButton` call sites in `JobDetail` and `ProfileDetail` to pass singular values and updated the `EntityType` type alias from `'jobs' | 'profiles'` to `'job' | 'profile'`
+- **Removed legacy proxy resume upload endpoint** — `POST /api/v1/upload/resume` (multipart proxy through backend) deleted; only the signed-url flow remains; removed `uploadResume()` from `api.ts`, `UploadResumeResponse` type, and the proxy fallback branch in `ProfileForm`; in dev mode (no GCS bucket) the upload step is skipped and a placeholder `resume_key` is used
+
+### Fixed
 - **Verify page "View your listing" link → 404** — backend returns `entity_type` as singular (`"job"` / `"profile"`) but frontend routes are plural (`/jobs/[code]`, `/profiles/[code]`); verify page now maps singular to plural before constructing the href
 - **Resend verification form sends wrong entity_type** — radio buttons on the resend form used `"jobs"`/`"profiles"` (plural) which the backend rejects with "Invalid entity type"; changed state type and radio values to `"job"`/`"profile"` (singular)
 - **Email verification only activates the directly verified listing** — `verification_service.verify_code()` now bulk-activates all `pending_verification` jobs and profiles under the verified email address, so older unverified listings go live at the same time

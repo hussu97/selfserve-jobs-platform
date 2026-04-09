@@ -99,7 +99,7 @@ export function JobDetail({ job }: JobDetailProps) {
       {/* Actions */}
       <div className="flex gap-2">
         <ShareButton title={`${job.job_title} at ${job.company_name}`} />
-        <ReportButton entityType="jobs" entityCode={job.code} />
+        <ReportButton entityType="job" entityCode={job.code} />
       </div>
     </article>
   );

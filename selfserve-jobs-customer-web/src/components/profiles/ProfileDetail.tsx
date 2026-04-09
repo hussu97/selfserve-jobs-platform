@@ -199,7 +199,7 @@ export function ProfileDetail({ profile, resumeUrl }: ProfileDetailProps) {
           {/* Actions */}
           <div className="flex gap-2">
             <ShareButton title={`${profile.person_name} — ${profile.current_title}`} />
-            <ReportButton entityType="profiles" entityCode={profile.code} />
+            <ReportButton entityType="profile" entityCode={profile.code} />
           </div>
         </aside>
       </div>

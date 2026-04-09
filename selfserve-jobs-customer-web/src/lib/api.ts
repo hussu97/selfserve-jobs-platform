@@ -11,7 +11,6 @@ import type {
   VerificationResponse,
   ManageValidationResponse,
   ResumeUrlResponse,
-  UploadResumeResponse,
   StatsResponse,
   ReportRequest,
   JobFilters,
@@ -164,30 +163,6 @@ export async function trackProfileView(code: string): Promise<void> {
 }
 
 // Resume
-export async function uploadResume(file: File): Promise<UploadResumeResponse> {
-  const formData = new FormData();
-  formData.append('file', file);
-
-  const url = `${API_URL}/api/v1/upload/resume`;
-  const response = await fetch(url, {
-    method: 'POST',
-    body: formData,
-  });
-
-  if (!response.ok) {
-    let errorMessage = `Upload failed with status ${response.status}`;
-    try {
-      const errorData = await response.json();
-      errorMessage = errorData.detail ?? errorData.message ?? errorMessage;
-    } catch {
-      // ignore
-    }
-    throw new ApiError(response.status, errorMessage);
-  }
-
-  return response.json();
-}
-
 export async function getResumeUrl(profileCode: string): Promise<ResumeUrlResponse> {
   return request<ResumeUrlResponse>(`/profiles/${profileCode}/resume`);
 }

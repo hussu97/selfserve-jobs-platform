@@ -10,7 +10,7 @@ import { CountrySelect } from '@/components/shared/CountrySelect';
 import { PhoneInput } from '@/components/ui/PhoneInput';
 import { StatusBanner } from '@/components/shared/StatusBanner';
 import { NOTICE_PERIODS, RELOCATION_PREFERENCES } from '@/lib/constants';
-import { createProfile, uploadResume, getResumeUploadUrl, uploadResumeDirect } from '@/lib/api';
+import { createProfile, getResumeUploadUrl, uploadResumeDirect } from '@/lib/api';
 import type { CreateProfileRequest } from '@/lib/types';
 
 interface ProfileFormProps {
@@ -79,16 +79,12 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
 
     setLoading(true);
     try {
-      // Try direct browser→GCS signed URL upload first (faster — skips BE proxy).
-      // Falls back to the legacy proxy endpoint when upload_url is null (dev mode).
-      let resumeKey: string;
-      const signedUrlResult = await getResumeUploadUrl();
-      if (signedUrlResult.upload_url) {
-        resumeKey = signedUrlResult.resume_key;
-        await uploadResumeDirect(resumeFile!, signedUrlResult.upload_url);
-      } else {
-        const uploadResult = await uploadResume(resumeFile!);
-        resumeKey = uploadResult.resume_key;
+      // Get a signed GCS PUT URL and upload the resume directly from the browser.
+      // In dev mode upload_url is null (no GCS bucket) — skip the upload and use
+      // the placeholder resume_key so the rest of the form submission proceeds.
+      const { resume_key: resumeKey, upload_url: uploadUrl } = await getResumeUploadUrl();
+      if (uploadUrl) {
+        await uploadResumeDirect(resumeFile!, uploadUrl);
       }
 
       const payload: CreateProfileRequest = {

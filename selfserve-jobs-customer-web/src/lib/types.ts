@@ -206,10 +206,6 @@ export interface ResumeUrlResponse {
   expires_in: number;
 }
 
-export interface UploadResumeResponse {
-  resume_key: string;
-  message: string;
-}
 
 export interface StatsResponse {
   active_jobs: number;
