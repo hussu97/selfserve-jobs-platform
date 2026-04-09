@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useEditor, EditorContent, type Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -20,7 +20,7 @@ interface MarkdownEditorProps {
   disabled?: boolean;
 }
 
-// ── Toolbar ──────────────────────────────────────────────────
+// ── Toolbar icons ─────────────────────────────────────────────
 
 function BoldIcon() {
   return (
@@ -77,6 +77,8 @@ function CodeIcon() {
     </svg>
   );
 }
+
+// ── Toolbar ───────────────────────────────────────────────────
 
 function ToolbarButton({
   label,
@@ -172,7 +174,88 @@ function MarkdownToolbar({ editor }: { editor: Editor | null }) {
   );
 }
 
-// ── Editor ────────────────────────────────────────────────────
+// ── Inner editor (client-only) ────────────────────────────────
+// Separated into its own component so useEditor never runs during SSR.
+
+function MarkdownEditorContent({
+  value,
+  onChange,
+  placeholder,
+  error,
+  editorId,
+  minHeight,
+  disabled,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  error?: string;
+  editorId: string | undefined;
+  minHeight: string;
+  disabled?: boolean;
+}) {
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Markdown.configure({
+        html: false,
+        transformCopiedText: true,
+        transformPastedText: true,
+      }),
+      Placeholder.configure({
+        placeholder: placeholder ?? '',
+      }),
+    ],
+    content: value,
+    immediatelyRender: false,
+    editable: !disabled,
+    editorProps: {
+      attributes: {
+        id: editorId ?? '',
+        class: 'prose outline-none px-4 py-3 text-sm text-text-main',
+      },
+    },
+    onUpdate({ editor: e }) {
+      onChange(e.storage.markdown.getMarkdown());
+    },
+  });
+
+  // Controlled sync — only update when value differs to avoid cursor reset
+  useEffect(() => {
+    if (!editor) return;
+    const current = editor.storage.markdown.getMarkdown();
+    if (current !== value) {
+      editor.commands.setContent(value, false);
+    }
+  }, [value, editor]);
+
+  useEffect(() => {
+    if (!editor) return;
+    editor.setEditable(!disabled);
+  }, [disabled, editor]);
+
+  return (
+    <div
+      className={cn(
+        'rounded-xl bg-surface transition-all cursor-text',
+        'focus-within:ring-1 focus-within:ring-primary/30 focus-within:bg-surface-lowest',
+        error ? 'ring-1 ring-red-400 bg-red-50' : ''
+      )}
+      style={{ minHeight }}
+      onClick={() => editor?.commands.focus()}
+    >
+      <EditorContent
+        editor={editor}
+        style={{ minHeight: `calc(${minHeight} - 44px)` }}
+      />
+      <MarkdownToolbar editor={editor} />
+    </div>
+  );
+}
+
+// ── Public component ──────────────────────────────────────────
+// Renders a plain shell on the server / before hydration.
+// Swaps to the live Tiptap editor after mount to keep useEditor off the server.
 
 export function MarkdownEditor({
   value,
@@ -187,47 +270,12 @@ export function MarkdownEditor({
   disabled,
 }: MarkdownEditorProps) {
   const editorId = id ?? label?.toLowerCase().replace(/\s+/g, '-');
+  const [mounted, setMounted] = useState(false);
 
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      Markdown.configure({
-        html: false,
-        transformCopiedText: true,
-        transformPastedText: true,
-      }),
-      Placeholder.configure({
-        placeholder: placeholder ?? '',
-      }),
-    ],
-    content: value,
-    editable: !disabled,
-    editorProps: {
-      attributes: {
-        id: editorId ?? '',
-        class: 'prose outline-none px-4 py-3 text-sm text-text-main',
-      },
-    },
-    onUpdate({ editor: e }) {
-      onChange(e.storage.markdown.getMarkdown());
-    },
-  });
-
-  // Controlled sync — only update when value differs from current editor state
   useEffect(() => {
-    if (!editor) return;
-    const current = editor.storage.markdown.getMarkdown();
-    if (current !== value) {
-      // false = don't emit onUpdate, preventing infinite loop
-      editor.commands.setContent(value, false);
-    }
-  }, [value, editor]);
-
-  // Sync disabled state
-  useEffect(() => {
-    if (!editor) return;
-    editor.setEditable(!disabled);
-  }, [disabled, editor]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+  }, []);
 
   return (
     <div className="flex flex-col gap-1">
@@ -241,21 +289,26 @@ export function MarkdownEditor({
         </label>
       )}
 
-      <div
-        className={cn(
-          'rounded-xl bg-surface transition-all cursor-text',
-          'focus-within:ring-1 focus-within:ring-primary/30 focus-within:bg-surface-lowest',
-          error ? 'ring-1 ring-red-400 bg-red-50' : ''
-        )}
-        style={{ minHeight }}
-        onClick={() => editor?.commands.focus()}
-      >
-        <EditorContent
-          editor={editor}
-          style={{ minHeight: `calc(${minHeight} - 44px)` }}
+      {mounted ? (
+        <MarkdownEditorContent
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          error={error}
+          editorId={editorId}
+          minHeight={minHeight}
+          disabled={disabled}
         />
-        <MarkdownToolbar editor={editor} />
-      </div>
+      ) : (
+        // Server / pre-hydration shell — same dimensions, no Tiptap
+        <div
+          className={cn(
+            'rounded-xl bg-surface',
+            error ? 'ring-1 ring-red-400 bg-red-50' : ''
+          )}
+          style={{ minHeight }}
+        />
+      )}
 
       {hint && !error && <p className="text-xs text-text-muted">{hint}</p>}
       {error && <p className="text-xs text-red-600">{error}</p>}

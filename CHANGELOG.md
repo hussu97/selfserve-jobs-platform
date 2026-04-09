@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   - Toolbar at the bottom with Bold, Italic, Heading H2, Bullet List, Ordered List, Code Block buttons (SVG icons, no icon library)
   - Controlled component (`value: string` / `onChange: (val: string) => void`); emits plain markdown string — no change to backend storage
   - Replaced `<Textarea>` in `JobForm.tsx`, `ProfileForm.tsx`, and `manage/[entityType]/[code]/page.tsx` (both job description and profile brief fields)
+  - Uses a `mounted` gate (`MarkdownEditorContent` child component) to keep `useEditor` off the server — avoids Tiptap v3 SSR error in Next.js App Router
 
 ### Changed
 - **JobCard layout redesign** (`src/components/jobs/JobCard.tsx`) — fixed overflow and crowding at 2-column grid widths:
