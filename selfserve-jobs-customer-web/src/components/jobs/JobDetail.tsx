@@ -4,7 +4,7 @@ import { EmploymentTypeBadge } from '@/components/shared/EmploymentTypeBadge';
 import { SkillTag } from '@/components/shared/SkillTag';
 import { ShareButton } from '@/components/shared/ShareButton';
 import { ReportButton } from '@/components/shared/ReportButton';
-import { formatDate, formatDeadline, getCountryLabel, timeAgo } from '@/lib/utils';
+import { formatDeadline, getCountryLabel, timeAgo } from '@/lib/utils';
 import type { Job } from '@/lib/types';
 
 interface JobDetailProps {
@@ -12,6 +12,11 @@ interface JobDetailProps {
 }
 
 export function JobDetail({ job }: JobDetailProps) {
+  const applyHref =
+    job.contact_method === 'email' && job.contact_email
+      ? `mailto:${job.contact_email}`
+      : job.contact_url ?? null;
+
   return (
     <article className="max-w-4xl mx-auto">
       {/* Back link */}
@@ -27,12 +32,28 @@ export function JobDetail({ job }: JobDetailProps) {
 
       {/* Header */}
       <header className="mb-8">
-        <div className="flex flex-wrap items-start gap-3 mb-3">
-          <EmploymentTypeBadge type={job.employment_type} size="md" />
-          {job.deadline_date && (
-            <span className="text-sm px-2.5 py-1 rounded-full font-medium text-primary bg-primary/10">
-              Deadline: {formatDeadline(job.deadline_date)}
-            </span>
+        <div className="flex items-start justify-between gap-4 mb-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <EmploymentTypeBadge type={job.employment_type} size="md" />
+            {job.deadline_date && (
+              <span className="text-sm px-2.5 py-1 rounded-full font-medium text-primary bg-primary/10">
+                Deadline: {formatDeadline(job.deadline_date)}
+              </span>
+            )}
+          </div>
+
+          {applyHref && (
+            <a
+              href={applyHref}
+              target={job.contact_method !== 'email' ? '_blank' : undefined}
+              rel={job.contact_method !== 'email' ? 'noopener noreferrer' : undefined}
+              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold text-white bg-primary hover:opacity-90 transition-opacity flex-shrink-0 shadow-ambient"
+            >
+              Apply now
+              <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fillRule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clipRule="evenodd" />
+              </svg>
+            </a>
           )}
         </div>
 
@@ -65,88 +86,20 @@ export function JobDetail({ job }: JobDetailProps) {
         )}
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main content */}
-        <div className="lg:col-span-2">
-          <div className="bg-surface-lowest rounded-2xl shadow-ambient p-6 mb-6">
-            <h2 className="font-heading text-xl text-primary mb-4">
-              Job description
-            </h2>
-            <div className="prose">
-              <ReactMarkdown>{job.description}</ReactMarkdown>
-            </div>
-          </div>
+      {/* Description */}
+      <div className="bg-surface-lowest rounded-2xl shadow-ambient p-6 mb-6">
+        <h2 className="font-heading text-xl text-primary mb-4">
+          Job description
+        </h2>
+        <div className="prose">
+          <ReactMarkdown>{job.description}</ReactMarkdown>
         </div>
+      </div>
 
-        {/* Sidebar */}
-        <aside className="flex flex-col gap-4">
-          {/* Apply / Contact */}
-          <div className="bg-surface-lowest rounded-2xl shadow-ambient p-5">
-            <h3 className="font-heading text-xl text-primary mb-3">
-              How to apply
-            </h3>
-            {job.contact_method === 'email' && job.contact_email ? (
-              <a
-                href={`mailto:${job.contact_email}`}
-                className="inline-flex items-center justify-center w-full gap-2 px-4 py-3 rounded-full text-white font-medium transition-all hover:opacity-90 shadow-ambient-hover bg-primary"
-              >
-                <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                  <path d="M3 4a2 2 0 00-2 2v1.161l8.441 4.221a1.25 1.25 0 001.118 0L19 7.162V6a2 2 0 00-2-2H3z" />
-                  <path d="M19 8.839l-7.77 3.885a2.75 2.75 0 01-2.46 0L1 8.839V14a2 2 0 002 2h14a2 2 0 002-2V8.839z" />
-                </svg>
-                Apply via email
-              </a>
-            ) : job.contact_url ? (
-              <a
-                href={job.contact_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center w-full gap-2 px-4 py-3 rounded-full text-white font-medium transition-all hover:opacity-90 shadow-ambient-hover bg-primary"
-              >
-                <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                  <path fillRule="evenodd" d="M4.25 5.5a.75.75 0 00-.75.75v8.5c0 .414.336.75.75.75h8.5a.75.75 0 00.75-.75v-4a.75.75 0 011.5 0v4A2.25 2.25 0 0112.75 17h-8.5A2.25 2.25 0 012 14.75v-8.5A2.25 2.25 0 014.25 4h5a.75.75 0 010 1.5h-5z" clipRule="evenodd" />
-                  <path fillRule="evenodd" d="M6.194 12.753a.75.75 0 001.06.053L16.5 4.44v2.81a.75.75 0 001.5 0v-4.5a.75.75 0 00-.75-.75h-4.5a.75.75 0 000 1.5h2.553l-9.056 8.194a.75.75 0 00-.053 1.06z" clipRule="evenodd" />
-                </svg>
-                Apply now
-              </a>
-            ) : null}
-          </div>
-
-          {/* Job info */}
-          <div className="bg-surface-lowest rounded-2xl shadow-ambient p-5 flex flex-col gap-3">
-            <h3 className="font-heading text-xl text-primary">
-              Details
-            </h3>
-            <dl className="flex flex-col gap-2.5 text-sm">
-              <div className="flex justify-between">
-                <dt className="text-text-muted">Type</dt>
-                <dd>
-                  <EmploymentTypeBadge type={job.employment_type} />
-                </dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-text-muted">Location</dt>
-                <dd className="text-text-main">{job.company_city}, {getCountryLabel(job.company_country)}</dd>
-              </div>
-              {job.deadline_date && (
-                <div className="flex justify-between">
-                  <dt className="text-text-muted">Deadline</dt>
-                  <dd className="text-text-main">{formatDate(job.deadline_date)}</dd>
-                </div>
-              )}
-              <div className="flex justify-between">
-                <dt className="text-text-muted">Posted</dt>
-                <dd className="text-text-main">{formatDate(job.created_at)}</dd>
-              </div>
-            </dl>
-          </div>
-
-          {/* Actions */}
-          <div className="flex gap-2">
-            <ShareButton title={`${job.job_title} at ${job.company_name}`} />
-            <ReportButton entityType="jobs" entityCode={job.code} />
-          </div>
-        </aside>
+      {/* Actions */}
+      <div className="flex gap-2">
+        <ShareButton title={`${job.job_title} at ${job.company_name}`} />
+        <ReportButton entityType="jobs" entityCode={job.code} />
       </div>
     </article>
   );

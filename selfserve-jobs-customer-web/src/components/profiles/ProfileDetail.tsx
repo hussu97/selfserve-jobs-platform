@@ -5,7 +5,6 @@ import { SkillTag } from '@/components/shared/SkillTag';
 import { ShareButton } from '@/components/shared/ShareButton';
 import { ReportButton } from '@/components/shared/ReportButton';
 import {
-  formatDate,
   getCountryLabel,
   getNoticePeriodLabel,
   getRelocationLabel,
@@ -16,6 +15,7 @@ import type { Profile } from '@/lib/types';
 
 interface ProfileDetailProps {
   profile: Profile;
+  resumeUrl?: string;
 }
 
 // LinkedIn brand color — not a design system token
@@ -27,7 +27,7 @@ const RELOCATION_BADGE: Record<string, 'success' | 'default' | 'warning'> = {
   no: 'default',
 };
 
-export function ProfileDetail({ profile }: ProfileDetailProps) {
+export function ProfileDetail({ profile, resumeUrl }: ProfileDetailProps) {
   return (
     <article className="max-w-4xl mx-auto">
       {/* Back link */}
@@ -81,6 +81,7 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main content */}
         <div className="lg:col-span-2">
+          {/* About */}
           <div className="bg-surface-lowest rounded-2xl shadow-ambient p-6 mb-6">
             <h2 className="font-heading text-xl text-primary mb-4">
               About
@@ -89,6 +90,44 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
               <ReactMarkdown>{profile.brief}</ReactMarkdown>
             </div>
           </div>
+
+          {/* Resume preview */}
+          {resumeUrl && (
+            <div className="bg-surface-lowest rounded-2xl shadow-ambient p-6 mb-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="font-heading text-xl text-primary">Resume</h2>
+                <a
+                  href={resumeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:opacity-70 transition-opacity"
+                >
+                  Open / Download
+                  <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fillRule="evenodd" d="M4.25 5.5a.75.75 0 00-.75.75v8.5c0 .414.336.75.75.75h8.5a.75.75 0 00.75-.75v-4a.75.75 0 011.5 0v4A2.25 2.25 0 0112.75 17h-8.5A2.25 2.25 0 012 14.75v-8.5A2.25 2.25 0 014.25 4h5a.75.75 0 010 1.5h-5z" clipRule="evenodd" />
+                    <path fillRule="evenodd" d="M6.194 12.753a.75.75 0 001.06.053L16.5 4.44v2.81a.75.75 0 001.5 0v-4.5a.75.75 0 00-.75-.75h-4.5a.75.75 0 000 1.5h2.553l-9.056 8.194a.75.75 0 00-.053 1.06z" clipRule="evenodd" />
+                  </svg>
+                </a>
+              </div>
+              <div className="w-full rounded-xl overflow-hidden">
+                <object
+                  data={resumeUrl}
+                  type="application/pdf"
+                  className="w-full"
+                  style={{ height: '700px' }}
+                >
+                  <a
+                    href={resumeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-primary hover:opacity-70 transition-opacity"
+                  >
+                    Download Resume
+                  </a>
+                </object>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Sidebar */}
@@ -125,12 +164,6 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
                 <dd className="text-text-main">{formatExperience(profile.years_of_experience)}</dd>
               </div>
               <div className="flex justify-between">
-                <dt className="text-text-muted">Location</dt>
-                <dd className="text-text-main">
-                  {profile.current_city}, {getCountryLabel(profile.current_country)}
-                </dd>
-              </div>
-              <div className="flex justify-between">
                 <dt className="text-text-muted">Available</dt>
                 <dd className="text-text-main">{getNoticePeriodLabel(profile.notice_period)}</dd>
               </div>
@@ -144,18 +177,6 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
                     {getRelocationLabel(profile.relocation_preference)}
                   </Badge>
                 </dd>
-              </div>
-              {profile.has_resume && (
-                <div className="flex justify-between">
-                  <dt className="text-text-muted">Resume</dt>
-                  <dd className="text-xs font-medium text-accent">
-                    Available
-                  </dd>
-                </div>
-              )}
-              <div className="flex justify-between">
-                <dt className="text-text-muted">Listed</dt>
-                <dd className="text-text-main">{formatDate(profile.created_at)}</dd>
               </div>
             </dl>
           </div>

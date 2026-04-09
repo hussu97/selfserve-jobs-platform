@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Terms of Service',
-  description: 'The rules for using jobs4u — a free jobs platform for employers and candidates.',
+  description: 'The rules for using jobs4u — a self-serve jobs platform for employers and candidates.',
 };
 
 const LAST_UPDATED = 'April 2025';
@@ -38,7 +38,7 @@ export default function TermsPage() {
             <div>
               <h2 className="font-heading text-2xl text-primary mb-3">What jobs4u is</h2>
               <p className="text-sm leading-relaxed text-text-muted">
-                jobs4u is a free, self-serve jobs board. We act as a neutral platform that displays listings submitted by users. We do not verify the accuracy of listings, do not act as a recruiter or employment agency, and are not a party to any hiring arrangement between employers and candidates.
+                jobs4u is a self-serve jobs board. We act as a neutral platform that displays listings submitted by users. We do not verify the accuracy of listings, do not act as a recruiter or employment agency, and are not a party to any hiring arrangement between employers and candidates.
               </p>
             </div>
 
@@ -113,7 +113,7 @@ export default function TermsPage() {
             <div>
               <h2 className="font-heading text-2xl text-primary mb-3">Limitation of liability</h2>
               <p className="text-sm leading-relaxed text-text-muted">
-                To the maximum extent permitted by law, jobs4u and its operators shall not be liable for any indirect, incidental, special, or consequential damages arising out of your use of the platform, including but not limited to loss of data, lost profits, or any harm resulting from reliance on a listing. Our total liability in any matter shall not exceed zero, as the service is provided free of charge.
+                To the maximum extent permitted by law, jobs4u and its operators shall not be liable for any indirect, incidental, special, or consequential damages arising out of your use of the platform, including but not limited to loss of data, lost profits, or any harm resulting from reliance on a listing. Our total liability in any matter shall not exceed zero, as the service is currently provided at no cost.
               </p>
             </div>
 

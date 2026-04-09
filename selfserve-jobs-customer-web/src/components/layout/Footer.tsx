@@ -11,7 +11,7 @@ export function Footer() {
               jobs4u
             </span>
             <p className="text-xs text-text-muted leading-relaxed">
-              Free to use · No signup required
+              No signup required · No middlemen
             </p>
           </div>
 

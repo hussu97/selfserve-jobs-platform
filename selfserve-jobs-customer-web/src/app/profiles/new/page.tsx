@@ -3,7 +3,7 @@ import { ProfileForm } from '@/components/profiles/ProfileForm';
 
 export const metadata: Metadata = {
   title: 'Create a Profile',
-  description: 'Create a free talent profile on jobs4u. Let employers find you. No signup required.',
+  description: 'Create a talent profile on jobs4u. Let employers find you. No signup required.',
 };
 
 export default function NewProfilePage() {
@@ -12,7 +12,7 @@ export default function NewProfilePage() {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-12">
           <span className="text-xs font-semibold uppercase tracking-widest text-secondary mb-4 block">
-            Free forever · No account needed
+            No account needed · No middlemen
           </span>
           <h1 className="font-heading text-4xl sm:text-5xl text-primary mb-4">
             Curate Your <em>Professional</em> Identity

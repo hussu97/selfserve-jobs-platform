@@ -31,7 +31,7 @@ export default function PrivacyPage() {
             <div>
               <h2 className="font-heading text-2xl text-primary mb-3">Overview</h2>
               <p className="text-sm leading-relaxed text-text-muted">
-                jobs4u is a free, no-signup jobs platform connecting employers and candidates. We are
+                jobs4u is a no-signup jobs platform connecting employers and candidates. We are
                 committed to handling your personal data responsibly. This policy explains what we
                 collect, how we use it, and your rights.
               </p>

@@ -4,7 +4,7 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'About',
   description:
-    'jobs4u is a free, no-signup jobs board connecting talent with opportunity. Learn how it works.',
+    'jobs4u is a no-signup jobs board connecting talent with opportunity. Learn how it works.',
 };
 
 const JOB_SEEKER_STEPS = [
@@ -50,8 +50,8 @@ const VALUES = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     ),
-    title: 'Always free',
-    desc: 'Posting jobs and profiles is free. Browsing is free. There are no premium tiers, no pay-to-rank.',
+    title: 'No fees',
+    desc: 'No premium tiers, no pay-to-rank. Listings are ranked by recency, not by spend.',
   },
   {
     icon: (
@@ -149,7 +149,7 @@ export default function AboutPage() {
               Post a job in <em>minutes</em>
             </h2>
             <p className="text-sm text-text-muted">
-              Reach candidates worldwide. Always free.
+              Reach candidates worldwide. No account needed.
             </p>
           </div>
 
@@ -172,7 +172,7 @@ export default function AboutPage() {
               href="/jobs/new"
               className="inline-flex items-center justify-center px-6 py-3 rounded-full text-white font-medium transition-opacity hover:opacity-90 text-sm bg-primary"
             >
-              Post a job free
+              Post a job
             </Link>
           </div>
         </div>

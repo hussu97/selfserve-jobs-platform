@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { ProfileDetail } from '@/components/profiles/ProfileDetail';
 import { ProfileCard } from '@/components/profiles/ProfileCard';
 import { ViewTracker } from '@/components/shared/ViewTracker';
-import { getProfile, getProfiles } from '@/lib/api';
+import { getProfile, getProfiles, getResumeUrl } from '@/lib/api';
 import { truncate } from '@/lib/utils';
 
 interface PageProps {
@@ -40,7 +40,10 @@ export default async function ProfileDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  const recentProfilesResult = await getProfiles({ per_page: 4 }).catch(() => null);
+  const [recentProfilesResult, resumeUrl] = await Promise.all([
+    getProfiles({ per_page: 4 }).catch(() => null),
+    profile.has_resume ? getResumeUrl(profileCode).then((r) => r.url).catch(() => null) : null,
+  ]);
   const recentProfiles =
     recentProfilesResult?.items.filter((p) => p.code !== profileCode).slice(0, 3) ?? [];
 
@@ -49,7 +52,7 @@ export default async function ProfileDetailPage({ params }: PageProps) {
       <ViewTracker entityType="profile" code={profileCode} />
     <div className="hero-gradient">
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <ProfileDetail profile={profile} />
+      <ProfileDetail profile={profile} resumeUrl={resumeUrl ?? undefined} />
 
       {recentProfiles.length > 0 && (
         <section className="mt-16">

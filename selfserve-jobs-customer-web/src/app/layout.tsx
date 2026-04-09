@@ -10,20 +10,20 @@ export const metadata: Metadata = {
     template: '%s | jobs4u',
   },
   description:
-    'jobs4u is a free, no-signup jobs platform connecting talent with opportunities. Browse jobs and candidate profiles worldwide.',
+    'jobs4u is a no-signup jobs platform connecting talent with opportunities. Browse jobs and candidate profiles worldwide.',
   keywords: ['jobs', 'careers', 'hiring', 'remote work', 'freelance', 'talent'],
   openGraph: {
     type: 'website',
     siteName: 'jobs4u',
     title: 'jobs4u — Find Your Next Opportunity',
     description:
-      'A free, no-signup jobs platform connecting talent with opportunities worldwide.',
+      'A no-signup jobs platform connecting talent with opportunities worldwide.',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'jobs4u — Find Your Next Opportunity',
     description:
-      'A free, no-signup jobs platform connecting talent with opportunities worldwide.',
+      'A no-signup jobs platform connecting talent with opportunities worldwide.',
   },
   robots: {
     index: true,

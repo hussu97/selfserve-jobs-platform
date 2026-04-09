@@ -48,7 +48,7 @@ describe('ProfileCard', () => {
 
   it('renders experience information', () => {
     render(<ProfileCard profile={baseProfile} />);
-    expect(screen.getByText('5 years exp.')).toBeInTheDocument();
+    expect(screen.getByText(/5 years exp\./)).toBeInTheDocument();
   });
 
   it('renders skill tags', () => {
@@ -80,7 +80,7 @@ describe('ProfileCard', () => {
   it('renders "Entry level" for 0 years of experience', () => {
     const profile: ProfileListItem = { ...baseProfile, years_of_experience: 0 };
     render(<ProfileCard profile={profile} />);
-    expect(screen.getByText('Entry level exp.')).toBeInTheDocument();
+    expect(screen.getByText(/Entry level exp\./)).toBeInTheDocument();
   });
 
   it('renders "Today" for a profile created today', () => {

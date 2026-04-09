@@ -6,6 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+- **Removed "free" from all marketing copy** — replaced with "no middlemen" / "no account required" messaging across homepage, about, jobs/new, profiles/new, footer, mobile nav, OG images, privacy, and terms pages; terms liability clause updated to "currently provided at no cost"
+- **JobDetail redesign** (`src/components/jobs/JobDetail.tsx`) — simplified layout:
+  - Removed "How to apply" sidebar card and "Details" sidebar card (both were redundant with header info)
+  - Apply button (email or URL) moved to top-right of the header badges row as a compact pill
+  - Description now renders full-width (no grid sidebar); share/report actions moved to bottom of article
+- **ProfileCard redesign** (`src/components/profiles/ProfileCard.tsx`) — fixed overflow/crowding at narrow widths:
+  - Relocation badge + time posted moved to a dedicated top row (mirroring the new JobCard pattern)
+  - Avatar shrunk to `w-10 h-10`; name reduced to `text-xl` with `line-clamp-1` — prevents overflow with long names
+  - Footer restructured to `flex-col`: location on line 1, experience/notice + "View Profile →" on line 2
+- **ProfileDetail cleanup** (`src/components/profiles/ProfileDetail.tsx`):
+  - Removed `Location` and `Listed` rows from the Details sidebar card (already visible in the header)
+  - Removed `Resume — Available` indicator from Details sidebar
+- **Profile detail page** (`src/app/profiles/[profileCode]/page.tsx`) — now fetches the signed resume URL server-side in parallel with recent profiles
+
+### Added
+- **Resume PDF preview on profile detail page** — when a profile has a resume, a full-width "Resume" section renders below the About card using a native `<object>` PDF embed (700px tall, browser handles multi-page rendering); includes an "Open / Download" link that opens the signed URL in a new tab for full-screen view, download, and printing
+
 ### Added
 - **MarkdownEditor component** (`src/components/ui/MarkdownEditor.tsx`) — WYSIWYG markdown editor (JIRA/Confluence-style) replacing the plain textarea for job descriptions and professional briefs:
   - Powered by Tiptap (`@tiptap/react`, `@tiptap/starter-kit`, `@tiptap/extension-placeholder`, `tiptap-markdown`)

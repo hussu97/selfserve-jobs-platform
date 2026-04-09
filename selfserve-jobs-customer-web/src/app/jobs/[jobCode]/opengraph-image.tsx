@@ -150,7 +150,7 @@ export default async function Image({ params }: Props) {
           }}
         >
           <span style={{ fontSize: 13, color: '#434843', fontFamily: 'sans-serif' }}>
-            jobs4u.app · Free to use · No signup required
+            jobs4u.app · No signup required · No middlemen
           </span>
         </div>
       </div>

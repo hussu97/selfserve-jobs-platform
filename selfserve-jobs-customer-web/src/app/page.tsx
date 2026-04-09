@@ -24,7 +24,7 @@ export default async function HomePage() {
             {/* Eyebrow */}
             <div className="anim-fade-up inline-flex items-center gap-2 mb-7 px-4 py-1.5 rounded-full bg-surface shadow-ambient text-xs font-semibold uppercase tracking-widest text-text-muted">
               <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block" />
-              Free forever · No signup required
+              No signup required · No middlemen
             </div>
 
             {/* Headline */}
@@ -34,7 +34,7 @@ export default async function HomePage() {
 
             {/* Subheading */}
             <p className="anim-fade-up anim-delay-2 text-lg text-text-muted leading-relaxed mb-10 max-w-xl mx-auto">
-              Post jobs and candidate profiles in minutes. No account, no recruiters, no fees.
+              Post jobs and candidate profiles in minutes. No account, no recruiters.
             </p>
 
             {/* CTAs */}
@@ -101,7 +101,7 @@ export default async function HomePage() {
                     <path fillRule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clipRule="evenodd" />
                   </svg>
                 ),
-                title: 'Browse freely',
+                title: 'Browse',
                 desc: 'Search jobs and profiles with filters. No account required.',
               },
               {
@@ -269,7 +269,7 @@ export default async function HomePage() {
             Ready to get <span className="italic">started?</span>
           </h2>
           <p className="text-white/70 mb-10 text-lg">
-            Free forever. No spam. No recruiters.
+            No spam. No recruiters.
           </p>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center sm:justify-center gap-3">
             <Link

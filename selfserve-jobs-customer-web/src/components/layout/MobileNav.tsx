@@ -151,7 +151,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
           </div>
         ) : (
           <div className="px-5 py-4 bg-surface text-[10px] uppercase tracking-widest text-text-muted">
-            Free to use · No signup required
+            No signup required · No middlemen
           </div>
         )}
       </div>
