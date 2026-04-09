@@ -82,7 +82,7 @@ export function PhoneInput({ value, onChange, error, required, label = 'Contact 
           <button
             type="button"
             onClick={() => setOpen((o) => !o)}
-            className="flex items-center gap-1.5 px-3 py-3.5 h-full rounded-l-xl bg-surface hover:bg-surface-lowest transition-colors text-sm font-medium text-text-main border-r border-border/40 whitespace-nowrap focus:outline-none"
+            className="flex items-center gap-1.5 px-3 py-3.5 h-full rounded-l-xl bg-surface hover:bg-surface-lowest transition-colors text-sm font-medium text-text-main border-r border-border/40 whitespace-nowrap focus:outline-none focus-visible:outline-none"
             aria-haspopup="listbox"
             aria-expanded={open}
           >
@@ -140,7 +140,7 @@ export function PhoneInput({ value, onChange, error, required, label = 'Contact 
           value={localNumber}
           onChange={(e) => setLocalNumber(e.target.value)}
           placeholder="50 123 4567"
-          className="flex-1 min-w-0 px-4 py-3.5 bg-transparent text-sm text-text-main placeholder:text-text-muted focus:outline-none rounded-r-xl"
+          className="flex-1 min-w-0 px-4 py-3.5 bg-transparent text-sm text-text-main placeholder:text-text-muted focus:outline-none focus-visible:outline-none rounded-r-xl"
           required={required}
         />
       </div>
