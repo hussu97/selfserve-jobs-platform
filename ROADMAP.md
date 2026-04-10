@@ -92,7 +92,6 @@ Organized into phases by criticality. Each phase should be completed before star
 > Listings currently never expire despite having `expires_at` set. This phase implements the full lifecycle.
 
 - [ ] **Implement auto-expiry cron for listings** — `expires_at` is set on creation but nothing transitions listings to `expired` status. Add `POST /api/v1/internal/expire-listings` endpoint (protected by shared secret). SQL: `UPDATE job SET status='expired' WHERE status='active' AND expires_at < now()` (same for profile). Wire to Cloud Scheduler.
-- [ ] **Add expired listing cleanup job** — Expired listings older than 90 days should have PII (email, contact info) scrubbed. Add scheduled job.
 - [ ] **Add session/token cleanup job** — Auth sessions, expired verification codes, and email logs grow unbounded. Add scheduled cleanup for records older than 30/90 days respectively.
 - [ ] **Add resume cleanup for removed profiles** — When a profile is removed, the GCS resume file should be deleted. Currently orphaned.
 - [ ] **Send expiry warning emails** — Notify listing owners 7 days before expiry with option to renew (extend 60 days).
