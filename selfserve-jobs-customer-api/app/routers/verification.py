@@ -24,13 +24,19 @@ async def verify_email(
     db: AsyncSession = Depends(get_session),
 ):
     result = await verification_service.verify_code(db, data.code)
+    entity_type = result["entity_type"]
+    if entity_type == "recruiter":
+        message = "Email verified. Your recruiter account is under review — we'll notify you when approved."
+    else:
+        message = "Email verified successfully. Your listing is now active."
     return VerificationResponse(
         success=True,
-        message="Email verified successfully. Your listing is now active.",
-        entity_type=result["entity_type"],
+        message=message,
+        entity_type=entity_type,
         code=result["entity_code"],
         session_token=result.get("session_token"),
         email=result.get("email"),
+        recruiter_status=result.get("recruiter_status"),
     )
 
 

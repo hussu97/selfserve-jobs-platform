@@ -20,10 +20,15 @@ class LoginResponse(BaseModel):
 class LoginVerifyResponse(BaseModel):
     session_token: str
     email: str
+    user_type: str | None = None
+    recruiter_status: str | None = None
 
 
 class MeResponse(BaseModel):
     email: str
+    user_type: str | None = None
+    recruiter_code: str | None = None
+    recruiter_status: str | None = None
 
 
 class EntityItem(BaseModel):

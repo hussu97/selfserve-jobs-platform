@@ -13,8 +13,8 @@ interface MobileNavProps {
 }
 
 const BASE_NAV_LINKS = [
+  { href: '/profiles', label: 'Browse Talent' },
   { href: '/jobs', label: 'Browse Jobs' },
-  { href: '/profiles', label: 'Browse Profiles' },
   { href: '/about', label: 'About' },
 ];
 
@@ -112,7 +112,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
           <div className="border-t border-border/20 my-2" />
 
           <Link
-            href="/jobs/new"
+            href="/recruiter/register"
             onClick={onClose}
             className="px-4 py-3 rounded-full text-xs font-semibold uppercase tracking-widest transition-colors hover:bg-surface text-text-main"
           >
@@ -152,7 +152,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
           </div>
         ) : (
           <div className="px-5 py-4 bg-surface text-[10px] uppercase tracking-widest text-text-muted">
-            No signup required · No middlemen
+            UAE&apos;s talent-first tech platform
           </div>
         )}
       </div>

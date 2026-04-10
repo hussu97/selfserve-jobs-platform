@@ -61,6 +61,24 @@ export function JobDetail({ job }: JobDetailProps) {
           {job.job_title}
         </h1>
 
+        {/* Salary display */}
+        {(job.salary_min || job.salary_max) && job.salary_currency && (
+          <div className="inline-flex items-center gap-1.5 mb-3 px-3 py-1.5 rounded-full bg-surface text-sm font-medium text-[var(--color-accent-dark)]">
+            <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path d="M10.75 10.818v2.614A3.13 3.13 0 0011.888 13c.482-.315.612-.648.612-.875 0-.229-.13-.562-.612-.875a3.13 3.13 0 00-1.138-.432zM8.33 8.62c.053.055.115.11.184.164.208.16.46.284.736.363V6.5l-.746.592A2.25 2.25 0 008.33 8.62z" />
+              <path fillRule="evenodd" d="M9.75 2.75a.75.75 0 00-1.5 0v.295a2.98 2.98 0 00-1.189.39l-.23-.23a.75.75 0 10-1.06 1.061l.23.23a2.98 2.98 0 00-.39 1.189H5.25a.75.75 0 000 1.5h.405a2.98 2.98 0 00.39 1.189l-.23.23a.75.75 0 101.06 1.061l.23-.23a2.98 2.98 0 001.189.39v.295a.75.75 0 001.5 0v-.295a2.98 2.98 0 001.189-.39l.23.23a.75.75 0 101.06-1.061l-.23-.23a2.98 2.98 0 00.39-1.189h.405a.75.75 0 000-1.5h-.405a2.98 2.98 0 00-.39-1.189l.23-.23a.75.75 0 10-1.06-1.061l-.23.23a2.98 2.98 0 00-1.189-.39V2.75zM10 6.5a1.5 1.5 0 100 3 1.5 1.5 0 000-3z" clipRule="evenodd" />
+              <path d="M15.5 2a.75.75 0 00-1.5 0v9.5a.75.75 0 001.5 0V2z" />
+            </svg>
+            {job.salary_currency}{' '}
+            {job.salary_min && job.salary_max
+              ? `${new Intl.NumberFormat().format(job.salary_min)} – ${new Intl.NumberFormat().format(job.salary_max)}`
+              : job.salary_min
+              ? `From ${new Intl.NumberFormat().format(job.salary_min)}`
+              : `Up to ${new Intl.NumberFormat().format(job.salary_max!)}`}
+            {' /month'}
+          </div>
+        )}
+
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mb-4">
           <span className="text-secondary font-medium text-lg">
             {job.company_name}

@@ -10,15 +10,31 @@ import { CountrySelect } from '@/components/shared/CountrySelect';
 import { StatusBanner } from '@/components/shared/StatusBanner';
 import { EMPLOYMENT_TYPES } from '@/lib/constants';
 import { createJob } from '@/lib/api';
-import type { CreateJobRequest } from '@/lib/types';
+import { useAuth } from '@/context/AuthContext';
+import type { CreateJobRequest, SalaryCurrency } from '@/lib/types';
 
 interface JobFormProps {
   onSuccess?: (code: string) => void;
 }
 
-type FormErrors = Partial<Record<keyof CreateJobRequest | 'general', string>>;
+type FormErrors = Partial<Record<keyof CreateJobRequest | 'general' | 'salary', string>>;
+
+const SALARY_CURRENCIES: { value: SalaryCurrency; label: string }[] = [
+  { value: 'AED', label: 'AED — UAE Dirham' },
+  { value: 'USD', label: 'USD — US Dollar' },
+  { value: 'EUR', label: 'EUR — Euro' },
+  { value: 'GBP', label: 'GBP — British Pound' },
+  { value: 'INR', label: 'INR — Indian Rupee' },
+  { value: 'SAR', label: 'SAR — Saudi Riyal' },
+  { value: 'QAR', label: 'QAR — Qatari Riyal' },
+  { value: 'BHD', label: 'BHD — Bahraini Dinar' },
+  { value: 'KWD', label: 'KWD — Kuwaiti Dinar' },
+  { value: 'OMR', label: 'OMR — Omani Rial' },
+  { value: 'EGP', label: 'EGP — Egyptian Pound' },
+];
 
 export function JobForm({ onSuccess }: JobFormProps) {
+  const { sessionToken } = useAuth();
   const [form, setForm] = useState<Partial<CreateJobRequest>>({
     contact_method: 'email',
     employment_type: 'full_time',
@@ -30,7 +46,7 @@ export function JobForm({ onSuccess }: JobFormProps) {
 
   const set = <K extends keyof CreateJobRequest>(key: K, value: CreateJobRequest[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
-    setErrors((prev) => ({ ...prev, [key]: undefined }));
+    setErrors((prev) => ({ ...prev, [key]: undefined, salary: undefined }));
   };
 
   const addSkill = (skill: string) => {
@@ -49,8 +65,6 @@ export function JobForm({ onSuccess }: JobFormProps) {
 
   const validate = (): boolean => {
     const errs: FormErrors = {};
-    if (!form.email?.trim()) errs.email = 'Email is required';
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = 'Please enter a valid email';
     if (!form.job_title?.trim()) errs.job_title = 'Job title is required';
     if (!form.company_name?.trim()) errs.company_name = 'Company name is required';
     if (!form.company_city?.trim()) errs.company_city = 'City is required';
@@ -63,6 +77,15 @@ export function JobForm({ onSuccess }: JobFormProps) {
     if (form.contact_method === 'url' && !form.contact_url?.trim()) {
       errs.contact_url = 'Application URL is required';
     }
+    // Salary validation
+    const hasMin = form.salary_min != null && form.salary_min > 0;
+    const hasMax = form.salary_max != null && form.salary_max > 0;
+    if ((hasMin || hasMax) && !form.salary_currency) {
+      errs.salary = 'Currency is required when specifying salary';
+    }
+    if (hasMin && hasMax && form.salary_min! > form.salary_max!) {
+      errs.salary = 'Minimum salary cannot exceed maximum';
+    }
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -73,7 +96,24 @@ export function JobForm({ onSuccess }: JobFormProps) {
 
     setLoading(true);
     try {
-      const result = await createJob(form as CreateJobRequest);
+      const payload: CreateJobRequest = {
+        job_title: form.job_title!,
+        company_name: form.company_name!,
+        company_city: form.company_city!,
+        company_country: form.company_country!,
+        employment_type: form.employment_type!,
+        description: form.description!,
+        key_skills: form.key_skills!,
+        contact_method: form.contact_method!,
+        contact_email: form.contact_email,
+        contact_url: form.contact_url,
+        deadline_date: form.deadline_date,
+        salary_min: form.salary_min,
+        salary_max: form.salary_max,
+        salary_currency: form.salary_currency,
+        honeypot: form.honeypot,
+      };
+      const result = await createJob(payload, sessionToken!);
       setSuccessData({ code: result.code, message: result.message });
       onSuccess?.(result.code);
     } catch (err) {
@@ -85,7 +125,6 @@ export function JobForm({ onSuccess }: JobFormProps) {
   };
 
   if (successData) {
-    const isLive = successData.message.includes('now live');
     return (
       <div className="max-w-lg mx-auto py-12 px-4 text-center">
         <div className="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center mx-auto mb-4">
@@ -93,21 +132,10 @@ export function JobForm({ onSuccess }: JobFormProps) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h2 className="font-heading text-2xl mb-2 text-secondary">
-          Job posted!
-        </h2>
+        <h2 className="font-heading text-2xl mb-2 text-secondary">Job posted!</h2>
         <p className="mb-6 text-sm text-text-muted">
-          {isLive
-            ? 'Your listing is now live and visible to candidates.'
-            : "Check your email and click the verification link to publish your listing. It won't appear publicly until verified."}
+          Your listing is now live and visible to candidates.
         </p>
-        {!isLive && (
-          <StatusBanner
-            type="info"
-            title="Next steps"
-            message="A verification email has been sent to the address you provided. The link expires in 24 hours."
-          />
-        )}
       </div>
     );
   }
@@ -121,29 +149,10 @@ export function JobForm({ onSuccess }: JobFormProps) {
         <StatusBanner type="error" message={errors.general} />
       )}
 
-      {/* Section 01 — Verification */}
+      {/* Section 01 — Job Details */}
       <div className="bg-surface-lowest shadow-ambient rounded-2xl p-8 flex flex-col gap-4">
         <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-2">
           <span className="font-heading text-2xl italic text-secondary">01</span>
-          <h2 className="font-heading text-xl text-primary">Your Email</h2>
-        </div>
-        <p className="text-sm text-text-muted -mt-2">
-          Used for verification and managing your listing — never shown publicly.
-        </p>
-        <Input
-          type="email"
-          placeholder="you@company.com"
-          value={form.email ?? ''}
-          onChange={(e) => set('email', e.target.value)}
-          error={errors.email}
-          required
-        />
-      </div>
-
-      {/* Section 02 — Job Details */}
-      <div className="bg-surface-lowest shadow-ambient rounded-2xl p-8 flex flex-col gap-4">
-        <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-2">
-          <span className="font-heading text-2xl italic text-secondary">02</span>
           <h2 className="font-heading text-xl text-primary">Job Details</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -199,10 +208,10 @@ export function JobForm({ onSuccess }: JobFormProps) {
         </div>
       </div>
 
-      {/* Section 03 — Description */}
+      {/* Section 02 — Description */}
       <div className="bg-surface-lowest shadow-ambient rounded-2xl p-8 flex flex-col gap-4">
         <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-2">
-          <span className="font-heading text-2xl italic text-secondary">03</span>
+          <span className="font-heading text-2xl italic text-secondary">02</span>
           <h2 className="font-heading text-xl text-primary">Description</h2>
         </div>
         <MarkdownEditor
@@ -216,10 +225,10 @@ export function JobForm({ onSuccess }: JobFormProps) {
         />
       </div>
 
-      {/* Section 04 — Skills */}
+      {/* Section 03 — Skills */}
       <div className="bg-surface-lowest shadow-ambient rounded-2xl p-8 flex flex-col gap-4">
         <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-2">
-          <span className="font-heading text-2xl italic text-secondary">04</span>
+          <span className="font-heading text-2xl italic text-secondary">03</span>
           <h2 className="font-heading text-xl text-primary">Key Skills</h2>
         </div>
         <div className="flex gap-2">
@@ -250,7 +259,58 @@ export function JobForm({ onSuccess }: JobFormProps) {
         )}
       </div>
 
-      {/* Section 05 — Contact */}
+      {/* Section 04 — Salary (Optional) */}
+      <div className="bg-surface-lowest shadow-ambient rounded-2xl p-8 flex flex-col gap-4">
+        <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-2">
+          <span className="font-heading text-2xl italic text-secondary">04</span>
+          <div>
+            <h2 className="font-heading text-xl text-primary">Salary Range</h2>
+            <p className="text-xs text-text-muted mt-0.5">Optional — listings with salary ranges get more applications</p>
+          </div>
+        </div>
+        {errors.salary && <p className="text-xs text-red-600">{errors.salary}</p>}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-xs uppercase tracking-[0.1em] text-text-muted mb-2">Currency</label>
+            <select
+              value={form.salary_currency ?? ''}
+              onChange={(e) => set('salary_currency', (e.target.value || undefined) as SalaryCurrency | undefined)}
+              className="w-full bg-surface rounded-xl px-3 py-2.5 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              <option value="">Select…</option>
+              {SALARY_CURRENCIES.map(({ value, label }) => (
+                <option key={value} value={value}>{label}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs uppercase tracking-[0.1em] text-text-muted mb-2">Min / Month</label>
+            <input
+              type="number"
+              min={0}
+              step={500}
+              value={form.salary_min ?? ''}
+              onChange={(e) => set('salary_min', e.target.value ? Number(e.target.value) : undefined)}
+              placeholder="e.g. 15000"
+              className="w-full bg-surface rounded-xl px-3 py-2.5 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          </div>
+          <div>
+            <label className="block text-xs uppercase tracking-[0.1em] text-text-muted mb-2">Max / Month</label>
+            <input
+              type="number"
+              min={0}
+              step={500}
+              value={form.salary_max ?? ''}
+              onChange={(e) => set('salary_max', e.target.value ? Number(e.target.value) : undefined)}
+              placeholder="e.g. 25000"
+              className="w-full bg-surface rounded-xl px-3 py-2.5 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Section 05 — How to Apply */}
       <div className="bg-surface-lowest shadow-ambient rounded-2xl p-8 flex flex-col gap-4">
         <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-2">
           <span className="font-heading text-2xl italic text-secondary">05</span>

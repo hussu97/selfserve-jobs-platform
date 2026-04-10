@@ -48,7 +48,22 @@ async def verify_login(
     db: AsyncSession = Depends(get_session),
 ):
     session = await auth_service.verify_login_token(db, token)
-    return LoginVerifyResponse(session_token=session.session_token, email=session.email)
+    # Fetch recruiter status to include in response for frontend routing decisions
+    recruiter_status = None
+    if session.user_type == "recruiter" and session.recruiter_code:
+        from app.services import recruiter_service
+
+        try:
+            recruiter = await recruiter_service.get_by_code(db, session.recruiter_code)
+            recruiter_status = recruiter.status
+        except Exception:
+            pass
+    return LoginVerifyResponse(
+        session_token=session.session_token,
+        email=session.email,
+        user_type=session.user_type,
+        recruiter_status=recruiter_status,
+    )
 
 
 @router.post("/logout", response_model=MessageResponse)
@@ -63,8 +78,23 @@ async def logout(
 @router.get("/me", response_model=MeResponse)
 async def me(
     current_session: AuthSession = Depends(get_current_session),
+    db: AsyncSession = Depends(get_session),
 ):
-    return MeResponse(email=current_session.email)
+    recruiter_status = None
+    if current_session.user_type == "recruiter" and current_session.recruiter_code:
+        from app.services import recruiter_service
+
+        try:
+            recruiter = await recruiter_service.get_by_code(db, current_session.recruiter_code)
+            recruiter_status = recruiter.status
+        except Exception:
+            pass
+    return MeResponse(
+        email=current_session.email,
+        user_type=current_session.user_type,
+        recruiter_code=current_session.recruiter_code,
+        recruiter_status=recruiter_status,
+    )
 
 
 @router.get("/entities", response_model=EntitiesResponse)

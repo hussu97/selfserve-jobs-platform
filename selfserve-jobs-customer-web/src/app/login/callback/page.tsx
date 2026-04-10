@@ -24,8 +24,16 @@ function CallbackContent() {
 
     loginVerify(token)
       .then((res) => {
-        login(res.session_token, res.email);
-        router.replace('/account');
+        login(res.session_token, res.email, res.user_type, undefined, res.recruiter_status);
+        if (res.user_type === 'recruiter') {
+          if (res.recruiter_status === 'active') {
+            router.replace('/account');
+          } else {
+            router.replace('/recruiter/pending');
+          }
+        } else {
+          router.replace('/account');
+        }
       })
       .catch((err) => {
         setError(err instanceof Error ? err.message : 'Login link is invalid or expired.');

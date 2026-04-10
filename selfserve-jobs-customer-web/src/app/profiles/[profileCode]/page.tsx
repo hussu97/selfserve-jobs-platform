@@ -7,7 +7,7 @@ import { ViewTracker } from '@/components/shared/ViewTracker';
 import { Breadcrumbs } from '@/components/seo/Breadcrumbs';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { personSchema } from '@/lib/schema';
-import { getProfile, getProfiles, getResumeUrl } from '@/lib/api';
+import { getProfile, getProfiles } from '@/lib/api';
 import { truncate } from '@/lib/utils';
 
 interface PageProps {
@@ -49,10 +49,7 @@ export default async function ProfileDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  const [recentProfilesResult, resumeUrl] = await Promise.all([
-    getProfiles({ per_page: 4 }).catch(() => null),
-    profile.has_resume ? getResumeUrl(profileCode).then((r) => r.url).catch(() => null) : null,
-  ]);
+  const recentProfilesResult = await getProfiles({ per_page: 4 }).catch(() => null);
   const recentProfiles =
     recentProfilesResult?.items.filter((p) => p.code !== profileCode).slice(0, 3) ?? [];
 
@@ -71,7 +68,7 @@ export default async function ProfileDetailPage({ params }: PageProps) {
               { label: profile.person_name },
             ]}
           />
-          <ProfileDetail profile={profile} resumeUrl={resumeUrl ?? undefined} />
+          <ProfileDetail profile={profile} />
 
           {recentProfiles.length > 0 && (
             <section className="mt-16">

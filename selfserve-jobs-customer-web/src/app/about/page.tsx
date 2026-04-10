@@ -2,9 +2,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'About hirebridge — Free UAE Job Board, No Signup Required',
+  title: "About hirebridge — UAE's Talent-First Tech Platform",
   description:
-    'hirebridge is a free, no-signup job board connecting tech talent with companies across the UAE and Middle East. Learn how it works, who built it, and why it\'s free.',
+    "hirebridge is a free UAE talent-first tech platform. Talent profiles are friction-free. Recruiters register for verified access to sensitive candidate data. Learn how it works.",
   alternates: { canonical: '/about' },
 };
 
@@ -17,30 +17,30 @@ const JOB_SEEKER_STEPS = [
   {
     step: '02',
     title: 'Apply directly',
-    desc: 'Contact the employer directly via email or application URL. No middlemen, no fees.',
+    desc: 'Contact the employer directly via email or application URL. No fees.',
   },
   {
     step: '03',
     title: 'List yourself',
-    desc: 'Create a talent profile so employers can find you. Just verify your email to go live.',
+    desc: 'Create a talent profile so recruiters and employers can find you. Just verify your email to go live — no account needed.',
   },
 ];
 
-const EMPLOYER_STEPS = [
+const RECRUITER_STEPS = [
   {
     step: '01',
-    title: 'Post your job',
-    desc: 'Fill in the job details, add the required skills, and set a contact method.',
+    title: 'Register your account',
+    desc: 'Submit your name, company, email, and LinkedIn profile. Registration is free.',
   },
   {
     step: '02',
-    title: 'Verify your email',
-    desc: "Click the link we send you. That's it — your listing goes live immediately.",
+    title: 'Get approved',
+    desc: 'We review recruiter applications within 1–2 business days to ensure talent data is accessed responsibly.',
   },
   {
     step: '03',
-    title: 'Manage your listing',
-    desc: 'Use your management link to edit or remove the listing at any time.',
+    title: 'Post jobs & access talent',
+    desc: 'Post job listings and view sensitive talent details — email, phone, and resume — all in one place.',
   },
 ];
 
@@ -51,17 +51,17 @@ const VALUES = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     ),
-    title: 'No fees',
-    desc: 'No premium tiers, no pay-to-rank. Listings are ranked by recency, not by spend.',
+    title: 'Always free',
+    desc: 'No premium tiers, no pay-to-rank. Listings are ranked by recency, not by spend. Free to post · Free to browse · Always.',
   },
   {
     icon: (
       <svg className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
       </svg>
     ),
-    title: 'No signup',
-    desc: "We don't collect passwords or personal data beyond what's needed. Verify your email, you're done.",
+    title: 'Verified access',
+    desc: 'Talent contact details are only accessible to approved recruiters — never exposed to anonymous browsers.',
   },
   {
     icon: (
@@ -84,11 +84,12 @@ export default function AboutPage() {
             About hirebridge
           </span>
           <h1 className="font-heading text-4xl sm:text-5xl text-primary mb-6">
-            Jobs without the <em>noise</em>
+            UAE&apos;s talent-first tech <em>platform</em>
           </h1>
           <p className="text-lg leading-relaxed text-text-muted max-w-2xl mx-auto">
-            hirebridge is a minimalist jobs platform built for people who are tired of bloated job boards.
-            No accounts, no algorithms, no recruiter fees. Just jobs and talent, directly connected.
+            hirebridge puts talent at the centre. Professionals create profiles with nothing more than an email
+            verification. Recruiters register for a verified account and get approved before accessing sensitive
+            candidate data. Free to post · Free to browse · Always.
           </p>
         </div>
       </section>
@@ -114,9 +115,15 @@ export default function AboutPage() {
             <p>
               We built hirebridge UAE as a small, focused response. Major job platforms are noisy —
               buried in algorithms, recruiter spam, and pay-to-play rankings. We wanted
-              something simpler: a concentrated space where real companies post real jobs,
-              and talented people can be found without the clutter. No middlemen, no
-              hidden fees, no endless scrolling.
+              something simpler: a concentrated space where talent can be discovered and real
+              companies post real jobs, without the clutter or the cost.
+            </p>
+            <p>
+              The platform is designed around a dual model. Talent profiles are friction-free —
+              verify your email and you&apos;re live. Recruiters go through a lightweight registration
+              and approval process so that sensitive candidate data (email, phone, resume) is only
+              accessed by verified parties. This keeps the platform useful for everyone while
+              protecting professionals from unsolicited outreach.
             </p>
             <p>
               hirebridge is a personal project by{' '}
@@ -138,7 +145,7 @@ export default function AboutPage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center mb-12">
             <span className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-3 block">
-              For job seekers
+              For talent
             </span>
             <h2 className="font-heading text-3xl sm:text-4xl text-primary mb-3">
               Find your next <em>opportunity</em>
@@ -179,23 +186,23 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* How it works — Employers */}
+      {/* How it works — Recruiters */}
       <section className="bg-surface">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center mb-12">
             <span className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-3 block">
-              For employers
+              For recruiters &amp; employers
             </span>
             <h2 className="font-heading text-3xl sm:text-4xl text-primary mb-3">
-              Post a job in <em>minutes</em>
+              Access verified <em>talent</em>
             </h2>
             <p className="text-sm text-text-muted">
-              Reach candidates worldwide. No account needed.
+              Register once, get approved, and post jobs or browse candidate profiles — free.
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {EMPLOYER_STEPS.map(({ step, title, desc }) => (
+            {RECRUITER_STEPS.map(({ step, title, desc }) => (
               <div key={step} className="flex flex-col gap-3 rounded-2xl bg-surface-lowest shadow-ambient p-6">
                 <span className="font-heading text-3xl italic text-secondary">{step}</span>
                 <h3 className="font-semibold text-base font-heading text-text-main">
@@ -210,10 +217,10 @@ export default function AboutPage() {
 
           <div className="mt-10 flex justify-center">
             <Link
-              href="/jobs/new"
+              href="/recruiters/register"
               className="inline-flex items-center justify-center px-6 py-3 rounded-full text-white font-medium transition-opacity hover:opacity-90 text-sm bg-primary-btn"
             >
-              Post a job
+              Register as a recruiter
             </Link>
           </div>
         </div>

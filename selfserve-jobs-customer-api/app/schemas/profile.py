@@ -61,7 +61,8 @@ class ProfileUpdate(BaseModel):
 
 
 class ProfileResponse(BaseModel):
-    """Full profile detail — email and contact_number are intentionally excluded for privacy."""
+    """Full profile detail. Sensitive fields (email, contact_number) are conditionally included
+    based on the requester's access level — only active recruiters receive them."""
 
     code: str
     person_name: str
@@ -82,11 +83,14 @@ class ProfileResponse(BaseModel):
     has_resume: bool
     is_verified: bool
     is_active: bool
+    # Sensitive fields — only populated for active recruiters
+    email: str | None = None
+    contact_number: str | None = None
 
     model_config = {"from_attributes": True}
 
     @classmethod
-    def from_orm_with_resume(cls, obj) -> "ProfileResponse":
+    def from_orm_with_resume(cls, obj, include_sensitive: bool = False) -> "ProfileResponse":
         data = {
             "code": obj.profile_code,
             "person_name": obj.person_name,
@@ -107,6 +111,8 @@ class ProfileResponse(BaseModel):
             "has_resume": bool(obj.resume_gcs_path),
             "is_verified": obj.email_verified,
             "is_active": obj.status == "active",
+            "email": obj.email if include_sensitive else None,
+            "contact_number": obj.contact_number if include_sensitive else None,
         }
         return cls(**data)
 

@@ -21,6 +21,7 @@ class VerificationResponse(BaseModel):
     code: str | None = None
     session_token: str | None = None
     email: str | None = None
+    recruiter_status: str | None = None  # present when entity_type == "recruiter"
 
 
 class ResendVerificationRequest(BaseModel):

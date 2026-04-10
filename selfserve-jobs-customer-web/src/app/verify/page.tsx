@@ -61,7 +61,7 @@ function VerifyContent() {
         setResult(res);
         // Auto-login: verification activates the listing and creates a session
         if (res.session_token && res.email) {
-          login(res.session_token, res.email);
+          login(res.session_token, res.email, res.entity_type === 'recruiter' ? 'recruiter' : undefined, undefined, res.recruiter_status);
         }
         setState('success');
       })
@@ -127,6 +127,31 @@ function VerifyContent() {
   }
 
   if (state === 'success' && result) {
+    // Recruiter verification → show pending page redirect
+    if (result.entity_type === 'recruiter') {
+      return (
+        <div className="max-w-lg mx-auto px-4 sm:px-6 py-20 text-center">
+          <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-5">
+            <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h1 className="font-heading text-3xl text-primary mb-3">
+            Email <em>verified</em>
+          </h1>
+          <p className="text-sm mb-8 text-text-muted">
+            {result.message || 'Your email has been verified. Your recruiter account is now under review.'}
+          </p>
+          <Link
+            href="/recruiter/pending"
+            className="inline-flex items-center justify-center px-6 py-3 rounded-full text-white font-semibold transition-opacity hover:opacity-90 bg-primary-btn"
+          >
+            View application status →
+          </Link>
+        </div>
+      );
+    }
+
     const pluralType = result.entity_type === 'job' ? 'jobs' : 'profiles';
     const listingHref =
       result.entity_type && result.code

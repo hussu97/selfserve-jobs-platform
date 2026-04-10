@@ -29,10 +29,15 @@ async def get_active_job_count_for_email(db: AsyncSession, email: str) -> int:
     return result.scalar_one()
 
 
-async def create_job(db: AsyncSession, data: JobCreate) -> Job:
-    """Create a new job listing."""
-    # Rate limit check
-    active_count = await get_active_job_count_for_email(db, data.email)
+async def create_job(
+    db: AsyncSession,
+    data: JobCreate,
+    recruiter_email: str,
+    recruiter_code: str,
+) -> Job:
+    """Create a new job listing. Requires a verified recruiter session."""
+    # Rate limit check (based on recruiter email)
+    active_count = await get_active_job_count_for_email(db, recruiter_email)
     if active_count >= MAX_ACTIVE_JOBS_PER_EMAIL:
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
@@ -42,8 +47,8 @@ async def create_job(db: AsyncSession, data: JobCreate) -> Job:
     now = datetime.now(UTC)
     job = Job(
         job_code=generate_code(12),
-        email=data.email,
-        email_verified=False,
+        email=recruiter_email,
+        email_verified=True,  # Recruiter is already verified
         job_title=data.job_title,
         company_name=data.company_name,
         company_city=data.company_city,
@@ -55,7 +60,11 @@ async def create_job(db: AsyncSession, data: JobCreate) -> Job:
         contact_method=data.contact_method,
         contact_email=str(data.contact_email) if data.contact_email else None,
         contact_url=data.contact_url,
-        status="pending_verification",
+        salary_min=data.salary_min,
+        salary_max=data.salary_max,
+        salary_currency=data.salary_currency,
+        recruiter_code=recruiter_code,
+        status="active",  # Recruiter is already verified — go live immediately
         view_count=0,
         expires_at=now + timedelta(days=JOB_EXPIRY_DAYS),
         edit_token=generate_token(64),

@@ -9,9 +9,10 @@ EMPLOYMENT_TYPES = Literal["full_time", "part_time", "contract", "consulting", "
 CONTACT_METHODS = Literal["email", "url"]
 JOB_STATUSES = Literal["pending_verification", "active", "removed", "expired", "under_review"]
 
+SALARY_CURRENCIES = Literal["AED", "USD", "EUR", "GBP", "INR", "SAR", "QAR", "BHD", "KWD", "OMR", "EGP"]
+
 
 class JobCreate(BaseModel):
-    email: EmailStr
     job_title: str = Field(..., min_length=2, max_length=200)
     company_name: str = Field(..., min_length=1, max_length=200)
     company_city: str = Field(..., min_length=1, max_length=100)
@@ -23,6 +24,10 @@ class JobCreate(BaseModel):
     contact_method: CONTACT_METHODS
     contact_email: EmailStr | None = None
     contact_url: str | None = Field(None, max_length=2048)
+    # Optional salary range
+    salary_min: int | None = Field(None, ge=0)
+    salary_max: int | None = Field(None, ge=0)
+    salary_currency: SALARY_CURRENCIES | None = None
     # Honeypot field — must be empty
     website: str | None = Field(None, exclude=True)
 
@@ -39,22 +44,21 @@ class JobCreate(BaseModel):
             raise ValueError(f"Application deadline cannot exceed the listing expiry ({JOB_EXPIRY_DAYS} days)")
         return v
 
-    @field_validator("email", mode="before")
-    @classmethod
-    def normalize_email(cls, v: str) -> str:
-        return v.strip().lower()
-
     @field_validator("key_skills", mode="before")
     @classmethod
     def validate_skills(cls, v: list) -> list:
         return [s.strip() for s in v if s.strip()]
 
     @model_validator(mode="after")
-    def validate_contact(self) -> "JobCreate":
+    def validate_contact_and_salary(self) -> "JobCreate":
         if self.contact_method == "email" and not self.contact_email:
             raise ValueError("contact_email is required when contact_method is 'email'")
         if self.contact_method == "url" and not self.contact_url:
             raise ValueError("contact_url is required when contact_method is 'url'")
+        if (self.salary_min is not None or self.salary_max is not None) and not self.salary_currency:
+            raise ValueError("salary_currency is required when salary_min or salary_max is set")
+        if self.salary_min is not None and self.salary_max is not None and self.salary_min > self.salary_max:
+            raise ValueError("salary_min must be less than or equal to salary_max")
         return self
 
 
@@ -70,6 +74,9 @@ class JobUpdate(BaseModel):
     contact_method: CONTACT_METHODS | None = None
     contact_email: EmailStr | None = None
     contact_url: str | None = Field(None, max_length=2048)
+    salary_min: int | None = Field(None, ge=0)
+    salary_max: int | None = Field(None, ge=0)
+    salary_currency: SALARY_CURRENCIES | None = None
 
     @field_validator("key_skills", mode="before")
     @classmethod
@@ -94,6 +101,10 @@ class JobResponse(BaseModel):
     contact_method: str
     contact_email: str | None
     contact_url: str | None
+    salary_min: int | None
+    salary_max: int | None
+    salary_currency: str | None
+    recruiter_code: str | None
     status: str
     view_count: int
     expires_at: datetime
@@ -120,6 +131,10 @@ class JobResponse(BaseModel):
                 "contact_method": obj.contact_method,
                 "contact_email": obj.contact_email,
                 "contact_url": obj.contact_url,
+                "salary_min": getattr(obj, "salary_min", None),
+                "salary_max": getattr(obj, "salary_max", None),
+                "salary_currency": getattr(obj, "salary_currency", None),
+                "recruiter_code": getattr(obj, "recruiter_code", None),
                 "status": obj.status,
                 "view_count": obj.view_count,
                 "expires_at": obj.expires_at,
@@ -143,6 +158,9 @@ class JobListItem(BaseModel):
     employment_type: str
     deadline_date: date | None
     key_skills: list[str]
+    salary_min: int | None
+    salary_max: int | None
+    salary_currency: str | None
     status: str
     view_count: int
     expires_at: datetime
@@ -162,6 +180,9 @@ class JobListItem(BaseModel):
                 "employment_type": obj.employment_type,
                 "deadline_date": obj.deadline_date,
                 "key_skills": obj.key_skills or [],
+                "salary_min": getattr(obj, "salary_min", None),
+                "salary_max": getattr(obj, "salary_max", None),
+                "salary_currency": getattr(obj, "salary_currency", None),
                 "status": obj.status,
                 "view_count": obj.view_count,
                 "expires_at": obj.expires_at,

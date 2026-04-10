@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
-from app.dependencies import get_session, require_edit_token
+from app.dependencies import get_session, require_active_recruiter, require_edit_token
+from app.models.auth_session import AuthSession
 from app.schemas.job import (
     JobCreate,
     JobCreateResponse,
@@ -11,7 +12,7 @@ from app.schemas.job import (
     JobResponse,
     JobUpdate,
 )
-from app.services import email_service, job_service, verification_service
+from app.services import job_service
 
 router = APIRouter(prefix="/api/v1/jobs", tags=["jobs"])
 settings = get_settings()
@@ -70,42 +71,24 @@ async def track_job_view(
 @router.post("", response_model=JobCreateResponse, status_code=status.HTTP_201_CREATED)
 async def create_job(
     data: JobCreate,
+    recruiter_session: AuthSession = Depends(require_active_recruiter),
     db: AsyncSession = Depends(get_session),
 ):
     # Honeypot check
     if data.website:
-        # Silently reject bot submissions
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid submission",
         )
 
-    job = await job_service.create_job(db, data)
-
-    if settings.is_production:
-        # Create verification record and send email
-        verification = await verification_service.create_verification(
-            db=db,
-            email=job.email,
-            entity_type="job",
-            entity_code=job.job_code,
-        )
-        await email_service.send_verification_email(
-            db=db,
-            email=job.email,
-            entity_type="job",
-            entity_code=job.job_code,
-            verification_code=verification.verification_code,
-            edit_token=job.edit_token,
-            frontend_url=settings.frontend_url,
-        )
-        message = "Job listing created. Please check your email to verify and activate your listing."
-    else:
-        # Non-production: auto-activate immediately (email_verified=False stays as audit flag)
-        await job_service.activate_job(db, job.job_code)
-        message = "Job listing created and is now live."
-
-    return JobCreateResponse(code=job.job_code, message=message)
+    job = await job_service.create_job(
+        db,
+        data,
+        recruiter_email=recruiter_session.email,
+        recruiter_code=recruiter_session.recruiter_code,
+    )
+    # Job is created as active immediately — recruiter is already verified
+    return JobCreateResponse(code=job.job_code, message="Job listing is now live.")
 
 
 @router.put("/{code}", response_model=JobResponse)

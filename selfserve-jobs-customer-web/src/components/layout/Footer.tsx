@@ -47,10 +47,10 @@ export function Footer() {
           <div className="col-span-2 sm:col-span-1 flex flex-col gap-2">
             <Image src="/logo.png" alt="hirebridge" width={120} height={54} />
             <p className="text-xs text-text-muted leading-relaxed mt-1">
-              No signup required · No middlemen
+              UAE&apos;s talent-first tech platform
             </p>
             <p className="text-xs text-text-muted/70 leading-relaxed">
-              The UAE&apos;s free job board for tech talent and companies.
+              Free to post · Free to browse · Always
             </p>
           </div>
 

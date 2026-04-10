@@ -46,6 +46,12 @@ class Job(Base):
     status: Mapped[str] = mapped_column(VARCHAR(20), default="pending_verification", nullable=False)
     view_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     expires_at: Mapped[datetime] = mapped_column(TIMESTAMPTZ, nullable=False)
+    # Salary range (optional)
+    salary_min: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    salary_max: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    salary_currency: Mapped[str | None] = mapped_column(VARCHAR(3), nullable=True)
+    # Recruiter who posted this (null for legacy jobs)
+    recruiter_code: Mapped[str | None] = mapped_column(VARCHAR(12), nullable=True)
     edit_token: Mapped[str] = mapped_column(VARCHAR(64), unique=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(TIMESTAMPTZ, nullable=False, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(

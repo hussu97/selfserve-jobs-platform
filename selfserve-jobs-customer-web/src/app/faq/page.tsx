@@ -29,18 +29,13 @@ const FAQ_SECTIONS: FaqSection[] = [
       {
         question: 'What is hirebridge?',
         answer:
-          'hirebridge is a free, no-signup job board focused on the UAE tech market. It connects employers with tech talent without accounts, algorithms, or fees. Users post jobs or talent profiles by verifying an email address — that\'s all that\'s required.',
+          "hirebridge is a free, talent-first jobs platform focused on the UAE tech market. It operates a dual model: professionals create talent profiles through a simple email-verification flow (no account needed), while recruiters register for a verified account to post jobs and access sensitive candidate data. Browsing is always free and open to everyone.",
         links: [{ label: 'Learn more about us', href: '/about' }],
       },
       {
         question: 'Is hirebridge free to use?',
         answer:
-          'Yes, completely. Posting a job, creating a talent profile, and browsing are all free. There are no premium tiers, no pay-to-rank features, and no plans to introduce them. Listings are ranked purely by recency.',
-      },
-      {
-        question: 'Do I need to create an account?',
-        answer:
-          'No. You only need to verify your email address to post a job or create a talent profile. hirebridge does not store passwords or require any registration beyond email verification.',
+          'Yes, completely. Browsing jobs and talent profiles is free for everyone. Creating a talent profile is free. Recruiter registration and job posting are free. There are no premium tiers, no pay-to-rank features, and no plans to introduce them. Listings are ranked purely by recency.',
       },
       {
         question: 'How long do listings stay active?',
@@ -50,12 +45,12 @@ const FAQ_SECTIONS: FaqSection[] = [
       {
         question: 'How many listings can I post?',
         answer:
-          'Each email address can have up to 5 active job listings and 2 active talent profiles at any given time. Once a listing expires or is removed, you can post a new one.',
+          'Each recruiter account can have up to 5 active job listings at any given time. Each email address can have up to 2 active talent profiles. Once a listing expires or is removed, you can post a new one.',
       },
     ],
   },
   {
-    title: 'For Job Seekers',
+    title: 'For Talent',
     items: [
       {
         question: 'How do I find jobs in Dubai or Abu Dhabi?',
@@ -67,9 +62,25 @@ const FAQ_SECTIONS: FaqSection[] = [
         ],
       },
       {
+        question: 'How do I create a talent profile to get found by recruiters?',
+        answer:
+          'Go to /profiles/new and fill in your details — current title, location, skills, a brief bio, and optionally a resume PDF. Verify your email and your profile goes live immediately. No account registration is required. Approved recruiters can then find and contact you directly.',
+        links: [{ label: 'Create your profile', href: '/profiles/new' }],
+      },
+      {
+        question: 'Who can see my contact details and resume?',
+        answer:
+          'Your public profile (title, skills, location, bio) is visible to anyone browsing the platform. However, sensitive details — your email address, phone number, and resume — are only accessible to recruiters who have completed registration and received admin approval. This ensures your contact information reaches legitimate hiring parties only.',
+      },
+      {
+        question: 'Do I need to create an account to post a talent profile?',
+        answer:
+          'No. You only need to verify your email address to create a talent profile. hirebridge does not store passwords or require any registration for talent. Your management link (sent by email) is how you edit or remove your profile.',
+      },
+      {
         question: 'Do I need a UAE visa to work in the UAE?',
         answer:
-          'Yes — unless you are a UAE or GCC national, you need a work visa to be legally employed in the UAE. Work visas are typically sponsored by your employer as part of the hiring process. Most companies post on hirebridge expect to sponsor visas for suitable candidates.',
+          'Yes — unless you are a UAE or GCC national, you need a work visa to be legally employed in the UAE. Work visas are typically sponsored by your employer as part of the hiring process. Most companies posting on hirebridge expect to sponsor visas for suitable candidates.',
       },
       {
         question: 'What is visa sponsorship in the UAE?',
@@ -94,45 +105,59 @@ const FAQ_SECTIONS: FaqSection[] = [
       {
         question: 'Can I work remotely from the UAE?',
         answer:
-          'Yes. The UAE offers a Remote Work Visa (Virtual Work Programme) for professionals employed by foreign companies. Many UAE companies also offer hybrid arrangements. The UAE\'s central timezone (GMT+4) makes it excellent for working with teams in Europe, Asia, and Africa.',
+          "Yes. The UAE offers a Remote Work Visa (Virtual Work Programme) for professionals employed by foreign companies. Many UAE companies also offer hybrid arrangements. The UAE's central timezone (GMT+4) makes it excellent for working with teams in Europe, Asia, and Africa.",
         links: [{ label: 'Browse remote jobs', href: '/jobs/type/remote' }],
-      },
-      {
-        question: 'How do I create a talent profile to get found by employers?',
-        answer:
-          'Go to /profiles/new and fill in your details — current title, location, skills, a brief bio, and optionally a resume PDF. Verify your email and your profile goes live immediately. Employers can then find you when browsing or filtering talent.',
-        links: [{ label: 'Create your profile', href: '/profiles/new' }],
       },
     ],
   },
   {
-    title: 'For Employers',
+    title: 'For Recruiters',
     items: [
       {
         question: 'How do I post a job on hirebridge?',
         answer:
-          'Go to /jobs/new, fill in your job details (title, company, location, employment type, description, required skills, and contact method), then verify your email. Your listing goes live immediately after verification. The whole process takes under 5 minutes.',
-        links: [{ label: 'Post a job', href: '/jobs/new' }],
+          'Job posting requires a recruiter account. Register at /recruiters/register with your name, company, work email, and LinkedIn profile. Once your account is approved (typically 1–2 business days), you can post jobs and access talent contact details.',
+        links: [{ label: 'Register as a recruiter', href: '/recruiters/register' }],
       },
       {
-        question: 'How do candidates contact me after seeing my listing?',
+        question: 'How long does recruiter approval take?',
+        answer:
+          'We review recruiter applications within 1–2 business days. We manually check submitted information to verify that applicants represent legitimate hiring organisations. You will receive an email once your account is approved.',
+      },
+      {
+        question: 'Is recruiter registration free?',
+        answer:
+          'Yes, completely free. There are no fees to register, no subscription charges, and no pay-to-rank features. Listings are shown in chronological order.',
+      },
+      {
+        question: 'What information do I need to register as a recruiter?',
+        answer:
+          'You need to provide your full name, company name, work email address, and a LinkedIn profile URL. This information is used to verify your identity and ensure talent data is accessed responsibly. It is stored securely and is not displayed publicly.',
+      },
+      {
+        question: 'What talent data can I access as an approved recruiter?',
+        answer:
+          "Once approved, you can view a candidate's full profile including their email address, phone number, and resume PDF (if uploaded). Public profile information — title, skills, location, and bio — is visible to everyone. Sensitive contact details are gated behind recruiter approval.",
+      },
+      {
+        question: 'How do candidates contact me after seeing my job listing?',
         answer:
           'You choose your preferred contact method when posting — either a direct email address or an application URL (such as your own careers page or LinkedIn posting). Candidates contact you directly; there is no in-platform messaging system.',
       },
       {
         question: 'Can I edit or remove my job listing after it goes live?',
         answer:
-          'Yes. When your listing is verified, you receive a management link by email. Use that link to edit details, extend the listing (if approaching expiry), or remove it entirely. Keep this email — there is no account to log into for management.',
+          'Yes. When your listing is verified, you receive a management link by email. Use that link to edit details, extend the listing (if approaching expiry), or remove it entirely.',
       },
       {
         question: 'How long will my job listing appear?',
         answer:
-          'Job listings are active for 60 days from the date of verification. After 60 days, they automatically expire and are no longer visible to candidates. You can post a new listing at any time.',
+          'Job listings are active for 60 days from the date of posting. After 60 days, they automatically expire and are no longer visible to candidates. You can post a new listing at any time.',
       },
       {
         question: 'Can I post multiple jobs?',
         answer:
-          'Yes — each email address can have up to 5 active job listings at a time. If you need to post more than 5 simultaneous listings, you can use different email addresses for each batch.',
+          'Yes — each recruiter account can have up to 5 active job listings at a time.',
       },
     ],
   },
@@ -161,7 +186,7 @@ const FAQ_SECTIONS: FaqSection[] = [
       {
         question: 'Are there blockchain and Web3 jobs in the UAE?',
         answer:
-          'Yes — the UAE has actively positioned itself as a crypto-friendly jurisdiction. RAK Digital Assets Oasis (RAK DAO) in Ras Al Khaimah is dedicated to Web3 and digital asset companies. Dubai\'s VARA (Virtual Assets Regulatory Authority) has licensed hundreds of crypto firms, many of which hire actively.',
+          "Yes — the UAE has actively positioned itself as a crypto-friendly jurisdiction. RAK Digital Assets Oasis (RAK DAO) in Ras Al Khaimah is dedicated to Web3 and digital asset companies. Dubai's VARA (Virtual Assets Regulatory Authority) has licensed hundreds of crypto firms, many of which hire actively.",
         links: [{ label: 'Jobs in Ras Al Khaimah', href: '/jobs/in/ras-al-khaimah' }],
       },
     ],
@@ -248,7 +273,7 @@ export default function FaqPage() {
         <div className="mt-16 rounded-2xl bg-primary p-8 text-white text-center">
           <h2 className="font-heading text-xl mb-2">Ready to get started?</h2>
           <p className="text-sm opacity-80 mb-6">
-            Browse UAE jobs, post your own listing, or create a talent profile — all free, no signup.
+            Browse UAE jobs, create a talent profile, or register as a recruiter — all free.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Link
@@ -262,6 +287,12 @@ export default function FaqPage() {
               className="px-6 py-2.5 rounded-full bg-white/10 text-white font-semibold text-sm hover:bg-white/20 transition-colors"
             >
               Create Profile
+            </Link>
+            <Link
+              href="/recruiters/register"
+              className="px-6 py-2.5 rounded-full bg-white/10 text-white font-semibold text-sm hover:bg-white/20 transition-colors"
+            >
+              Recruiter Register
             </Link>
           </div>
         </div>

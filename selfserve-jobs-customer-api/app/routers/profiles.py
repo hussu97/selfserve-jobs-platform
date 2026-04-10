@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
-from app.dependencies import get_session, require_edit_token
+from app.dependencies import get_optional_session, get_session, require_active_recruiter, require_edit_token
+from app.models.auth_session import AuthSession
 from app.schemas.profile import (
     ProfileCreate,
     ProfileCreateResponse,
@@ -12,7 +13,7 @@ from app.schemas.profile import (
     ProfileUpdate,
     ResumeUrlResponse,
 )
-from app.services import email_service, profile_service, storage_service, verification_service
+from app.services import email_service, profile_service, recruiter_service, storage_service, verification_service
 
 router = APIRouter(prefix="/api/v1/profiles", tags=["profiles"])
 settings = get_settings()
@@ -75,8 +76,10 @@ async def list_profiles(
 @router.get("/{code}/resume", response_model=ResumeUrlResponse)
 async def get_resume_url(
     code: str,
+    _session: AuthSession = Depends(require_active_recruiter),
     db: AsyncSession = Depends(get_session),
 ):
+    """Returns a temporary signed URL for the resume. Requires active recruiter session."""
     profile = await profile_service.get_profile_by_code(db, code)
     if not profile.resume_gcs_path:
         raise HTTPException(
@@ -90,10 +93,16 @@ async def get_resume_url(
 @router.get("/{code}", response_model=ProfileResponse)
 async def get_profile(
     code: str,
+    optional_session: AuthSession | None = Depends(get_optional_session),
     db: AsyncSession = Depends(get_session),
 ):
     profile = await profile_service.get_profile_detail(db, code)
-    return ProfileResponse.from_orm_with_resume(profile)
+    # Include sensitive fields only for active recruiters
+    include_sensitive = False
+    if optional_session and optional_session.user_type == "recruiter":
+        recruiter = await recruiter_service.get_by_email(db, optional_session.email)
+        include_sensitive = recruiter is not None and recruiter.status == "active"
+    return ProfileResponse.from_orm_with_resume(profile, include_sensitive=include_sensitive)
 
 
 @router.post("/{code}/view", status_code=status.HTTP_204_NO_CONTENT)

@@ -6,6 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.config import get_settings
 from app.email_templates import login as login_template
 from app.email_templates import management_links as management_links_template
+from app.email_templates import recruiter_status as recruiter_status_template
+from app.email_templates import recruiter_verification as recruiter_verification_template
 from app.email_templates import verification as verification_template
 
 logger = logging.getLogger(__name__)
@@ -157,3 +159,93 @@ async def send_management_links_email(
 ) -> bool:
     subject, html_body, text_body = management_links_template.build(entities)
     return await _send(db, "management_links", email, subject, html_body, text_body)
+
+
+async def send_recruiter_verification_email(
+    db: AsyncSession,
+    email: str,
+    recruiter_code: str,
+    verification_code: str,
+    frontend_url: str,
+) -> bool:
+    verify_url = f"{frontend_url}/verify?code={verification_code}"
+    subject, html_body, text_body = recruiter_verification_template.build(verify_url)
+    return await _send(
+        db,
+        "recruiter_verification",
+        email,
+        subject,
+        html_body,
+        text_body,
+        entity_type="recruiter",
+        entity_code=recruiter_code,
+    )
+
+
+async def send_recruiter_approved_email(
+    db: AsyncSession,
+    email: str,
+    recruiter_code: str,
+    frontend_url: str,
+) -> bool:
+    subject, html_body, text_body = recruiter_status_template.build_approved(frontend_url)
+    return await _send(
+        db,
+        "recruiter_approved",
+        email,
+        subject,
+        html_body,
+        text_body,
+        entity_type="recruiter",
+        entity_code=recruiter_code,
+    )
+
+
+async def send_recruiter_rejected_email(
+    db: AsyncSession,
+    email: str,
+    recruiter_code: str,
+    frontend_url: str,
+) -> bool:
+    subject, html_body, text_body = recruiter_status_template.build_rejected(frontend_url)
+    return await _send(
+        db,
+        "recruiter_rejected",
+        email,
+        subject,
+        html_body,
+        text_body,
+        entity_type="recruiter",
+        entity_code=recruiter_code,
+    )
+
+
+async def send_admin_new_recruiter_notification(
+    db: AsyncSession,
+    recruiter_name: str,
+    recruiter_email: str,
+    recruiter_linkedin: str,
+    recruiter_code: str,
+    frontend_url: str,
+    admin_email: str,
+) -> bool:
+    if not admin_email:
+        logger.info("No admin_notification_email configured — skipping admin notification")
+        return True
+    subject, html_body, text_body = recruiter_status_template.build_admin_notification(
+        recruiter_name=recruiter_name,
+        recruiter_email=recruiter_email,
+        recruiter_linkedin=recruiter_linkedin,
+        recruiter_code=recruiter_code,
+        frontend_url=frontend_url,
+    )
+    return await _send(
+        db,
+        "admin_new_recruiter",
+        admin_email,
+        subject,
+        html_body,
+        text_body,
+        entity_type="recruiter",
+        entity_code=recruiter_code,
+    )

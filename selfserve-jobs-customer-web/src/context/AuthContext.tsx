@@ -5,14 +5,21 @@ import { createContext, useContext, useState, useCallback, useEffect } from 'rea
 interface AuthState {
   email: string | null;
   sessionToken: string | null;
+  userType: string | null;
+  recruiterCode: string | null;
+  recruiterStatus: string | null;
 }
 
 interface AuthContextValue extends AuthState {
   isLoggedIn: boolean;
   isHydrated: boolean;
+  isRecruiter: boolean;
+  isActiveRecruiter: boolean;
+  isPendingRecruiter: boolean;
   initial: string;
-  login: (sessionToken: string, email: string) => void;
+  login: (sessionToken: string, email: string, userType?: string | null, recruiterCode?: string | null, recruiterStatus?: string | null) => void;
   logout: () => void;
+  updateRecruiterStatus: (status: string) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -20,7 +27,13 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 const STORAGE_KEY = 'auth_session';
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [auth, setAuth] = useState<AuthState>({ email: null, sessionToken: null });
+  const [auth, setAuth] = useState<AuthState>({
+    email: null,
+    sessionToken: null,
+    userType: null,
+    recruiterCode: null,
+    recruiterStatus: null,
+  });
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
@@ -37,22 +50,61 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsHydrated(true);
   }, []);
 
-  const login = useCallback((sessionToken: string, email: string) => {
-    const state = { sessionToken, email };
-    setAuth(state);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }, []);
+  const login = useCallback(
+    (
+      sessionToken: string,
+      email: string,
+      userType?: string | null,
+      recruiterCode?: string | null,
+      recruiterStatus?: string | null,
+    ) => {
+      const state: AuthState = {
+        sessionToken,
+        email,
+        userType: userType ?? null,
+        recruiterCode: recruiterCode ?? null,
+        recruiterStatus: recruiterStatus ?? null,
+      };
+      setAuth(state);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    },
+    [],
+  );
 
   const logoutFn = useCallback(() => {
-    setAuth({ email: null, sessionToken: null });
+    setAuth({ email: null, sessionToken: null, userType: null, recruiterCode: null, recruiterStatus: null });
     localStorage.removeItem(STORAGE_KEY);
   }, []);
 
+  const updateRecruiterStatus = useCallback((status: string) => {
+    setAuth((prev) => {
+      const next = { ...prev, recruiterStatus: status };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
   const isLoggedIn = !!auth.sessionToken && !!auth.email;
+  const isRecruiter = isLoggedIn && auth.userType === 'recruiter';
+  const isActiveRecruiter = isRecruiter && auth.recruiterStatus === 'active';
+  const isPendingRecruiter = isRecruiter && (auth.recruiterStatus === 'pending_approval' || auth.recruiterStatus === 'pending_verification');
   const initial = auth.email ? auth.email[0].toUpperCase() : '';
 
   return (
-    <AuthContext.Provider value={{ ...auth, isLoggedIn, isHydrated, initial, login, logout: logoutFn }}>
+    <AuthContext.Provider
+      value={{
+        ...auth,
+        isLoggedIn,
+        isHydrated,
+        isRecruiter,
+        isActiveRecruiter,
+        isPendingRecruiter,
+        initial,
+        login,
+        logout: logoutFn,
+        updateRecruiterStatus,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

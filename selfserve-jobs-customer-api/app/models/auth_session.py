@@ -16,5 +16,8 @@ class AuthSession(Base):
     id: Mapped[int] = mapped_column(BIGINT_COMPAT, primary_key=True, autoincrement=True)
     session_token: Mapped[str] = mapped_column(VARCHAR(64), unique=True, nullable=False, index=True)
     email: Mapped[str] = mapped_column(VARCHAR(320), nullable=False, index=True)
+    # Recruiter-aware session fields (null for non-recruiter sessions)
+    user_type: Mapped[str | None] = mapped_column(VARCHAR(20), nullable=True)
+    recruiter_code: Mapped[str | None] = mapped_column(VARCHAR(12), nullable=True)
     expires_at: Mapped[datetime] = mapped_column(TIMESTAMPTZ, nullable=False)
     created_at: Mapped[datetime] = mapped_column(TIMESTAMPTZ, nullable=False, server_default=func.now())

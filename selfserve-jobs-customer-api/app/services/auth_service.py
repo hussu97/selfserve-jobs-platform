@@ -75,11 +75,17 @@ async def verify_login_token(db: AsyncSession, token_str: str) -> AuthSession:
 
 
 async def create_session(db: AsyncSession, email: str) -> AuthSession:
-    """Create a new auth session for an email."""
+    """Create a new auth session for an email. Detects recruiter status."""
+    from app.services import recruiter_service
+
     now = datetime.now(UTC)
+    recruiter = await recruiter_service.get_by_email(db, email)
+
     session = AuthSession(
         session_token=generate_token(64),
         email=email,
+        user_type="recruiter" if recruiter else None,
+        recruiter_code=recruiter.recruiter_code if recruiter else None,
         expires_at=now + timedelta(days=SESSION_EXPIRY_DAYS),
     )
     db.add(session)

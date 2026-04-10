@@ -65,11 +65,31 @@ async def verify_code(
     # Mark verification as done
     verification.verified_at = now
 
-    if verification.entity_type not in ("job", "profile"):
+    if verification.entity_type not in ("job", "profile", "recruiter"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Unknown entity type",
         )
+
+    if verification.entity_type == "recruiter":
+        # Move recruiter to pending_approval and notify admin
+        from app.services import recruiter_service
+
+        recruiter = await recruiter_service.activate_recruiter(db, verification.entity_code)
+        await db.flush()
+
+        # Auto-create session
+        from app.services.auth_service import create_session
+
+        session = await create_session(db, verification.email)
+
+        return {
+            "entity_type": "recruiter",
+            "entity_code": verification.entity_code,
+            "email": verification.email,
+            "session_token": session.session_token,
+            "recruiter_status": recruiter.status,
+        }
 
     # Activate ALL pending jobs and profiles for this email — one verified email
     # confirms ownership of the address, so all pending listings under it go live.

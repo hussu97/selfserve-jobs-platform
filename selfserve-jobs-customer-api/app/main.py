@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.config import get_settings
-from app.routers import auth, jobs, management, meta, profiles, reports, upload, verification
+from app.routers import admin, auth, jobs, management, meta, profiles, recruiters, reports, upload, verification
 
 logging.basicConfig(
     level=logging.INFO,
@@ -100,6 +100,8 @@ async def cache_control_middleware(request: Request, call_next) -> Response:
 
 # Include all routers
 app.include_router(auth.router)
+app.include_router(recruiters.router)
+app.include_router(admin.router)
 app.include_router(jobs.router)
 app.include_router(profiles.router)
 app.include_router(verification.router)

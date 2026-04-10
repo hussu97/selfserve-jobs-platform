@@ -6,11 +6,11 @@ export async function GET() {
   const stats = await getStats().catch(() => ({ active_jobs: 0, active_profiles: 0 }));
 
   const content = `# hirebridge
-> Free UAE job board — no signup required to post or browse
+> UAE's talent-first tech platform — free for talent, verified access for recruiters
 
 ## What is hirebridge?
 
-hirebridge (hirebridgeuae.com) is a minimalist, no-signup job board connecting tech talent with employers across the United Arab Emirates. Founded in 2024 by Hussain Abbasi and Tejasvie Subrahmanyam, the platform lets users post jobs and talent profiles by verifying only an email address — no passwords, no accounts, no fees.
+hirebridge (hirebridgeuae.com) is a talent-first tech job platform connecting UAE tech talent with verified recruiters. Founded in 2024 by Hussain Abbasi and Tejasvie Subrahmanyam. Talent profiles are friction-free (email verification only, no account needed). Recruiters register with their LinkedIn, undergo admin approval, then get full access to resumes and contact details. No fees for anyone.
 
 ## Current Platform Statistics
 
@@ -22,13 +22,15 @@ hirebridge (hirebridgeuae.com) is a minimalist, no-signup job board connecting t
 
 ## Key Features
 
-- No account creation required — verify email only
+- Talent: No account required — email verification only, listing goes live immediately
+- Recruiters: Free registration, admin-verified access to contact details and resumes
 - No recruiter fees or pay-to-rank algorithms
 - All listings ranked purely by recency
-- Direct employer-to-candidate contact (email or URL)
+- Verified recruiters post jobs directly (immediately active)
 - Listings expire after 60 days (jobs) or 180 days (profiles)
-- Maximum 5 active jobs per email, 2 active profiles per email
+- Maximum 5 active jobs per recruiter email, 2 active profiles per talent email
 - Resume upload support for talent profiles (PDF, up to 5MB)
+- Sensitive data (email, phone, resume) only visible to verified recruiters
 
 ## Supported Employment Types
 

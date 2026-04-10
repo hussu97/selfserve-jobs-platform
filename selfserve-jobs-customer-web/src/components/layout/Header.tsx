@@ -9,8 +9,8 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
 
 const NAV_LINKS = [
+  { href: '/profiles', label: 'Talent' },
   { href: '/jobs', label: 'Jobs' },
-  { href: '/profiles', label: 'Profiles' },
 ];
 
 function CreateListingDropdown() {
@@ -129,7 +129,7 @@ export function Header() {
               ) : (
                 <>
                   <Link
-                    href="/jobs/new"
+                    href="/recruiter/register"
                     className="px-4 py-2 text-xs font-semibold uppercase tracking-widest text-text-muted transition-all hover:text-text-main hover:bg-surface/60 rounded-xl"
                   >
                     Post a Job

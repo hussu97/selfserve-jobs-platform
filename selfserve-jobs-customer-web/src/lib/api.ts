@@ -17,7 +17,9 @@ import type {
   ProfileFilters,
   LoginResponse,
   LoginVerifyResponse,
+  MeResponse,
   EntitiesResponse,
+  RecruiterRegisterRequest,
 } from './types';
 import { buildQueryString } from './utils';
 
@@ -94,9 +96,10 @@ export async function getJob(code: string): Promise<Job> {
   return request<Job>(`/jobs/${code}`);
 }
 
-export async function createJob(data: CreateJobRequest): Promise<{ code: string; message: string }> {
+export async function createJob(data: CreateJobRequest, sessionToken: string): Promise<{ code: string; message: string }> {
   return request<{ code: string; message: string }>('/jobs', {
     method: 'POST',
+    headers: { Authorization: `Bearer ${sessionToken}` },
     body: JSON.stringify(data),
   });
 }
@@ -137,8 +140,10 @@ export async function getProfiles(filters: ProfileFilters = {}): Promise<Paginat
   return request<PaginatedResponse<ProfileListItem>>(`/profiles${buildQueryString(params)}`);
 }
 
-export async function getProfile(code: string): Promise<Profile> {
-  return request<Profile>(`/profiles/${code}`);
+export async function getProfile(code: string, sessionToken?: string): Promise<Profile> {
+  return request<Profile>(`/profiles/${code}`, {
+    headers: sessionToken ? { Authorization: `Bearer ${sessionToken}` } : {},
+  });
 }
 
 export async function createProfile(data: CreateProfileRequest): Promise<{ code: string; message: string }> {
@@ -168,8 +173,10 @@ export async function trackProfileView(code: string): Promise<void> {
 }
 
 // Resume
-export async function getResumeUrl(profileCode: string): Promise<ResumeUrlResponse> {
-  return request<ResumeUrlResponse>(`/profiles/${profileCode}/resume`);
+export async function getResumeUrl(profileCode: string, sessionToken: string): Promise<ResumeUrlResponse> {
+  return request<ResumeUrlResponse>(`/profiles/${profileCode}/resume`, {
+    headers: { Authorization: `Bearer ${sessionToken}` },
+  });
 }
 
 export async function getResumeUploadUrl(): Promise<{ resume_key: string; upload_url: string | null }> {
@@ -241,6 +248,19 @@ export async function submitReport(data: ReportRequest): Promise<{ message: stri
 }
 
 // Auth
+export async function getMe(sessionToken: string): Promise<MeResponse> {
+  return request<MeResponse>('/auth/me', {
+    headers: { Authorization: `Bearer ${sessionToken}` },
+  });
+}
+
+export async function registerRecruiter(data: RecruiterRegisterRequest): Promise<{ code: string; message: string }> {
+  return request<{ code: string; message: string }>('/recruiters/register', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
 export async function loginRequest(email: string): Promise<LoginResponse> {
   return request<LoginResponse>('/auth/login', {
     method: 'POST',

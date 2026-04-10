@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Terms of Service',
-  description: 'The rules for using hirebridge — a self-serve jobs platform for employers and candidates.',
+  description: 'The rules for using hirebridge — a talent-first jobs platform for candidates, employers, and recruiters.',
   alternates: { canonical: '/terms' },
 };
 
@@ -32,30 +32,82 @@ export default function TermsPage() {
             <div>
               <h2 className="font-heading text-2xl text-primary mb-3">Acceptance</h2>
               <p className="text-sm leading-relaxed text-text-muted">
-                By using hirebridge — whether to browse, post a job, or create a candidate profile — you agree to these Terms of Service. If you do not agree, please do not use the platform. We reserve the right to update these terms at any time; continued use constitutes acceptance.
+                By using hirebridge — whether to browse, post a job, create a candidate profile, or register as a recruiter — you agree to these Terms of Service. If you do not agree, please do not use the platform. We reserve the right to update these terms at any time; continued use constitutes acceptance.
               </p>
             </div>
 
             <div>
               <h2 className="font-heading text-2xl text-primary mb-3">What hirebridge is</h2>
               <p className="text-sm leading-relaxed text-text-muted">
-                hirebridge is a self-serve jobs board. We act as a neutral platform that displays listings submitted by users. We do not verify the accuracy of listings, do not act as a recruiter or employment agency, and are not a party to any hiring arrangement between employers and candidates.
+                hirebridge is a talent-first jobs platform operating a dual model: talent professionals create
+                profiles through a simple email-verification flow, and recruiters register for a verified account
+                to post jobs and access sensitive candidate data. We act as a neutral platform that displays
+                listings and facilitates connections. We do not act as an employment agency and are not a party
+                to any hiring arrangement between recruiters and candidates.
               </p>
             </div>
 
             <div>
-              <h2 className="font-heading text-2xl text-primary mb-3">Posting rules</h2>
+              <h2 className="font-heading text-2xl text-primary mb-3">Talent profiles</h2>
               <p className="text-sm leading-relaxed text-text-muted mb-4">
-                All listings must comply with the following:
+                Any professional may create a talent profile by verifying their email address. No account
+                registration is required. By creating a profile you confirm that:
               </p>
               <div className="flex flex-col gap-3">
                 <div className="flex items-start gap-3">
                   <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0"></div>
-                  <p className="text-sm text-text-muted"><span className="font-medium text-text-main">Accuracy</span> — All information must be truthful and not misleading. Fake jobs, fake profiles, and impersonation are prohibited.</p>
+                  <p className="text-sm text-text-muted">All information is accurate and represents you personally — not another individual.</p>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0"></div>
-                  <p className="text-sm text-text-muted"><span className="font-medium text-text-main">No spam</span> — Duplicate listings, mass-posting, or automated submissions are prohibited. Maximum 5 active job listings and 2 active candidate profiles per email address.</p>
+                  <p className="text-sm text-text-muted">Any resume uploaded contains only your own information and you consent to it being accessed by approved recruiters.</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0"></div>
+                  <p className="text-sm text-text-muted">You own the email address used for verification and management.</p>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h2 className="font-heading text-2xl text-primary mb-3">Recruiter registration &amp; job posting</h2>
+              <p className="text-sm leading-relaxed text-text-muted mb-4">
+                Posting jobs and accessing sensitive talent data (email, phone, resume) requires a recruiter
+                account. Registration is free. By registering and using a recruiter account you agree that:
+              </p>
+              <div className="flex flex-col gap-3">
+                <div className="flex items-start gap-3">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0"></div>
+                  <p className="text-sm text-text-muted"><span className="font-medium text-text-main">Accurate identity</span> — You provide truthful information during registration, including your real name, company, and a LinkedIn profile that represents you.</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0"></div>
+                  <p className="text-sm text-text-muted"><span className="font-medium text-text-main">Legitimate hiring intent</span> — Recruiter accounts are for sourcing candidates for genuine open roles only. Using the platform for sales outreach, data harvesting, or non-hiring purposes is prohibited.</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0"></div>
+                  <p className="text-sm text-text-muted"><span className="font-medium text-text-main">Responsible data handling</span> — Talent contact information accessed through hirebridge may only be used to progress a candidate through a genuine hiring process. You must not share, sell, or use it for unsolicited marketing.</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0"></div>
+                  <p className="text-sm text-text-muted"><span className="font-medium text-text-main">Accurate job listings</span> — All job details must be truthful. Fake listings, misleading role descriptions, and advance-fee schemes are prohibited.</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0"></div>
+                  <p className="text-sm text-text-muted"><span className="font-medium text-text-main">Grounds for suspension</span> — Accounts may be suspended or permanently revoked for: misusing talent contact data, submitting false registration information, posting fraudulent listings, or any conduct that harms candidates or undermines the platform&apos;s integrity.</p>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h2 className="font-heading text-2xl text-primary mb-3">General posting rules</h2>
+              <p className="text-sm leading-relaxed text-text-muted mb-4">
+                All listings — job postings and talent profiles — must comply with the following:
+              </p>
+              <div className="flex flex-col gap-3">
+                <div className="flex items-start gap-3">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0"></div>
+                  <p className="text-sm text-text-muted"><span className="font-medium text-text-main">No spam</span> — Duplicate listings, mass-posting, or automated submissions are prohibited. Maximum 5 active job listings per recruiter account and 2 active candidate profiles per email address.</p>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0"></div>
@@ -64,10 +116,6 @@ export default function TermsPage() {
                 <div className="flex items-start gap-3">
                   <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0"></div>
                   <p className="text-sm text-text-muted"><span className="font-medium text-text-main">No harmful content</span> — No offensive, abusive, or otherwise inappropriate content in any listing field.</p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0"></div>
-                  <p className="text-sm text-text-muted"><span className="font-medium text-text-main">Valid contact information</span> — You must provide a working email address you own. Third-party emails are not permitted.</p>
                 </div>
               </div>
             </div>
@@ -86,7 +134,7 @@ export default function TermsPage() {
             <div>
               <h2 className="font-heading text-2xl text-primary mb-3">Resume uploads</h2>
               <p className="text-sm leading-relaxed text-text-muted">
-                By uploading a resume, you confirm that it contains only your own information and that you consent to it being stored and made accessible to employers who view your profile. Resumes are stored securely and are not indexed by search engines. Do not upload documents containing third-party personal data or sensitive information beyond your own professional details.
+                By uploading a resume, you confirm that it contains only your own information and that you consent to it being stored and made accessible to approved recruiters who view your profile. Resumes are stored securely and are not indexed by search engines. Do not upload documents containing third-party personal data or sensitive information beyond your own professional details.
               </p>
             </div>
 
@@ -101,6 +149,7 @@ export default function TermsPage() {
                 <li>Collect personal information from other users&apos; listings for unsolicited outreach or marketing.</li>
                 <li>Attempt to circumvent rate limits, verification, or any security measure.</li>
                 <li>Post listings intended to defraud job seekers (e.g., advance-fee scams, false promises).</li>
+                <li>Access sensitive talent data without a valid, approved recruiter account.</li>
               </ul>
             </div>
 

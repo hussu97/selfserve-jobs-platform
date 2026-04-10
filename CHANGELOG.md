@@ -6,8 +6,49 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+- **Static page messaging updated to reflect talent-first platform with recruiter accounts model** — removed all "no signup", "no middlemen", "no accounts", "no recruiters" copy across About, Privacy, Terms, and FAQ pages:
+  - **`about/page.tsx`** — hero tagline updated to "UAE's talent-first tech platform"; intro paragraph rewritten; "For employers" section replaced with "For recruiters & employers" covering the register → approve → post flow (3-step cards); "No signup" value card replaced with "Verified access" (talent contact details gated to approved recruiters); story section updated to explain dual model
+  - **`privacy/page.tsx`** — "no-signup jobs platform" reference removed from Overview; new "Recruiter registration" data collection block added (name, company, LinkedIn stored for verification); new "Controlled access to sensitive talent data" section explaining recruiter approval gate; "Your rights" section extended with recruiter account closure right; data retention updated to cover recruiter account records
+  - **`terms/page.tsx`** — metadata description updated from "self-serve jobs board" to "talent-first jobs platform"; "What hirebridge is" rewritten to explain dual model; new "Talent profiles" section; old "Posting rules" block replaced with separate "Recruiter registration & job posting" section covering legitimate intent, responsible data handling, and grounds for suspension; "Prohibited use" extended with recruiter-specific prohibition
+  - **`faq/page.tsx`** — "About hirebridge" Q&As updated: "no-signup job board" and "no account needed" Q&As rewritten to reflect dual model; "For Employers" section renamed to "For Recruiters" with new Q&As covering registration, approval timeline (1–2 business days), pricing (free), data accessible, and job management; "For Job Seekers" section renamed to "For Talent" with new Q&A on who can see contact details and clarifying profile creation stays email-verification-only; CTA strip updated to remove "no signup" copy and add "Recruiter Register" button
+
 ### Added
-- **SEO/GEO hyperoptimization — full programmatic SEO overhaul** for hirebridge UAE:
+- **Talent-first platform with recruiter accounts** — major architectural overhaul:
+  - **Recruiter model** (`app/models/recruiter.py`) — new `recruiter` table with `recruiter_code`, `email`, `name`, `linkedin_profile_url`, `status` (`pending_verification` → `pending_approval` → `active`)
+  - **Recruiter registration flow** — `POST /api/v1/recruiters/register`; verification email sent; on verify, transitions to `pending_approval` and notifies admin; manual admin approval via `POST /api/v1/admin/recruiters/{code}/approve`
+  - **Admin API** (`app/routers/admin.py`) — `X-Admin-Secret` protected endpoints to list pending recruiters, approve, reject; sends approval/rejection emails
+  - **Recruiter-aware auth sessions** — `auth_session` now stores `user_type` and `recruiter_code`; `create_session` automatically links recruiter accounts
+  - **Salary range on job listings** — `salary_min`, `salary_max`, `salary_currency` (ISO 4217, 11 currencies) added to `job` model, API, and frontend job form; display in job detail pages
+  - **Recruiter-gated job creation** — `POST /api/v1/jobs` now requires active recruiter session; jobs go directly to `active` (no email verification needed); `email` sourced from session
+  - **Sensitive profile data gating** — `GET /api/v1/profiles/{code}` conditionally includes `email` and `contact_number` only for active recruiters via `Authorization` header; `GET /api/v1/profiles/{code}/resume` requires active recruiter
+  - **`get_optional_session` dependency** — returns `None` instead of 401 for anonymous requests to profile detail
+  - **`require_active_recruiter` dependency** — validates recruiter session and status, raises 403 with helpful message for pending recruiters
+  - **Frontend recruiter pages** — `/recruiter/register` (application form with LinkedIn URL), `/recruiter/pending` (account under review state)
+  - **Auth context recruiter state** — `AuthContext` extended with `userType`, `recruiterCode`, `recruiterStatus`, `isRecruiter`, `isActiveRecruiter`, `isPendingRecruiter`, `updateRecruiterStatus`
+  - **Jobs/new recruiter guard** — shows editorial "Recruiter Access Required" screen for non-recruiters; pending recruiter sees "under review" screen; active recruiter sees form
+  - **ProfileDetail sensitive data hiding** — contact info card shows `●●●@●●●.com` / `●●● ●●● ●●●●` for non-recruiters; resume section shows blurred locked state with CTA; active recruiters see real data
+  - **Salary display in job detail** — formatted salary range (e.g., "AED 15,000 – 25,000 /month") shown below job title when present
+  - **Login callback recruiter routing** — after login verify, pending recruiters route to `/recruiter/pending`, active recruiters route to `/account`
+  - **Verify page recruiter handling** — recruiter email verification shows pending state and routes to `/recruiter/pending`
+  - **Talent-first UI** — homepage, header, footer, mobile nav reordered: Talent sections before Jobs, "Browse Talent" CTA is primary, stats show profiles first
+  - **Email templates** — recruiter verification, approval, rejection, admin notification emails
+  - **llms.txt updated** — reflects talent-first platform model with recruiter registration flow description
+  - **Alembic migration 0004** — creates `recruiter` table; adds `user_type`/`recruiter_code` to `auth_session`; adds `salary_min`/`salary_max`/`salary_currency`/`recruiter_code` to `job`
+
+### Changed
+- **Job form** — removed email section (Section 01); sections renumbered 01–05; added Section 04 Salary Range (currency + min/max fields)
+- **Homepage messaging** — eyebrow updated to "UAE's Talent-First Tech Platform"; headline changed to "Find Extraordinary Talent"; hero CTAs swapped (Talent first, Jobs second); stats show profiles count first; sections reordered (Talent section before Jobs section); CTA strip primary action is "Create a Profile"
+- **Header nav** — "Talent" link now appears before "Jobs"; "Post a Job" CTA now links to `/recruiter/register` for unauthenticated users
+- **Footer** — tagline updated from "No signup required · No middlemen" to "UAE's talent-first tech platform"
+- **Mobile nav** — "Browse Talent" appears before "Browse Jobs"; "Post a Job" links to `/recruiter/register`
+- **Profile detail page** — removed server-side resume URL fetch; `ProfileDetail` now a client component; fetches resume URL client-side with auth token only for active recruiters
+- **`/api/v1/jobs` (POST)** — now requires `Authorization: Bearer <session_token>` with active recruiter; `email` field removed from request body
+
+### Fixed
+- **Backend tests for job creation** — updated `test_jobs.py` to work with auth-required job creation; added recruiter session fixture; new tests for salary validation
+
+### SEO/GEO hyperoptimization — full programmatic SEO overhaul** for hirebridge UAE:
   - **next/font migration** — switched from render-blocking Google Fonts CSS `@import` to `next/font/google` for `Newsreader` and `Manrope`; applied via CSS variables on `<html>` tag; eliminates render-blocking font request, improves LCP
   - **Canonical URLs** — added `metadataBase` to root layout, explicit `alternates.canonical` on all pages (job detail, profile detail, about, contact, privacy, terms, FAQ, blog, all landing pages); prevents duplicate content indexing from paginated/filtered URLs
   - **Expanded metadata** — root layout keywords updated to UAE-specific terms; `googleBot` directives added for max-snippet, max-image-preview; all static page metadata enhanced
