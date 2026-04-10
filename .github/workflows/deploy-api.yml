@@ -53,6 +53,4 @@ jobs:
             --region "${{ secrets.GCP_REGION }}" \
             --platform managed \
             --allow-unauthenticated \
-            --port 8080 \
-            --set-env-vars "ENVIRONMENT=production,FRONTEND_URL=${{ secrets.FRONTEND_URL }},GCS_BUCKET_NAME=${{ secrets.GCS_BUCKET_NAME }},RESEND_FROM_EMAIL=${{ secrets.RESEND_FROM_EMAIL }},ADMIN_NOTIFICATION_EMAIL=${{ secrets.ADMIN_NOTIFICATION_EMAIL }}" \
-            --set-secrets "DATABASE_URL=DATABASE_URL:latest,RESEND_API_KEY=RESEND_API_KEY:latest,ADMIN_API_SECRET=ADMIN_API_SECRET:latest"
+            --port 8080
