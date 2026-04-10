@@ -34,22 +34,33 @@
 All custom events use **kebab-case** with a `{entity}-{action}` pattern:
 
 ```
-job-form-start          ← user begins filling the job form
-job-form-submit         ← user clicks submit
-job-apply-click         ← visitor clicks the apply button on a job
-profile-form-submit     ← user submits a profile
-recruiter-register      ← recruiter submits registration
+job-form-start-direct       ← non-recruiter begins filling the job form
+job-form-start-recruiter    ← recruiter begins filling the job form
+job-form-submit-direct      ← non-recruiter submits a job
+job-form-submit-recruiter   ← recruiter submits a job
+job-apply-click             ← visitor clicks the apply button on a job
+profile-form-submit         ← user submits a profile
+recruiter-register-submit   ← recruiter submits registration
+email-verify-success-job    ← email verification for a job listing
+email-verify-success-profile ← email verification for a profile
+email-verify-success-recruiter ← email verification for a recruiter account
 ```
 
 Event data properties use **snake_case** to match our API conventions:
 
 ```ts
-umami.track('job-form-submit', {
+umami.track('job-form-submit-direct', {
   employment_type: 'full_time',
   has_salary: true,
   skill_count: 5,
 })
 ```
+
+### Why variants are encoded in the event name
+
+> **Umami funnel limitation:** Umami funnel steps match on event name or URL only — they do **not** support filtering by event data properties. This means you cannot create a funnel step like `email-verify-success (filter: entity_type = recruiter)`.
+>
+> To work around this, events that need to be distinguishable in funnels encode their variant in the event name itself (e.g., `email-verify-success-recruiter`). Event data properties are still used for Insights queries where property-level filtering is supported.
 
 ---
 
@@ -92,17 +103,21 @@ These are the minimum events needed to build meaningful funnels.
 
 | Event Name | Trigger Location | Event Data | Purpose |
 |---|---|---|---|
-| `job-form-start` | `JobForm.tsx` — on first field focus | `{ source: 'recruiter' \| 'direct' }` | Top of job-posting funnel |
-| `job-form-submit` | `JobForm.tsx` — on successful API response | `{ employment_type, has_salary, skill_count, source }` | Job creation conversion |
+| `job-form-start-direct` | `JobForm.tsx` — on first field focus (non-recruiter) | — | Top of direct job-posting funnel |
+| `job-form-start-recruiter` | `JobForm.tsx` — on first field focus (recruiter) | — | Top of recruiter job-posting funnel |
+| `job-form-submit-direct` | `JobForm.tsx` — on successful API response (non-recruiter) | `{ employment_type, has_salary, skill_count }` | Direct job creation conversion |
+| `job-form-submit-recruiter` | `JobForm.tsx` — on successful API response (recruiter) | `{ employment_type, has_salary, skill_count }` | Recruiter job creation conversion |
 | `job-form-error` | `JobForm.tsx` — on validation failure | `{ field: string }` | Identify friction in form |
 | `profile-form-start` | `ProfileForm.tsx` — on first field focus | — | Top of talent funnel |
 | `profile-form-submit` | `ProfileForm.tsx` — on successful API response | `{ has_resume, skill_count, experience_years }` | Profile creation conversion |
 | `profile-form-error` | `ProfileForm.tsx` — on validation failure | `{ field: string }` | Identify friction in form |
 | `recruiter-register-start` | `recruiter/register/page.tsx` — on first field focus | — | Top of recruiter funnel |
 | `recruiter-register-submit` | `recruiter/register/page.tsx` — on successful API response | — | Recruiter registration conversion |
-| `email-verify-success` | `verify/page.tsx` — on successful verification | `{ entity_type: 'job' \| 'profile' \| 'recruiter' }` | Verification conversion |
+| `email-verify-success-job` | `verify/page.tsx` — on successful job verification | — | Job verification conversion |
+| `email-verify-success-profile` | `verify/page.tsx` — on successful profile verification | — | Profile verification conversion |
+| `email-verify-success-recruiter` | `verify/page.tsx` — on successful recruiter verification | — | Recruiter verification conversion |
 | `email-verify-fail` | `verify/page.tsx` — on error | `{ reason: string }` | Identify expired/invalid links |
-| `job-apply-click` | `JobDetail.tsx` — on apply button click | `{ method: 'email' \| 'url' }` | Key engagement signal — did browsing lead to action? |
+| `job-apply-click` | `ApplyButton.tsx` — on apply button click | `{ method: 'email' \| 'url' }` | Key engagement signal — did browsing lead to action? |
 | `resume-download` | `ProfileDetail.tsx` — on resume button click | — | Recruiter engagement signal |
 
 ### P1 — Engagement & Discovery Events
@@ -144,7 +159,7 @@ Measures: How many visitors who land on the profile form actually create and ver
 | 1 | URL | `/profiles/new` |
 | 2 | Event | `profile-form-start` |
 | 3 | Event | `profile-form-submit` |
-| 4 | Event | `email-verify-success` (filter: `entity_type = profile`) |
+| 4 | Event | `email-verify-success-profile` |
 
 **Key questions this answers:**
 - What % of visitors to `/profiles/new` actually start filling the form?
@@ -160,9 +175,9 @@ Measures: Full recruiter journey from registration to first job post.
 | 1 | URL | `/recruiter/register` |
 | 2 | Event | `recruiter-register-start` |
 | 3 | Event | `recruiter-register-submit` |
-| 4 | Event | `email-verify-success` (filter: `entity_type = recruiter`) |
+| 4 | Event | `email-verify-success-recruiter` |
 | 5 | Event | `recruiter-approved` |
-| 6 | Event | `job-form-submit` (filter: `source = recruiter`) |
+| 6 | Event | `job-form-submit-recruiter` |
 
 **Key questions this answers:**
 - Where is the biggest recruiter drop-off? (registration vs. verification vs. approval wait vs. first post)
@@ -185,9 +200,9 @@ Measures: Visitor → job poster conversion for users posting without a recruite
 | Step | Type | Value |
 |------|------|-------|
 | 1 | URL | `/jobs/new` |
-| 2 | Event | `job-form-start` (filter: `source = direct`) |
-| 3 | Event | `job-form-submit` (filter: `source = direct`) |
-| 4 | Event | `email-verify-success` (filter: `entity_type = job`) |
+| 2 | Event | `job-form-start-direct` |
+| 3 | Event | `job-form-submit-direct` |
+| 4 | Event | `email-verify-success-job` |
 
 ### Funnel 5: Recruiter Profile Discovery → Resume Download
 
@@ -209,10 +224,13 @@ Goals track cumulative event counts against a target. Configure under **Reports 
 
 | Goal Name | Event | Target (monthly) | Notes |
 |---|---|---|---|
-| Job Listings Created | `job-form-submit` | 50 | Track month-over-month growth |
+| Job Listings Created (Direct) | `job-form-submit-direct` | 40 | Non-recruiter job creation |
+| Job Listings Created (Recruiter) | `job-form-submit-recruiter` | 10 | Recruiter job creation |
 | Profiles Created | `profile-form-submit` | 100 | Talent-side health metric |
 | Recruiters Registered | `recruiter-register-submit` | 20 | Supply-side growth |
-| Email Verifications | `email-verify-success` | 150 | Measures verification friction — compare to total submissions |
+| Email Verifications (Jobs) | `email-verify-success-job` | 100 | Job verification completion |
+| Email Verifications (Profiles) | `email-verify-success-profile` | 50 | Profile verification completion |
+| Email Verifications (Recruiters) | `email-verify-success-recruiter` | 20 | Recruiter verification completion |
 | Job Applications | `job-apply-click` | 200 | Core marketplace metric — are jobs getting applications? |
 | Resume Downloads | `resume-download` | 50 | Are recruiters engaging with profiles? |
 
@@ -242,7 +260,7 @@ In the Umami Cloud dashboard, pin these widgets for at-a-glance monitoring:
 
 Use **Reports → Insights** to run ad-hoc queries:
 
-- "Show me all `job-form-submit` events grouped by `employment_type`" — which job types are most posted?
+- "Show me all `job-form-submit-direct` + `job-form-submit-recruiter` events grouped by `employment_type`" — which job types are most posted?
 - "Show me all `job-apply-click` events grouped by `method`" — do people prefer email or URL applications?
 - "Show me all `profile-form-submit` events grouped by `experience_years`" — what experience level is our talent pool?
 - "Show me `job-form-error` events grouped by `field`" — which form fields cause the most friction?
@@ -298,7 +316,7 @@ Use **Reports → Journey** to visualize how users navigate:
 
 | Question | How to answer |
 |---|---|
-| Are we getting more job postings over time? | Goal: `Job Listings Created` trend |
+| Are we getting more job postings over time? | Goals: `Job Listings Created (Direct)` + `Job Listings Created (Recruiter)` trend |
 | Where do talent users drop off? | Funnel 1: Talent Profile Creation |
 | Why do recruiters abandon registration? | Funnel 2: Recruiter Onboarding + `recruiter-register-start` vs `submit` delta |
 | Are job listings actually useful? | `job-apply-click` count vs. job detail page views = effective apply rate |

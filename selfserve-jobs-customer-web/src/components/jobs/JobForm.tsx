@@ -47,10 +47,12 @@ export function JobForm({ onSuccess }: JobFormProps) {
   const [successData, setSuccessData] = useState<{ code: string; message: string } | null>(null);
   const hasTrackedStart = useRef(false);
 
+  const source = isActiveRecruiter ? 'recruiter' : 'direct';
+
   const handleFormStart = () => {
     if (!hasTrackedStart.current) {
       hasTrackedStart.current = true;
-      trackEvent('job-form-start', { source: isActiveRecruiter ? 'recruiter' : 'direct' });
+      trackEvent(`job-form-start-${source}`);
     }
   };
 
@@ -107,11 +109,10 @@ export function JobForm({ onSuccess }: JobFormProps) {
         honeypot: form.honeypot,
       };
       const result = await createJob(payload, sessionToken!);
-      trackEvent('job-form-submit', {
+      trackEvent(`job-form-submit-${source}`, {
         employment_type: form.employment_type ?? 'full_time',
         has_salary: !!(form.salary_min || form.salary_max),
         skill_count: form.key_skills?.length ?? 0,
-        source: isActiveRecruiter ? 'recruiter' : 'direct',
       });
       setSuccessData({ code: result.code, message: result.message });
       onSuccess?.(result.code);

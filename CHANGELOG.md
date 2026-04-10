@@ -11,16 +11,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 
 ### Added
-- **P0 analytics events** — implemented all 12 core conversion events from `ANALYTICS.md` using Umami custom event tracking:
+- **P0 analytics events** — implemented all core conversion events from `ANALYTICS.md` using Umami custom event tracking:
   - `src/lib/analytics.ts` — thin `trackEvent()` wrapper (no-ops gracefully if Umami is blocked)
   - `src/types/umami.d.ts` — `Window.umami` type declaration
-  - `JobForm.tsx` — `job-form-start` (first focus, with `source`), `job-form-submit` (with `employment_type`, `has_salary`, `skill_count`, `source`), `job-form-error` (with `field`)
+  - `JobForm.tsx` — `job-form-start-{direct|recruiter}` (first focus), `job-form-submit-{direct|recruiter}` (with `employment_type`, `has_salary`, `skill_count`), `job-form-error` (with `field`)
   - `ProfileForm.tsx` — `profile-form-start`, `profile-form-submit` (with `has_resume`, `skill_count`, `experience_years`), `profile-form-error` (with `field`)
   - `recruiter/register/page.tsx` — `recruiter-register-start`, `recruiter-register-submit`
-  - `verify/page.tsx` — `email-verify-success` (with `entity_type`), `email-verify-fail` (with `reason`)
+  - `verify/page.tsx` — `email-verify-success-{job|profile|recruiter}` (distinct names per entity type), `email-verify-fail` (with `reason`)
   - `ApplyButton.tsx` (new client component) — `job-apply-click` (with `method`); extracted from `JobDetail.tsx` to keep it a server component
   - `ProfileDetail.tsx` — `resume-download` on the download link
 - **`ANALYTICS.md`** — comprehensive Umami analytics implementation plan covering custom event catalog (P0/P1/P2 priority tiers), 5 user funnels (talent, recruiter onboarding, job discovery, direct posting, profile discovery), conversion and engagement goals, event naming conventions, tracking utility design, privacy considerations, and Umami Cloud Hobby tier budget planning
+
+### Changed
+- **Funnel event naming** — split `job-form-start`, `job-form-submit`, and `email-verify-success` into per-variant event names (e.g. `job-form-submit-direct`, `email-verify-success-recruiter`) because Umami funnel steps match on event name only and do not support filtering by event data properties; updated `JobForm.tsx`, `verify/page.tsx`, and `ANALYTICS.md` accordingly
 
 ### Fixed
 - **Recruiter pending page** — page now polls `GET /auth/me` every 15 s and redirects to `/account` automatically when admin approves the account; fixes recruiter being stuck on "under review" indefinitely after approval

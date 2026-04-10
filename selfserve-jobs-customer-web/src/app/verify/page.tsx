@@ -64,7 +64,7 @@ function VerifyContent() {
         if (res.session_token && res.email) {
           login(res.session_token, res.email, res.entity_type === 'recruiter' ? 'recruiter' : undefined, undefined, res.recruiter_status);
         }
-        trackEvent('email-verify-success', { entity_type: res.entity_type ?? 'unknown' });
+        trackEvent(`email-verify-success-${res.entity_type ?? 'unknown'}`);
         setState('success');
       })
       .catch((err) => {
