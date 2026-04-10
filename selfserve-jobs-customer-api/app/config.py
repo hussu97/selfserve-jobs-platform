@@ -10,7 +10,6 @@ class Settings(BaseSettings):
     resend_api_key: str = ""
     resend_from_email: str = ""
     environment: str = "development"
-    admin_api_secret: str = ""
     admin_notification_email: str = ""
     admin_emails: str = ""
 

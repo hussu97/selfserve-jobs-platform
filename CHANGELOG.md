@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+- **`.env.example`** — added `RESEND_FROM_EMAIL`, `ADMIN_NOTIFICATION_EMAIL`, `ADMIN_EMAILS`; removed stale `ADMIN_API_SECRET` entry
+- **`app/config.py`** — removed `admin_api_secret` field (no longer used; admin auth is session-based Bearer token only)
+- **`app/email_templates/recruiter_status.py`** — replaced old `X-Admin-Secret` curl commands in admin notification email with a link to the admin portal dashboard
+
 ### Added
 - **Admin portal** — full session-based admin portal at `/admin` (hidden from site nav/header)
   - `POST /api/v1/admin/login` — sends magic link to whitelisted admin emails (pointing to `/admin/verify`); returns dev-mode URL when `ENVIRONMENT != production`

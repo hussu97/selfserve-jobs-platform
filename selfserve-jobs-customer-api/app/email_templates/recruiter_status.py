@@ -152,15 +152,10 @@ def build_admin_notification(
         </tr>
       </table>
       <p style="margin:0 0 8px 0;font-family:'Helvetica Neue',Arial,sans-serif;
-                font-size:13px;color:#434843;">Admin API commands:</p>
-      <pre style="background:#f6f3ef;border-radius:8px;padding:12px;font-size:12px;
-                  color:#1c1c1a;overflow-x:auto;margin:0;">
-curl -X POST {frontend_url.replace("localhost:3000", "localhost:8080")}/api/v1/admin/\
-recruiters/{recruiter_code}/approve -H "X-Admin-Secret: YOUR_ADMIN_SECRET"
-
-curl -X POST {frontend_url.replace("localhost:3000", "localhost:8080")}/api/v1/admin/\
-recruiters/{recruiter_code}/reject -H "X-Admin-Secret: YOUR_ADMIN_SECRET"
-      </pre>
+                font-size:13px;color:#434843;">
+        Review this recruiter in the
+        <a href="{frontend_url}/admin/dashboard" style="color:#384B3B;">admin portal</a>.
+      </p>
     """
 
     html_body = shell(
@@ -176,11 +171,7 @@ Email: {recruiter_email}
 LinkedIn: {recruiter_linkedin}
 Code: {recruiter_code}
 
-To approve:
-curl -X POST /api/v1/admin/recruiters/{recruiter_code}/approve -H "X-Admin-Secret: YOUR_ADMIN_SECRET"
-
-To reject:
-curl -X POST /api/v1/admin/recruiters/{recruiter_code}/reject -H "X-Admin-Secret: YOUR_ADMIN_SECRET"
+Review in the admin portal: {frontend_url}/admin/dashboard
 """
 
     return subject, html_body, text_body
