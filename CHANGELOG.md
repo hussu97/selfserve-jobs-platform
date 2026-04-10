@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+- **`ANALYTICS.md`** — comprehensive Umami analytics implementation plan covering custom event catalog (P0/P1/P2 priority tiers), 5 user funnels (talent, recruiter onboarding, job discovery, direct posting, profile discovery), conversion and engagement goals, event naming conventions, tracking utility design, privacy considerations, and Umami Cloud Hobby tier budget planning
+
 ### Fixed
 - **Recruiter pending page** — page now polls `GET /auth/me` every 15 s and redirects to `/account` automatically when admin approves the account; fixes recruiter being stuck on "under review" indefinitely after approval
 - **Email verification deduplication** — profile and recruiter registration flows now check if the email was already verified (via `is_email_verified` in `verification_service`) and skip sending another verification email; emails verified in any prior flow (job, profile, recruiter) are not re-challenged
