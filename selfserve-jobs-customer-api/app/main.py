@@ -1,7 +1,7 @@
 import logging
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
@@ -70,6 +70,33 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["X-Edit-Token"],
 )
+
+# Cache-Control middleware — improves CDN + browser caching for SEO crawlability
+_CACHE_RULES = [
+    ("/api/v1/countries", "public, s-maxage=86400, stale-while-revalidate=604800"),
+    ("/api/v1/skills", "public, s-maxage=86400, stale-while-revalidate=604800"),
+    ("/api/v1/stats", "public, s-maxage=60, stale-while-revalidate=120"),
+    ("/api/v1/jobs/", "public, s-maxage=300, stale-while-revalidate=600"),
+    ("/api/v1/jobs", "public, s-maxage=120, stale-while-revalidate=300"),
+    ("/api/v1/profiles/", "public, s-maxage=300, stale-while-revalidate=600"),
+    ("/api/v1/profiles", "public, s-maxage=120, stale-while-revalidate=300"),
+]
+
+_NO_CACHE_METHODS = {"POST", "PUT", "DELETE", "PATCH"}
+
+
+@app.middleware("http")
+async def cache_control_middleware(request: Request, call_next) -> Response:
+    response = await call_next(request)
+    if request.method in _NO_CACHE_METHODS:
+        return response
+    path = request.url.path
+    for prefix, header in _CACHE_RULES:
+        if path.startswith(prefix):
+            response.headers["Cache-Control"] = header
+            break
+    return response
+
 
 # Include all routers
 app.include_router(auth.router)

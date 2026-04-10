@@ -6,6 +6,37 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+- **SEO/GEO hyperoptimization — full programmatic SEO overhaul** for hirebridge UAE:
+  - **next/font migration** — switched from render-blocking Google Fonts CSS `@import` to `next/font/google` for `Newsreader` and `Manrope`; applied via CSS variables on `<html>` tag; eliminates render-blocking font request, improves LCP
+  - **Canonical URLs** — added `metadataBase` to root layout, explicit `alternates.canonical` on all pages (job detail, profile detail, about, contact, privacy, terms, FAQ, blog, all landing pages); prevents duplicate content indexing from paginated/filtered URLs
+  - **Expanded metadata** — root layout keywords updated to UAE-specific terms; `googleBot` directives added for max-snippet, max-image-preview; all static page metadata enhanced
+  - **Organization + WebSite JSON-LD** — global `Organization` schema (name, logo, founders, areaServed: UAE) and `WebSite` schema with `SearchAction` (sitelinks search box) injected on every page via root layout
+  - **Person/ProfilePage JSON-LD** — `ProfilePage` + `Person` structured data added to all talent profile detail pages
+  - **BreadcrumbList JSON-LD** — `Breadcrumbs` component renders visible breadcrumb nav + `BreadcrumbList` schema; deployed on job detail, profile detail, all landing pages, FAQ, about, blog
+  - **JsonLd server component** — reusable `src/components/seo/JsonLd.tsx` for injecting any Schema.org structured data
+  - **Schema generation library** — `src/lib/schema.ts` with typed generators for Organization, WebSite, JobPosting, Person/ProfilePage, BreadcrumbList, CollectionPage, Article, FAQ schemas
+  - **robots.txt AI crawler rules** — explicit `allow` rules added for GPTBot, ClaudeBot, PerplexityBot, Google-Extended, Applebot-Extended, Bytespider; private paths (`/login/`, `/account/`, `/login/callback/`) added to disallow list; `host` directive added
+  - **Image optimization** — removed `unoptimized` prop from logo `<Image>` components in Header and Footer; enables Next.js WebP/AVIF conversion
+  - **Contextual internal links** — job detail pages now link to emirate landing pages and skill landing pages; profile detail pages link to emirate and skill talent pages
+  - **Footer SEO link grid** — footer restructured with UAE Jobs by Emirate, Job Types, Popular Skills, and Resources link sections for internal SEO equity distribution
+  - **`city` filter in JobFilters** — added `city?: string` to `JobFilters` type and `getJobs()` API client; connects frontend to backend's existing city filter capability
+  - **ISR fetch revalidation** — `getStats()` revalidates every 60s, `getJobs()` every 120s for incremental static regeneration
+  - **API Cache-Control middleware** — FastAPI middleware sets `Cache-Control` headers on all GET routes (static data: 24h, listings: 2min SWR, detail: 5min SWR, stats: 60s); improves CDN caching and crawlability
+  - **SEO constants** (`src/lib/seo-constants.ts`) — typed data for all 7 UAE emirates (slug, city name, Arabic name), 7 employment types, top 25 skills with slugs and categories; helper functions for slug lookups
+  - **SEO content library** (`src/lib/seo-content.ts`) — 200+ word editorial copy for each UAE emirate (intro, work culture, key industries, highlights, FAQs), each employment type (intro, benefits, considerations, FAQs), and top skills (intro, demand drivers, salary ranges, FAQs); all content authored for SEO and AI citation
+  - **Programmatic landing pages** (all server components with `generateStaticParams`):
+    - `/jobs/in/[emirate]` — 7 pages, one per UAE emirate, with editorial content, live job listings, FAQ accordion, sidebar with skill links and emirate cross-links
+    - `/jobs/type/[type]` — 7 pages, one per employment type, with editorial content, benefits/considerations, live listings, sidebar with emirate and type cross-links
+    - `/jobs/in/[emirate]/[skill]` — 70 pre-built combination pages (7 emirates × 10 top skills); shows combined listings, related jobs if empty, skill + emirate cross-links
+    - `/profiles/in/[emirate]` — 7 emirate talent pages with live profile listings
+    - `/profiles/skill/[skill]` — 25 skill talent pages with live listings, demand context, salary info
+  - **Sitemap expansion** — sitemap now includes ~160 new static URLs: 7 emirate job pages, 7 employment type pages, 70 emirate+skill pages, 7 emirate profile pages, 25 skill profile pages, FAQ, blog, all blog posts; dynamic job/profile detail URLs unchanged
+  - **llms.txt** — dynamic route at `/llms.txt` (Next.js route handler) returns machine-readable site description with real-time job/profile stats for AI engine consumption; revalidates hourly
+  - **FAQ page** (`/faq`) — comprehensive 25+ Q&A FAQ page covering UAE jobs, visa sponsorship, salary expectations, work culture, and hirebridge platform; `FAQPage` JSON-LD schema on all items; section nav, accordion UI, internal links to landing pages
+  - **Blog** (`/blog`, `/blog/[slug]`) — blog index and 7 full-length articles (1,000–2,000 words each) authored directly in TypeScript (`src/lib/blog-content.ts`); no CMS required; covers: finding Dubai tech jobs, UAE work visa guide, free zone vs mainland, tech salaries, remote work, top skills, emirate guide; each post has `Article` JSON-LD, `BreadcrumbList`, author attribution, `datePublished`
+  - **About page canonical** — canonical URL added to about page metadata
+
 ### Fixed
 - **`tsc --noEmit` added to pre-commit hook** — TypeScript type errors were not caught before commit because the pre-commit hook ran only ESLint (style/lint) and not the TypeScript compiler; `npx tsc --noEmit` now runs alongside ESLint whenever `.ts`/`.tsx` files are staged
 - **`EntityType` corrected to singular values** — `EntityType` was `'jobs' | 'profiles'` but the API uses `'job' | 'profile'`; corrected the type alias, fixed stale `=== 'jobs'` comparison in `report/page.tsx`, and the three `TS2820`/`TS2367` typecheck errors now resolve cleanly

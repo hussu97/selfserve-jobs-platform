@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Privacy Policy',
   description: 'How hirebridge collects, uses, and protects your personal data.',
+  alternates: { canonical: '/privacy' },
 };
 
 const LAST_UPDATED = 'April 2025';

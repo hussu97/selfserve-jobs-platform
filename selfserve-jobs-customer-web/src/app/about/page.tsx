@@ -2,9 +2,10 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'About',
+  title: 'About hirebridge — Free UAE Job Board, No Signup Required',
   description:
-    'hirebridge is a no-signup jobs board connecting talent with opportunity in the UAE and Middle East. Learn how it works.',
+    'hirebridge is a free, no-signup job board connecting tech talent with companies across the UAE and Middle East. Learn how it works, who built it, and why it\'s free.',
+  alternates: { canonical: '/about' },
 };
 
 const JOB_SEEKER_STEPS = [

@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Terms of Service',
   description: 'The rules for using hirebridge — a self-serve jobs platform for employers and candidates.',
+  alternates: { canonical: '/terms' },
 };
 
 const LAST_UPDATED = 'April 2025';

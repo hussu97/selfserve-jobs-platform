@@ -36,15 +36,17 @@ class ApiError extends Error {
 
 async function request<T>(
   path: string,
-  options: RequestInit = {}
+  options: RequestInit & { next?: { revalidate?: number | false; tags?: string[] } } = {}
 ): Promise<T> {
+  const { next, ...fetchOptions } = options;
   const url = `${API_URL}/api/v1${path}`;
   const response = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
-      ...options.headers,
+      ...fetchOptions.headers,
     },
-    ...options,
+    ...(next ? { next } : {}),
+    ...fetchOptions,
   });
 
   if (!response.ok) {
@@ -67,7 +69,7 @@ async function request<T>(
 
 // Stats
 export async function getStats(): Promise<StatsResponse> {
-  return request<StatsResponse>('/stats');
+  return request<StatsResponse>('/stats', { next: { revalidate: 60 } });
 }
 
 // Jobs
@@ -78,11 +80,14 @@ export async function getJobs(filters: JobFilters = {}): Promise<PaginatedRespon
   };
   if (filters.search) params.search = filters.search;
   if (filters.country) params.country = filters.country;
+  if (filters.city) params.city = filters.city;
   if (filters.employment_type?.length) params.employment_type = filters.employment_type;
   if (filters.skills?.length) params.skills = filters.skills;
   if (filters.sort) params.sort = filters.sort;
 
-  return request<PaginatedResponse<JobListItem>>(`/jobs${buildQueryString(params)}`);
+  return request<PaginatedResponse<JobListItem>>(`/jobs${buildQueryString(params)}`, {
+    next: { revalidate: 120 },
+  });
 }
 
 export async function getJob(code: string): Promise<Job> {

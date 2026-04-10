@@ -223,6 +223,7 @@ export interface ReportRequest {
 export interface JobFilters {
   search?: string;
   country?: string;
+  city?: string;
   employment_type?: EmploymentType[];
   skills?: string[];
   sort?: 'newest' | 'oldest' | 'deadline';
