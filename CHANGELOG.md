@@ -11,6 +11,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 
 ### Added
+- **P0 analytics events** — implemented all 12 core conversion events from `ANALYTICS.md` using Umami custom event tracking:
+  - `src/lib/analytics.ts` — thin `trackEvent()` wrapper (no-ops gracefully if Umami is blocked)
+  - `src/types/umami.d.ts` — `Window.umami` type declaration
+  - `JobForm.tsx` — `job-form-start` (first focus, with `source`), `job-form-submit` (with `employment_type`, `has_salary`, `skill_count`, `source`), `job-form-error` (with `field`)
+  - `ProfileForm.tsx` — `profile-form-start`, `profile-form-submit` (with `has_resume`, `skill_count`, `experience_years`), `profile-form-error` (with `field`)
+  - `recruiter/register/page.tsx` — `recruiter-register-start`, `recruiter-register-submit`
+  - `verify/page.tsx` — `email-verify-success` (with `entity_type`), `email-verify-fail` (with `reason`)
+  - `ApplyButton.tsx` (new client component) — `job-apply-click` (with `method`); extracted from `JobDetail.tsx` to keep it a server component
+  - `ProfileDetail.tsx` — `resume-download` on the download link
 - **`ANALYTICS.md`** — comprehensive Umami analytics implementation plan covering custom event catalog (P0/P1/P2 priority tiers), 5 user funnels (talent, recruiter onboarding, job discovery, direct posting, profile discovery), conversion and engagement goals, event naming conventions, tracking utility design, privacy considerations, and Umami Cloud Hobby tier budget planning
 
 ### Fixed

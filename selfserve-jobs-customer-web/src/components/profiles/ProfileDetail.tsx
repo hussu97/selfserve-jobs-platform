@@ -16,6 +16,7 @@ import {
 } from '@/lib/utils';
 import { getResumeUrl } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
+import { trackEvent } from '@/lib/analytics';
 import type { Profile } from '@/lib/types';
 
 interface ProfileDetailProps {
@@ -114,6 +115,7 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
                     <a
                       href={resumeUrl}
                       download
+                      onClick={() => trackEvent('resume-download')}
                       className="p-1.5 rounded-lg text-text-muted hover:text-primary hover:bg-surface transition-colors"
                       title="Download resume"
                     >

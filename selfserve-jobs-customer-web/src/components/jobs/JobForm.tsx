@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Input } from '@/components/ui/Input';
 import { MarkdownEditor } from '@/components/ui/MarkdownEditor';
 import { Select } from '@/components/ui/Select';
@@ -12,6 +12,7 @@ import { EMPLOYMENT_TYPES } from '@/lib/constants';
 import { createJob } from '@/lib/api';
 import { validateJobForm } from '@/lib/validation';
 import { useAuth } from '@/context/AuthContext';
+import { trackEvent } from '@/lib/analytics';
 import type { CreateJobRequest, SalaryCurrency } from '@/lib/types';
 
 interface JobFormProps {
@@ -35,7 +36,7 @@ const SALARY_CURRENCIES: { value: SalaryCurrency; label: string }[] = [
 ];
 
 export function JobForm({ onSuccess }: JobFormProps) {
-  const { sessionToken } = useAuth();
+  const { sessionToken, isActiveRecruiter } = useAuth();
   const [form, setForm] = useState<Partial<CreateJobRequest>>({
     contact_method: 'email',
     employment_type: 'full_time',
@@ -44,6 +45,14 @@ export function JobForm({ onSuccess }: JobFormProps) {
   const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
   const [successData, setSuccessData] = useState<{ code: string; message: string } | null>(null);
+  const hasTrackedStart = useRef(false);
+
+  const handleFormStart = () => {
+    if (!hasTrackedStart.current) {
+      hasTrackedStart.current = true;
+      trackEvent('job-form-start', { source: isActiveRecruiter ? 'recruiter' : 'direct' });
+    }
+  };
 
   const set = <K extends keyof CreateJobRequest>(key: K, value: CreateJobRequest[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -67,6 +76,10 @@ export function JobForm({ onSuccess }: JobFormProps) {
   const validate = (): boolean => {
     const errs = validateJobForm(form);
     setErrors(errs);
+    if (Object.keys(errs).length > 0) {
+      const firstField = Object.keys(errs)[0];
+      trackEvent('job-form-error', { field: firstField });
+    }
     return Object.keys(errs).length === 0;
   };
 
@@ -94,6 +107,12 @@ export function JobForm({ onSuccess }: JobFormProps) {
         honeypot: form.honeypot,
       };
       const result = await createJob(payload, sessionToken!);
+      trackEvent('job-form-submit', {
+        employment_type: form.employment_type ?? 'full_time',
+        has_salary: !!(form.salary_min || form.salary_max),
+        skill_count: form.key_skills?.length ?? 0,
+        source: isActiveRecruiter ? 'recruiter' : 'direct',
+      });
       setSuccessData({ code: result.code, message: result.message });
       onSuccess?.(result.code);
     } catch (err) {
@@ -121,7 +140,7 @@ export function JobForm({ onSuccess }: JobFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-8 max-w-2xl">
+    <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-8 max-w-2xl" onFocus={handleFormStart}>
       {/* Honeypot */}
       <input type="text" name="website" className="hidden" tabIndex={-1} aria-hidden="true" onChange={(e) => set('honeypot', e.target.value)} />
 

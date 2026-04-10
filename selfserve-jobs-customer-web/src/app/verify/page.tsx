@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/Input';
 import { StatusBanner } from '@/components/shared/StatusBanner';
 import { verifyEmail, resendVerification } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
+import { trackEvent } from '@/lib/analytics';
 import type { VerificationResponse } from '@/lib/types';
 
 type VerifyState = 'idle' | 'loading' | 'success' | 'error' | 'no_code';
@@ -63,11 +64,13 @@ function VerifyContent() {
         if (res.session_token && res.email) {
           login(res.session_token, res.email, res.entity_type === 'recruiter' ? 'recruiter' : undefined, undefined, res.recruiter_status);
         }
+        trackEvent('email-verify-success', { entity_type: res.entity_type ?? 'unknown' });
         setState('success');
       })
       .catch((err) => {
         const msg = err instanceof Error ? err.message : 'Verification failed.';
         setErrorMessage(msg);
+        trackEvent('email-verify-fail', { reason: msg });
         setState('error');
       });
   }, [code, login]);

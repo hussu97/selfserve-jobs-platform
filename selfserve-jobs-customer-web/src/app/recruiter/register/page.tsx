@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Link from 'next/link';
 import { registerRecruiter } from '@/lib/api';
 import { ApiError } from '@/lib/api';
+import { trackEvent } from '@/lib/analytics';
 
 interface FormData {
   name: string;
@@ -25,6 +26,14 @@ export default function RecruiterRegisterPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [serverError, setServerError] = useState('');
+  const hasTrackedStart = useRef(false);
+
+  const handleFormStart = () => {
+    if (!hasTrackedStart.current) {
+      hasTrackedStart.current = true;
+      trackEvent('recruiter-register-start');
+    }
+  };
 
   function validate(): boolean {
     const next: Partial<FormData> = {};
@@ -49,6 +58,7 @@ export default function RecruiterRegisterPage() {
         linkedin_profile_url: form.linkedin_profile_url.trim(),
         website: form.website,
       });
+      trackEvent('recruiter-register-submit');
       setSubmitted(true);
     } catch (err) {
       if (err instanceof ApiError) {
@@ -119,7 +129,7 @@ export default function RecruiterRegisterPage() {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-0" noValidate>
+        <form onSubmit={handleSubmit} className="space-y-0" noValidate onFocus={handleFormStart}>
           {serverError && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
               {serverError}

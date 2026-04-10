@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Input } from '@/components/ui/Input';
 import { MarkdownEditor } from '@/components/ui/MarkdownEditor';
 import { Select } from '@/components/ui/Select';
@@ -11,6 +11,7 @@ import { PhoneInput } from '@/components/ui/PhoneInput';
 import { StatusBanner } from '@/components/shared/StatusBanner';
 import { NOTICE_PERIODS, RELOCATION_PREFERENCES } from '@/lib/constants';
 import { createProfile, getResumeUploadUrl, uploadResumeDirect } from '@/lib/api';
+import { trackEvent } from '@/lib/analytics';
 import type { CreateProfileRequest } from '@/lib/types';
 
 interface ProfileFormProps {
@@ -30,6 +31,14 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
   const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
   const [successData, setSuccessData] = useState<{ code: string; message: string } | null>(null);
+  const hasTrackedStart = useRef(false);
+
+  const handleFormStart = () => {
+    if (!hasTrackedStart.current) {
+      hasTrackedStart.current = true;
+      trackEvent('profile-form-start');
+    }
+  };
 
   const set = <K extends keyof CreateProfileRequest>(key: K, value: CreateProfileRequest[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -70,6 +79,10 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
       errs.resume = 'File must be under 5 MB';
     }
     setErrors(errs);
+    if (Object.keys(errs).length > 0) {
+      const firstField = Object.keys(errs)[0];
+      trackEvent('profile-form-error', { field: firstField });
+    }
     return Object.keys(errs).length === 0;
   };
 
@@ -93,6 +106,11 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
       };
 
       const result = await createProfile(payload);
+      trackEvent('profile-form-submit', {
+        has_resume: !!resumeFile,
+        skill_count: form.key_skills?.length ?? 0,
+        experience_years: form.years_of_experience ?? 0,
+      });
       setSuccessData({ code: result.code, message: result.message });
       onSuccess?.(result.code);
     } catch (err) {
@@ -132,7 +150,7 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-6 max-w-2xl">
+    <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-6 max-w-2xl" onFocus={handleFormStart}>
       {/* Honeypot */}
       <input type="text" name="website" className="hidden" tabIndex={-1} aria-hidden="true" onChange={(e) => set('honeypot', e.target.value)} />
 
