@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends
+import logging
+
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
@@ -14,6 +16,8 @@ from app.schemas.auth import (
 )
 from app.schemas.common import MessageResponse
 from app.services import auth_service, email_service
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
 settings = get_settings()
@@ -56,8 +60,8 @@ async def verify_login(
         try:
             recruiter = await recruiter_service.get_by_code(db, session.recruiter_code)
             recruiter_status = recruiter.status
-        except Exception:
-            pass
+        except HTTPException:
+            logger.warning("Recruiter %s not found while building verify response", session.recruiter_code)
     return LoginVerifyResponse(
         session_token=session.session_token,
         email=session.email,
@@ -87,8 +91,8 @@ async def me(
         try:
             recruiter = await recruiter_service.get_by_code(db, current_session.recruiter_code)
             recruiter_status = recruiter.status
-        except Exception:
-            pass
+        except HTTPException:
+            logger.warning("Recruiter %s not found while building /me response", current_session.recruiter_code)
     return MeResponse(
         email=current_session.email,
         user_type=current_session.user_type,

@@ -6,6 +6,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+- **`app/constants.py`** — single source of truth for all business-rule constants (`JOB_EXPIRY_DAYS`, `MAX_ACTIVE_JOBS_PER_EMAIL`, `PROFILE_EXPIRY_DAYS`, `MAX_ACTIVE_PROFILES_PER_EMAIL`, `SESSION_EXPIRY_DAYS`, `LOGIN_TOKEN_EXPIRY_MINUTES`, `LOGIN_RATE_LIMIT_PER_HOUR`, `VERIFICATION_EXPIRY_HOURS`, `RESEND_LIMIT_PER_ENTITY`, `REPORT_THRESHOLD`); duplicate module-level definitions removed from `job_service`, `profile_service`, `auth_service`, `verification_service`, and `schemas/job.py`
+- **`app/services/report_service.py`** — extracted all report submission logic from `reports.py` router into a dedicated service (`submit_report`): entity lookup, duplicate check, report creation, and auto-flag threshold logic; race condition fixed by counting existing reports before flush (count+1 ≥ threshold) instead of post-flush count
+- **`profile_service.to_list_item()`** — profile-to-dict mapping extracted from `profiles.py` router into service layer; router now uses a list comprehension
+- **`verification_service.get_pending_entity_for_resend()`** — entity lookup for resend flow extracted from `verification.py` router into service layer; router simplified to 3 service calls
+- **`src/lib/validation.ts`** — extracted `validateJobForm`, `isJobFormValid`, `validateProfileForm`, `isProfileFormValid` as pure functions for unit testing; `JobForm.tsx` updated to use `validateJobForm`
+- **`tests/test_reports.py`** — 11 new tests covering report submission, duplicate prevention, threshold auto-flag, removed-entity rejection
+- **`tests/test_admin.py`** — 8 new tests covering admin secret auth, list pending recruiters, approve/reject happy paths and error cases
+- **`tests/test_profiles.py`** — expanded from 3 to 18 tests: list filtering, create limit, get detail, update, deactivate/activate cycle, delete, and token validation
+- **`tests/test_verification.py`** — expanded from 2 to 11 tests: valid verify, expired code, bulk-activate on verify, double-use prevention, resend not-found, resend success, and rate-limit enforcement
+- **`src/lib/__tests__/validation.test.ts`** — 35 Vitest tests covering all job and profile form validation rules (required fields, contact method, salary cross-validation)
+
+### Changed
+- **`app/routers/reports.py`** — rewritten to delegate entirely to `report_service.submit_report()`; router is now 11 lines
+- **`app/routers/verification.py`** — `resend_verification` endpoint simplified; entity lookup delegated to `verification_service.get_pending_entity_for_resend()`
+- **`app/routers/admin.py`** — admin secret comparison changed from `!=` to `secrets.compare_digest()` (timing-safe)
+- **`app/routers/auth.py`** — bare `except Exception: pass` replaced with `except HTTPException` + `logger.warning` in `verify_login` and `me` endpoints; added `logging` import
+- **`app/database.py`** — `except Exception` in `get_db()` now logs the error before rollback
+- **`app/services/storage_service.py`** — all four GCS operations now catch `GoogleCloudError` instead of bare `Exception`; `delete_file` raises on failure instead of returning `False` (callers must handle)
+- **`src/lib/api.ts`** — `loginVerify()` refactored to use the centralized `request()` wrapper, eliminating duplicated error-handling logic
+- **`.github/workflows/deploy-api.yml`** — Cloud Run deploy step now includes `--set-env-vars` for non-sensitive config and `--set-secrets` for sensitive values, making the deployment reproducible from CI
+
 ### Changed
 - **Static page messaging updated to reflect talent-first platform with recruiter accounts model** — removed all "no signup", "no middlemen", "no accounts", "no recruiters" copy across About, Privacy, Terms, and FAQ pages:
   - **`about/page.tsx`** — hero tagline updated to "UAE's talent-first tech platform"; intro paragraph rewritten; "For employers" section replaced with "For recruiters & employers" covering the register → approve → post flow (3-step cards); "No signup" value card replaced with "Verified access" (talent contact details gated to approved recruiters); story section updated to explain dual model

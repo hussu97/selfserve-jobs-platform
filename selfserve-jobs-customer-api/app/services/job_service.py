@@ -7,14 +7,12 @@ from sqlalchemy import and_, func, select, update
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.constants import JOB_EXPIRY_DAYS, MAX_ACTIVE_JOBS_PER_EMAIL
 from app.models.job import Job
 from app.schemas.job import JobCreate, JobUpdate
 from app.services.code_generator import generate_code, generate_token
 
 logger = logging.getLogger(__name__)
-
-JOB_EXPIRY_DAYS = 60
-MAX_ACTIVE_JOBS_PER_EMAIL = 5
 
 
 async def get_active_job_count_for_email(db: AsyncSession, email: str) -> int:

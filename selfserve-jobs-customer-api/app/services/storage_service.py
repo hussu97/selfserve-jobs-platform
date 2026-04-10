@@ -32,6 +32,7 @@ async def upload_file(
 
     try:
         from google.cloud import storage
+        from google.cloud.exceptions import GoogleCloudError
 
         client = storage.Client()
         bucket = client.bucket(settings.gcs_bucket_name)
@@ -39,8 +40,8 @@ async def upload_file(
         blob.upload_from_string(file_data, content_type=content_type)
         logger.info("Uploaded file to GCS: gs://%s/%s", settings.gcs_bucket_name, gcs_path)
         return gcs_path
-    except Exception as exc:
-        logger.error("Failed to upload to GCS: %s", exc)
+    except GoogleCloudError as exc:
+        logger.error("GCS upload failed for %s: %s", gcs_path, exc)
         raise
 
 
@@ -56,6 +57,7 @@ async def generate_signed_url(
 
     try:
         from google.cloud import storage
+        from google.cloud.exceptions import GoogleCloudError
 
         client = storage.Client()
         bucket = client.bucket(settings.gcs_bucket_name)
@@ -67,8 +69,8 @@ async def generate_signed_url(
             method="GET",
         )
         return url
-    except Exception as exc:
-        logger.error("Failed to generate signed URL for %s: %s", gcs_path, exc)
+    except GoogleCloudError as exc:
+        logger.error("GCS signed URL generation failed for %s: %s", gcs_path, exc)
         raise
 
 
@@ -87,6 +89,7 @@ async def generate_signed_upload_url(
 
     try:
         from google.cloud import storage
+        from google.cloud.exceptions import GoogleCloudError
 
         client = storage.Client()
         bucket = client.bucket(settings.gcs_bucket_name)
@@ -99,8 +102,8 @@ async def generate_signed_upload_url(
             content_type=content_type,
         )
         return url
-    except Exception as exc:
-        logger.error("Failed to generate signed upload URL for %s: %s", gcs_path, exc)
+    except GoogleCloudError as exc:
+        logger.error("GCS signed upload URL generation failed for %s: %s", gcs_path, exc)
         raise
 
 
@@ -115,6 +118,7 @@ async def delete_file(gcs_path: str) -> bool:
 
     try:
         from google.cloud import storage
+        from google.cloud.exceptions import GoogleCloudError
 
         client = storage.Client()
         bucket = client.bucket(settings.gcs_bucket_name)
@@ -122,6 +126,6 @@ async def delete_file(gcs_path: str) -> bool:
         blob.delete()
         logger.info("Deleted GCS file: gs://%s/%s", settings.gcs_bucket_name, gcs_path)
         return True
-    except Exception as exc:
-        logger.error("Failed to delete GCS file %s: %s", gcs_path, exc)
-        return False
+    except GoogleCloudError as exc:
+        logger.error("GCS delete failed for %s: %s", gcs_path, exc)
+        raise

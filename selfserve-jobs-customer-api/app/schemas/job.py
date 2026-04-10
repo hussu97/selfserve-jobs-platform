@@ -3,7 +3,7 @@ from typing import Literal
 
 from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
 
-JOB_EXPIRY_DAYS = 60  # must match job_service.JOB_EXPIRY_DAYS
+from app.constants import JOB_EXPIRY_DAYS
 
 EMPLOYMENT_TYPES = Literal["full_time", "part_time", "contract", "consulting", "internship", "freelance", "remote"]
 CONTACT_METHODS = Literal["email", "url"]

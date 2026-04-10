@@ -269,17 +269,9 @@ export async function loginRequest(email: string): Promise<LoginResponse> {
 }
 
 export async function loginVerify(token: string): Promise<LoginVerifyResponse> {
-  const url = `${API_URL}/api/v1/auth/verify?token=${encodeURIComponent(token)}`;
-  const response = await fetch(url, { method: 'POST' });
-  if (!response.ok) {
-    let errorMessage = `Request failed with status ${response.status}`;
-    try {
-      const errorData = await response.json();
-      errorMessage = errorData.detail ?? errorData.message ?? errorMessage;
-    } catch { /* ignore */ }
-    throw new ApiError(response.status, errorMessage);
-  }
-  return response.json();
+  return request<LoginVerifyResponse>(`/auth/verify?token=${encodeURIComponent(token)}`, {
+    method: 'POST',
+  });
 }
 
 export async function logout(sessionToken: string): Promise<void> {

@@ -5,6 +5,7 @@ from fastapi import HTTPException, status
 from sqlalchemy import and_, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.constants import RESEND_LIMIT_PER_ENTITY, VERIFICATION_EXPIRY_HOURS
 from app.models.email_verification import EmailVerification
 from app.models.job import Job
 from app.models.profile import Profile
@@ -12,8 +13,6 @@ from app.services.code_generator import generate_verification_code
 
 logger = logging.getLogger(__name__)
 
-VERIFICATION_EXPIRY_HOURS = 24
-RESEND_LIMIT_PER_ENTITY = 3
 RESEND_WINDOW_HOURS = 24
 
 
@@ -117,6 +116,59 @@ async def verify_code(
         "email": verification.email,
         "session_token": session.session_token,
     }
+
+
+async def get_pending_entity_for_resend(
+    db: AsyncSession,
+    entity_type: str,
+    email: str,
+    entity_code: str | None,
+) -> tuple[str, str]:
+    """Resolve the entity code and edit token for a resend request.
+
+    Returns ``(entity_code, edit_token)``. Raises 404 if no matching pending entity
+    is found for the given email, and 400 for an invalid entity_type.
+    """
+    if entity_type == "job":
+        query = select(Job).where(
+            and_(
+                Job.email == email,
+                Job.status == "pending_verification",
+            )
+        )
+        if entity_code:
+            query = query.where(Job.job_code == entity_code)
+        result = await db.execute(query)
+        entity = result.scalar_one_or_none()
+        if not entity:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Pending job not found for this email",
+            )
+        return entity.job_code, entity.edit_token
+
+    if entity_type == "profile":
+        query = select(Profile).where(
+            and_(
+                Profile.email == email,
+                Profile.status == "pending_verification",
+            )
+        )
+        if entity_code:
+            query = query.where(Profile.profile_code == entity_code)
+        result = await db.execute(query)
+        entity = result.scalar_one_or_none()
+        if not entity:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Pending profile not found for this email",
+            )
+        return entity.profile_code, entity.edit_token
+
+    raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="Invalid entity type",
+    )
 
 
 async def check_resend_rate_limit(

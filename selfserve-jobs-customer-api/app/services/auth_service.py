@@ -5,6 +5,7 @@ from fastapi import HTTPException, status
 from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.constants import LOGIN_RATE_LIMIT_PER_HOUR, LOGIN_TOKEN_EXPIRY_MINUTES, SESSION_EXPIRY_DAYS
 from app.models.auth_session import AuthSession
 from app.models.job import Job
 from app.models.login_token import LoginToken
@@ -12,10 +13,6 @@ from app.models.profile import Profile
 from app.services.code_generator import generate_token
 
 logger = logging.getLogger(__name__)
-
-LOGIN_TOKEN_EXPIRY_MINUTES = 15
-SESSION_EXPIRY_DAYS = 30
-LOGIN_RATE_LIMIT_PER_HOUR = 5
 
 
 async def create_login_token(db: AsyncSession, email: str) -> LoginToken:

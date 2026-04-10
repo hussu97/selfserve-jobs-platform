@@ -7,14 +7,12 @@ from sqlalchemy import and_, func, select, update
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.constants import MAX_ACTIVE_PROFILES_PER_EMAIL, PROFILE_EXPIRY_DAYS
 from app.models.profile import Profile
 from app.schemas.profile import ProfileCreate, ProfileUpdate
 from app.services.code_generator import generate_code, generate_token
 
 logger = logging.getLogger(__name__)
-
-PROFILE_EXPIRY_DAYS = 180
-MAX_ACTIVE_PROFILES_PER_EMAIL = 2
 
 
 async def get_active_profile_count_for_email(db: AsyncSession, email: str) -> int:
@@ -167,6 +165,26 @@ async def list_profiles(
         "page": page,
         "per_page": per_page,
         "total_pages": total_pages,
+    }
+
+
+def to_list_item(p: Profile) -> dict:
+    """Convert a Profile ORM object to a dict suitable for ProfileListItem construction."""
+    return {
+        "code": p.profile_code,
+        "person_name": p.person_name,
+        "current_city": p.current_city,
+        "current_country": p.current_country,
+        "years_of_experience": p.years_of_experience,
+        "current_title": p.current_title,
+        "notice_period": p.notice_period,
+        "relocation_preference": p.relocation_preference,
+        "key_skills": p.key_skills or [],
+        "status": p.status,
+        "view_count": p.view_count,
+        "expires_at": p.expires_at,
+        "created_at": p.created_at,
+        "has_resume": bool(p.resume_gcs_path),
     }
 
 

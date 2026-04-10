@@ -10,6 +10,7 @@ import { CountrySelect } from '@/components/shared/CountrySelect';
 import { StatusBanner } from '@/components/shared/StatusBanner';
 import { EMPLOYMENT_TYPES } from '@/lib/constants';
 import { createJob } from '@/lib/api';
+import { validateJobForm } from '@/lib/validation';
 import { useAuth } from '@/context/AuthContext';
 import type { CreateJobRequest, SalaryCurrency } from '@/lib/types';
 
@@ -64,28 +65,7 @@ export function JobForm({ onSuccess }: JobFormProps) {
   };
 
   const validate = (): boolean => {
-    const errs: FormErrors = {};
-    if (!form.job_title?.trim()) errs.job_title = 'Job title is required';
-    if (!form.company_name?.trim()) errs.company_name = 'Company name is required';
-    if (!form.company_city?.trim()) errs.company_city = 'City is required';
-    if (!form.company_country) errs.company_country = 'Country is required';
-    if (!form.description?.trim()) errs.description = 'Description is required';
-    if ((form.key_skills?.length ?? 0) === 0) errs.key_skills = 'At least one skill is required';
-    if (form.contact_method === 'email' && !form.contact_email?.trim()) {
-      errs.contact_email = 'Contact email is required';
-    }
-    if (form.contact_method === 'url' && !form.contact_url?.trim()) {
-      errs.contact_url = 'Application URL is required';
-    }
-    // Salary validation
-    const hasMin = form.salary_min != null && form.salary_min > 0;
-    const hasMax = form.salary_max != null && form.salary_max > 0;
-    if ((hasMin || hasMax) && !form.salary_currency) {
-      errs.salary = 'Currency is required when specifying salary';
-    }
-    if (hasMin && hasMax && form.salary_min! > form.salary_max!) {
-      errs.salary = 'Minimum salary cannot exceed maximum';
-    }
+    const errs = validateJobForm(form);
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };

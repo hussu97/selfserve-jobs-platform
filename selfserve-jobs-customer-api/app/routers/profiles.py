@@ -44,26 +44,7 @@ async def list_profiles(
         relocation_preference=relocation_preference,
         sort=sort,
     )
-    items = []
-    for p in result["items"]:
-        items.append(
-            ProfileListItem(
-                code=p.profile_code,
-                person_name=p.person_name,
-                current_city=p.current_city,
-                current_country=p.current_country,
-                years_of_experience=p.years_of_experience,
-                current_title=p.current_title,
-                notice_period=p.notice_period,
-                relocation_preference=p.relocation_preference,
-                key_skills=p.key_skills or [],
-                status=p.status,
-                view_count=p.view_count,
-                expires_at=p.expires_at,
-                created_at=p.created_at,
-                has_resume=bool(p.resume_gcs_path),
-            )
-        )
+    items = [ProfileListItem(**profile_service.to_list_item(p)) for p in result["items"]]
     return ProfileListResponse(
         items=items,
         total=result["total"],

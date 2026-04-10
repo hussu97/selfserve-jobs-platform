@@ -1,3 +1,5 @@
+import secrets
+
 from fastapi import APIRouter, Depends, Header, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,7 +13,7 @@ settings = get_settings()
 
 
 def _verify_admin_secret(x_admin_secret: str = Header(..., alias="X-Admin-Secret")) -> str:
-    if not settings.admin_api_secret or x_admin_secret != settings.admin_api_secret:
+    if not settings.admin_api_secret or not secrets.compare_digest(x_admin_secret, settings.admin_api_secret):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or missing admin secret",
