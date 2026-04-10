@@ -171,6 +171,19 @@ async def get_pending_entity_for_resend(
     )
 
 
+async def is_email_verified(db: AsyncSession, email: str) -> bool:
+    """Return True if this email has at least one completed verification record."""
+    result = await db.execute(
+        select(func.count(EmailVerification.id)).where(
+            and_(
+                EmailVerification.email == email,
+                EmailVerification.verified_at.is_not(None),
+            )
+        )
+    )
+    return result.scalar_one() > 0
+
+
 async def check_resend_rate_limit(
     db: AsyncSession,
     entity_type: str,

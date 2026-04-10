@@ -108,23 +108,28 @@ async def create_profile(
     profile = await profile_service.create_profile(db, data)
 
     if settings.is_production:
-        # Create verification record and send email
-        verification = await verification_service.create_verification(
-            db=db,
-            email=profile.email,
-            entity_type="profile",
-            entity_code=profile.profile_code,
-        )
-        await email_service.send_verification_email(
-            db=db,
-            email=profile.email,
-            entity_type="profile",
-            entity_code=profile.profile_code,
-            verification_code=verification.verification_code,
-            edit_token=profile.edit_token,
-            frontend_url=settings.frontend_url,
-        )
-        message = "Profile created. Please check your email to verify and activate your profile."
+        if await verification_service.is_email_verified(db, profile.email):
+            # Email already verified from a previous flow — activate immediately
+            await profile_service.activate_profile(db, profile.profile_code)
+            message = "Profile created and is now live."
+        else:
+            # Create verification record and send email
+            verification = await verification_service.create_verification(
+                db=db,
+                email=profile.email,
+                entity_type="profile",
+                entity_code=profile.profile_code,
+            )
+            await email_service.send_verification_email(
+                db=db,
+                email=profile.email,
+                entity_type="profile",
+                entity_code=profile.profile_code,
+                verification_code=verification.verification_code,
+                edit_token=profile.edit_token,
+                frontend_url=settings.frontend_url,
+            )
+            message = "Profile created. Please check your email to verify and activate your profile."
     else:
         # Non-production: auto-activate immediately (email_verified=False stays as audit flag)
         await profile_service.activate_profile(db, profile.profile_code)

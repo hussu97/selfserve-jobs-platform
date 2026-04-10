@@ -1,10 +1,40 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { getMe } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 
+const POLL_INTERVAL_MS = 15_000;
+
 export default function RecruiterPendingPage() {
-  const { email } = useAuth();
+  const { email, sessionToken, updateRecruiterStatus } = useAuth();
+  const router = useRouter();
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    if (!sessionToken) return;
+
+    const checkStatus = async () => {
+      try {
+        const me = await getMe(sessionToken);
+        if (me.recruiter_status === 'active') {
+          updateRecruiterStatus('active');
+          router.replace('/account');
+        }
+      } catch {
+        // silently ignore — polling failures shouldn't break the page
+      }
+    };
+
+    // Check immediately, then on interval
+    checkStatus();
+    intervalRef.current = setInterval(checkStatus, POLL_INTERVAL_MS);
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [sessionToken, updateRecruiterStatus, router]);
 
   return (
     <div className="min-h-screen bg-[var(--color-bg)] flex items-center justify-center px-4">

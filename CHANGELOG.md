@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+- **Recruiter pending page** — page now polls `GET /auth/me` every 15 s and redirects to `/account` automatically when admin approves the account; fixes recruiter being stuck on "under review" indefinitely after approval
+- **Email verification deduplication** — profile and recruiter registration flows now check if the email was already verified (via `is_email_verified` in `verification_service`) and skip sending another verification email; emails verified in any prior flow (job, profile, recruiter) are not re-challenged
+
+### Added
+- **`is_email_verified`** helper in `verification_service.py` — queries `email_verification` for any row with a non-null `verified_at` for the given email; used to deduplicate verification across all entity flows
+
 ### Changed
 - **`ROADMAP.md`** — complete rewrite based on exhaustive full-system audit; expanded from 4 phases to 12 covering security, bugs, infrastructure, observability, accessibility, SEO, testing, admin, email compliance, scalability, features, and documentation (124 items total)
 - **`selfserve-jobs-customer-web/package-lock.json`** — regenerated to sync with `package.json` (missing `@testing-library/dom` transitive deps broke `npm ci` in CI)

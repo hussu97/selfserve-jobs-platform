@@ -22,23 +22,26 @@ async def register_recruiter(
 
     recruiter = await recruiter_service.register_recruiter(db, data)
 
-    # Create a verification record (entity_type="recruiter")
-    verification = await verification_service.create_verification(
-        db=db,
-        email=recruiter.email,
-        entity_type="recruiter",
-        entity_code=recruiter.recruiter_code,
-    )
-
     if settings.is_production:
-        await email_service.send_recruiter_verification_email(
-            db=db,
-            email=recruiter.email,
-            recruiter_code=recruiter.recruiter_code,
-            verification_code=verification.verification_code,
-            frontend_url=settings.frontend_url,
-        )
-        message = "Check your email to verify your address. After verification, your account will be reviewed."
+        if await verification_service.is_email_verified(db, recruiter.email):
+            # Email already verified from a previous flow — skip straight to pending_approval
+            await recruiter_service.activate_recruiter(db, recruiter.recruiter_code)
+            message = "Your email is already verified. Your account is now pending review."
+        else:
+            verification = await verification_service.create_verification(
+                db=db,
+                email=recruiter.email,
+                entity_type="recruiter",
+                entity_code=recruiter.recruiter_code,
+            )
+            await email_service.send_recruiter_verification_email(
+                db=db,
+                email=recruiter.email,
+                recruiter_code=recruiter.recruiter_code,
+                verification_code=verification.verification_code,
+                frontend_url=settings.frontend_url,
+            )
+            message = "Check your email to verify your address. After verification, your account will be reviewed."
     else:
         # Non-production: auto-advance to pending_approval
         await recruiter_service.activate_recruiter(db, recruiter.recruiter_code)
