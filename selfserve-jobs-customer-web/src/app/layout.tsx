@@ -6,6 +6,7 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { AuthProvider } from '@/context/AuthContext';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { Analytics } from '@vercel/analytics/next';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { organizationSchema, websiteSchema } from '@/lib/schema';
 
@@ -103,6 +104,7 @@ export default function RootLayout({
           />
         )}
         <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );
