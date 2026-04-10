@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Changed
+- **`ROADMAP.md`** — complete rewrite based on exhaustive full-system audit; expanded from 4 phases to 12 covering security, bugs, infrastructure, observability, accessibility, SEO, testing, admin, email compliance, scalability, features, and documentation (124 items total)
+- **`selfserve-jobs-customer-web/package-lock.json`** — regenerated to sync with `package.json` (missing `@testing-library/dom` transitive deps broke `npm ci` in CI)
+
+### Changed
 - **`.env.example`** — added `RESEND_FROM_EMAIL`, `ADMIN_NOTIFICATION_EMAIL`, `ADMIN_EMAILS`; removed stale `ADMIN_API_SECRET` entry
 - **`app/config.py`** — removed `admin_api_secret` field (no longer used; admin auth is session-based Bearer token only)
 - **`app/email_templates/recruiter_status.py`** — replaced old `X-Admin-Secret` curl commands in admin notification email with a link to the admin portal dashboard
