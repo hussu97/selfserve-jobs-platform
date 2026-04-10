@@ -11,7 +11,7 @@ const FOUNDERS = [
   {
     name: 'Hussain Abbasi',
     initials: 'HA',
-    headline: 'Head of Product · noon',
+    headline: 'Head of Product · Namshi',
     linkedin: 'https://www.linkedin.com/in/hussainabbasi/',
     color: 'bg-primary',
   },
