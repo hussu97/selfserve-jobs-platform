@@ -64,6 +64,9 @@ export function Header() {
   const pathname = usePathname();
   const { isLoggedIn, isHydrated, initial } = useAuth();
 
+  // Admin portal uses its own header — hide the main site header on /admin routes
+  if (pathname.startsWith('/admin')) return null;
+
   return (
     <>
       <header className="sticky top-0 z-30 backdrop-blur-xl bg-bg/80 shadow-[0_1px_3px_rgba(28,28,26,0.04)]">

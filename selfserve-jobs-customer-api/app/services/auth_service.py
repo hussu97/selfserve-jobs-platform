@@ -72,17 +72,29 @@ async def verify_login_token(db: AsyncSession, token_str: str) -> AuthSession:
 
 
 async def create_session(db: AsyncSession, email: str) -> AuthSession:
-    """Create a new auth session for an email. Detects recruiter status."""
+    """Create a new auth session for an email. Admin takes precedence over recruiter."""
+    from app.config import get_settings
     from app.services import recruiter_service
 
+    settings = get_settings()
     now = datetime.now(UTC)
     recruiter = await recruiter_service.get_by_email(db, email)
+
+    if email in settings.admin_email_list:
+        user_type = "admin"
+        recruiter_code = None
+    elif recruiter:
+        user_type = "recruiter"
+        recruiter_code = recruiter.recruiter_code
+    else:
+        user_type = None
+        recruiter_code = None
 
     session = AuthSession(
         session_token=generate_token(64),
         email=email,
-        user_type="recruiter" if recruiter else None,
-        recruiter_code=recruiter.recruiter_code if recruiter else None,
+        user_type=user_type,
+        recruiter_code=recruiter_code,
         expires_at=now + timedelta(days=SESSION_EXPIRY_DAYS),
     )
     db.add(session)

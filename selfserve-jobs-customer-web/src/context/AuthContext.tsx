@@ -13,6 +13,7 @@ interface AuthState {
 interface AuthContextValue extends AuthState {
   isLoggedIn: boolean;
   isHydrated: boolean;
+  isAdmin: boolean;
   isRecruiter: boolean;
   isActiveRecruiter: boolean;
   isPendingRecruiter: boolean;
@@ -85,6 +86,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const isLoggedIn = !!auth.sessionToken && !!auth.email;
+  const isAdmin = isLoggedIn && auth.userType === 'admin';
   const isRecruiter = isLoggedIn && auth.userType === 'recruiter';
   const isActiveRecruiter = isRecruiter && auth.recruiterStatus === 'active';
   const isPendingRecruiter = isRecruiter && (auth.recruiterStatus === 'pending_approval' || auth.recruiterStatus === 'pending_verification');
@@ -96,6 +98,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         ...auth,
         isLoggedIn,
         isHydrated,
+        isAdmin,
         isRecruiter,
         isActiveRecruiter,
         isPendingRecruiter,

@@ -3,7 +3,7 @@ import { Newsreader, Manrope } from 'next/font/google';
 import Script from 'next/script';
 import './globals.css';
 import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
+import { AppShell } from '@/components/layout/AppShell';
 import { AuthProvider } from '@/context/AuthContext';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { JsonLd } from '@/components/seo/JsonLd';
@@ -87,8 +87,7 @@ export default function RootLayout({
         <JsonLd data={[organizationSchema(), websiteSchema()]} />
         <AuthProvider>
           <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
+          <AppShell>{children}</AppShell>
         </AuthProvider>
         {process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID && (
           <Script

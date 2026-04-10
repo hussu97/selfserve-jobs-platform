@@ -272,3 +272,62 @@ export interface ProfileFilters {
   page?: number;
   per_page?: number;
 }
+
+// Admin portal types
+export interface AdminListResponse<T> {
+  items: T[];
+  total: number;
+  page: number;
+  per_page: number;
+  total_pages: number;
+}
+
+export interface AdminUserItem {
+  profile_code: string;
+  person_name: string;
+  email: string;
+  email_verified: boolean;
+  status: string;
+  current_title: string | null;
+  created_at: string;
+  view_count: number;
+}
+
+export interface AdminRecruiterItem {
+  recruiter_code: string;
+  name: string;
+  email: string;
+  linkedin_profile_url: string;
+  status: string;
+  rejection_reason_code: string | null;
+  rejection_comment: string | null;
+  created_at: string;
+}
+
+export interface AdminReportItem {
+  report_code: string;
+  entity_type: string;
+  entity_code: string;
+  reporter_email: string;
+  reason: string;
+  details: string | null;
+  status: string;
+  created_at: string;
+  entity_title: string | null;
+}
+
+export interface RejectionReason {
+  code: string;
+  name: string;
+}
+
+export interface AdminListFilters {
+  search?: string;
+  status?: string;
+  page?: number;
+  per_page?: number;
+}
+
+export interface AdminReportFilters extends AdminListFilters {
+  entity_type?: string;
+}

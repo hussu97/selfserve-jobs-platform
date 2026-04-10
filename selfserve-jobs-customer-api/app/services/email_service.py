@@ -4,6 +4,7 @@ from typing import Any
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
+from app.email_templates import admin_login as admin_login_template
 from app.email_templates import login as login_template
 from app.email_templates import management_links as management_links_template
 from app.email_templates import recruiter_status as recruiter_status_template
@@ -206,8 +207,9 @@ async def send_recruiter_rejected_email(
     email: str,
     recruiter_code: str,
     frontend_url: str,
+    reason_name: str = "",
 ) -> bool:
-    subject, html_body, text_body = recruiter_status_template.build_rejected(frontend_url)
+    subject, html_body, text_body = recruiter_status_template.build_rejected(frontend_url, reason_name)
     return await _send(
         db,
         "recruiter_rejected",
@@ -218,6 +220,17 @@ async def send_recruiter_rejected_email(
         entity_type="recruiter",
         entity_code=recruiter_code,
     )
+
+
+async def send_admin_login_email(
+    db: AsyncSession,
+    email: str,
+    login_token: str,
+    frontend_url: str,
+) -> bool:
+    login_url = f"{frontend_url}/admin/verify?code={login_token}"
+    subject, html_body, text_body = admin_login_template.build(login_url)
+    return await _send(db, "admin_login", email, subject, html_body, text_body)
 
 
 async def send_admin_new_recruiter_notification(

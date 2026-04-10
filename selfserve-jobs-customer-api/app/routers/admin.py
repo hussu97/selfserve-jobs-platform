@@ -1,42 +1,114 @@
-import secrets
-
-from fastapi import APIRouter, Depends, Header, HTTPException, status
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
 from app.dependencies import get_session
+from app.models.auth_session import AuthSession
+from app.schemas.admin import (
+    AdminLoginRequest,
+    AdminRecruiterListResponse,
+    AdminReportListResponse,
+    AdminUserListResponse,
+    RejectionReasonItem,
+    RejectRecruiterRequest,
+)
 from app.schemas.recruiter import RecruiterResponse
-from app.services import email_service, recruiter_service
+from app.services import admin_service, auth_service, email_service, recruiter_service
 
 router = APIRouter(prefix="/api/v1/admin", tags=["admin"])
 settings = get_settings()
 
 
-def _verify_admin_secret(x_admin_secret: str = Header(..., alias="X-Admin-Secret")) -> str:
-    if not settings.admin_api_secret or not secrets.compare_digest(x_admin_secret, settings.admin_api_secret):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or missing admin secret",
-        )
-    return x_admin_secret
-
-
-@router.get("/recruiters/pending", response_model=list[RecruiterResponse])
-async def list_pending_recruiters(
-    _secret: str = Depends(_verify_admin_secret),
+async def _get_admin_session(
+    authorization: str | None = Header(None),
     db: AsyncSession = Depends(get_session),
-):
-    """List all recruiters awaiting approval."""
-    recruiters = await recruiter_service.list_pending(db)
-    return [RecruiterResponse.from_orm(r) for r in recruiters]
+) -> AuthSession:
+    """Dependency: validate Bearer token and require user_type == 'admin'."""
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing or invalid authorization header")
+
+    token = authorization.removeprefix("Bearer ").strip()
+    session = await auth_service.validate_session(db, token)
+    if not session or session.user_type != "admin":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
+    return session
+
+
+# ---------------------------------------------------------------------------
+# Admin login (no auth required — entry point)
+# ---------------------------------------------------------------------------
+
+
+@router.post("/login")
+async def admin_login(
+    body: AdminLoginRequest,
+    db: AsyncSession = Depends(get_session),
+) -> dict:
+    """Send a magic link to an admin email. Returns 403 if email is not in the admin list."""
+    if body.email not in settings.admin_email_list:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="This email is not authorized for admin access",
+        )
+
+    token = await auth_service.create_login_token(db, body.email)
+
+    if settings.is_production:
+        await email_service.send_admin_login_email(
+            db=db,
+            email=body.email,
+            login_token=token.token,
+            frontend_url=settings.frontend_url,
+        )
+    else:
+        admin_verify_url = f"{settings.frontend_url}/admin/verify?code={token.token}"
+        return {"message": "Magic link created (dev mode — not sent by email)", "url": admin_verify_url}
+
+    return {"message": "Magic link sent. Check your email."}
+
+
+# ---------------------------------------------------------------------------
+# Users (talent profiles)
+# ---------------------------------------------------------------------------
+
+
+@router.get("/users", response_model=AdminUserListResponse)
+async def list_users(
+    search: str | None = Query(None),
+    filter_status: str | None = Query(None, alias="status"),
+    page: int = Query(1, ge=1),
+    per_page: int = Query(20, ge=1, le=100),
+    _session: AuthSession = Depends(_get_admin_session),
+    db: AsyncSession = Depends(get_session),
+) -> AdminUserListResponse:
+    """List talent profiles."""
+    return await admin_service.list_users(db, search=search, status=filter_status, page=page, per_page=per_page)
+
+
+# ---------------------------------------------------------------------------
+# Recruiters
+# ---------------------------------------------------------------------------
+
+
+@router.get("/recruiters", response_model=AdminRecruiterListResponse)
+async def list_recruiters(
+    search: str | None = Query(None),
+    filter_status: str | None = Query(None, alias="status"),
+    page: int = Query(1, ge=1),
+    per_page: int = Query(20, ge=1, le=100),
+    _session: AuthSession = Depends(_get_admin_session),
+    db: AsyncSession = Depends(get_session),
+) -> AdminRecruiterListResponse:
+    """List all recruiters."""
+    return await admin_service.list_recruiters(db, search=search, status=filter_status, page=page, per_page=per_page)
 
 
 @router.post("/recruiters/{code}/approve", response_model=RecruiterResponse)
 async def approve_recruiter(
     code: str,
-    _secret: str = Depends(_verify_admin_secret),
+    _session: AuthSession = Depends(_get_admin_session),
     db: AsyncSession = Depends(get_session),
-):
+) -> RecruiterResponse:
     """Approve a pending recruiter account."""
     recruiter = await recruiter_service.approve_recruiter(db, code)
 
@@ -54,11 +126,12 @@ async def approve_recruiter(
 @router.post("/recruiters/{code}/reject", response_model=RecruiterResponse)
 async def reject_recruiter(
     code: str,
-    _secret: str = Depends(_verify_admin_secret),
+    body: RejectRecruiterRequest,
+    _session: AuthSession = Depends(_get_admin_session),
     db: AsyncSession = Depends(get_session),
-):
-    """Reject a recruiter account application."""
-    recruiter = await recruiter_service.reject_recruiter(db, code)
+) -> RecruiterResponse:
+    """Reject a recruiter with a reason code and optional comment."""
+    recruiter, reason_name = await admin_service.reject_recruiter_with_reason(db, code, body.reason_code, body.comment)
 
     if settings.is_production:
         await email_service.send_recruiter_rejected_email(
@@ -66,6 +139,47 @@ async def reject_recruiter(
             email=recruiter.email,
             recruiter_code=recruiter.recruiter_code,
             frontend_url=settings.frontend_url,
+            reason_name=reason_name,
         )
 
     return RecruiterResponse.from_orm(recruiter)
+
+
+# ---------------------------------------------------------------------------
+# Reports
+# ---------------------------------------------------------------------------
+
+
+@router.get("/reports", response_model=AdminReportListResponse)
+async def list_reports(
+    search: str | None = Query(None),
+    entity_type: str | None = Query(None),
+    report_status: str | None = Query(None, alias="status"),
+    page: int = Query(1, ge=1),
+    per_page: int = Query(20, ge=1, le=100),
+    _session: AuthSession = Depends(_get_admin_session),
+    db: AsyncSession = Depends(get_session),
+) -> AdminReportListResponse:
+    """List reports on jobs and profiles."""
+    return await admin_service.list_reports(
+        db,
+        search=search,
+        entity_type=entity_type,
+        report_status=report_status,
+        page=page,
+        per_page=per_page,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Rejection reasons lookup
+# ---------------------------------------------------------------------------
+
+
+@router.get("/rejection-reasons", response_model=list[RejectionReasonItem])
+async def get_rejection_reasons(
+    _session: AuthSession = Depends(_get_admin_session),
+    db: AsyncSession = Depends(get_session),
+) -> list[RejectionReasonItem]:
+    """Return all available recruiter rejection reason codes."""
+    return await admin_service.get_rejection_reasons(db)

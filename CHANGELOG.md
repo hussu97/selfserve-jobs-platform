@@ -7,6 +7,39 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- **Admin portal** — full session-based admin portal at `/admin` (hidden from site nav/header)
+  - `POST /api/v1/admin/login` — sends magic link to whitelisted admin emails (pointing to `/admin/verify`); returns dev-mode URL when `ENVIRONMENT != production`
+  - `app/config.py` — new `ADMIN_EMAILS` env var (comma-separated); `admin_email_list` property for list access
+  - `app/models/recruiter_rejection_reason.py` — new `recruiter_rejection_reason` lookup table (`code`, `name`) for structured rejection reasons
+  - `app/services/admin_service.py` — `list_users`, `list_recruiters`, `list_reports`, `reject_recruiter_with_reason`, `get_rejection_reasons` with ilike search + filter + pagination
+  - `app/schemas/admin.py` — `AdminUserItem`, `AdminRecruiterItem`, `AdminReportItem`, `RejectionReasonItem`, `RejectRecruiterRequest` and paginated list wrappers
+  - `app/email_templates/admin_login.py` — admin magic link email template
+  - `alembic/versions/0005_admin_portal.py` — creates `recruiter_rejection_reason` table, seeds 7 default reasons, adds `rejection_reason_code`/`rejection_comment`/`reviewed_at` columns to `recruiter`
+  - New admin endpoints: `GET /api/v1/admin/users`, `GET /api/v1/admin/recruiters`, `GET /api/v1/admin/reports`, `POST /recruiters/{code}/approve`, `POST /recruiters/{code}/reject`, `GET /api/v1/admin/rejection-reasons` — all protected by `Authorization: Bearer {token}` with `user_type=admin` check
+  - `src/app/admin/login/page.tsx` — admin login form with dev-mode magic link display
+  - `src/app/admin/verify/page.tsx` — admin magic link verify page (calls `/api/v1/auth/verify`)
+  - `src/app/admin/dashboard/page.tsx` — protected dashboard with Users/Recruiters/Reported Posts tabs (tab state in URL)
+  - `src/components/admin/UsersTable.tsx` — talent profiles table with debounced search + status filter + pagination
+  - `src/components/admin/RecruitersTable.tsx` — recruiters table with LinkedIn button, approve/reject actions, reject reason modal
+  - `src/components/admin/ReportsTable.tsx` — reports table with entity-type + status filters
+
+### Changed
+- **`app/services/auth_service.py` `create_session()`** — admin takes precedence over recruiter: if email is in `admin_email_list`, sets `user_type="admin"` and clears `recruiter_code`
+- **`app/routers/admin.py`** — replaced `X-Admin-Secret` header auth with session-based `Authorization: Bearer` dependency (`user_type == "admin"` required); removed `/recruiters/pending` endpoint (superseded by `/recruiters?status=pending_approval`)
+- **`app/models/recruiter.py`** — added `rejection_reason_code`, `rejection_comment`, `reviewed_at` columns
+- **`app/services/email_service.py`** — `send_recruiter_rejected_email` now accepts `reason_name` param (included in email body); added `send_admin_login_email`
+- **`app/email_templates/recruiter_status.py`** `build_rejected()` — now accepts optional `reason_name` and renders it in the email body
+- **`src/context/AuthContext.tsx`** — added `isAdmin: boolean` computed from `userType === 'admin'`
+- **`src/components/layout/Header.tsx`** — returns `null` on `/admin/*` routes
+- **`src/app/layout.tsx`** — replaced inline `<main>/<Footer>` with `<AppShell>` client wrapper; Footer suppressed on `/admin/*`
+- **`src/components/layout/AppShell.tsx`** — new client wrapper that conditionally renders `<Footer>` based on pathname
+- **`tests/test_admin.py`** — fully rewritten for session-based auth; tests now cover new `list_recruiters`, `reject_with_reason`, `rejection-reasons` endpoints
+
+### Added (continued)
+- `src/lib/types.ts` — `AdminUserItem`, `AdminRecruiterItem`, `AdminReportItem`, `RejectionReason`, `AdminListFilters`, `AdminReportFilters`, `AdminListResponse<T>`
+- `src/lib/api.ts` — `adminLogin`, `adminGetUsers`, `adminGetRecruiters`, `adminApproveRecruiter`, `adminRejectRecruiter`, `adminGetReports`, `adminGetRejectionReasons`
+
+
 - **`app/constants.py`** — single source of truth for all business-rule constants (`JOB_EXPIRY_DAYS`, `MAX_ACTIVE_JOBS_PER_EMAIL`, `PROFILE_EXPIRY_DAYS`, `MAX_ACTIVE_PROFILES_PER_EMAIL`, `SESSION_EXPIRY_DAYS`, `LOGIN_TOKEN_EXPIRY_MINUTES`, `LOGIN_RATE_LIMIT_PER_HOUR`, `VERIFICATION_EXPIRY_HOURS`, `RESEND_LIMIT_PER_ENTITY`, `REPORT_THRESHOLD`); duplicate module-level definitions removed from `job_service`, `profile_service`, `auth_service`, `verification_service`, and `schemas/job.py`
 - **`app/services/report_service.py`** — extracted all report submission logic from `reports.py` router into a dedicated service (`submit_report`): entity lookup, duplicate check, report creation, and auto-flag threshold logic; race condition fixed by counting existing reports before flush (count+1 ≥ threshold) instead of post-flush count
 - **`profile_service.to_list_item()`** — profile-to-dict mapping extracted from `profiles.py` router into service layer; router now uses a list comprehension

@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     environment: str = "development"
     admin_api_secret: str = ""
     admin_notification_email: str = ""
+    admin_emails: str = ""
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -27,6 +28,10 @@ class Settings(BaseSettings):
     @property
     def is_production(self) -> bool:
         return self.environment.lower() == "production"
+
+    @property
+    def admin_email_list(self) -> list[str]:
+        return [e.strip().lower() for e in self.admin_emails.split(",") if e.strip()]
 
 
 @lru_cache

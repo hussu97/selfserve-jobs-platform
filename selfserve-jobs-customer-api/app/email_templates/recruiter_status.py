@@ -57,10 +57,20 @@ and download resumes. Handle all candidate data responsibly per our privacy poli
     return subject, html_body, text_body
 
 
-def build_rejected(frontend_url: str) -> tuple[str, str, str]:
+def build_rejected(frontend_url: str, reason_name: str = "") -> tuple[str, str, str]:
     """Return (subject, html_body, text_body) for a recruiter rejection email."""
     subject = "Update on your hirebridge recruiter application"
     contact_url = f"{frontend_url}/contact"
+
+    reason_block = ""
+    reason_text = ""
+    if reason_name:
+        reason_block = f"""
+      <p style="margin:0 0 20px 0;font-family:'Helvetica Neue',Arial,sans-serif;
+                font-size:14px;color:{TEXT_MUTED};line-height:1.6;">
+        <strong>Reason:</strong> {reason_name}
+      </p>"""
+        reason_text = f"\nReason: {reason_name}\n"
 
     body_html = f"""
       <h1 style="margin:0 0 16px 0;font-family:Georgia,'Times New Roman',serif;
@@ -72,6 +82,7 @@ def build_rejected(frontend_url: str) -> tuple[str, str, str]:
         Thank you for your interest in hirebridge. After reviewing your application,
         we're unable to approve your recruiter account at this time.
       </p>
+      {reason_block}
       <p style="margin:0;font-family:'Helvetica Neue',Arial,sans-serif;
                 font-size:14px;color:{TEXT_MUTED};line-height:1.6;">
         If you believe this is an error or would like more information, please
@@ -90,7 +101,7 @@ def build_rejected(frontend_url: str) -> tuple[str, str, str]:
 Thank you for your interest in hirebridge.
 
 After reviewing your application, we're unable to approve your recruiter account at this time.
-
+{reason_text}
 If you believe this is an error or would like more information, please contact us: {contact_url}
 """
 

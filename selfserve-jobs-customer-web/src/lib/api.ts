@@ -20,6 +20,13 @@ import type {
   MeResponse,
   EntitiesResponse,
   RecruiterRegisterRequest,
+  AdminListResponse,
+  AdminUserItem,
+  AdminRecruiterItem,
+  AdminReportItem,
+  RejectionReason,
+  AdminListFilters,
+  AdminReportFilters,
 } from './types';
 import { buildQueryString } from './utils';
 
@@ -313,6 +320,89 @@ export async function activateProfile(code: string, editToken: string): Promise<
   return request<Profile>(`/profiles/${code}/activate`, {
     method: 'POST',
     headers: { 'X-Edit-Token': editToken },
+  });
+}
+
+// Admin
+export async function adminLogin(email: string): Promise<{ message: string; url?: string }> {
+  return request<{ message: string; url?: string }>('/admin/login', {
+    method: 'POST',
+    body: JSON.stringify({ email }),
+  });
+}
+
+export async function adminGetUsers(
+  filters: AdminListFilters,
+  sessionToken: string
+): Promise<AdminListResponse<AdminUserItem>> {
+  const params: Record<string, string | number | undefined> = {
+    page: filters.page ?? 1,
+    per_page: filters.per_page ?? 20,
+  };
+  if (filters.search) params.search = filters.search;
+  if (filters.status) params.status = filters.status;
+  return request<AdminListResponse<AdminUserItem>>(`/admin/users${buildQueryString(params)}`, {
+    headers: { Authorization: `Bearer ${sessionToken}` },
+  });
+}
+
+export async function adminGetRecruiters(
+  filters: AdminListFilters,
+  sessionToken: string
+): Promise<AdminListResponse<AdminRecruiterItem>> {
+  const params: Record<string, string | number | undefined> = {
+    page: filters.page ?? 1,
+    per_page: filters.per_page ?? 20,
+  };
+  if (filters.search) params.search = filters.search;
+  if (filters.status) params.status = filters.status;
+  return request<AdminListResponse<AdminRecruiterItem>>(`/admin/recruiters${buildQueryString(params)}`, {
+    headers: { Authorization: `Bearer ${sessionToken}` },
+  });
+}
+
+export async function adminApproveRecruiter(
+  code: string,
+  sessionToken: string
+): Promise<{ recruiter_code: string; status: string }> {
+  return request(`/admin/recruiters/${code}/approve`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${sessionToken}` },
+  });
+}
+
+export async function adminRejectRecruiter(
+  code: string,
+  reasonCode: string,
+  comment: string | null,
+  sessionToken: string
+): Promise<{ recruiter_code: string; status: string }> {
+  return request(`/admin/recruiters/${code}/reject`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${sessionToken}` },
+    body: JSON.stringify({ reason_code: reasonCode, comment }),
+  });
+}
+
+export async function adminGetReports(
+  filters: AdminReportFilters,
+  sessionToken: string
+): Promise<AdminListResponse<AdminReportItem>> {
+  const params: Record<string, string | number | undefined> = {
+    page: filters.page ?? 1,
+    per_page: filters.per_page ?? 20,
+  };
+  if (filters.search) params.search = filters.search;
+  if (filters.status) params.status = filters.status;
+  if (filters.entity_type) params.entity_type = filters.entity_type;
+  return request<AdminListResponse<AdminReportItem>>(`/admin/reports${buildQueryString(params)}`, {
+    headers: { Authorization: `Bearer ${sessionToken}` },
+  });
+}
+
+export async function adminGetRejectionReasons(sessionToken: string): Promise<RejectionReason[]> {
+  return request<RejectionReason[]>('/admin/rejection-reasons', {
+    headers: { Authorization: `Bearer ${sessionToken}` },
   });
 }
 
