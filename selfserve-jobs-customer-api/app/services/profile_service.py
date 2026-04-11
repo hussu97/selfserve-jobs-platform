@@ -237,9 +237,19 @@ async def remove_profile(
     edit_token: str,
 ) -> Profile:
     profile = await get_profile_by_code_and_token(db, profile_code, edit_token)
+    resume_path = profile.resume_gcs_path
     profile.status = "removed"
     profile.updated_at = datetime.now(UTC)
     await db.flush()
+
+    if resume_path:
+        from app.services import storage_service
+
+        try:
+            await storage_service.delete_file(resume_path)
+        except Exception as exc:
+            logger.warning("Failed to delete resume file %s: %s", resume_path, exc)
+
     return profile
 
 

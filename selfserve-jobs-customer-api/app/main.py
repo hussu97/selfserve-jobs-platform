@@ -11,7 +11,19 @@ from slowapi.errors import RateLimitExceeded
 
 from app.config import get_settings
 from app.limiter import limiter
-from app.routers import admin, auth, jobs, management, meta, profiles, recruiters, reports, upload, verification
+from app.routers import (
+    admin,
+    auth,
+    internal,
+    jobs,
+    management,
+    meta,
+    profiles,
+    recruiters,
+    reports,
+    upload,
+    verification,
+)
 
 settings = get_settings()
 
@@ -182,6 +194,7 @@ async def cache_control_middleware(request: Request, call_next) -> Response:
 
 # Include all routers
 app.include_router(auth.router)
+app.include_router(internal.router)
 app.include_router(recruiters.router)
 app.include_router(admin.router)
 app.include_router(jobs.router)

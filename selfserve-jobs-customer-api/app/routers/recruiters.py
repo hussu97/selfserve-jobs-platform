@@ -52,6 +52,22 @@ async def register_recruiter(
         await recruiter_service.activate_recruiter(db, recruiter.recruiter_code)
         message = "Recruiter registered (dev mode — email skipped). Account is pending approval."
 
+    # Notify admin of new recruiter registration (fire-and-forget — failure is non-fatal)
+    try:
+        await email_service.send_admin_new_recruiter_notification(
+            db=db,
+            recruiter_name=recruiter.name,
+            recruiter_email=recruiter.email,
+            recruiter_linkedin=recruiter.linkedin_profile_url,
+            recruiter_code=recruiter.recruiter_code,
+            frontend_url=settings.frontend_url,
+            admin_email=settings.admin_notification_email,
+        )
+    except Exception as exc:
+        import logging
+
+        logging.getLogger(__name__).warning("Failed to send admin recruiter notification: %s", exc)
+
     return RecruiterRegisterResponse(code=recruiter.recruiter_code, message=message)
 
 

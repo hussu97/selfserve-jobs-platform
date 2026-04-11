@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     admin_emails: str = ""
     sentry_dsn: str = ""
     log_format: str = "json"  # "json" in production, "text" in development
+    internal_api_secret: str = ""  # shared secret for /api/v1/internal/* cron endpoints
 
     model_config = SettingsConfigDict(
         env_file=".env",

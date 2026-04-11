@@ -7,6 +7,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- **Internal cron endpoints** — `POST /api/v1/internal/expire-listings` transitions active listings past `expires_at` to `expired` and sends 7-day expiry warning emails (hourly window ±1h); `POST /api/v1/internal/cleanup` deletes expired `auth_session` / `login_token` rows and `email_log` rows older than 90 days; both endpoints are protected by a shared secret (`X-Internal-Secret` header, `INTERNAL_API_SECRET` env var)
+- **Expiry warning email template** — `email_templates/expiry_warning.py` renders a Sage & Stone styled 7-day expiry reminder; `email_service.send_expiry_warning_email()` added as the corresponding send function
+- **`INTERNAL_API_SECRET` config field** — new `Settings` field for the cron shared secret; empty string disables the endpoint with 503
+- **Admin new-recruiter notification** — `send_admin_new_recruiter_notification` is now called in `POST /api/v1/recruiters/register` after successful registration; failure is non-fatal (warning-logged, not surfaced to caller)
+- **Resume GCS cleanup on profile removal** — `profile_service.remove_profile` now calls `storage_service.delete_file(resume_gcs_path)` after marking the profile as `removed`; deletion failure is warning-logged, not re-raised
 - **Structured JSON logging** — `pythonjsonlogger` replaces `basicConfig`; production uses JSON format (toggled via `LOG_FORMAT=json` env var), development uses plain text; all log records include `timestamp`, `level`, `logger`
 - **Request correlation IDs** — `request_id_middleware` generates a UUID per request (or echoes `X-Request-Id` header if supplied) and returns it in `X-Request-Id` response header; `request.state.request_id` is available to handlers
 - **Sentry error tracking** — `sentry-sdk[fastapi]` integrated; initialised at startup when `SENTRY_DSN` env var is set; includes FastAPI and SQLAlchemy integrations; traces sampled at 10%

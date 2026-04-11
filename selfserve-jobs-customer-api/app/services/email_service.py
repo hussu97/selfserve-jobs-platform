@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
 from app.email_templates import admin_login as admin_login_template
+from app.email_templates import expiry_warning as expiry_warning_template
 from app.email_templates import login as login_template
 from app.email_templates import management_links as management_links_template
 from app.email_templates import recruiter_status as recruiter_status_template
@@ -232,6 +233,28 @@ async def send_admin_login_email(
     login_url = f"{frontend_url}/admin/verify?code={login_token}"
     subject, html_body, text_body = admin_login_template.build(login_url)
     return await _send(db, "admin_login", email, subject, html_body, text_body)
+
+
+async def send_expiry_warning_email(
+    db: AsyncSession,
+    email: str,
+    entity_type: str,
+    entity_code: str,
+    entity_title: str,
+    manage_url: str,
+    days_remaining: int,
+) -> bool:
+    subject, html_body, text_body = expiry_warning_template.build(entity_type, entity_title, manage_url, days_remaining)
+    return await _send(
+        db,
+        "expiry_warning",
+        email,
+        subject,
+        html_body,
+        text_body,
+        entity_type=entity_type,
+        entity_code=entity_code,
+    )
 
 
 async def send_admin_new_recruiter_notification(
