@@ -126,8 +126,11 @@ async def test_verification_resend_email_failure_returns_503(client, db_session)
     assert response.status_code == 503
 
 
-async def test_profile_creation_email_failure_in_production_mode_returns_503(client, db_session):
-    """In production mode, a failed verification email on profile creation returns 503."""
+async def test_profile_creation_in_production_mode_returns_201_even_if_email_fails(client, db_session):
+    """In production mode, profile creation returns 201 regardless of email send outcome.
+    The verification email is sent as a background task after the response, so a Resend
+    failure cannot block or fail the request.
+    """
     payload = {
         "person_name": "Email Fail User",
         "email": "profilefail@test.com",
@@ -141,7 +144,6 @@ async def test_profile_creation_email_failure_in_production_mode_returns_503(cli
         "key_skills": ["Python"],
         "contact_number": "+971 50 000 0000",
     }
-    # Simulate production behaviour: is_production=True forces the email path
     with (
         patch("app.routers.profiles.settings") as mock_settings,
         patch("app.services.email_service.send_verification_email", new_callable=AsyncMock, return_value=False),
@@ -149,7 +151,7 @@ async def test_profile_creation_email_failure_in_production_mode_returns_503(cli
         mock_settings.is_production = True
         mock_settings.frontend_url = "http://localhost:3000"
         response = await client.post("/api/v1/profiles", json=payload)
-    assert response.status_code == 503
+    assert response.status_code == 201
 
 
 # ---------------------------------------------------------------------------

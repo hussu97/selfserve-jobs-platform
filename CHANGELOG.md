@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Changed
+- **`POST /profiles` verification email sent as BackgroundTask** — `send_verification_email` moved off the request thread using FastAPI `BackgroundTasks`; the handler now returns as soon as the profile and verification records are flushed (~100–150 ms), cutting profile creation latency from ~1.2 s to ~150 ms. The db session stays alive until after background tasks complete so the email log write still commits in the same transaction. The now-unreachable 503 guard (raised if email send failed) has been removed; resend is available if the email is not received.
 - **Resume upload now happens immediately on file selection, not on form submit** — as soon as the user picks a PDF, the frontend calls `POST /upload/resume/signed-url` and starts a direct browser-to-GCS PUT upload via XHR; form submission only calls `POST /profiles` (no upload step), cutting the end-to-end wait from ~2.7 s to ~1.2 s
 - **Upload progress bar on resume section** — XHR `upload.onprogress` drives a real percentage bar during the upload; the dropzone cycles through `idle → uploading (with %) → done (green checkmark) → error (retry prompt)` states
 - **"Create Profile" button disabled during upload** — button is disabled while `uploadState === 'uploading'`; re-enabled when upload completes or errors out so the user knows they must fix the file first
