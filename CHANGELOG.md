@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Add security response headers middleware** — all API responses now include `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Strict-Transport-Security: max-age=31536000; includeSubDomains`, and `Content-Security-Policy: default-src 'none'`
 - **Add request body size limit middleware** — requests with `Content-Length` exceeding 10 MB are rejected with HTTP 413 before reaching any route handler
 - **Validate `contact_url` scheme in `JobCreate` and `JobUpdate`** — field now rejects any URL whose scheme is not `http` or `https`, preventing `javascript:` / `data:` XSS vectors
+- **Restrict Next.js `remotePatterns` from wildcard** — `next.config.ts` previously allowed all hostnames (`hostname: '**'`) for both http and https; now restricted to `storage.googleapis.com` (https only)
 
 ### Fixed
 - **Next.js logo image aspect-ratio warning** — added explicit `style={{ width: 'Xpx', height: 'Ypx' }}` inline styles to all three logo `<Image>` usages (Header, Footer, MobileNav); Tailwind preflight's `height: auto` was making computed height differ from the `height` attribute while width matched exactly, triggering the "one dimension modified" warning
