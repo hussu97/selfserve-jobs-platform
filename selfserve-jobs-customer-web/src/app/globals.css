@@ -185,6 +185,14 @@
   padding-left: 1.5em;
 }
 
+.prose ul {
+  list-style-type: disc;
+}
+
+.prose ol {
+  list-style-type: decimal;
+}
+
 .prose li {
   margin-bottom: 0.3em;
   line-height: 1.75;

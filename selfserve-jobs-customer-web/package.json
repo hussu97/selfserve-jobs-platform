@@ -14,7 +14,10 @@
     "e2e:install": "playwright install --with-deps chromium"
   },
   "dependencies": {
+    "@sentry/nextjs": "^10.48.0",
+    "@testing-library/dom": "^10.4.1",
     "@tiptap/extension-placeholder": "^3.22.3",
+    "@tiptap/extension-underline": "^3.22.3",
     "@tiptap/react": "^3.22.3",
     "@tiptap/starter-kit": "^3.22.3",
     "@vercel/analytics": "^2.0.1",
@@ -26,6 +29,7 @@
     "tiptap-markdown": "^0.9.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.50.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.6",
     "@testing-library/react": "^16.3",
@@ -39,7 +43,6 @@
     "jsdom": "^26.0",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "vitest": "^3.1",
-    "@playwright/test": "^1.50.0"
+    "vitest": "^3.1"
   }
 }
