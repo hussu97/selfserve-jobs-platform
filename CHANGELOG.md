@@ -9,6 +9,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Security
 - **Remove hardcoded dev DB credentials from `alembic.ini`** — replaced `postgresql+asyncpg://jobs4u:jobs4u_dev@...` with placeholder `driver://`; runtime override in `alembic/env.py` already supplies the real URL
 - **Remove default DB URL from `app/config.py`** — `database_url` field no longer has a default value; startup fails with a clear pydantic validation error if `DATABASE_URL` env var is not set
+- **Tighten CORS policy in `main.py`** — `allow_methods` changed from `["*"]` to explicit list `["GET", "POST", "PUT", "DELETE", "OPTIONS"]`; `allow_headers` restricted to `["Content-Type", "Authorization", "X-Session-Token", "X-Edit-Token"]`
+- **Add security response headers middleware** — all API responses now include `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Strict-Transport-Security: max-age=31536000; includeSubDomains`, and `Content-Security-Policy: default-src 'none'`
+- **Add request body size limit middleware** — requests with `Content-Length` exceeding 10 MB are rejected with HTTP 413 before reaching any route handler
 
 ### Fixed
 - **Next.js logo image aspect-ratio warning** — added explicit `style={{ width: 'Xpx', height: 'Ypx' }}` inline styles to all three logo `<Image>` usages (Header, Footer, MobileNav); Tailwind preflight's `height: auto` was making computed height differ from the `height` attribute while width matched exactly, triggering the "one dimension modified" warning
