@@ -110,16 +110,29 @@ async def list_reports(
     result = await db.execute(query.order_by(Report.created_at.desc()).offset(offset).limit(per_page))
     reports = result.scalars().all()
 
-    # Enrich with entity title
+    # Batch-fetch entity titles to avoid N+1 queries
+    job_codes = [r.entity_code for r in reports if r.entity_type == "job"]
+    profile_codes = [r.entity_code for r in reports if r.entity_type == "profile"]
+
+    job_titles: dict[str, str] = {}
+    if job_codes:
+        job_rows = await db.execute(select(Job.job_code, Job.job_title).where(Job.job_code.in_(job_codes)))
+        job_titles = dict(job_rows.all())
+
+    profile_names: dict[str, str] = {}
+    if profile_codes:
+        profile_rows = await db.execute(
+            select(Profile.profile_code, Profile.person_name).where(Profile.profile_code.in_(profile_codes))
+        )
+        profile_names = dict(profile_rows.all())
+
     items: list[AdminReportItem] = []
     for r in reports:
         entity_title: str | None = None
         if r.entity_type == "job":
-            job_result = await db.execute(select(Job.job_title).where(Job.job_code == r.entity_code))
-            entity_title = job_result.scalar_one_or_none()
+            entity_title = job_titles.get(r.entity_code)
         elif r.entity_type == "profile":
-            profile_result = await db.execute(select(Profile.person_name).where(Profile.profile_code == r.entity_code))
-            entity_title = profile_result.scalar_one_or_none()
+            entity_title = profile_names.get(r.entity_code)
 
         item = AdminReportItem.model_validate(r)
         item.entity_title = entity_title

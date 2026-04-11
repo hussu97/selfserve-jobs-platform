@@ -28,6 +28,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Admin inactivity timeout** — admin sessions now expire after 1 hour of inactivity (`last_active_at` column on `auth_session`); `validate_session` bumps this field on every API call and deletes the session if idle too long
 - **DB indexes (migration 0006)** — added `ix_job_email`, `ix_profile_email`, `ix_job_status_expires_at`, `ix_profile_status_expires_at`, `ix_email_verification_entity`, `ix_job_email_status`, `ix_profile_email_status` for query performance; added unique constraint `uq_report_entity_reporter` on `(entity_type, entity_code, reporter_email)` to atomically prevent duplicate reports at DB level
 
+- **`key_skills` CHECK constraint (migration 0008)** — `json_array_length(key_skills) <= 30` added to `job` and `profile` tables as `NOT VALID` constraints (enforces on new/updated rows without a full table scan)
+- **Client-side GET cache in api.ts** — 60-second in-memory TTL cache for `getJobs` and `getProfiles` client-side calls; eliminates redundant API fetches on rapid navigation; also adds `next: { revalidate: 120 }` to `getProfiles` for server-side revalidation parity with `getJobs`
 - **Email retry with exponential backoff** — `_send()` now retries up to 3 times with 1s / 5s / 30s delays before marking a send as failed; each attempt is logged at WARNING level
 - **Circuit breaker for Resend** — after 5 consecutive Resend failures the circuit opens; all sends are skipped for a 2-minute cooldown, then a half-open probe is allowed; state changes are logged at WARNING level
 - **`List-Unsubscribe` headers** — all outgoing emails now include `List-Unsubscribe` (mailto + URL) and `List-Unsubscribe-Post: List-Unsubscribe=One-Click` headers for CAN-SPAM / GDPR compliance
@@ -40,6 +42,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Backend test coverage (Phase 7)** — 9 new tests in `tests/test_coverage_gaps.py` covering: verification resend 503 on email failure, profile creation 503 on email failure in production mode, job update 422 on invalid `contact_method`/field combinations, view count increment on job/profile GET detail, admin recruiter rejection invalidates all sessions, profile removal succeeds with GCS delete failure
 
 ### Fixed
+- **N+1 query in admin report listing** — `admin_service.list_reports` now batch-fetches entity titles using two IN-clause queries (one for jobs, one for profiles) instead of one SELECT per report
+- **Graceful shutdown** — lifespan handler now calls `engine.dispose()` on shutdown to cleanly drain DB connections
 - **`/admin/` disallowed in robots.txt** — added to `PRIVATE_PATHS`; all bot user-agent rules now exclude admin routes
 - **Search loading indicator** — `SearchBar` now accepts `searching` prop; shows spinner during 350ms debounce window; browse pages pass state correctly
 - **Improved empty state messaging** — browse pages detect whether filters are active and show context-appropriate messages ("Try broadening your search" vs "No jobs posted yet")

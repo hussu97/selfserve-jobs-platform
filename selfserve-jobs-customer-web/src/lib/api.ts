@@ -43,12 +43,46 @@ class ApiError extends Error {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Client-side GET cache (60 s TTL) — avoids redundant fetches on navigation
+// ---------------------------------------------------------------------------
+const CLIENT_CACHE_TTL_MS = 60_000;
+
+interface CacheEntry<T> {
+  data: T;
+  expiresAt: number;
+}
+
+const _cache = new Map<string, CacheEntry<unknown>>();
+
+function _cacheGet<T>(key: string): T | undefined {
+  const entry = _cache.get(key) as CacheEntry<T> | undefined;
+  if (!entry) return undefined;
+  if (Date.now() > entry.expiresAt) {
+    _cache.delete(key);
+    return undefined;
+  }
+  return entry.data;
+}
+
+function _cacheSet<T>(key: string, data: T): void {
+  _cache.set(key, { data, expiresAt: Date.now() + CLIENT_CACHE_TTL_MS });
+}
+
 async function request<T>(
   path: string,
-  options: RequestInit & { next?: { revalidate?: number | false; tags?: string[] } } = {}
+  options: RequestInit & { next?: { revalidate?: number | false; tags?: string[] }; clientCache?: boolean } = {}
 ): Promise<T> {
-  const { next, ...fetchOptions } = options;
+  const { next, clientCache, ...fetchOptions } = options;
   const url = `${API_URL}/api/v1${path}`;
+
+  // Client-side GET cache — only in browser, only for explicit opt-in GET requests
+  const isGet = !fetchOptions.method || fetchOptions.method === 'GET';
+  if (clientCache && isGet && typeof window !== 'undefined') {
+    const cached = _cacheGet<T>(url);
+    if (cached !== undefined) return cached;
+  }
+
   const response = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
@@ -73,7 +107,13 @@ async function request<T>(
     return undefined as T;
   }
 
-  return response.json();
+  const data = await response.json();
+
+  if (clientCache && isGet && typeof window !== 'undefined') {
+    _cacheSet(url, data);
+  }
+
+  return data;
 }
 
 // Stats
@@ -96,6 +136,7 @@ export async function getJobs(filters: JobFilters = {}): Promise<PaginatedRespon
 
   return request<PaginatedResponse<JobListItem>>(`/jobs${buildQueryString(params)}`, {
     next: { revalidate: 120 },
+    clientCache: true,
   });
 }
 
@@ -140,7 +181,10 @@ export async function getProfiles(filters: ProfileFilters = {}): Promise<Paginat
   if (filters.skills?.length) params.skills = filters.skills;
   if (filters.sort) params.sort = filters.sort;
 
-  return request<PaginatedResponse<ProfileListItem>>(`/profiles${buildQueryString(params)}`);
+  return request<PaginatedResponse<ProfileListItem>>(`/profiles${buildQueryString(params)}`, {
+    next: { revalidate: 120 },
+    clientCache: true,
+  });
 }
 
 export async function getProfile(code: string, sessionToken?: string): Promise<Profile> {

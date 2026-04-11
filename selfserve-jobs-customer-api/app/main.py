@@ -101,6 +101,13 @@ async def lifespan(app: FastAPI):
     yield
 
     logger.info("Shutting down selfserve-jobs-customer-api")
+    try:
+        from app.database import engine as _engine
+
+        await _engine.dispose()
+        logger.info("DB connection pool disposed cleanly")
+    except Exception as exc:
+        logger.warning("Error disposing DB engine on shutdown: %s", exc)
 
 
 app = FastAPI(
