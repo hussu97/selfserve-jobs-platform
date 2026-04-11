@@ -126,7 +126,12 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
           <div className="bg-surface-lowest rounded-2xl shadow-ambient p-6 mb-6">
             <h2 className="font-heading text-xl text-primary mb-4">About</h2>
             <div className="prose">
-              <ReactMarkdown>{profile.brief}</ReactMarkdown>
+              <ReactMarkdown
+                allowedElements={['p', 'ul', 'ol', 'li', 'strong', 'em', 'a', 'blockquote', 'code', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'br', 'hr']}
+                unwrapDisallowed
+              >
+                {profile.brief}
+              </ReactMarkdown>
             </div>
           </div>
 

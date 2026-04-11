@@ -104,7 +104,12 @@ export function JobDetail({ job }: JobDetailProps) {
           Job description
         </h2>
         <div className="prose">
-          <ReactMarkdown>{job.description}</ReactMarkdown>
+          <ReactMarkdown
+            allowedElements={['p', 'ul', 'ol', 'li', 'strong', 'em', 'a', 'blockquote', 'code', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'br', 'hr']}
+            unwrapDisallowed
+          >
+            {job.description}
+          </ReactMarkdown>
         </div>
       </div>
 
