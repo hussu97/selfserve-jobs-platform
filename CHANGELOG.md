@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+- **Founding year corrected to 2026** — updated `llms.txt` route (both inline text and `Launch year` field) to reflect the correct founding year
+
 ### Added
 - **Sentry error monitoring for frontend** — `@sentry/nextjs` installed; `sentry.client.config.ts`, `sentry.server.config.ts`, `sentry.edge.config.ts` created; `src/instrumentation.ts` registers server/edge configs via Next.js instrumentation hook; `next.config.ts` wrapped with `withSentryConfig` (source map upload gated on `SENTRY_AUTH_TOKEN`, tunnel route `/monitoring` to bypass ad-blockers); errors only sent in production, 10% performance tracing sample rate
 
