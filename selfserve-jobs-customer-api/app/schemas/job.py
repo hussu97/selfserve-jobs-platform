@@ -1,5 +1,6 @@
 from datetime import date, datetime, timedelta
 from typing import Literal
+from urllib.parse import urlparse
 
 from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
 
@@ -30,6 +31,15 @@ class JobCreate(BaseModel):
     salary_currency: SALARY_CURRENCIES | None = None
     # Honeypot field — must be empty
     website: str | None = Field(None, exclude=True)
+
+    @field_validator("contact_url", mode="after")
+    @classmethod
+    def validate_contact_url_scheme(cls, v: str | None) -> str | None:
+        if v is not None:
+            scheme = urlparse(v).scheme
+            if scheme not in ("http", "https"):
+                raise ValueError("contact_url must use http or https scheme")
+        return v
 
     @field_validator("deadline_date", mode="after")
     @classmethod
@@ -77,6 +87,15 @@ class JobUpdate(BaseModel):
     salary_min: int | None = Field(None, ge=0)
     salary_max: int | None = Field(None, ge=0)
     salary_currency: SALARY_CURRENCIES | None = None
+
+    @field_validator("contact_url", mode="after")
+    @classmethod
+    def validate_contact_url_scheme(cls, v: str | None) -> str | None:
+        if v is not None:
+            scheme = urlparse(v).scheme
+            if scheme not in ("http", "https"):
+                raise ValueError("contact_url must use http or https scheme")
+        return v
 
     @field_validator("key_skills", mode="before")
     @classmethod
