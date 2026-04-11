@@ -49,7 +49,7 @@ export function Footer() {
             <p className="text-xs text-text-muted leading-relaxed mt-1">
               UAE&apos;s talent-first tech platform
             </p>
-            <p className="text-xs text-text-muted/70 leading-relaxed">
+            <p className="text-xs text-text-muted leading-relaxed">
               Free to post · Free to browse · Always
             </p>
           </div>

@@ -1,11 +1,9 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import dynamic from 'next/dynamic';
 import { Input } from '@/components/ui/Input';
-import { MarkdownEditor } from '@/components/ui/MarkdownEditor';
 import { Select } from '@/components/ui/Select';
-import { Button } from '@/components/ui/Button';
-import { SkillTag } from '@/components/shared/SkillTag';
 import { CountrySelect } from '@/components/shared/CountrySelect';
 import { StatusBanner } from '@/components/shared/StatusBanner';
 import { EMPLOYMENT_TYPES } from '@/lib/constants';
@@ -13,27 +11,27 @@ import { createJob } from '@/lib/api';
 import { validateJobForm } from '@/lib/validation';
 import { useAuth } from '@/context/AuthContext';
 import { trackEvent } from '@/lib/analytics';
-import type { CreateJobRequest, SalaryCurrency } from '@/lib/types';
+import type { CreateJobRequest } from '@/lib/types';
+
+const JobFormLower = dynamic(() => import('./JobFormLower'), {
+  loading: () => (
+    <div className="flex flex-col gap-8">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i} className="bg-surface-lowest shadow-ambient rounded-2xl p-8 animate-pulse">
+          <div className="h-6 w-32 bg-surface rounded-lg mb-4" />
+          <div className="h-24 w-full bg-surface rounded-xl" />
+        </div>
+      ))}
+    </div>
+  ),
+  ssr: false,
+});
 
 interface JobFormProps {
   onSuccess?: (code: string) => void;
 }
 
 type FormErrors = Partial<Record<keyof CreateJobRequest | 'general' | 'salary', string>>;
-
-const SALARY_CURRENCIES: { value: SalaryCurrency; label: string }[] = [
-  { value: 'AED', label: 'AED — UAE Dirham' },
-  { value: 'USD', label: 'USD — US Dollar' },
-  { value: 'EUR', label: 'EUR — Euro' },
-  { value: 'GBP', label: 'GBP — British Pound' },
-  { value: 'INR', label: 'INR — Indian Rupee' },
-  { value: 'SAR', label: 'SAR — Saudi Riyal' },
-  { value: 'QAR', label: 'QAR — Qatari Riyal' },
-  { value: 'BHD', label: 'BHD — Bahraini Dinar' },
-  { value: 'KWD', label: 'KWD — Kuwaiti Dinar' },
-  { value: 'OMR', label: 'OMR — Omani Rial' },
-  { value: 'EGP', label: 'EGP — Egyptian Pound' },
-];
 
 export function JobForm({ onSuccess }: JobFormProps) {
   const { sessionToken, isActiveRecruiter } = useAuth();
@@ -59,6 +57,14 @@ export function JobForm({ onSuccess }: JobFormProps) {
   const set = <K extends keyof CreateJobRequest>(key: K, value: CreateJobRequest[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
     setErrors((prev) => ({ ...prev, [key]: undefined, salary: undefined }));
+  };
+
+  const blurField = (key: keyof CreateJobRequest | 'salary') => {
+    const errs = validateJobForm(form);
+    const fieldError = key === 'salary' ? errs.salary : errs[key as keyof CreateJobRequest];
+    if (fieldError) {
+      setErrors((prev) => ({ ...prev, [key]: fieldError }));
+    }
   };
 
   const addSkill = (skill: string) => {
@@ -161,6 +167,7 @@ export function JobForm({ onSuccess }: JobFormProps) {
             placeholder="e.g. Senior Frontend Engineer"
             value={form.job_title ?? ''}
             onChange={(e) => set('job_title', e.target.value)}
+            onBlur={() => blurField('job_title')}
             error={errors.job_title}
             required
           />
@@ -178,6 +185,7 @@ export function JobForm({ onSuccess }: JobFormProps) {
             placeholder="Acme Inc."
             value={form.company_name ?? ''}
             onChange={(e) => set('company_name', e.target.value)}
+            onBlur={() => blurField('company_name')}
             error={errors.company_name}
             required
           />
@@ -186,6 +194,7 @@ export function JobForm({ onSuccess }: JobFormProps) {
             placeholder="Dubai"
             value={form.company_city ?? ''}
             onChange={(e) => set('company_city', e.target.value)}
+            onBlur={() => blurField('company_city')}
             error={errors.company_city}
             required
           />
@@ -208,158 +217,16 @@ export function JobForm({ onSuccess }: JobFormProps) {
         </div>
       </div>
 
-      {/* Section 02 — Description */}
-      <div className="bg-surface-lowest shadow-ambient rounded-2xl p-8 flex flex-col gap-4">
-        <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-2">
-          <span className="font-heading text-2xl italic text-secondary">02</span>
-          <h2 className="font-heading text-xl text-primary">Description</h2>
-        </div>
-        <MarkdownEditor
-          label="Job description"
-          placeholder="Describe the role, responsibilities, requirements, and benefits. Markdown is supported."
-          value={form.description ?? ''}
-          onChange={(val) => set('description', val)}
-          error={errors.description}
-          hint="Markdown formatting supported (bold, lists, headings etc.)"
-          required
-        />
-      </div>
-
-      {/* Section 03 — Skills */}
-      <div className="bg-surface-lowest shadow-ambient rounded-2xl p-8 flex flex-col gap-4">
-        <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-2">
-          <span className="font-heading text-2xl italic text-secondary">03</span>
-          <h2 className="font-heading text-xl text-primary">Key Skills</h2>
-        </div>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={skillInput}
-            onChange={(e) => setSkillInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ',') {
-                e.preventDefault();
-                addSkill(skillInput);
-              }
-            }}
-            placeholder="Type a skill and press Enter"
-            className="flex-1 rounded-xl bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary text-text-main"
-          />
-          <Button type="button" variant="outline" size="md" onClick={() => addSkill(skillInput)}>
-            Add
-          </Button>
-        </div>
-        {errors.key_skills && <p className="text-xs text-red-600">{errors.key_skills}</p>}
-        {(form.key_skills?.length ?? 0) > 0 && (
-          <div className="flex flex-wrap gap-2 bg-surface rounded-2xl p-4">
-            {form.key_skills?.map((skill) => (
-              <SkillTag key={skill} skill={skill} removable onRemove={removeSkill} size="md" />
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Section 04 — Salary (Optional) */}
-      <div className="bg-surface-lowest shadow-ambient rounded-2xl p-8 flex flex-col gap-4">
-        <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-2">
-          <span className="font-heading text-2xl italic text-secondary">04</span>
-          <div>
-            <h2 className="font-heading text-xl text-primary">Salary Range</h2>
-            <p className="text-xs text-text-muted mt-0.5">Optional — listings with salary ranges get more applications</p>
-          </div>
-        </div>
-        {errors.salary && <p className="text-xs text-red-600">{errors.salary}</p>}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div>
-            <label className="block text-xs uppercase tracking-[0.1em] text-text-muted mb-2">Currency</label>
-            <select
-              value={form.salary_currency ?? ''}
-              onChange={(e) => set('salary_currency', (e.target.value || undefined) as SalaryCurrency | undefined)}
-              className="w-full bg-surface rounded-xl px-3 py-2.5 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-primary"
-            >
-              <option value="">Select…</option>
-              {SALARY_CURRENCIES.map(({ value, label }) => (
-                <option key={value} value={value}>{label}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs uppercase tracking-[0.1em] text-text-muted mb-2">Min / Month</label>
-            <input
-              type="number"
-              min={0}
-              step={500}
-              value={form.salary_min ?? ''}
-              onChange={(e) => set('salary_min', e.target.value ? Number(e.target.value) : undefined)}
-              placeholder="e.g. 15000"
-              className="w-full bg-surface rounded-xl px-3 py-2.5 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
-          <div>
-            <label className="block text-xs uppercase tracking-[0.1em] text-text-muted mb-2">Max / Month</label>
-            <input
-              type="number"
-              min={0}
-              step={500}
-              value={form.salary_max ?? ''}
-              onChange={(e) => set('salary_max', e.target.value ? Number(e.target.value) : undefined)}
-              placeholder="e.g. 25000"
-              className="w-full bg-surface rounded-xl px-3 py-2.5 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Section 05 — How to Apply */}
-      <div className="bg-surface-lowest shadow-ambient rounded-2xl p-8 flex flex-col gap-4">
-        <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-2">
-          <span className="font-heading text-2xl italic text-secondary">05</span>
-          <h2 className="font-heading text-xl text-primary">How to Apply</h2>
-        </div>
-        <div className="flex gap-4">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="radio"
-              name="contact_method"
-              value="email"
-              checked={form.contact_method === 'email'}
-              onChange={() => set('contact_method', 'email')}
-            />
-            <span className="text-sm text-text-main">Via email</span>
-          </label>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="radio"
-              name="contact_method"
-              value="url"
-              checked={form.contact_method === 'url'}
-              onChange={() => set('contact_method', 'url')}
-            />
-            <span className="text-sm text-text-main">Via application URL</span>
-          </label>
-        </div>
-        {form.contact_method === 'email' ? (
-          <Input
-            label="Contact email"
-            type="email"
-            placeholder="hiring@company.com"
-            value={form.contact_email ?? ''}
-            onChange={(e) => set('contact_email', e.target.value)}
-            error={errors.contact_email}
-            required
-          />
-        ) : (
-          <Input
-            label="Application URL"
-            type="url"
-            placeholder="https://company.com/apply"
-            value={form.contact_url ?? ''}
-            onChange={(e) => set('contact_url', e.target.value)}
-            error={errors.contact_url}
-            required
-          />
-        )}
-      </div>
+      <JobFormLower
+        form={form}
+        errors={errors}
+        set={set}
+        blurField={blurField}
+        skillInput={skillInput}
+        setSkillInput={setSkillInput}
+        addSkill={addSkill}
+        removeSkill={removeSkill}
+      />
 
       <button type="submit" disabled={loading} className="self-start bg-secondary text-white px-10 py-4 rounded-xl font-label text-sm uppercase tracking-widest hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer inline-flex items-center gap-2">
         {loading && (

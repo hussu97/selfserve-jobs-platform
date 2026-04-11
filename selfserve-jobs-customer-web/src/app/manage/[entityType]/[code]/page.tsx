@@ -6,11 +6,13 @@ import Link from 'next/link';
 import { Spinner } from '@/components/ui/Spinner';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { Modal } from '@/components/ui/Modal';
 import { MarkdownEditor } from '@/components/ui/MarkdownEditor';
 import { Select } from '@/components/ui/Select';
 import { StatusBanner } from '@/components/shared/StatusBanner';
 import { SkillTag } from '@/components/shared/SkillTag';
 import { CountrySelect } from '@/components/shared/CountrySelect';
+import { useToast } from '@/context/ToastContext';
 import {
   validateToken,
   getJob,
@@ -41,6 +43,7 @@ function ManageContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token') ?? '';
   const { entityType, code } = params;
+  const { addToast } = useToast();
 
   const [pageState, setPageState] = useState<PageState>('loading');
   const [tokenError, setTokenError] = useState('');
@@ -58,7 +61,6 @@ function ManageContent() {
   // Edit state
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
-  const [saveSuccess, setSaveSuccess] = useState('');
 
   // Job edit fields
   const [jobForm, setJobForm] = useState<UpdateJobRequest>({});
@@ -71,9 +73,8 @@ function ManageContent() {
   // Renew
   const [renewLoading, setRenewLoading] = useState(false);
   const [renewError, setRenewError] = useState('');
-  const [renewSuccess, setRenewSuccess] = useState('');
 
-  // Delete confirm
+  // Delete confirm modal
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState('');
@@ -174,11 +175,10 @@ function ManageContent() {
     e.preventDefault();
     setSaving(true);
     setSaveError('');
-    setSaveSuccess('');
     try {
       const updated = await updateJob(code, jobForm, token);
       setJob(updated);
-      setSaveSuccess('Changes saved successfully.');
+      addToast('Changes saved successfully.', 'success');
     } catch (err) {
       setSaveError(err instanceof Error ? err.message : 'Failed to save changes.');
     } finally {
@@ -207,11 +207,10 @@ function ManageContent() {
     e.preventDefault();
     setSaving(true);
     setSaveError('');
-    setSaveSuccess('');
     try {
       const updated = await updateProfile(code, profileForm, token);
       setProfile(updated);
-      setSaveSuccess('Changes saved successfully.');
+      addToast('Changes saved successfully.', 'success');
     } catch (err) {
       setSaveError(err instanceof Error ? err.message : 'Failed to save changes.');
     } finally {
@@ -223,7 +222,6 @@ function ManageContent() {
   const handleRenew = async () => {
     setRenewLoading(true);
     setRenewError('');
-    setRenewSuccess('');
     try {
       if (entityType === 'job') {
         const updated = await renewJob(code, token);
@@ -232,7 +230,7 @@ function ManageContent() {
         const updated = await renewProfile(code, token);
         setProfile(updated);
       }
-      setRenewSuccess('Listing renewed! Your listing is now active for another 60 days.');
+      addToast('Listing renewed! Active for another 60 days.', 'success');
     } catch (err) {
       setRenewError(err instanceof Error ? err.message : 'Failed to renew. Try again.');
     } finally {
@@ -377,9 +375,6 @@ function ManageContent() {
           : `Editing: ${profile?.person_name} — ${profile?.current_title}`}
       </p>
 
-      {saveSuccess && (
-        <StatusBanner type="success" message={saveSuccess} className="mb-6" />
-      )}
       {saveError && (
         <StatusBanner type="error" message={saveError} className="mb-6" />
       )}
@@ -668,9 +663,6 @@ function ManageContent() {
               Renewals used: {renewalCount} / {MAX_RENEWALS}
             </p>
 
-            {renewSuccess && (
-              <StatusBanner type="success" message={renewSuccess} className="mb-4" />
-            )}
             {renewError && (
               <StatusBanner type="error" message={renewError} className="mb-4" />
             )}
@@ -701,35 +693,40 @@ function ManageContent() {
           <StatusBanner type="error" message={deleteError} className="mb-4" />
         )}
 
-        {!showDeleteConfirm ? (
-          <Button variant="danger" onClick={() => setShowDeleteConfirm(true)} className="rounded-full">
-            Delete this listing
-          </Button>
-        ) : (
-          <div className="rounded-xl p-5 bg-red-50">
-            <p className="text-sm font-medium mb-4 text-red-800">
-              Are you sure? This cannot be undone.
-            </p>
-            <div className="flex gap-3">
-              <Button
-                variant="danger"
-                loading={deleteLoading}
-                onClick={handleDelete}
-                className="rounded-full"
-              >
-                Yes, delete permanently
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={() => setShowDeleteConfirm(false)}
-                className="rounded-full"
-              >
-                Cancel
-              </Button>
-            </div>
-          </div>
-        )}
+        <Button variant="danger" onClick={() => setShowDeleteConfirm(true)} className="rounded-full">
+          Delete this listing
+        </Button>
       </div>
+
+      {/* Delete confirmation modal */}
+      <Modal
+        open={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        title="Delete listing"
+        size="sm"
+        role="alertdialog"
+      >
+        <p className="text-sm text-text-muted mb-6">
+          Are you sure you want to permanently delete this listing? This cannot be undone.
+        </p>
+        <div className="flex gap-3 justify-end">
+          <Button
+            variant="ghost"
+            onClick={() => setShowDeleteConfirm(false)}
+            className="rounded-full"
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="danger"
+            loading={deleteLoading}
+            onClick={handleDelete}
+            className="rounded-full"
+          >
+            Yes, delete permanently
+          </Button>
+        </div>
+      </Modal>
     </div>
   );
 }

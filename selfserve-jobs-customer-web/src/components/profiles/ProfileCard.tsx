@@ -30,7 +30,7 @@ export const ProfileCard = memo(function ProfileCard({ profile }: ProfileCardPro
           <Badge variant={RELOCATION_BADGE[profile.relocation_preference] ?? 'default'} size="sm">
             {getRelocationLabel(profile.relocation_preference)}
           </Badge>
-          <span className="text-xs text-text-muted/70 whitespace-nowrap">{timeAgo(profile.created_at)}</span>
+          <span className="text-xs text-text-muted whitespace-nowrap">{timeAgo(profile.created_at)}</span>
         </div>
 
         {/* Row 2: Avatar + Name/Title */}

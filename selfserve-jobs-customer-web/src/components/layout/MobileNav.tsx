@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -20,17 +20,66 @@ const BASE_NAV_LINKS = [
 
 export function MobileNav({ open, onClose }: MobileNavProps) {
   const { isLoggedIn, initial, sessionToken, logout } = useAuth();
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
+  // Track the element that opened the nav so we can return focus on close
+  const returnFocusRef = useRef<Element | null>(null);
 
   useEffect(() => {
     if (open) {
       document.body.style.overflow = 'hidden';
+      returnFocusRef.current = document.activeElement;
+      // Move focus into the drawer after the transition starts
+      setTimeout(() => closeBtnRef.current?.focus(), 50);
     } else {
       document.body.style.overflow = '';
+      // Return focus to the trigger element
+      if (returnFocusRef.current instanceof HTMLElement) {
+        returnFocusRef.current.focus();
+      }
     }
     return () => {
       document.body.style.overflow = '';
     };
   }, [open]);
+
+  // Escape key closes the nav; Tab key stays trapped inside the drawer
+  useEffect(() => {
+    if (!open) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+      if (e.key === 'Tab') {
+        const drawer = drawerRef.current;
+        if (!drawer) return;
+        const focusable = Array.from(
+          drawer.querySelectorAll<HTMLElement>(
+            'a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          )
+        ).filter((el) => !el.hasAttribute('disabled'));
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [open, onClose]);
 
   const handleLogout = async () => {
     if (sessionToken) {
@@ -54,6 +103,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
 
       {/* Drawer */}
       <div
+        ref={drawerRef}
         className={cn(
           'fixed top-0 right-0 z-50 h-full w-72 shadow-ambient-hover transition-transform duration-300 ease-in-out',
           'flex flex-col bg-bg',
@@ -73,6 +123,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
             <Image src="/logo.png" alt="hirebridge" width={110} height={50} unoptimized style={{ width: '110px', height: '50px' }} />
           </Link>
           <button
+            ref={closeBtnRef}
             onClick={onClose}
             className="p-2 rounded-full transition-colors text-text-muted hover:bg-surface-lowest"
             aria-label="Close menu"

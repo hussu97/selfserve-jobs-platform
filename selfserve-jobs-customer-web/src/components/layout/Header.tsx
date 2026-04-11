@@ -73,7 +73,7 @@ function CreateListingDropdown() {
             return !o;
           });
         }}
-        aria-haspopup="true"
+        aria-haspopup="menu"
         aria-expanded={open}
         className="flex items-center gap-1 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-text-muted transition-all hover:text-text-main hover:bg-surface/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/40"
       >

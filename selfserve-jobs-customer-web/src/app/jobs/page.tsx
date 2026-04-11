@@ -42,9 +42,29 @@ function filtersToParams(filters: JobFiltersType): URLSearchParams {
   return params;
 }
 
+function JobsPageSkeleton() {
+  return (
+    <div>
+      <div className="hero-gradient">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12">
+          <div className="h-12 w-48 animate-pulse rounded-lg bg-surface mb-2" aria-hidden="true" />
+          <div className="h-6 w-24 animate-pulse rounded-lg bg-surface" aria-hidden="true" />
+        </div>
+      </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <JobCardSkeleton key={i} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function JobsPage() {
   return (
-    <Suspense fallback={<div className="flex justify-center py-20"><span className="text-text-muted">Loading…</span></div>}>
+    <Suspense fallback={<JobsPageSkeleton />}>
       <JobsContent />
     </Suspense>
   );

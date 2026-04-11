@@ -78,7 +78,7 @@ export default function BlogIndexPage() {
                   {post.title}
                 </h2>
                 <p className="text-sm text-text-muted leading-relaxed mb-4">{post.excerpt}</p>
-                <div className="flex items-center justify-between text-xs text-text-muted/70">
+                <div className="flex items-center justify-between text-xs text-text-muted">
                   <span>{post.author}</span>
                   <span>{post.readingMinutes} min read · {formatDate(post.datePublished)}</span>
                 </div>

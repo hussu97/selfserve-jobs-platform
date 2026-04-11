@@ -20,7 +20,7 @@ export const JobCard = memo(function JobCard({ job }: JobCardProps) {
         {/* Row 1: Employment type badge + time posted */}
         <div className="flex items-center justify-between gap-2">
           <EmploymentTypeBadge type={job.employment_type} />
-          <span className="text-xs text-text-muted/70 whitespace-nowrap">{timeAgo(job.created_at)}</span>
+          <span className="text-xs text-text-muted whitespace-nowrap">{timeAgo(job.created_at)}</span>
         </div>
 
         {/* Row 2: Title + Company — full width, no avatar */}
