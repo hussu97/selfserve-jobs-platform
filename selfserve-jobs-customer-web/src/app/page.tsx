@@ -80,12 +80,41 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* ── CTA strip ────────────────────────────────────── */}
+      <section className="bg-primary py-20 sm:py-28">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="font-heading text-4xl sm:text-5xl text-white mb-4">
+            Ready to get <span className="italic">started?</span>
+          </h2>
+          <p className="text-white/70 mb-10 text-lg">
+            Free to post · Free to browse · Always
+          </p>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center sm:justify-center gap-3">
+            <Link
+              href="/profiles/new"
+              className="inline-flex items-center justify-center px-7 py-3.5 rounded-full text-primary font-semibold text-sm bg-white shadow-ambient transition-all hover:bg-surface hover:shadow-ambient-hover active:scale-[0.98]"
+            >
+              Create a Profile
+            </Link>
+            <Link
+              href="/recruiter/register"
+              className="inline-flex items-center justify-center px-7 py-3.5 rounded-full font-semibold text-sm text-white bg-white/10 transition-all hover:bg-white/20 active:scale-[0.98]"
+            >
+              Post a Job
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* ── Why we built this (summary) ──────────────────── */}
       <section className="bg-surface">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
           <p className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-4">
             Our story
           </p>
+          <h2 className="font-heading text-3xl sm:text-4xl text-primary mb-8">
+            Why we built <em>this</em>
+          </h2>
           <p className="text-base leading-relaxed text-text-muted mb-6">
             Economic disruption across the Middle East is real — people are losing jobs, facing salary cuts, and watching
             stability erode. We built hirebridge as a focused response: a place where talent can be discovered and companies
@@ -280,31 +309,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── CTA strip ────────────────────────────────────── */}
-      <section className="bg-primary py-20 sm:py-28">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="font-heading text-4xl sm:text-5xl text-white mb-4">
-            Ready to get <span className="italic">started?</span>
-          </h2>
-          <p className="text-white/70 mb-10 text-lg">
-            Free to post · Free to browse · Always
-          </p>
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center sm:justify-center gap-3">
-            <Link
-              href="/profiles/new"
-              className="inline-flex items-center justify-center px-7 py-3.5 rounded-full text-primary font-semibold text-sm bg-white shadow-ambient transition-all hover:bg-surface hover:shadow-ambient-hover active:scale-[0.98]"
-            >
-              Create a Profile
-            </Link>
-            <Link
-              href="/recruiter/register"
-              className="inline-flex items-center justify-center px-7 py-3.5 rounded-full font-semibold text-sm text-white bg-white/10 transition-all hover:bg-white/20 active:scale-[0.98]"
-            >
-              Post a Job
-            </Link>
-          </div>
-        </div>
-      </section>
 
     </div>
   );

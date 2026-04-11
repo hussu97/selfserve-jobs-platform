@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+- **Homepage restructured** — "Ready to get started?" CTA strip moved above "Our story" section; "Our story" section gains an eyebrow + `h2` heading ("Why we built *this*") matching the about page pattern; background alternation (primary → surface → bg → surface → bg) preserved throughout.
+
 ### Added
 - **Phase 6 — SEO & Structured Data (full implementation)**
   - *OG image:* `app/opengraph-image.tsx` added — branded `ImageResponse` (1200×630) with design-system palette (sage green, forest, cream); serves as site-wide default OG/Twitter card for all pages without a page-specific image; replaces broken `/og-default.png` reference in root layout metadata
