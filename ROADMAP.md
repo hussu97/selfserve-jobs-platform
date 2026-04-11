@@ -65,6 +65,9 @@ Organized into phases by criticality. Each phase should be completed before star
 - [x] **Add pre-deploy health check in CI** — `deploy-api.yml` polls `/api/v1/health` up to 5 times after deploy.
 - [x] **Add secrets validation step in CI** — `deploy-api.yml` validates all 4 required GCP secrets before auth.
 - [ ] **Restrict GCS CORS** — Current config allows `origin: ["*"]`. Replace with actual frontend domain(s). (Requires GCS bucket config change — done via `gsutil` or Console, not code.)
+- [ ] **Disable interactive API docs in production** — `/api/docs`, `/api/redoc`, and `/api/openapi.json` are publicly accessible. Gate behind admin auth or disable entirely in production via `docs_url=None` when `ENVIRONMENT=production`.
+- [ ] **Add `Referrer-Policy` security header** — Missing from security headers middleware. Add `Referrer-Policy: strict-origin-when-cross-origin` to prevent leaking full URLs to third parties.
+- [ ] **Add `Permissions-Policy` security header** — Restrict browser features not used by the platform (camera, microphone, geolocation, payment) via `Permissions-Policy` header.
 
 ### Health & Observability
 
@@ -89,10 +92,10 @@ Organized into phases by criticality. Each phase should be completed before star
 
 > Listings currently never expire despite having `expires_at` set. This phase implements the full lifecycle.
 
-- [ ] **Implement auto-expiry cron for listings** — `expires_at` is set on creation but nothing transitions listings to `expired` status. Add `POST /api/v1/internal/expire-listings` endpoint (protected by shared secret). SQL: `UPDATE job SET status='expired' WHERE status='active' AND expires_at < now()` (same for profile). Wire to Cloud Scheduler.
-- [ ] **Add session/token cleanup job** — Auth sessions, expired verification codes, and email logs grow unbounded. Add scheduled cleanup for records older than 30/90 days respectively.
-- [ ] **Add resume cleanup for removed profiles** — When a profile is removed, the GCS resume file should be deleted. Currently orphaned.
-- [ ] **Send expiry warning emails** — Notify listing owners 7 days before expiry with option to renew (extend 60 days).
+- [x] **Implement auto-expiry cron for listings** — `POST /api/v1/internal/expire-listings` endpoint added (protected by `X-Internal-Secret` header). Transitions active listings past `expires_at` to `expired` status for both jobs and profiles. Ready for Cloud Scheduler.
+- [x] **Add session/token cleanup job** — `POST /api/v1/internal/cleanup` endpoint added. Deletes expired auth sessions, expired login tokens, and email logs older than 90 days.
+- [x] **Add resume cleanup for removed profiles** — `remove_profile()` now calls `storage_service.delete_file()` for the GCS resume when `resume_gcs_path` is set. Gracefully handles GCS failures without blocking removal.
+- [x] **Send expiry warning emails** — Integrated into expire-listings endpoint. Sends branded warning emails 7 days before expiry with management link CTA. Uses 2-hour delivery window to prevent duplicates across hourly invocations.
 
 ---
 
@@ -139,6 +142,13 @@ Organized into phases by criticality. Each phase should be completed before star
 - [x] **Add blog post structured data** — Blog pages missing `Article` schema, `og:type: "article"`, and author metadata.
 - [x] **Validate sitemap size** — Dynamic sitemap generates multiple files but doesn't enforce the 50,000 URL / 50MB per-file limits. Add validation.
 
+### SEO Enhancements
+
+- [ ] **Integrate Google Indexing API** — Use `URL_UPDATED` / `URL_DELETED` API calls when listings are created, verified, or expired. Gets new listings into Google for Jobs within minutes instead of waiting for crawl cycles.
+- [ ] **Return 410 Gone for expired listings** — Expired listing URLs currently return 404 or redirect. Return HTTP 410 so search engines deindex stale results faster.
+- [ ] **Add `hiringOrganization.logo` to JobPosting JSON-LD** — If companies provide a logo URL, include it in structured data for richer Google for Jobs display.
+- [ ] **Add canonical URLs with pagination** — Browse pages lack `rel="canonical"` with page parameter handling. Add to prevent duplicate content across paginated results.
+
 ---
 
 ## Phase 7 — Test Coverage & CI Hardening
@@ -170,6 +180,9 @@ Organized into phases by criticality. Each phase should be completed before star
 - [x] **Add security scanning to CI** — `bandit -r app/ -ll` added to `test-api.yml`; `npm audit --audit-level=high` added to `test-web.yml`; both non-blocking.
 - [x] **Add E2E test suite** — Playwright scaffold added: `playwright.config.ts` (Desktop Chrome, Mobile Chrome, Tablet projects), `e2e/smoke.spec.ts`, `e2e/responsive.spec.ts`, `e2e/critical-path.spec.ts`. Full create→verify→delete flow gated behind `E2E_FULL_FLOW=true`. CI workflow: `.github/workflows/e2e.yml` (manual dispatch, `BASE_URL` override, artifact upload).
 - [x] **Parallelize API and web test jobs** — `.github/workflows/test-all.yml` added: single workflow with `test-api` and `test-web` as parallel jobs using reusable workflow references.
+- [ ] **Add API contract testing** — Use `schemathesis` to auto-generate fuzz tests from the OpenAPI spec, catching schema drift between Pydantic models and actual API responses.
+- [ ] **Add OWASP ZAP DAST scanning in CI** — Run automated dynamic application security testing against staging on each deploy to catch injection flaws and broken auth.
+- [ ] **Add preview deployments for frontend PRs** — Configure Vercel preview deployments that point to a staging API, so every frontend PR gets a live URL for review.
 
 ---
 
@@ -217,6 +230,12 @@ Organized into phases by criticality. Each phase should be completed before star
 
 - [ ] **Connection pooling with PgBouncer** — Direct asyncpg connections to CloudSQL limited by instance. Add PgBouncer for connection multiplexing at scale.
 
+### Monitoring & Observability
+
+- [ ] **Add OpenTelemetry tracing** — Instrument FastAPI with `opentelemetry-instrumentation-fastapi` for distributed request traces. Export to Cloud Trace or Jaeger for production debugging.
+- [ ] **Add Prometheus-compatible metrics endpoint** — Expose `/metrics` with request count, latency histograms, and error rates for alerting and dashboards.
+- [ ] **Add uptime monitoring with external health checks** — Configure an external monitor (e.g., Uptime Robot, Better Stack) to ping `/api/v1/health` and alert on downtime or degraded dependencies.
+
 ---
 
 ## Phase 11 — Feature Requests
@@ -230,12 +249,17 @@ Organized into phases by criticality. Each phase should be completed before star
 - [ ] **Application tracking (lightweight)** — No way for job posters to know how many people clicked their contact link. Add anonymous click tracking on contact_url/contact_email reveal.
 - [ ] **Similar listings recommendations** — Detail pages show no related content. Add "Similar Jobs" / "Similar Profiles" section based on matching skills/location.
 - [ ] **Dark mode** — No dark mode specification or implementation. Add theme toggle respecting `prefers-color-scheme`, using design system CSS variables.
+- [ ] **AI-powered job description quality scorer** — On job creation, run description through a lightweight LLM check that flags vague requirements, missing salary info, or biased language, and suggests improvements before publishing.
+- [ ] **Listing analytics dashboard for employers** — Show view count trends, referral sources (via UTM params), and how the listing compares to similar postings. Accessible via the management magic link.
+- [ ] **RSS/Atom feed for job listings** — Generate `/feed.xml` from active listings. Enables job aggregators, RSS readers, and partner sites to syndicate listings automatically.
 
 ### Platform Features
 
 - [ ] **Employer/company profiles** — Jobs are standalone with no company page. Add optional company profile that groups all listings from the same company.
 - [ ] **API rate limit headers** — API doesn't return rate limit headers (`X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`). Add to all rate-limited endpoints.
 - [ ] **Public API for job boards** — No public API for third-party aggregators. Add read-only API with API key auth for partners to pull active listings.
+- [ ] **Multi-language support (i18n)** — Platform is English-only. Add Next.js internationalization with at least Arabic support given UAE market, including RTL layout.
+- [ ] **Email notification preferences** — No way for users to control which emails they receive. Add a preferences page (accessible via magic link) to opt out of specific email types.
 
 ---
 
@@ -249,6 +273,18 @@ Organized into phases by criticality. Each phase should be completed before star
 
 ---
 
+## Phase 13 — Compliance & Data Privacy
+
+> Legal compliance, GDPR readiness, and data lifecycle policies.
+
+- [ ] **Implement automated PII purging for expired listings** — GDPR requires candidate data for expired listings to be purged within a reasonable retention period. Add a scheduled job that anonymizes or deletes profile PII (name, email, resume) after `expires_at + 180 days`.
+- [ ] **Add data export endpoint (DSAR support)** — GDPR Right of Access requires providing all stored data about a person on request. Add `GET /api/v1/data-export?email={email}` (authenticated via verification code) that returns all stored data as JSON.
+- [ ] **Add privacy policy and terms of service pages** — Platform lacks legal pages. Add `/privacy` and `/terms` routes with content reviewed by legal.
+- [ ] **Add cookie/localStorage disclosure** — Platform uses localStorage for bookmarks and session dedup. Add a minimal privacy notice banner disclosing this usage per ePrivacy/GDPR requirements.
+- [ ] **Implement right-to-deletion flow** — Allow users to request deletion of all data associated with their email address via a verified email flow. Remove all listings, reports, verification records, and GCS files.
+
+---
+
 ## Dependency Notes
 
 - **Rate limiting** (Phase 2) should land before **auto-expiry cron** (Phase 4) — cron endpoint needs protection.
@@ -258,6 +294,10 @@ Organized into phases by criticality. Each phase should be completed before star
 - **Test expansion** (Phase 7) should cover all changes from Phases 1-6.
 - **Admin audit log** (Phase 8) should land before **admin 2FA** — audit trail captures auth events.
 - **Email retry** (Phase 9) depends on **non-blocking Resend** (Phase 1) — can't retry blocking calls efficiently.
+- **PII purging** (Phase 13) depends on **resume cleanup** (Phase 4) — reuse the GCS deletion logic for bulk cleanup.
+- **Data export** (Phase 13) should land before **right-to-deletion** — users should be able to export before deleting.
+- **Google Indexing API** (Phase 6) should land after **auto-expiry cron** (Phase 4) — so expired listings trigger `URL_DELETED` calls.
+- **OpenTelemetry** (Phase 10) should land after **Sentry** (Phase 3) — can correlate traces with error events.
 
 ---
 
