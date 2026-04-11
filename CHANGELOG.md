@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Security
+- **Remove hardcoded dev DB credentials from `alembic.ini`** — replaced `postgresql+asyncpg://jobs4u:jobs4u_dev@...` with placeholder `driver://`; runtime override in `alembic/env.py` already supplies the real URL
+- **Remove default DB URL from `app/config.py`** — `database_url` field no longer has a default value; startup fails with a clear pydantic validation error if `DATABASE_URL` env var is not set
+
 ### Fixed
 - **Next.js logo image aspect-ratio warning** — added explicit `style={{ width: 'Xpx', height: 'Ypx' }}` inline styles to all three logo `<Image>` usages (Header, Footer, MobileNav); Tailwind preflight's `height: auto` was making computed height differ from the `height` attribute while width matched exactly, triggering the "one dimension modified" warning
 - **Next.js smooth-scroll route transition warning** — added `data-scroll-behavior="smooth"` to the `<html>` element in `layout.tsx`

@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    database_url: str = "postgresql+asyncpg://jobs4u:jobs4u_dev@localhost:5432/jobs4u"
+    database_url: str  # required — set via DATABASE_URL env var; no default to avoid credential exposure
     frontend_url: str = "http://localhost:3000"
     gcs_bucket_name: str = ""
     resend_api_key: str = ""
