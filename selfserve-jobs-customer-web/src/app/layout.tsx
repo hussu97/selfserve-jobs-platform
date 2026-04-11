@@ -83,7 +83,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${newsreader.variable} ${manrope.variable}`}>
+    <html lang="en" className={`${newsreader.variable} ${manrope.variable}`} data-scroll-behavior="smooth">
       <body className="flex flex-col min-h-screen" style={{ backgroundColor: 'var(--color-bg)' }}>
         <JsonLd data={[organizationSchema(), websiteSchema()]} />
         <AuthProvider>

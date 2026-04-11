@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+- **Next.js logo image aspect-ratio warning** — added `style={{ height: 'auto' }}` to all three logo `<Image>` usages (Header, Footer, MobileNav) so Tailwind preflight's `max-width: 100%` doesn't distort aspect ratio
+- **Next.js smooth-scroll route transition warning** — added `data-scroll-behavior="smooth"` to the `<html>` element in `layout.tsx`
+
 ### Added
 - **Profile owner view toggle** — profile owners now see their own sensitive data (email, phone, resume) when viewing their profile; a "Your view / Public view" toggle in the top-right lets them switch to see exactly what the public sees; backend returns `is_owner: bool` in `ProfileResponse` and includes sensitive fields when owner is detected
 - **Homepage "Why we built this" summary** — added a concise story summary section above the "Simple by design" section on the homepage, linking to the full about page
