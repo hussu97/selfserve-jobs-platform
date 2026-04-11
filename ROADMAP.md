@@ -177,9 +177,9 @@ Organized into phases by criticality. Each phase should be completed before star
 
 > Improve admin tooling for content moderation and operations.
 
-- [ ] **Add admin audit log** — No record of who approved/rejected which recruiter, when, or why. Add `admin_audit_log` table: `(id, admin_email, action, entity_type, entity_code, details_json, created_at)`. Log all admin mutations.
-- [ ] **Add manual entity flagging** — Admins cannot manually flag a job/profile for removal without waiting for 3 reports. Add `POST /api/v1/admin/entities/{type}/{code}/flag` with reason.
-- [ ] **Add session invalidation on admin email removal** — If admin email is removed from `ADMIN_EMAILS` config, existing sessions for that email should be invalidated on next request.
+- [x] **Add admin audit log** — No record of who approved/rejected which recruiter, when, or why. Add `admin_audit_log` table: `(id, admin_email, action, entity_type, entity_code, details_json, created_at)`. Log all admin mutations.
+- [x] **Add manual entity flagging** — Admins cannot manually flag a job/profile for removal without waiting for 3 reports. Add `POST /api/v1/admin/entities/{type}/{code}/flag` with reason.
+- [x] **Add session invalidation on admin email removal** — If admin email is removed from `ADMIN_EMAILS` config, existing sessions for that email should be invalidated on next request.
 
 ---
 
@@ -187,11 +187,11 @@ Organized into phases by criticality. Each phase should be completed before star
 
 > Email delivery reliability and legal compliance.
 
-- [ ] **Add List-Unsubscribe header** — All transactional emails lack unsubscribe mechanism. Required by CAN-SPAM (US) and good practice under GDPR. Add `List-Unsubscribe` header with mailto and URL options.
-- [ ] **Implement email retry with backoff** — Single-attempt email sends with no retry. Add exponential backoff retry (3 attempts, 1s/5s/30s delays) before marking as failed.
-- [ ] **Add circuit breaker for Resend** — If Resend API fails repeatedly, stop attempting sends for a cooldown period rather than queuing failures. Log circuit state changes.
-- [ ] **Add report notification emails for admins** — `send_admin_new_recruiter_notification` function exists but is never called. Implement admin notification for: new reports (3+ threshold), new recruiter registrations.
-- [ ] **Remove hardcoded domain from email templates** — `base.py` hardcodes `hirebridgeuae.com`. Pull from `settings.frontend_url` for compatibility with custom domains.
+- [x] **Add List-Unsubscribe header** — All transactional emails lack unsubscribe mechanism. Required by CAN-SPAM (US) and good practice under GDPR. Add `List-Unsubscribe` header with mailto and URL options.
+- [x] **Implement email retry with backoff** — Single-attempt email sends with no retry. Add exponential backoff retry (3 attempts, 1s/5s/30s delays) before marking as failed.
+- [x] **Add circuit breaker for Resend** — If Resend API fails repeatedly, stop attempting sends for a cooldown period rather than queuing failures. Log circuit state changes.
+- [x] **Add report notification emails for admins** — `send_admin_new_recruiter_notification` function exists but is never called. Implement admin notification for: new reports (3+ threshold), new recruiter registrations.
+- [x] **Remove hardcoded domain from email templates** — `base.py` hardcodes `hirebridgeuae.com`. Pull from `settings.frontend_url` for compatibility with custom domains.
 
 ---
 
@@ -201,15 +201,15 @@ Organized into phases by criticality. Each phase should be completed before star
 
 ### Backend
 
-- [ ] **Fix N+1 query in admin report listing** — `admin_service.py` enriches each report with entity title in a loop (1 + N queries). Refactor to use JOIN or batch IN clause.
+- [x] **Fix N+1 query in admin report listing** — `admin_service.py` enriches each report with entity title in a loop (1 + N queries). Refactor to use JOIN or batch IN clause.
 - [ ] **Batch view count writes** — Each page view triggers an atomic UPDATE. At scale, high-traffic listings cause write contention. Buffer counts in Redis (or in-memory), flush to DB on interval (e.g., every 60 seconds).
 - [ ] **Add query result caching** — List endpoints (browse jobs/profiles) hit DB on every request. Add short TTL cache (30-60s) for list queries using Redis or in-memory cache.
-- [ ] **Enforce max key_skills array length** — JSONB `key_skills` arrays have no max length at DB level. Add CHECK constraint: `array_length(key_skills, 1) <= 30`.
-- [ ] **Add graceful shutdown handling** — Lifespan handler only covers startup. Add shutdown hook to drain in-flight requests and close DB connections cleanly.
+- [x] **Enforce max key_skills array length** — JSONB `key_skills` arrays have no max length at DB level. Add CHECK constraint: `array_length(key_skills, 1) <= 30`.
+- [x] **Add graceful shutdown handling** — Lifespan handler only covers startup. Add shutdown hook to drain in-flight requests and close DB connections cleanly.
 
 ### Frontend
 
-- [ ] **Implement ISR or SWR caching for browse pages** — List pages fetch fresh data on every navigation. Add `revalidate` to server components or use SWR for client-side caching.
+- [x] **Implement ISR or SWR caching for browse pages** — List pages fetch fresh data on every navigation. Add `revalidate` to server components or use SWR for client-side caching.
 - [ ] **Add image CDN optimization** — Profile/company images (if added) should go through Next.js Image Optimization with specific width/quality settings.
 - [ ] **Bundle analysis and code splitting** — No bundle analysis configured. Add `@next/bundle-analyzer` to identify and split large chunks.
 
@@ -225,7 +225,7 @@ Organized into phases by criticality. Each phase should be completed before star
 
 ### User-Facing Features
 
-- [ ] **Job/profile renewal flow** — Listings expire after 60 days with no renewal mechanism. Add "Renew" button on manage page that extends `expires_at` by 60 days (max 2 renewals).
+- [x] **Job/profile renewal flow** — Listings expire after 60 days with no renewal mechanism. Add "Renew" button on manage page that extends `expires_at` by 60 days (max 2 renewals).
 - [ ] **Saved search alerts** — Users can bookmark listings but can't save searches. Add ability to save search criteria and receive weekly email with new matches.
 - [ ] **Application tracking (lightweight)** — No way for job posters to know how many people clicked their contact link. Add anonymous click tracking on contact_url/contact_email reveal.
 - [ ] **Similar listings recommendations** — Detail pages show no related content. Add "Similar Jobs" / "Similar Profiles" section based on matching skills/location.
@@ -243,8 +243,8 @@ Organized into phases by criticality. Each phase should be completed before star
 
 > Improve onboarding, troubleshooting, and operational runbooks.
 
-- [ ] **Add troubleshooting section to PRODUCTION.md** — No guidance for common failures: migration errors, GCS auth failures, Resend outages, CloudSQL connection limits.
-- [ ] **Add API documentation (OpenAPI)** — FastAPI auto-generates OpenAPI spec but no security scheme declared, no 429 response documented, no example values on schemas. Enrich OpenAPI spec.
+- [x] **Add troubleshooting section to PRODUCTION.md** — No guidance for common failures: migration errors, GCS auth failures, Resend outages, CloudSQL connection limits.
+- [x] **Add API documentation (OpenAPI)** — FastAPI auto-generates OpenAPI spec but no security scheme declared, no 429 response documented, no example values on schemas. Enrich OpenAPI spec.
 - [ ] **Export design tokens as JSON** — Design system lives only in CLAUDE.md and HTML mockups. Export as `design-tokens.json` consumable by Tailwind config and email templates.
 
 ---
