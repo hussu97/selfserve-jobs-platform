@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Restrict Next.js `remotePatterns` from wildcard** — `next.config.ts` previously allowed all hostnames (`hostname: '**'`) for both http and https; now restricted to `storage.googleapis.com` (https only)
 - **Sanitize ReactMarkdown rendering** — `JobDetail.tsx` and `ProfileDetail.tsx` now pass an explicit `allowedElements` whitelist to `ReactMarkdown`, blocking all non-whitelisted HTML elements to prevent XSS via user-supplied markdown
 - **Handle email send failures with HTTP 503** — all router callsites that previously ignored `send_*_email()` return values now check the result; a `False` return raises `HTTP_503_SERVICE_UNAVAILABLE` so callers are notified instead of silently succeeding (affected: `profiles.py`, `verification.py`, `auth.py`, `recruiters.py`)
+- **Make Resend SDK call non-blocking** — `resend.Emails.send()` is a synchronous call; wrapped in `asyncio.to_thread()` in `email_service.py` so it no longer blocks the event loop during production email sends
 
 ### Fixed
 - **Next.js logo image aspect-ratio warning** — added explicit `style={{ width: 'Xpx', height: 'Ypx' }}` inline styles to all three logo `<Image>` usages (Header, Footer, MobileNav); Tailwind preflight's `height: auto` was making computed height differ from the `height` attribute while width matched exactly, triggering the "one dimension modified" warning

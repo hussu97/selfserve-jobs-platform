@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from typing import Any
 
@@ -93,7 +94,7 @@ async def _send(
             "html": html_body,
             "text": text_body,
         }
-        result = resend.Emails.send(params)
+        result = await asyncio.to_thread(resend.Emails.send, params)
         resend_id = result.get("id") if isinstance(result, dict) else getattr(result, "id", None)
         success = True
     except Exception as exc:
