@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Fixed
+- **Admin can now post jobs** — `isActiveRecruiter` in `AuthContext` was gated on `userType === 'recruiter'`, excluding admins; fixed to also return `true` when `isAdmin`
 - **Founding year corrected to 2026** — updated `llms.txt` route (both inline text and `Launch year` field) to reflect the correct founding year
 
 ### Added
