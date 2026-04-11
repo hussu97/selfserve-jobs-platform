@@ -7,6 +7,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- **Sentry error monitoring for frontend** — `@sentry/nextjs` installed; `sentry.client.config.ts`, `sentry.server.config.ts`, `sentry.edge.config.ts` created; `src/instrumentation.ts` registers server/edge configs via Next.js instrumentation hook; `next.config.ts` wrapped with `withSentryConfig` (source map upload gated on `SENTRY_AUTH_TOKEN`, tunnel route `/monitoring` to bypass ad-blockers); errors only sent in production, 10% performance tracing sample rate
+
+### Removed
+- **Vercel Analytics and Speed Insights** — removed `@vercel/analytics` and `@vercel/speed-insights` packages and their `<Analytics />` / `<SpeedInsights />` components from `layout.tsx`
+
+### Added
 - **Phase 7 — Test Coverage & CI Hardening (full implementation)**
   - *Backend — rate limiting:* `test_coverage_gaps.py` extended with `test_verify_ip_rate_limit` (POST /verify, 5/minute), `test_create_job_ip_rate_limit` (POST /jobs, 10/hour), and `test_report_ip_rate_limit` (POST /reports, 10/hour) — verifies slowapi middleware rejects the N+1 request with HTTP 429 after counting all requests regardless of their response status
   - *Backend — view count:* `test_view_count_accumulates_over_multiple_requests` — verifies five sequential GET /jobs/{code} requests each increment the counter atomically so the final count equals 5
