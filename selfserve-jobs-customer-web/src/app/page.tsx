@@ -80,8 +80,26 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── How it works ─────────────────────────────────── */}
+      {/* ── Why we built this (summary) ──────────────────── */}
       <section className="bg-surface">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+          <p className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-4">
+            Our story
+          </p>
+          <p className="text-base leading-relaxed text-text-muted mb-6">
+            Economic disruption across the Middle East is real — people are losing jobs, facing salary cuts, and watching
+            stability erode. We built hirebridge as a focused response: a place where talent can be discovered and companies
+            post real jobs, without algorithms, spam, or pay-to-rank. Talent profiles are friction-free. Recruiters
+            register once and get verified access to contact details and resumes. Free to post · Free to browse · Always.
+          </p>
+          <Link href="/about" className="text-sm font-semibold text-secondary hover:text-secondary-hover transition-colors">
+            Read our story →
+          </Link>
+        </div>
+      </section>
+
+      {/* ── How it works ─────────────────────────────────── */}
+      <section className="bg-bg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
           <div className="text-center mb-12">
             <p className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-3">
@@ -145,7 +163,7 @@ export default async function HomePage() {
       </section>
 
       {/* ── Available Talent ─────────────────────────────── (TALENT FIRST) */}
-      <section className="bg-bg py-20 sm:py-28">
+      <section className="bg-surface py-20 sm:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Section header */}
           <div className="flex items-end justify-between mb-10">
@@ -204,7 +222,7 @@ export default async function HomePage() {
       </section>
 
       {/* ── Recent Jobs ──────────────────────────────────── */}
-      <section className="bg-surface py-20 sm:py-28">
+      <section className="bg-bg py-20 sm:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Section header */}
           <div className="flex items-end justify-between mb-10">

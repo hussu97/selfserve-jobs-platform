@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+- **Profile owner view toggle** — profile owners now see their own sensitive data (email, phone, resume) when viewing their profile; a "Your view / Public view" toggle in the top-right lets them switch to see exactly what the public sees; backend returns `is_owner: bool` in `ProfileResponse` and includes sensitive fields when owner is detected
+- **Homepage "Why we built this" summary** — added a concise story summary section above the "Simple by design" section on the homepage, linking to the full about page
+
+### Fixed
+- **Recruiter gate shown after login/verify** — when a recruiter verified a non-recruiter entity (job/profile), `verify/page.tsx` derived `userType` from `entity_type` (e.g. `'job'` → `undefined`), losing the recruiter identity; fixed by returning `user_type` from the backend `verify_code` service and using it directly in the frontend login call
+- **ProfileForm email field** — email is now pre-seeded from the logged-in session and disabled (non-editable) when the user is authenticated, preventing profile creation under a different email
+- **Double `getProfile` fetch on profile detail page** — `generateMetadata` and the page component each called `getProfile` independently; wrapped with React `cache()` to deduplicate the two calls into one within a single render cycle
+
+### Changed
+- **About page "Find your next opportunity" steps** — reordered: 01 = List yourself, 02 = Browse or search, 03 = Apply directly (was 01 Browse, 02 Apply, 03 List)
+- **RSC prefetch reduction on profile detail page** — contextual links (city, skills, "Browse all") now use `prefetch={false}` to cut background RSC requests from ~15+ down to a handful on profile detail pages
+- **`is_owner` on `ProfileResponse`** — backend profile detail endpoint now detects session email == profile email and sets `is_owner=True`, includes sensitive fields for the owner (without requiring active recruiter status)
+- **`user_type` in `VerificationResponse`** — backend now includes `user_type` from the created auth session in the verification response, so the frontend can set the correct user type regardless of which entity type was verified
+
 ### Fixed
 - **GCS signed URL 500 on Cloud Run** — `blob.generate_signed_url()` with `version="v4"` fails on Cloud Run because the default Compute Engine credentials have no private key to sign with; fixed by refreshing credentials and passing `service_account_email` + `access_token` to both `generate_signed_url` and `generate_signed_upload_url` in `storage_service.py` so GCS uses IAM-based signing instead; also granted `roles/iam.serviceAccountTokenCreator` to the API service account on itself (required for `signBlob` IAM calls to succeed) and documented in `PRODUCTION.md`
 - **Sitemap 404** — removed `generateSitemaps` (multi-sitemap pattern) from `sitemap.ts` and replaced with a single `sitemap()` export; the multi-sitemap approach required a runtime index call that could 404 if the API was unreachable; single sitemap is served directly at `/sitemap.xml` with `revalidate = 3600` and API errors are silently skipped rather than failing the entire route

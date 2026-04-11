@@ -78,12 +78,16 @@ async def get_profile(
     db: AsyncSession = Depends(get_session),
 ):
     profile = await profile_service.get_profile_detail(db, code)
-    # Include sensitive fields only for active recruiters
+    # Include sensitive fields for active recruiters or the profile owner
     include_sensitive = False
-    if optional_session and optional_session.user_type == "recruiter":
-        recruiter = await recruiter_service.get_by_email(db, optional_session.email)
-        include_sensitive = recruiter is not None and recruiter.status == "active"
-    return ProfileResponse.from_orm_with_resume(profile, include_sensitive=include_sensitive)
+    is_owner = False
+    if optional_session:
+        if optional_session.email == profile.email:
+            is_owner = True
+        elif optional_session.user_type == "recruiter":
+            recruiter = await recruiter_service.get_by_email(db, optional_session.email)
+            include_sensitive = recruiter is not None and recruiter.status == "active"
+    return ProfileResponse.from_orm_with_resume(profile, include_sensitive=include_sensitive, is_owner=is_owner)
 
 
 @router.post("/{code}/view", status_code=status.HTTP_204_NO_CONTENT)

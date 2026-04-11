@@ -11,18 +11,18 @@ export const metadata: Metadata = {
 const JOB_SEEKER_STEPS = [
   {
     step: '01',
+    title: 'List yourself',
+    desc: 'Create a talent profile so recruiters and employers can find you. Just verify your email to go live — no account needed.',
+  },
+  {
+    step: '02',
     title: 'Browse or search',
     desc: 'Use filters to find jobs by country, employment type, skills, and more. No account required.',
   },
   {
-    step: '02',
+    step: '03',
     title: 'Apply directly',
     desc: 'Contact the employer directly via email or application URL. No fees.',
-  },
-  {
-    step: '03',
-    title: 'List yourself',
-    desc: 'Create a talent profile so recruiters and employers can find you. Just verify your email to go live — no account needed.',
   },
 ];
 

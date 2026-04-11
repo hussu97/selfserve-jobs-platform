@@ -88,6 +88,7 @@ async def verify_code(
             "email": verification.email,
             "session_token": session.session_token,
             "recruiter_status": recruiter.status,
+            "user_type": session.user_type,
         }
 
     # Activate ALL pending jobs and profiles for this email — one verified email
@@ -115,6 +116,7 @@ async def verify_code(
         "entity_code": verification.entity_code,
         "email": verification.email,
         "session_token": session.session_token,
+        "user_type": session.user_type,
     }
 
 

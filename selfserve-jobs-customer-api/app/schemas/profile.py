@@ -83,14 +83,22 @@ class ProfileResponse(BaseModel):
     has_resume: bool
     is_verified: bool
     is_active: bool
-    # Sensitive fields — only populated for active recruiters
+    # Sensitive fields — populated for active recruiters and the profile owner
     email: str | None = None
     contact_number: str | None = None
+    # True when the requesting session email matches the profile email
+    is_owner: bool = False
 
     model_config = {"from_attributes": True}
 
     @classmethod
-    def from_orm_with_resume(cls, obj, include_sensitive: bool = False) -> "ProfileResponse":
+    def from_orm_with_resume(
+        cls,
+        obj,
+        include_sensitive: bool = False,
+        is_owner: bool = False,
+    ) -> "ProfileResponse":
+        show_sensitive = include_sensitive or is_owner
         data = {
             "code": obj.profile_code,
             "person_name": obj.person_name,
@@ -111,8 +119,9 @@ class ProfileResponse(BaseModel):
             "has_resume": bool(obj.resume_gcs_path),
             "is_verified": obj.email_verified,
             "is_active": obj.status == "active",
-            "email": obj.email if include_sensitive else None,
-            "contact_number": obj.contact_number if include_sensitive else None,
+            "email": obj.email if show_sensitive else None,
+            "contact_number": obj.contact_number if show_sensitive else None,
+            "is_owner": is_owner,
         }
         return cls(**data)
 

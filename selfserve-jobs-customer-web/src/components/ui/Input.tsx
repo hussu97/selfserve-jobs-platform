@@ -35,6 +35,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             error
               ? 'bg-red-50 ring-1 ring-red-400'
               : '',
+            props.disabled
+              ? 'opacity-60 cursor-not-allowed'
+              : '',
             className
           )}
           {...props}

@@ -62,7 +62,7 @@ function VerifyContent() {
         setResult(res);
         // Auto-login: verification activates the listing and creates a session
         if (res.session_token && res.email) {
-          login(res.session_token, res.email, res.entity_type === 'recruiter' ? 'recruiter' : undefined, undefined, res.recruiter_status);
+          login(res.session_token, res.email, res.user_type ?? undefined, undefined, res.recruiter_status);
         }
         trackEvent(`email-verify-success-${res.entity_type ?? 'unknown'}`);
         setState('success');

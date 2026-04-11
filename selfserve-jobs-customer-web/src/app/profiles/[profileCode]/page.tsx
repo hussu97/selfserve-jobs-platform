@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -10,6 +11,9 @@ import { personSchema } from '@/lib/schema';
 import { getProfile, getProfiles } from '@/lib/api';
 import { truncate } from '@/lib/utils';
 
+// Deduplicate the getProfile fetch between generateMetadata and the page component
+const getProfileCached = cache(getProfile);
+
 interface PageProps {
   params: Promise<{ profileCode: string }>;
 }
@@ -17,7 +21,7 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { profileCode } = await params;
   try {
-    const profile = await getProfile(profileCode);
+    const profile = await getProfileCached(profileCode);
     const title = `${profile.person_name} — ${profile.current_title}`;
     const description = `${profile.current_title} based in ${profile.current_city}, ${profile.current_country}. ${profile.years_of_experience} years of experience. ${truncate(profile.brief, 100)}`;
     return {
@@ -44,7 +48,7 @@ export default async function ProfileDetailPage({ params }: PageProps) {
 
   let profile;
   try {
-    profile = await getProfile(profileCode);
+    profile = await getProfileCached(profileCode);
   } catch {
     notFound();
   }
@@ -74,7 +78,7 @@ export default async function ProfileDetailPage({ params }: PageProps) {
             <section className="mt-16">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="font-heading text-xl text-primary">More Talent</h2>
-                <Link href="/profiles" className="text-sm font-medium hover:opacity-70 text-primary">
+                <Link href="/profiles" prefetch={false} className="text-sm font-medium hover:opacity-70 text-primary">
                   Browse all →
                 </Link>
               </div>
@@ -86,11 +90,12 @@ export default async function ProfileDetailPage({ params }: PageProps) {
             </section>
           )}
 
-          {/* Contextual links */}
+          {/* Contextual links — prefetch disabled to reduce RSC background requests */}
           <div className="mt-12 flex flex-wrap gap-2">
             {profile.current_city && citySlug && (
               <Link
                 href={`/profiles/in/${citySlug}`}
+                prefetch={false}
                 className="text-xs uppercase tracking-wider px-3 py-1.5 rounded-full bg-surface text-text-muted hover:text-text-main hover:bg-surface-container-high transition-colors"
               >
                 More talent in {profile.current_city}
@@ -100,6 +105,7 @@ export default async function ProfileDetailPage({ params }: PageProps) {
               <Link
                 key={skill}
                 href={`/profiles/skill/${skill.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
+                prefetch={false}
                 className="text-xs uppercase tracking-wider px-3 py-1.5 rounded-full bg-surface text-text-muted hover:text-text-main hover:bg-surface-container-high transition-colors"
               >
                 {skill} talent

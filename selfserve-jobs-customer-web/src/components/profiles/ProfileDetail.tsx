@@ -35,27 +35,52 @@ const RELOCATION_BADGE: Record<string, 'success' | 'default' | 'warning'> = {
 export function ProfileDetail({ profile }: ProfileDetailProps) {
   const { isActiveRecruiter, sessionToken } = useAuth();
   const [resumeUrl, setResumeUrl] = useState<string | null>(null);
+  // For profile owners: toggle between your real data and public (masked) view
+  const [showPublicView, setShowPublicView] = useState(false);
+
+  const canSeeContact = profile.is_owner
+    ? !showPublicView
+    : isActiveRecruiter;
 
   useEffect(() => {
-    if (isActiveRecruiter && profile.has_resume && sessionToken) {
+    if ((isActiveRecruiter || profile.is_owner) && profile.has_resume && sessionToken) {
       getResumeUrl(profile.code, sessionToken)
         .then((r) => setResumeUrl(r.url))
         .catch(() => setResumeUrl(null));
     }
-  }, [isActiveRecruiter, profile.has_resume, profile.code, sessionToken]);
+  }, [isActiveRecruiter, profile.is_owner, profile.has_resume, profile.code, sessionToken]);
 
   return (
     <article className="max-w-4xl mx-auto">
-      {/* Back link */}
-      <Link
-        href="/profiles"
-        className="inline-flex items-center gap-1.5 text-sm mb-6 hover:opacity-70 transition-opacity text-text-muted"
-      >
-        <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-          <path fillRule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" />
-        </svg>
-        Back to profiles
-      </Link>
+      {/* Back link + owner toggle */}
+      <div className="flex items-center justify-between mb-6">
+        <Link
+          href="/profiles"
+          className="inline-flex items-center gap-1.5 text-sm hover:opacity-70 transition-opacity text-text-muted"
+        >
+          <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fillRule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" />
+          </svg>
+          Back to profiles
+        </Link>
+
+        {profile.is_owner && (
+          <div className="flex items-center gap-1 p-1 bg-surface rounded-xl text-xs font-semibold uppercase tracking-wider">
+            <button
+              onClick={() => setShowPublicView(false)}
+              className={`px-3 py-1.5 rounded-lg transition-colors ${!showPublicView ? 'bg-surface-lowest shadow-ambient text-primary' : 'text-text-muted hover:text-text-main'}`}
+            >
+              Your view
+            </button>
+            <button
+              onClick={() => setShowPublicView(true)}
+              className={`px-3 py-1.5 rounded-lg transition-colors ${showPublicView ? 'bg-surface-lowest shadow-ambient text-primary' : 'text-text-muted hover:text-text-main'}`}
+            >
+              Public view
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* Header */}
       <header className="mb-8">
@@ -110,7 +135,7 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
             <div className="bg-surface-lowest rounded-2xl shadow-ambient p-6 mb-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-heading text-xl text-primary">Resume</h2>
-                {isActiveRecruiter && resumeUrl && (
+                {canSeeContact && resumeUrl && (
                   <div className="flex items-center gap-1">
                     <a
                       href={resumeUrl}
@@ -140,7 +165,7 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
                 )}
               </div>
 
-              {isActiveRecruiter && resumeUrl ? (
+              {canSeeContact && resumeUrl ? (
                 <div className="w-full rounded-xl overflow-hidden">
                   <object
                     data={resumeUrl}
@@ -173,18 +198,26 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                         </svg>
                       </div>
-                      <p className="text-sm font-medium text-[var(--color-text-main)] mb-1">
-                        Resume available to verified recruiters
-                      </p>
-                      <p className="text-xs text-[var(--color-text-muted)] mb-4">
-                        Register for free recruiter access to view and download resumes
-                      </p>
-                      <Link
-                        href="/recruiter/register"
-                        className="inline-flex items-center justify-center bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white rounded-full px-5 py-2 text-xs font-medium transition-colors"
-                      >
-                        Apply for recruiter access
-                      </Link>
+                      {profile.is_owner ? (
+                        <p className="text-sm font-medium text-[var(--color-text-muted)]">
+                          This is how the public sees your resume section
+                        </p>
+                      ) : (
+                        <>
+                          <p className="text-sm font-medium text-[var(--color-text-main)] mb-1">
+                            Resume available to verified recruiters
+                          </p>
+                          <p className="text-xs text-[var(--color-text-muted)] mb-4">
+                            Register for free recruiter access to view and download resumes
+                          </p>
+                          <Link
+                            href="/recruiter/register"
+                            className="inline-flex items-center justify-center bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white rounded-full px-5 py-2 text-xs font-medium transition-colors"
+                          >
+                            Apply for recruiter access
+                          </Link>
+                        </>
+                      )}
                     </div>
                   </div>
                   {/* Decorative blurred background */}
@@ -200,7 +233,7 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
           {/* Contact info — recruiter only */}
           <div className="bg-surface-lowest rounded-2xl shadow-ambient p-5">
             <h3 className="font-heading text-xl text-primary mb-3">Contact</h3>
-            {isActiveRecruiter && (profile.email || profile.contact_number) ? (
+            {canSeeContact && (profile.email || profile.contact_number) ? (
               <div className="flex flex-col gap-2 text-sm">
                 {profile.email && (
                   <a
@@ -243,15 +276,23 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
                     <span className="text-xs tracking-wider">●●● ●●● ●●●●</span>
                   </div>
                 </div>
-                <p className="text-xs text-[var(--color-text-muted)] mb-2.5">
-                  Visible to verified recruiters only
-                </p>
-                <Link
-                  href="/recruiter/register"
-                  className="inline-flex items-center text-xs font-medium text-[var(--color-secondary)] hover:text-[var(--color-secondary-hover)] transition-colors"
-                >
-                  Get recruiter access →
-                </Link>
+                {profile.is_owner ? (
+                  <p className="text-xs text-[var(--color-text-muted)]">
+                    This is how the public sees your contact info
+                  </p>
+                ) : (
+                  <>
+                    <p className="text-xs text-[var(--color-text-muted)] mb-2.5">
+                      Visible to verified recruiters only
+                    </p>
+                    <Link
+                      href="/recruiter/register"
+                      className="inline-flex items-center text-xs font-medium text-[var(--color-secondary)] hover:text-[var(--color-secondary-hover)] transition-colors"
+                    >
+                      Get recruiter access →
+                    </Link>
+                  </>
+                )}
               </div>
             )}
           </div>

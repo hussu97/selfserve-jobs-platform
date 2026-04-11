@@ -19,7 +19,7 @@ Organized into phases by criticality. Each phase should be completed before star
 - [ ] **Validate `contact_url` scheme** — `contact_url` field accepts any URL. Restrict to `http`/`https` only via Pydantic `HttpUrl` or manual validation to prevent `javascript:` / `data:` XSS vectors.
 - [ ] **Restrict Next.js `remotePatterns`** — `next.config.ts` allows wildcard `hostname: '**'` for images. Restrict to GCS bucket and known CDN domains.
 - [ ] **Sanitize ReactMarkdown rendering** — `JobDetail.tsx` renders markdown without `allowedElements` whitelist. Add explicit element whitelist to prevent XSS.
-- [ ] **Add request body size limit** — No max request size configured. Add middleware to reject payloads > 1MB (excluding file uploads which use GCS signed URLs).
+- [ ] **Add request body size limit** — No max request size configured. Add middleware to reject payloads > 10MB (excluding file uploads which use GCS signed URLs).
 
 ### Silent Failures
 
@@ -50,7 +50,6 @@ Organized into phases by criticality. Each phase should be completed before star
 
 - [ ] **Reduce admin session expiry** — Currently 30 days. Reduce to 7 days. Add inactivity timeout (1 hour idle = session invalidated).
 - [ ] **Invalidate sessions on recruiter status change** — If a recruiter is rejected by admin, their existing session token remains valid for up to 30 days. Invalidate sessions when recruiter status changes to `rejected`/`suspended`.
-- [ ] **Add session IP/UA fingerprinting** — Session tokens work from any IP/browser. Bind sessions to originating IP + User-Agent; require re-auth on change.
 
 ---
 
@@ -60,7 +59,6 @@ Organized into phases by criticality. Each phase should be completed before star
 
 ### Deployment & Docker
 
-- [ ] **Fix deploy workflow env vars** — `deploy-api.yml` calls `gcloud run deploy` without `--set-env-vars`. Add secrets refs for `DATABASE_URL`, `RESEND_API_KEY`, `FRONTEND_URL`, `GCS_BUCKET_NAME`, `ENVIRONMENT`.
 - [ ] **Harden Dockerfile** — Add non-root user (`adduser appuser` + `USER appuser`), `HEALTHCHECK` pointing to `/api/v1/health`, and multi-stage build to reduce image size and attack surface.
 - [ ] **Add `.dockerignore`** — Missing entirely. Exclude `.env*`, `.git`, `__pycache__`, `tests/`, `*.md` from build context.
 - [ ] **Pin Docker base image digest** — Use `python:3.12-slim@sha256:...` instead of mutable tag to ensure reproducible builds.
@@ -170,7 +168,6 @@ Organized into phases by criticality. Each phase should be completed before star
 
 - [ ] **Add dependency caching to CI** — `test-api.yml` installs Python deps fresh every run. Add `uv cache` or pip caching step.
 - [ ] **Add security scanning to CI** — Run `bandit` (Python SAST) and `npm audit` on every PR. Block merge on high-severity findings.
-- [ ] **Add test coverage reporting** — Run `pytest --cov` and `vitest --coverage`. Set minimum thresholds (e.g., 70% backend, 50% frontend). Fail CI below threshold.
 - [ ] **Add E2E test suite** — No Playwright/Cypress tests. Add critical path E2E: create listing -> verify email -> browse -> view detail -> manage -> delete.
 - [ ] **Parallelize API and web test jobs** — Currently sequential. Run in parallel GitHub Actions jobs.
 
@@ -182,10 +179,6 @@ Organized into phases by criticality. Each phase should be completed before star
 
 - [ ] **Add admin audit log** — No record of who approved/rejected which recruiter, when, or why. Add `admin_audit_log` table: `(id, admin_email, action, entity_type, entity_code, details_json, created_at)`. Log all admin mutations.
 - [ ] **Add manual entity flagging** — Admins cannot manually flag a job/profile for removal without waiting for 3 reports. Add `POST /api/v1/admin/entities/{type}/{code}/flag` with reason.
-- [ ] **Add report detail view** — Admin can only list reports. Add endpoint and UI to view full report details, reporter history, and entity context.
-- [ ] **Add bulk actions** — Cannot approve/reject multiple recruiters at once. Add bulk status update endpoint.
-- [ ] **Add CSV export** — No way to export users, recruiters, or reports. Add `GET /api/v1/admin/export/{entity_type}?format=csv`.
-- [ ] **Implement admin 2FA (TOTP)** — Admin login is magic-link-only with 30-day sessions. Add optional TOTP second factor for admin accounts using `pyotp`.
 - [ ] **Add admin dashboard metrics** — Show counts: active jobs, active profiles, pending recruiters, open reports, listings expiring this week. Single SQL query, cached 5 minutes.
 - [ ] **Add session invalidation on admin email removal** — If admin email is removed from `ADMIN_EMAILS` config, existing sessions for that email should be invalidated on next request.
 

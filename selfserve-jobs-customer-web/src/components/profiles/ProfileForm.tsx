@@ -12,6 +12,7 @@ import { StatusBanner } from '@/components/shared/StatusBanner';
 import { NOTICE_PERIODS, RELOCATION_PREFERENCES } from '@/lib/constants';
 import { createProfile, getResumeUploadUrl, uploadResumeDirect } from '@/lib/api';
 import { trackEvent } from '@/lib/analytics';
+import { useAuth } from '@/context/AuthContext';
 import type { CreateProfileRequest } from '@/lib/types';
 
 interface ProfileFormProps {
@@ -21,10 +22,12 @@ interface ProfileFormProps {
 type FormErrors = Partial<Record<keyof CreateProfileRequest | 'general' | 'resume', string>>;
 
 export function ProfileForm({ onSuccess }: ProfileFormProps) {
+  const { email: sessionEmail, isLoggedIn } = useAuth();
   const [form, setForm] = useState<Partial<CreateProfileRequest>>({
     notice_period: 'immediate',
     relocation_preference: 'open',
     contact_number: '+971 ',
+    email: sessionEmail ?? undefined,
   });
   const [skillInput, setSkillInput] = useState('');
   const [resumeFile, setResumeFile] = useState<File | null>(null);
@@ -172,12 +175,13 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
             required
           />
           <Input
-            label="Email"
+            label={isLoggedIn ? 'Email (from your account)' : 'Email'}
             type="email"
             placeholder="you@email.com"
             value={form.email ?? ''}
             onChange={(e) => set('email', e.target.value)}
             error={errors.email}
+            disabled={isLoggedIn}
             required
           />
         </div>

@@ -85,6 +85,7 @@ export interface Profile {
   has_resume: boolean;
   is_verified: boolean;
   is_active: boolean;
+  is_owner: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -187,6 +188,7 @@ export interface VerificationResponse {
   session_token?: string;
   email?: string;
   recruiter_status?: string;
+  user_type?: string;
 }
 
 // Auth

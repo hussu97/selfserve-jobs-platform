@@ -22,6 +22,7 @@ class VerificationResponse(BaseModel):
     session_token: str | None = None
     email: str | None = None
     recruiter_status: str | None = None  # present when entity_type == "recruiter"
+    user_type: str | None = None  # "recruiter" | "admin" | None — from the created session
 
 
 class ResendVerificationRequest(BaseModel):
