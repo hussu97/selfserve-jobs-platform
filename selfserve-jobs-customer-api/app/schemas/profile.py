@@ -12,6 +12,29 @@ NOTICE_PERIODS = Literal["immediate", "1_week", "2_weeks", "1_month", "3_months"
 
 
 class ProfileCreate(BaseModel):
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "person_name": "Aisha Al-Mansouri",
+                    "email": "aisha@example.com",
+                    "contact_number": "+971 50 123 4567",
+                    "brief": (
+                        "Full-stack engineer with 6 years of experience building SaaS products in Dubai. "
+                        "Passionate about developer tooling and clean API design."
+                    ),
+                    "current_city": "Dubai",
+                    "current_country": "UAE",
+                    "years_of_experience": 6,
+                    "current_title": "Senior Software Engineer",
+                    "notice_period": "1_month",
+                    "relocation_preference": "open",
+                    "key_skills": ["TypeScript", "React", "Node.js", "PostgreSQL"],
+                }
+            ]
+        }
+    }
+
     person_name: str = Field(..., min_length=2, max_length=200)
     email: EmailStr
     contact_number: str = Field(..., min_length=3, max_length=30)

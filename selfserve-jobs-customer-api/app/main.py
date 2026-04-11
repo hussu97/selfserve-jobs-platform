@@ -112,7 +112,20 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="selfserve-jobs-customer-api",
-    description="Self-serve jobs platform API — post jobs and profiles without registration",
+    description=(
+        "Self-serve jobs platform API — post jobs and profiles without registration.\n\n"
+        "## Authentication\n\n"
+        "**Edit-token endpoints** (update/delete/renew a listing) require the `X-Edit-Token` header "
+        "containing the 64-char token returned on creation and emailed to the owner.\n\n"
+        "**Admin / recruiter endpoints** require a `Bearer <session-token>` `Authorization` header "
+        "obtained by exchanging a magic-link login token.\n\n"
+        "## Rate Limits\n\n"
+        "- `POST /jobs`, `POST /profiles`: 10 requests / hour / IP\n"
+        "- `POST /verify`: 5 requests / minute / IP\n"
+        "- `POST /verify/resend`: 3 requests / day / IP\n"
+        "- `POST /reports`: 10 requests / hour / IP\n\n"
+        "Exceeding a limit returns HTTP `429 Too Many Requests`."
+    ),
     version="1.0.0",
     lifespan=lifespan,
     docs_url="/api/docs",
@@ -123,6 +136,58 @@ app = FastAPI(
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+
+def _custom_openapi() -> dict:
+    """Enrich the auto-generated OpenAPI spec with security schemes, 429 responses, and examples."""
+    if app.openapi_schema:
+        return app.openapi_schema
+
+    from fastapi.openapi.utils import get_openapi
+
+    schema = get_openapi(
+        title=app.title,
+        version=app.version,
+        description=app.description,
+        routes=app.routes,
+    )
+
+    # --- Security schemes ---
+    schema.setdefault("components", {}).setdefault("securitySchemes", {})
+    schema["components"]["securitySchemes"]["BearerAuth"] = {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Session token obtained via magic-link login. Required for admin and recruiter endpoints.",
+    }
+    schema["components"]["securitySchemes"]["EditToken"] = {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Edit-Token",
+        "description": "64-char edit token included in the creation response and management email.",
+    }
+
+    # --- Add 429 response to all POST/PUT/DELETE paths ---
+    _429_response = {
+        "description": "Rate limit exceeded",
+        "content": {
+            "application/json": {
+                "schema": {"type": "object", "properties": {"error": {"type": "string"}}},
+                "example": {"error": "Rate limit exceeded: 10 per 1 hour"},
+            }
+        },
+    }
+    for path_item in schema.get("paths", {}).values():
+        for method in ("post", "put", "delete"):
+            operation = path_item.get(method)
+            if operation:
+                operation.setdefault("responses", {})["429"] = _429_response
+
+    app.openapi_schema = schema
+    return schema
+
+
+app.openapi = _custom_openapi  # type: ignore[method-assign]
 
 # CORS middleware
 app.add_middleware(

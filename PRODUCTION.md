@@ -374,3 +374,166 @@ After deploying:
 ### Local development
 
 The analytics script only loads when `NEXT_PUBLIC_UMAMI_WEBSITE_ID` is set. Leave it unset locally to skip analytics entirely.
+
+---
+
+## 13. Troubleshooting
+
+Common failure modes and how to resolve them.
+
+### Migration errors on startup
+
+**Symptom:** Cloud Run container starts, then immediately crashes with `alembic.util.exc.CommandError` or `sqlalchemy.exc.OperationalError` in logs.
+
+**Causes & fixes:**
+
+| Symptom detail | Fix |
+|---|---|
+| `can't connect to postgres` | Verify `DATABASE_URL` env var in Cloud Run includes `?host=/cloudsql/<connection-name>`. Check `--add-cloudsql-instances` flag matches `DB_CONNECTION_NAME`. |
+| `relation already exists` | A previous partial migration left the DB in an inconsistent state. Connect via Cloud SQL proxy, run `SELECT * FROM alembic_version;`, manually set to the last clean revision, then restart. |
+| `column ... of relation ... already exists` | Same cause — partial migration. Drop the partially-created column manually, then restart. |
+| `permission denied for table alembic_version` | DB user lacks DDL privileges. Grant: `ALTER USER selfserve_jobs_api CREATEDB;` or `GRANT ALL ON SCHEMA public TO selfserve_jobs_api;` |
+
+**Connect to DB via Cloud SQL Auth Proxy (for manual fixes):**
+```bash
+# Install proxy if needed
+curl -o cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.14.1/cloud-sql-proxy.linux.amd64
+chmod +x cloud-sql-proxy
+
+# Start proxy in background
+./cloud-sql-proxy $DB_CONNECTION_NAME &
+
+# Connect with psql
+psql "host=127.0.0.1 port=5432 dbname=$DB_NAME user=$DB_USER password=$DB_PASSWORD"
+```
+
+---
+
+### GCS auth failures
+
+**Symptom:** Resume upload returns 500 or 403. Logs show `google.auth.exceptions.TransportError` or `403 Forbidden` from `storage.googleapis.com`.
+
+**Causes & fixes:**
+
+| Symptom detail | Fix |
+|---|---|
+| `iam.serviceAccountTokenCreator` missing | The service account needs `roles/iam.serviceAccountTokenCreator` on itself for signed URL generation. Re-run step 5 of this guide. |
+| `The caller does not have permission` on bucket | Re-grant `roles/storage.objectAdmin` on the bucket to the service account (see step 5). |
+| CORS errors in browser | Update the bucket CORS policy (see step 4). Ensure `FRONTEND_URL` env var exactly matches the origin (no trailing slash). |
+| `GCS_BUCKET_NAME` not set | Verify the env var is set in the Cloud Run service configuration. |
+
+**Verify IAM:**
+```bash
+# Check service account roles
+gcloud projects get-iam-policy $PROJECT_ID \
+  --flatten="bindings[].members" \
+  --filter="bindings.members:$SA_EMAIL" \
+  --format="table(bindings.role)"
+```
+
+---
+
+### Resend outages
+
+**Symptom:** Verification/transactional emails not delivered. Logs show `Failed to send ... email` warnings after all retry attempts. The in-memory circuit breaker opens after 5 consecutive failures and stays open for 2 minutes.
+
+**Diagnosis:**
+```bash
+# Check recent email log (connect to DB first)
+SELECT email_type, success, error_message, created_at
+FROM email_log
+ORDER BY created_at DESC
+LIMIT 20;
+```
+
+**Causes & fixes:**
+
+| Symptom detail | Fix |
+|---|---|
+| `422 Unprocessable Entity` from Resend | `RESEND_FROM_EMAIL` domain is not verified in Resend. Verify the domain at resend.com/domains. |
+| `401 Unauthorized` | `RESEND_API_KEY` is invalid or rotated. Update the env var in Cloud Run. |
+| `429 Too Many Requests` | Resend rate limit hit. Reduce send volume or upgrade Resend plan. |
+| Status page incident | Check [status.resend.com](https://status.resend.com). The circuit breaker will auto-reset after 2 minutes of no failures; no action needed once Resend recovers. |
+
+**Manually resend a verification email (if user never received it):**
+```bash
+# Use the resend endpoint (max 3/entity/day enforced)
+curl -X POST https://your-api-url/api/v1/verify/resend \
+  -H "Content-Type: application/json" \
+  -d '{"entity_type":"job","email":"user@example.com","entity_code":"abc123"}'
+```
+
+---
+
+### CloudSQL connection limits
+
+**Symptom:** API returns 500 errors under load. Logs show `remaining connection slots are reserved` or `too many connections` from PostgreSQL.
+
+**Causes & fixes:**
+
+| Symptom detail | Fix |
+|---|---|
+| Single Cloud Run instance exceeding pool | Reduce `pool_size` in `database.py` (currently 10) or scale down `max_overflow` (currently 20). |
+| Multiple Cloud Run instances | Each instance has its own pool. With 10 instances × 10 pool_size = 100 connections. `db-f1-micro` supports ~25 connections. Upgrade instance tier or reduce pool. |
+| `FATAL: password authentication failed` | DB password changed. Update `DATABASE_URL` env var in Cloud Run. |
+
+**Check current connection count:**
+```sql
+-- Run via Cloud SQL proxy
+SELECT count(*) FROM pg_stat_activity WHERE datname = 'selfserve_jobs';
+
+-- Show max connections allowed
+SHOW max_connections;
+```
+
+**Scale Cloud Run max instances (short-term fix):**
+```bash
+gcloud run services update $API_SERVICE_NAME \
+  --region $REGION \
+  --max-instances=3
+```
+
+**Upgrade database instance tier (longer-term fix):**
+```bash
+# db-g1-small supports ~100 connections
+gcloud sql instances patch $DB_INSTANCE \
+  --tier=db-g1-small \
+  --region=$REGION
+```
+
+---
+
+### Slow or failed health checks
+
+**Symptom:** Load balancer marks instances unhealthy. `GET /api/v1/health` returns 503 intermittently.
+
+The health endpoint runs `SELECT 1` against the DB. If the DB is unreachable, it returns `{"status":"degraded","db":"unreachable"}` with a 503 status code.
+
+**Diagnosis:**
+```bash
+curl https://your-api-url/api/v1/health
+# Should return: {"status":"ok","db":"ok"}
+```
+
+If degraded: check CloudSQL instance status in GCP Console → SQL → your instance. Check Cloud Run logs for connection errors.
+
+---
+
+### Internal cron endpoints not firing
+
+**Symptom:** Listings are not expiring or expiry warning emails are not being sent.
+
+The cron endpoints (`POST /api/v1/internal/expire-listings`, `POST /api/v1/internal/cleanup`) are protected by `X-Internal-Secret` header matching the `INTERNAL_API_SECRET` env var.
+
+**Verify secret is set:**
+```bash
+gcloud run services describe $API_SERVICE_NAME \
+  --region $REGION \
+  --format="value(spec.template.spec.containers[0].env[].value)"
+```
+
+**Test manually:**
+```bash
+curl -X POST https://your-api-url/api/v1/internal/expire-listings \
+  -H "X-Internal-Secret: your-internal-secret"
+```

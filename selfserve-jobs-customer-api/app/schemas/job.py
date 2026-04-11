@@ -14,6 +14,27 @@ SALARY_CURRENCIES = Literal["AED", "USD", "EUR", "GBP", "INR", "SAR", "QAR", "BH
 
 
 class JobCreate(BaseModel):
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "job_title": "Senior Backend Engineer",
+                    "company_name": "Acme Corp",
+                    "company_city": "Dubai",
+                    "company_country": "UAE",
+                    "employment_type": "full_time",
+                    "description": (
+                        "We are looking for a Senior Backend Engineer to join our team in Dubai. "
+                        "You will work on our core platform, designing and building scalable APIs."
+                    ),
+                    "key_skills": ["Python", "FastAPI", "PostgreSQL", "Docker"],
+                    "contact_method": "email",
+                    "contact_email": "careers@acmecorp.ae",
+                }
+            ]
+        }
+    }
+
     job_title: str = Field(..., min_length=2, max_length=200)
     company_name: str = Field(..., min_length=1, max_length=200)
     company_city: str = Field(..., min_length=1, max_length=100)
