@@ -56,10 +56,15 @@ async def generate_signed_url(
         return f"http://localhost:8080/dev-files/{gcs_path}"
 
     try:
+        import google.auth
+        import google.auth.transport.requests
         from google.cloud import storage
         from google.cloud.exceptions import GoogleCloudError
 
-        client = storage.Client()
+        credentials, _ = google.auth.default()
+        credentials.refresh(google.auth.transport.requests.Request())
+
+        client = storage.Client(credentials=credentials)
         bucket = client.bucket(settings.gcs_bucket_name)
         blob = bucket.blob(gcs_path)
         expiration = timedelta(minutes=expiration_minutes)
@@ -67,6 +72,8 @@ async def generate_signed_url(
             version="v4",
             expiration=expiration,
             method="GET",
+            service_account_email=credentials.service_account_email,
+            access_token=credentials.token,
         )
         return url
     except GoogleCloudError as exc:
@@ -88,10 +95,15 @@ async def generate_signed_upload_url(
         return None
 
     try:
+        import google.auth
+        import google.auth.transport.requests
         from google.cloud import storage
         from google.cloud.exceptions import GoogleCloudError
 
-        client = storage.Client()
+        credentials, _ = google.auth.default()
+        credentials.refresh(google.auth.transport.requests.Request())
+
+        client = storage.Client(credentials=credentials)
         bucket = client.bucket(settings.gcs_bucket_name)
         blob = bucket.blob(gcs_path)
         expiration = timedelta(minutes=expiration_minutes)
@@ -100,6 +112,8 @@ async def generate_signed_upload_url(
             expiration=expiration,
             method="PUT",
             content_type=content_type,
+            service_account_email=credentials.service_account_email,
+            access_token=credentials.token,
         )
         return url
     except GoogleCloudError as exc:
