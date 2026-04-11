@@ -29,7 +29,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 - **MarkdownEditor** — toolbar bold/italic/underline/heading buttons were unclickable because the outer container's `onClick` (focus trigger) was firing after every toolbar `onMouseDown`; fixed by moving `cursor-text` + `onClick` to the `EditorContent` div only, and adding `e.stopPropagation()` to every toolbar button's `onMouseDown` handler
-- **MarkdownEditor** — bullet/numbered lists had no visible markers (Tailwind v4 preflight resets `list-style: none`); fixed by adding `list-style-type: disc` / `list-style-type: decimal` to `.prose ul` / `.prose ol` in `globals.css`
+- **MarkdownEditor** — bullet/numbered lists had no visible markers (Tailwind v4 preflight resets `list-style: none`); fixed by adding `list-style-type: disc` / `list-style-type: decimal` + `padding-left` to `.ProseMirror ul` / `.ProseMirror ol` in `globals.css` (the editor content lives in `.ProseMirror`, not `.prose`)
 
 ### Added
 - **MarkdownEditor** — underline support via `@tiptap/extension-underline`; underline toolbar button (⌘U) added between Italic and the list group
