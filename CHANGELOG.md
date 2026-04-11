@@ -7,7 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Fixed
-- **GCS signed URL 500 on Cloud Run** — `blob.generate_signed_url()` with `version="v4"` fails on Cloud Run because the default Compute Engine credentials have no private key to sign with; fixed by refreshing credentials and passing `service_account_email` + `access_token` to both `generate_signed_url` and `generate_signed_upload_url` in `storage_service.py` so GCS uses IAM-based signing instead
+- **GCS signed URL 500 on Cloud Run** — `blob.generate_signed_url()` with `version="v4"` fails on Cloud Run because the default Compute Engine credentials have no private key to sign with; fixed by refreshing credentials and passing `service_account_email` + `access_token` to both `generate_signed_url` and `generate_signed_upload_url` in `storage_service.py` so GCS uses IAM-based signing instead; also granted `roles/iam.serviceAccountTokenCreator` to the API service account on itself (required for `signBlob` IAM calls to succeed) and documented in `PRODUCTION.md`
 - **Sitemap 404** — removed `generateSitemaps` (multi-sitemap pattern) from `sitemap.ts` and replaced with a single `sitemap()` export; the multi-sitemap approach required a runtime index call that could 404 if the API was unreachable; single sitemap is served directly at `/sitemap.xml` with `revalidate = 3600` and API errors are silently skipped rather than failing the entire route
 
 

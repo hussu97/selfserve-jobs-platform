@@ -156,6 +156,13 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
 gcloud iam service-accounts add-iam-policy-binding ${SA_EMAIL} \
   --member="serviceAccount:${SA_EMAIL}" \
   --role="roles/iam.serviceAccountUser"
+
+# Grant Token Creator on itself (required for GCS v4 signed URLs on Cloud Run)
+# Cloud Run credentials have no private key; signBlob via IAM is used instead.
+# Without this role, generate_signed_url() returns 403 → 500.
+gcloud iam service-accounts add-iam-policy-binding ${SA_EMAIL} \
+  --member="serviceAccount:${SA_EMAIL}" \
+  --role="roles/iam.serviceAccountTokenCreator"
 ```
 
 ## 6. Deploy the API (Cloud Run)
