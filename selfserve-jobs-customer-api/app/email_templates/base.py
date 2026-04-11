@@ -18,8 +18,17 @@ ACCENT = "#8BA888"
 # ---------------------------------------------------------------------------
 
 
-def shell(header_text: str, body_html: str, footer_note: str) -> str:
-    """Wrap a body block in the standard hirebridge email shell (header + footer)."""
+def shell(header_text: str, body_html: str, footer_note: str, site_url: str = "") -> str:
+    """Wrap a body block in the standard hirebridge email shell (header + footer).
+
+    ``site_url`` overrides the footer domain line; falls back to ``settings.frontend_url``.
+    """
+    if not site_url:
+        from app.config import get_settings
+
+        site_url = get_settings().frontend_url
+    display_domain = site_url.replace("https://", "").replace("http://", "").rstrip("/")
+
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -67,7 +76,7 @@ def shell(header_text: str, body_html: str, footer_note: str) -> str:
               <p style="margin:0 0 6px 0;font-family:'Helvetica Neue',Arial,sans-serif;
                         font-size:11px;letter-spacing:0.1em;text-transform:uppercase;
                         color:{TEXT_MUTED};">
-                hirebridge · hirebridgeuae.com
+                hirebridge · {display_domain}
               </p>
               <p style="margin:0;font-family:'Helvetica Neue',Arial,sans-serif;
                         font-size:11px;color:#aaa;">

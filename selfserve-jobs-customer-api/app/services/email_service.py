@@ -1,11 +1,13 @@
 import asyncio
 import logging
+import time
 from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
 from app.email_templates import admin_login as admin_login_template
+from app.email_templates import admin_report as admin_report_template
 from app.email_templates import expiry_warning as expiry_warning_template
 from app.email_templates import login as login_template
 from app.email_templates import management_links as management_links_template
@@ -15,6 +17,52 @@ from app.email_templates import verification as verification_template
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
+
+# ---------------------------------------------------------------------------
+# Circuit breaker state (in-memory, per-process)
+# ---------------------------------------------------------------------------
+# Opens after _CB_FAILURE_THRESHOLD consecutive failures; resets after _CB_COOLDOWN_SECS.
+
+_CB_FAILURE_THRESHOLD = 5
+_CB_COOLDOWN_SECS = 120  # 2 minutes
+
+_cb_consecutive_failures: int = 0
+_cb_open_since: float | None = None  # time.monotonic() when circuit opened
+
+# Retry delays in seconds (3 attempts total after initial try)
+_RETRY_DELAYS = [1, 5, 30]
+
+
+def _cb_is_open() -> bool:
+    """Return True if the circuit is open (i.e. Resend calls should be skipped)."""
+    global _cb_open_since
+    if _cb_open_since is None:
+        return False
+    elapsed = time.monotonic() - _cb_open_since
+    if elapsed >= _CB_COOLDOWN_SECS:
+        # Transition to half-open — allow one probe
+        _cb_open_since = None
+        logger.info("[email-circuit] cooldown elapsed — moving to half-open")
+        return False
+    return True
+
+
+def _cb_record_success() -> None:
+    global _cb_consecutive_failures, _cb_open_since
+    _cb_consecutive_failures = 0
+    _cb_open_since = None
+
+
+def _cb_record_failure() -> None:
+    global _cb_consecutive_failures, _cb_open_since
+    _cb_consecutive_failures += 1
+    if _cb_consecutive_failures >= _CB_FAILURE_THRESHOLD and _cb_open_since is None:
+        _cb_open_since = time.monotonic()
+        logger.warning(
+            "[email-circuit] opened after %d consecutive failures — cooling down for %ds",
+            _cb_consecutive_failures,
+            _CB_COOLDOWN_SECS,
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -51,6 +99,13 @@ async def _log_email(
         logger.error("Failed to write email log to DB: %s", exc)
 
 
+def _build_list_unsubscribe_header(frontend_url: str) -> str:
+    """Return a List-Unsubscribe header value with mailto and URL forms."""
+    unsubscribe_url = f"{frontend_url}/unsubscribe"
+    from_domain = settings.resend_from_email.split("@")[-1] if "@" in settings.resend_from_email else "noreply"
+    return f"<mailto:unsubscribe@{from_domain}?subject=unsubscribe>, <{unsubscribe_url}>"
+
+
 async def _send(
     db: AsyncSession,
     email_type: str,
@@ -61,7 +116,7 @@ async def _send(
     entity_type: str | None = None,
     entity_code: str | None = None,
 ) -> bool:
-    """Send a single email via Resend and write a log row regardless of outcome."""
+    """Send an email via Resend with retry/backoff and circuit-breaker protection."""
     if not settings.resend_api_key:
         logger.info(
             "DEV MODE - %s email (would send to %s): %s",
@@ -80,27 +135,75 @@ async def _send(
         )
         return True
 
+    if _cb_is_open():
+        logger.warning(
+            "[email-circuit] OPEN — skipping %s email to %s",
+            email_type,
+            recipient_email,
+        )
+        await _log_email(
+            db,
+            email_type,
+            recipient_email,
+            False,
+            entity_type=entity_type,
+            entity_code=entity_code,
+            error_message="circuit_open",
+        )
+        return False
+
+    import resend
+
+    resend.api_key = settings.resend_api_key
+    params: dict[str, Any] = {
+        "from": settings.resend_from_email,
+        "to": [recipient_email],
+        "subject": subject,
+        "html": html_body,
+        "text": text_body,
+        "headers": {
+            "List-Unsubscribe": _build_list_unsubscribe_header(settings.frontend_url),
+            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+        },
+    }
+
     resend_id = None
     error_message = None
     success = False
+    last_exc: Exception | None = None
 
-    try:
-        import resend
+    # Initial attempt + up to len(_RETRY_DELAYS) retries
+    for attempt, delay in enumerate([0] + _RETRY_DELAYS):
+        if delay:
+            logger.info(
+                "[email] retry %d/%d for %s to %s — waiting %ds",
+                attempt,
+                len(_RETRY_DELAYS),
+                email_type,
+                recipient_email,
+                delay,
+            )
+            await asyncio.sleep(delay)
+        try:
+            result = await asyncio.to_thread(resend.Emails.send, params)
+            resend_id = result.get("id") if isinstance(result, dict) else getattr(result, "id", None)
+            success = True
+            _cb_record_success()
+            break
+        except Exception as exc:
+            last_exc = exc
+            logger.warning(
+                "Attempt %d failed for %s email to %s: %s",
+                attempt + 1,
+                email_type,
+                recipient_email,
+                exc,
+            )
 
-        resend.api_key = settings.resend_api_key
-        params: dict[str, Any] = {
-            "from": settings.resend_from_email,
-            "to": [recipient_email],
-            "subject": subject,
-            "html": html_body,
-            "text": text_body,
-        }
-        result = await asyncio.to_thread(resend.Emails.send, params)
-        resend_id = result.get("id") if isinstance(result, dict) else getattr(result, "id", None)
-        success = True
-    except Exception as exc:
-        error_message = str(exc)
-        logger.error("Failed to send %s email to %s: %s", email_type, recipient_email, exc)
+    if not success:
+        error_message = str(last_exc)
+        logger.error("All attempts failed for %s email to %s: %s", email_type, recipient_email, last_exc)
+        _cb_record_failure()
 
     await _log_email(
         db,
@@ -249,6 +352,37 @@ async def send_expiry_warning_email(
         db,
         "expiry_warning",
         email,
+        subject,
+        html_body,
+        text_body,
+        entity_type=entity_type,
+        entity_code=entity_code,
+    )
+
+
+async def send_admin_report_notification(
+    db: AsyncSession,
+    entity_type: str,
+    entity_code: str,
+    entity_title: str,
+    report_count: int,
+    frontend_url: str,
+    admin_email: str,
+) -> bool:
+    if not admin_email:
+        logger.info("No admin_notification_email configured — skipping report notification")
+        return True
+    subject, html_body, text_body = admin_report_template.build_admin_report_notification(
+        entity_type=entity_type,
+        entity_code=entity_code,
+        entity_title=entity_title,
+        report_count=report_count,
+        frontend_url=frontend_url,
+    )
+    return await _send(
+        db,
+        "admin_report_notification",
+        admin_email,
         subject,
         html_body,
         text_body,

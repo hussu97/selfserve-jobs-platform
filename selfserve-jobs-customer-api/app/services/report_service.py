@@ -94,7 +94,8 @@ async def submit_report(db: AsyncSession, data: ReportCreate) -> None:
     )
     db.add(report)
 
-    if existing_count + 1 >= REPORT_THRESHOLD:
+    threshold_reached = existing_count + 1 >= REPORT_THRESHOLD
+    if threshold_reached:
         entity.status = "under_review"
         entity.updated_at = now
         logger.info(
@@ -105,3 +106,22 @@ async def submit_report(db: AsyncSession, data: ReportCreate) -> None:
         )
 
     await db.flush()
+
+    if threshold_reached:
+        from app.config import get_settings
+        from app.services import email_service
+
+        _settings = get_settings()
+        entity_title = getattr(entity, "job_title", None) or getattr(entity, "person_name", "Unknown")
+        try:
+            await email_service.send_admin_report_notification(
+                db=db,
+                entity_type=data.entity_type,
+                entity_code=data.entity_code,
+                entity_title=entity_title,
+                report_count=existing_count + 1,
+                frontend_url=_settings.frontend_url,
+                admin_email=_settings.admin_notification_email,
+            )
+        except Exception as exc:
+            logger.warning("Failed to send admin report notification: %s", exc)
