@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+- **Deploy workflow** — `ADMIN_EMAILS` and `ADMIN_NOTIFICATION_EMAIL` env vars were missing from `deploy-api.yml`; both now passed from GitHub secrets to Cloud Run on every deploy so they no longer need to be set manually in the GCP console
+- **PRODUCTION.md** — added `ADMIN_EMAILS` and `ADMIN_NOTIFICATION_EMAIL` to the GitHub Actions secrets table and the manual deploy command in step 6b
+
 ### Changed
 - **Homepage restructured** — "Ready to get started?" CTA strip moved above "Our story" section; "Our story" section gains an eyebrow + `h2` heading ("Why we built *this*") matching the about page pattern; background alternation (primary → surface → bg → surface → bg) preserved throughout.
 

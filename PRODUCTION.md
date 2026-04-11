@@ -207,6 +207,8 @@ gcloud run deploy $API_SERVICE_NAME \
   --set-env-vars "RESEND_FROM_EMAIL=${RESEND_FROM_EMAIL}" \
   --set-env-vars "FRONTEND_URL=${FRONTEND_URL}" \
   --set-env-vars "ENVIRONMENT=production" \
+  --set-env-vars "ADMIN_EMAILS=${ADMIN_EMAILS}" \
+  --set-env-vars "ADMIN_NOTIFICATION_EMAIL=${ADMIN_NOTIFICATION_EMAIL}" \
   --min-instances=0 \
   --max-instances=10 \
   --memory=512Mi \
@@ -304,6 +306,8 @@ Configure these secrets in your GitHub repo (**Settings → Secrets and variable
 | `FRONTEND_URL` | e.g. `https://hirebridgeuae.com` | Used for CORS allow-list and links in outgoing emails |
 | `INTERNAL_API_SECRET` | Long random string | Shared secret for `POST /api/v1/internal/*` cron endpoints (`X-Internal-Secret` header) |
 | `SENTRY_DSN` | (optional) `https://...@sentry.io/...` | Enables Sentry error tracking when set |
+| `ADMIN_EMAILS` | (optional) comma-separated list e.g. `admin@example.com,ops@example.com` | Comma-separated list of admin email addresses used for access control |
+| `ADMIN_NOTIFICATION_EMAIL` | (optional) e.g. `admin@example.com` | Destination address for report/flag notification emails |
 
 > **Note:** The workflow also hard-codes `ENVIRONMENT=production` and `LOG_FORMAT=json` on every deploy. `ENVIRONMENT` controls dev/prod behaviour in `config.py`; `LOG_FORMAT=json` switches to structured JSON logging for Cloud Logging.
 

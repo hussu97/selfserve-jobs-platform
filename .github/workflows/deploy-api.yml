@@ -75,6 +75,8 @@ jobs:
           FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
           INTERNAL_API_SECRET: ${{ secrets.INTERNAL_API_SECRET }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          ADMIN_EMAILS: ${{ secrets.ADMIN_EMAILS }}
+          ADMIN_NOTIFICATION_EMAIL: ${{ secrets.ADMIN_NOTIFICATION_EMAIL }}
         run: |
           # Build a YAML env-vars file for Cloud Run. Using --env-vars-file rather
           # than --set-env-vars avoids shell-escaping headaches with values that
@@ -103,6 +105,8 @@ jobs:
             emit_yaml_scalar "FRONTEND_URL" "$FRONTEND_URL"
             emit_yaml_scalar "INTERNAL_API_SECRET" "$INTERNAL_API_SECRET"
             emit_yaml_scalar "SENTRY_DSN" "$SENTRY_DSN"
+            emit_yaml_scalar "ADMIN_EMAILS" "$ADMIN_EMAILS"
+            emit_yaml_scalar "ADMIN_NOTIFICATION_EMAIL" "$ADMIN_NOTIFICATION_EMAIL"
           } > "$ENV_FILE"
 
           gcloud run deploy selfserve-jobs-customer-api \
