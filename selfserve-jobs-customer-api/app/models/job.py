@@ -45,6 +45,7 @@ class Job(Base):
     contact_url: Mapped[str | None] = mapped_column(VARCHAR(2048), nullable=True)
     status: Mapped[str] = mapped_column(VARCHAR(20), default="pending_verification", nullable=False)
     view_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    renewal_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False, server_default="0")
     expires_at: Mapped[datetime] = mapped_column(TIMESTAMPTZ, nullable=False)
     # Salary range (optional)
     salary_min: Mapped[int | None] = mapped_column(Integer, nullable=True)

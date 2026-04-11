@@ -126,3 +126,14 @@ async def delete_job(
 ):
     job = await job_service.remove_job(db, code, edit_token)
     return JobResponse.model_validate(job)
+
+
+@router.post("/{code}/renew", response_model=JobResponse)
+async def renew_job(
+    code: str,
+    edit_token: str = Depends(require_edit_token),
+    db: AsyncSession = Depends(get_session),
+):
+    """Renew a job listing, extending expires_at by 60 days (max 2 renewals)."""
+    job = await job_service.renew_job(db, code, edit_token)
+    return JobResponse.model_validate(job)

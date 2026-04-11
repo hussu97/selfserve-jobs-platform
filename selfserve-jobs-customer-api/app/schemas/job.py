@@ -135,6 +135,7 @@ class JobResponse(BaseModel):
     recruiter_code: str | None
     status: str
     view_count: int
+    renewal_count: int
     expires_at: datetime
     created_at: datetime
     updated_at: datetime
@@ -165,6 +166,7 @@ class JobResponse(BaseModel):
                 "recruiter_code": getattr(obj, "recruiter_code", None),
                 "status": obj.status,
                 "view_count": obj.view_count,
+                "renewal_count": getattr(obj, "renewal_count", 0),
                 "expires_at": obj.expires_at,
                 "created_at": obj.created_at,
                 "updated_at": obj.updated_at,

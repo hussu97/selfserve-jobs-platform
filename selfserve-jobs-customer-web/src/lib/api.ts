@@ -167,6 +167,13 @@ export async function deleteJob(code: string, editToken: string): Promise<void> 
   });
 }
 
+export async function renewJob(code: string, editToken: string): Promise<Job> {
+  return request<Job>(`/jobs/${code}/renew`, {
+    method: 'POST',
+    headers: { 'X-Edit-Token': editToken },
+  });
+}
+
 // Profiles
 export async function getProfiles(filters: ProfileFilters = {}): Promise<PaginatedResponse<ProfileListItem>> {
   const params: Record<string, string | string[] | number | boolean | undefined | null> = {
@@ -211,6 +218,13 @@ export async function updateProfile(code: string, data: UpdateProfileRequest, ed
 export async function deleteProfile(code: string, editToken: string): Promise<void> {
   return request<void>(`/profiles/${code}`, {
     method: 'DELETE',
+    headers: { 'X-Edit-Token': editToken },
+  });
+}
+
+export async function renewProfile(code: string, editToken: string): Promise<Profile> {
+  return request<Profile>(`/profiles/${code}/renew`, {
+    method: 'POST',
     headers: { 'X-Edit-Token': editToken },
   });
 }

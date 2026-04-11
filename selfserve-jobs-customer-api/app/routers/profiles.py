@@ -182,3 +182,14 @@ async def delete_profile(
 ):
     profile = await profile_service.remove_profile(db, code, edit_token)
     return ProfileResponse.from_orm_with_resume(profile)
+
+
+@router.post("/{code}/renew", response_model=ProfileResponse)
+async def renew_profile(
+    code: str,
+    edit_token: str = Depends(require_edit_token),
+    db: AsyncSession = Depends(get_session),
+):
+    """Renew a profile listing, extending expires_at by 60 days (max 2 renewals)."""
+    profile = await profile_service.renew_profile(db, code, edit_token)
+    return ProfileResponse.from_orm_with_resume(profile)

@@ -19,6 +19,8 @@ import {
   updateProfile,
   deleteJob,
   deleteProfile,
+  renewJob,
+  renewProfile,
   requestManagementLinks,
 } from '@/lib/api';
 import { EMPLOYMENT_TYPES, NOTICE_PERIODS, RELOCATION_PREFERENCES } from '@/lib/constants';
@@ -65,6 +67,11 @@ function ManageContent() {
   // Profile edit fields
   const [profileForm, setProfileForm] = useState<UpdateProfileRequest>({});
   const [profileSkillInput, setProfileSkillInput] = useState('');
+
+  // Renew
+  const [renewLoading, setRenewLoading] = useState(false);
+  const [renewError, setRenewError] = useState('');
+  const [renewSuccess, setRenewSuccess] = useState('');
 
   // Delete confirm
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -209,6 +216,27 @@ function ManageContent() {
       setSaveError(err instanceof Error ? err.message : 'Failed to save changes.');
     } finally {
       setSaving(false);
+    }
+  };
+
+  // -- Renew --
+  const handleRenew = async () => {
+    setRenewLoading(true);
+    setRenewError('');
+    setRenewSuccess('');
+    try {
+      if (entityType === 'job') {
+        const updated = await renewJob(code, token);
+        setJob(updated);
+      } else {
+        const updated = await renewProfile(code, token);
+        setProfile(updated);
+      }
+      setRenewSuccess('Listing renewed! Your listing is now active for another 60 days.');
+    } catch (err) {
+      setRenewError(err instanceof Error ? err.message : 'Failed to renew. Try again.');
+    } finally {
+      setRenewLoading(false);
     }
   };
 
@@ -621,8 +649,47 @@ function ManageContent() {
         </form>
       )}
 
+      {/* Renew section */}
+      {(() => {
+        const currentEntity = isJobs ? job : profile;
+        const renewalCount = currentEntity?.renewal_count ?? 0;
+        const MAX_RENEWALS = 2;
+        const canRenew = renewalCount < MAX_RENEWALS && currentEntity?.status !== 'removed';
+        if (!canRenew && renewalCount >= MAX_RENEWALS) return null;
+        return (
+          <div className="mt-12 bg-surface rounded-2xl p-8">
+            <h2 className="font-heading text-xl text-primary mb-2">
+              Renew Listing
+            </h2>
+            <p className="text-sm mb-2 text-text-muted">
+              Extend your listing by 60 days. You can renew up to {MAX_RENEWALS} times.
+            </p>
+            <p className="text-xs mb-5 text-text-muted">
+              Renewals used: {renewalCount} / {MAX_RENEWALS}
+            </p>
+
+            {renewSuccess && (
+              <StatusBanner type="success" message={renewSuccess} className="mb-4" />
+            )}
+            {renewError && (
+              <StatusBanner type="error" message={renewError} className="mb-4" />
+            )}
+
+            <Button
+              variant="outline"
+              loading={renewLoading}
+              onClick={handleRenew}
+              className="rounded-full"
+              disabled={!canRenew}
+            >
+              Renew for 60 days
+            </Button>
+          </div>
+        );
+      })()}
+
       {/* Delete section */}
-      <div className="mt-16 pt-12 bg-surface rounded-2xl p-8">
+      <div className="mt-8 pt-12 bg-surface rounded-2xl p-8">
         <h2 className="font-heading text-xl text-red-600 mb-2">
           Delete Listing
         </h2>

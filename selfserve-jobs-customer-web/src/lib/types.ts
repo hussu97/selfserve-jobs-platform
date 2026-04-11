@@ -47,6 +47,10 @@ export interface Job {
   salary_max?: number;
   salary_currency?: SalaryCurrency;
   recruiter_code?: string;
+  status: string;
+  view_count: number;
+  renewal_count: number;
+  expires_at: string;
   is_verified: boolean;
   is_active: boolean;
   created_at: string;
@@ -83,6 +87,10 @@ export interface Profile {
   email?: string;
   contact_number?: string;
   has_resume: boolean;
+  status: string;
+  view_count: number;
+  renewal_count: number;
+  expires_at: string;
   is_verified: boolean;
   is_active: boolean;
   is_owner: boolean;

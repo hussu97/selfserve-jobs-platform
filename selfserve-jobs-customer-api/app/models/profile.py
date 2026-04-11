@@ -47,6 +47,7 @@ class Profile(Base):
     key_skills: Mapped[list] = mapped_column(JSONB_COMPAT, default=list, nullable=False, server_default="[]")
     status: Mapped[str] = mapped_column(VARCHAR(20), default="pending_verification", nullable=False)
     view_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    renewal_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False, server_default="0")
     expires_at: Mapped[datetime] = mapped_column(TIMESTAMPTZ, nullable=False)
     edit_token: Mapped[str] = mapped_column(VARCHAR(64), unique=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(TIMESTAMPTZ, nullable=False, server_default=func.now())
