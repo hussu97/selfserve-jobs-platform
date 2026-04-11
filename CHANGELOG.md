@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Fixed
+- **Lock file sync** — ran `npm install` in `selfserve-jobs-customer-web/` to regenerate `package-lock.json` after `next` was bumped to `^16.2.3`; resolves `npm ci` failures in CI
 - **Admin can now post jobs** — `isActiveRecruiter` in `AuthContext` was gated on `userType === 'recruiter'`, excluding admins; fixed to also return `true` when `isAdmin`
 - **Founding year corrected to 2026** — updated `llms.txt` route (both inline text and `Launch year` field) to reflect the correct founding year
 
