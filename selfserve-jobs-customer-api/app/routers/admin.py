@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
+from fastapi import APIRouter, BackgroundTasks, Depends, Header, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
@@ -43,6 +43,7 @@ async def _get_admin_session(
 @router.post("/login")
 async def admin_login(
     body: AdminLoginRequest,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_session),
 ) -> dict:
     """Send a magic link to an admin email. Returns 403 if email is not in the admin list."""
@@ -55,7 +56,8 @@ async def admin_login(
     token = await auth_service.create_login_token(db, body.email)
 
     if settings.is_production:
-        await email_service.send_admin_login_email(
+        background_tasks.add_task(
+            email_service.send_admin_login_email,
             db=db,
             email=body.email,
             login_token=token.token,
@@ -107,6 +109,7 @@ async def list_recruiters(
 @router.post("/recruiters/{code}/approve", response_model=RecruiterResponse)
 async def approve_recruiter(
     code: str,
+    background_tasks: BackgroundTasks,
     session: AuthSession = Depends(_get_admin_session),
     db: AsyncSession = Depends(get_session),
 ) -> RecruiterResponse:
@@ -122,7 +125,8 @@ async def approve_recruiter(
     )
 
     if settings.is_production:
-        await email_service.send_recruiter_approved_email(
+        background_tasks.add_task(
+            email_service.send_recruiter_approved_email,
             db=db,
             email=recruiter.email,
             recruiter_code=recruiter.recruiter_code,
@@ -136,6 +140,7 @@ async def approve_recruiter(
 async def reject_recruiter(
     code: str,
     body: RejectRecruiterRequest,
+    background_tasks: BackgroundTasks,
     session: AuthSession = Depends(_get_admin_session),
     db: AsyncSession = Depends(get_session),
 ) -> RecruiterResponse:
@@ -145,7 +150,8 @@ async def reject_recruiter(
     )
 
     if settings.is_production:
-        await email_service.send_recruiter_rejected_email(
+        background_tasks.add_task(
+            email_service.send_recruiter_rejected_email,
             db=db,
             email=recruiter.email,
             recruiter_code=recruiter.recruiter_code,

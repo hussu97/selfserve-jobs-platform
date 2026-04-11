@@ -97,14 +97,11 @@ async def _make_active_profile(db_session, **overrides) -> Profile:
     return profile
 
 
-# ---------------------------------------------------------------------------
-# Email failure → 503
-# ---------------------------------------------------------------------------
-
-
-async def test_verification_resend_email_failure_returns_503(client, db_session):
-    """Verification email send failure causes POST /verify/resend to return 503."""
-    # Entity must be pending_verification to be eligible for resend
+async def test_verification_resend_returns_200_regardless_of_email_outcome(client, db_session):
+    """POST /verify/resend returns 200 even if the Resend API call fails.
+    The email is sent as a background task after the response, so delivery
+    failures cannot block or fail the endpoint.
+    """
     job = await _make_active_job(
         db_session,
         job_code="emailfail01",
@@ -113,7 +110,6 @@ async def test_verification_resend_email_failure_returns_503(client, db_session)
         status="pending_verification",
     )
 
-    # Patch send_verification_email to return False (email failed)
     with patch("app.services.email_service.send_verification_email", new_callable=AsyncMock, return_value=False):
         response = await client.post(
             "/api/v1/verify/resend",
@@ -123,7 +119,7 @@ async def test_verification_resend_email_failure_returns_503(client, db_session)
                 "entity_code": job.job_code,
             },
         )
-    assert response.status_code == 503
+    assert response.status_code == 200
 
 
 async def test_profile_creation_in_production_mode_returns_201_even_if_email_fails(client, db_session):

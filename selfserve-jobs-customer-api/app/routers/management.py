@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
@@ -17,6 +17,7 @@ settings = get_settings()
 @router.post("/request-links", response_model=MessageResponse)
 async def request_management_links(
     data: ManagementLinkRequest,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_session),
 ):
     entities = await profile_service.get_entities_for_email(
@@ -31,7 +32,8 @@ async def request_management_links(
             message="If there are any active listings for this email, you will receive an email with management links."
         )
 
-    await email_service.send_management_links_email(
+    background_tasks.add_task(
+        email_service.send_management_links_email,
         db=db,
         email=data.email,
         entities=entities,

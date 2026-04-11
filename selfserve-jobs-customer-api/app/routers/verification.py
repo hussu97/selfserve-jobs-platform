@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, BackgroundTasks, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
@@ -45,6 +45,7 @@ async def verify_email(
 async def resend_verification(
     request: Request,
     data: ResendVerificationRequest,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_session),
 ):
     entity_code, edit_token = await verification_service.get_pending_entity_for_resend(
@@ -63,7 +64,8 @@ async def resend_verification(
         entity_code=entity_code,
     )
 
-    sent = await email_service.send_verification_email(
+    background_tasks.add_task(
+        email_service.send_verification_email,
         db=db,
         email=data.email,
         entity_type=data.entity_type,
@@ -72,10 +74,5 @@ async def resend_verification(
         edit_token=edit_token,
         frontend_url=settings.frontend_url,
     )
-    if not sent:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Verification email could not be sent. Please try again later.",
-        )
 
     return MessageResponse(message="Verification email sent. Please check your inbox.")
