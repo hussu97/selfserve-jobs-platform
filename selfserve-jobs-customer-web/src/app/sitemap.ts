@@ -5,6 +5,11 @@ import { UAE_EMIRATES, EMPLOYMENT_TYPES, TOP_SKILLS } from '@/lib/seo-constants'
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://hirebridgeuae.com';
 const PAGE_SIZE = 200;
 
+// Google's per-sitemap limits: 50,000 URLs and 50 MB uncompressed.
+// Log a warning if we get close so the team knows to split the sitemap.
+const SITEMAP_URL_LIMIT = 50_000;
+const SITEMAP_URL_WARN_THRESHOLD = 45_000;
+
 // Revalidate every hour so new listings appear in the sitemap without a full redeploy
 export const revalidate = 3600;
 
@@ -114,7 +119,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // API unavailable — skip dynamic profile URLs rather than failing the entire sitemap
   }
 
-  return [
+  const allRoutes = [
     ...staticRoutes,
     ...emirateJobRoutes,
     ...typeRoutes,
@@ -125,4 +130,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...jobRoutes,
     ...profileRoutes,
   ];
+
+  if (allRoutes.length >= SITEMAP_URL_WARN_THRESHOLD) {
+    console.warn(
+      `[sitemap] URL count (${allRoutes.length}) is approaching the 50,000 per-file limit. ` +
+        'Consider splitting into multiple sitemaps via generateSitemaps().'
+    );
+  }
+
+  return allRoutes.slice(0, SITEMAP_URL_LIMIT);
 }

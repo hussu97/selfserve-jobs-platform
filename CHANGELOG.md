@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- **Default Open Graph image** — root layout `og:image` and `twitter:image` now reference `/og-default.png` (1200×630); pages without a custom OG image will use this fallback for social sharing
+- **Sitemap URL cap** — `sitemap.ts` now hard-caps output at 50,000 URLs (Google's per-file limit) and logs a warning at 45,000 so the team knows to split into multiple sitemaps
 - **Skip-to-main-content link** — first focusable element in root layout; visible on focus, invisible otherwise (`sr-only focus:not-sr-only`)
 - **Toast notification system** — `ToastContext` + `ToastProvider` with `useToast()` hook; auto-dismisses after 4s; `aria-live="polite"` region for screen readers; success/error/info variants
 - **Card skeleton loading** — `JobCardSkeleton` and `ProfileCardSkeleton` components replace spinner on browse pages; layout matches final card structure for zero layout shift
@@ -27,6 +29,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **DB indexes (migration 0006)** — added `ix_job_email`, `ix_profile_email`, `ix_job_status_expires_at`, `ix_profile_status_expires_at`, `ix_email_verification_entity`, `ix_job_email_status`, `ix_profile_email_status` for query performance; added unique constraint `uq_report_entity_reporter` on `(entity_type, entity_code, reporter_email)` to atomically prevent duplicate reports at DB level
 
 ### Fixed
+- **`/admin/` disallowed in robots.txt** — added to `PRIVATE_PATHS`; all bot user-agent rules now exclude admin routes
 - **Search loading indicator** — `SearchBar` now accepts `searching` prop; shows spinner during 350ms debounce window; browse pages pass state correctly
 - **Improved empty state messaging** — browse pages detect whether filters are active and show context-appropriate messages ("Try broadening your search" vs "No jobs posted yet")
 - **`aria-current="page"`** — nav links now set `aria-current="page"` on the active route
