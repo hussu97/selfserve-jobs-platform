@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+- **ROADMAP.md audit** — unchecked "Paginate sitemap" completed item: `sitemap.ts` uses a single `sitemap()` export with a 50,000-URL cap and warning log, not the `generateSitemaps()` index pattern described; item moved back to open/pending
+
 ### Added
 - **Default Open Graph image** — root layout `og:image` and `twitter:image` now reference `/og-default.png` (1200×630); pages without a custom OG image will use this fallback for social sharing
 - **Sitemap URL cap** — `sitemap.ts` now hard-caps output at 50,000 URLs (Google's per-file limit) and logs a warning at 45,000 so the team knows to split into multiple sitemaps
