@@ -248,6 +248,10 @@ gcloud run services update $API_SERVICE_NAME \
    - Leave build/output settings as defaults
 4. Under **Environment Variables**, add:
    - `NEXT_PUBLIC_API_URL` = the Cloud Run URL from step 6 (e.g. `https://selfserve-jobs-customer-api-xxxx-uc.a.run.app`)
+   - `NEXT_PUBLIC_SENTRY_DSN` = your Sentry DSN (Sentry → Project Settings → Client Keys)
+   - `SENTRY_ORG` = your Sentry org slug
+   - `SENTRY_PROJECT` = your Sentry project slug
+   - `SENTRY_AUTH_TOKEN` = auth token with `project:releases` scope (Sentry → Settings → Auth Tokens) — enables source map uploads for readable stack traces
 5. Click **Deploy**
 
 From now on, every push to `main` that touches `selfserve-jobs-customer-web/` will trigger an automatic Vercel deployment (in addition to your GitHub Actions workflow).
