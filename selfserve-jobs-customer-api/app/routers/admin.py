@@ -9,6 +9,7 @@ from app.schemas.admin import (
     AdminRecruiterListResponse,
     AdminReportListResponse,
     AdminUserListResponse,
+    FlagEntityRequest,
     RejectionReasonItem,
     RejectRecruiterRequest,
 )
@@ -106,11 +107,19 @@ async def list_recruiters(
 @router.post("/recruiters/{code}/approve", response_model=RecruiterResponse)
 async def approve_recruiter(
     code: str,
-    _session: AuthSession = Depends(_get_admin_session),
+    session: AuthSession = Depends(_get_admin_session),
     db: AsyncSession = Depends(get_session),
 ) -> RecruiterResponse:
     """Approve a pending recruiter account."""
     recruiter = await recruiter_service.approve_recruiter(db, code)
+
+    await admin_service.write_audit_log(
+        db,
+        admin_email=session.email,
+        action="approve_recruiter",
+        entity_type="recruiter",
+        entity_code=code,
+    )
 
     if settings.is_production:
         await email_service.send_recruiter_approved_email(
@@ -127,11 +136,13 @@ async def approve_recruiter(
 async def reject_recruiter(
     code: str,
     body: RejectRecruiterRequest,
-    _session: AuthSession = Depends(_get_admin_session),
+    session: AuthSession = Depends(_get_admin_session),
     db: AsyncSession = Depends(get_session),
 ) -> RecruiterResponse:
     """Reject a recruiter with a reason code and optional comment."""
-    recruiter, reason_name = await admin_service.reject_recruiter_with_reason(db, code, body.reason_code, body.comment)
+    recruiter, reason_name = await admin_service.reject_recruiter_with_reason(
+        db, code, body.reason_code, body.comment, admin_email=session.email
+    )
 
     if settings.is_production:
         await email_service.send_recruiter_rejected_email(
@@ -183,3 +194,27 @@ async def get_rejection_reasons(
 ) -> list[RejectionReasonItem]:
     """Return all available recruiter rejection reason codes."""
     return await admin_service.get_rejection_reasons(db)
+
+
+# ---------------------------------------------------------------------------
+# Entity flagging
+# ---------------------------------------------------------------------------
+
+
+@router.post("/entities/{entity_type}/{entity_code}/flag", status_code=status.HTTP_200_OK)
+async def flag_entity(
+    entity_type: str,
+    entity_code: str,
+    body: FlagEntityRequest,
+    session: AuthSession = Depends(_get_admin_session),
+    db: AsyncSession = Depends(get_session),
+) -> dict:
+    """Manually flag a job or profile for review, bypassing the 3-report threshold."""
+    await admin_service.flag_entity(
+        db,
+        admin_email=session.email,
+        entity_type=entity_type,
+        entity_code=entity_code,
+        reason=body.reason,
+    )
+    return {"message": f"{entity_type} {entity_code} flagged for review"}

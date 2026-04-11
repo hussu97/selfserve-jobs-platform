@@ -127,6 +127,16 @@ async def validate_session(db: AsyncSession, session_token: str) -> AuthSession 
     if session is None:
         return None
 
+    # Admin sessions: check the email is still in the admin list (invalidates on config change)
+    if session.user_type == "admin":
+        from app.config import get_settings as _get_settings
+
+        _settings = _get_settings()
+        if session.email not in _settings.admin_email_list:
+            await db.delete(session)
+            await db.flush()
+            return None
+
     # Admin sessions expire after 1 hour of inactivity
     if session.user_type == "admin" and session.last_active_at is not None:
         idle_limit = timedelta(hours=ADMIN_SESSION_INACTIVITY_HOURS)

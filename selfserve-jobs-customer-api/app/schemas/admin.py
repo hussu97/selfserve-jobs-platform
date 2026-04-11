@@ -24,6 +24,10 @@ class RejectRecruiterRequest(BaseModel):
     comment: str | None = None
 
 
+class FlagEntityRequest(BaseModel):
+    reason: str
+
+
 class AdminUserItem(BaseModel):
     profile_code: str
     person_name: str

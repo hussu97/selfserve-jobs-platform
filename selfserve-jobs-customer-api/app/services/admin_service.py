@@ -5,6 +5,7 @@ from fastapi import HTTPException, status
 from sqlalchemy import delete, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.models.admin_audit_log import AdminAuditLog
 from app.models.auth_session import AuthSession
 from app.models.job import Job
 from app.models.profile import Profile
@@ -133,6 +134,68 @@ async def list_reports(
     )
 
 
+async def write_audit_log(
+    db: AsyncSession,
+    admin_email: str,
+    action: str,
+    entity_type: str | None = None,
+    entity_code: str | None = None,
+    details: dict | None = None,
+) -> None:
+    """Append a row to admin_audit_log."""
+    log_entry = AdminAuditLog(
+        admin_email=admin_email,
+        action=action,
+        entity_type=entity_type,
+        entity_code=entity_code,
+        details_json=details,
+    )
+    db.add(log_entry)
+    await db.flush()
+
+
+async def flag_entity(
+    db: AsyncSession,
+    admin_email: str,
+    entity_type: str,
+    entity_code: str,
+    reason: str,
+) -> None:
+    """Flag a job or profile for removal by setting status to 'under_review'."""
+    if entity_type not in ("job", "profile"):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="entity_type must be 'job' or 'profile'")
+
+    now = datetime.now(UTC)
+    if entity_type == "job":
+        result = await db.execute(select(Job).where(Job.job_code == entity_code))
+        entity = result.scalar_one_or_none()
+        if not entity:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
+        if entity.status in ("removed",):
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Entity is already removed")
+        entity.status = "under_review"
+        entity.updated_at = now
+    else:
+        result = await db.execute(select(Profile).where(Profile.profile_code == entity_code))
+        entity = result.scalar_one_or_none()
+        if not entity:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
+        if entity.status in ("removed",):
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Entity is already removed")
+        entity.status = "under_review"
+        entity.updated_at = now
+
+    await db.flush()
+    await write_audit_log(
+        db,
+        admin_email=admin_email,
+        action="flag_entity",
+        entity_type=entity_type,
+        entity_code=entity_code,
+        details={"reason": reason},
+    )
+
+
 async def get_rejection_reasons(db: AsyncSession) -> list[RejectionReasonItem]:
     result = await db.execute(select(RecruiterRejectionReason).order_by(RecruiterRejectionReason.id))
     reasons = result.scalars().all()
@@ -144,6 +207,7 @@ async def reject_recruiter_with_reason(
     code: str,
     reason_code: str,
     comment: str | None,
+    admin_email: str = "",
 ) -> tuple[Recruiter, str]:
     """Set recruiter status to rejected with reason. Returns (recruiter, reason_name)."""
     # Validate reason code exists
@@ -170,5 +234,14 @@ async def reject_recruiter_with_reason(
     # Invalidate all active sessions for the rejected recruiter
     await db.execute(delete(AuthSession).where(AuthSession.email == recruiter.email))
     await db.flush()
+
+    await write_audit_log(
+        db,
+        admin_email=admin_email,
+        action="reject_recruiter",
+        entity_type="recruiter",
+        entity_code=code,
+        details={"reason_code": reason_code, "comment": comment},
+    )
 
     return recruiter, reason.name

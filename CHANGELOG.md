@@ -28,6 +28,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Admin inactivity timeout** — admin sessions now expire after 1 hour of inactivity (`last_active_at` column on `auth_session`); `validate_session` bumps this field on every API call and deletes the session if idle too long
 - **DB indexes (migration 0006)** — added `ix_job_email`, `ix_profile_email`, `ix_job_status_expires_at`, `ix_profile_status_expires_at`, `ix_email_verification_entity`, `ix_job_email_status`, `ix_profile_email_status` for query performance; added unique constraint `uq_report_entity_reporter` on `(entity_type, entity_code, reporter_email)` to atomically prevent duplicate reports at DB level
 
+- **Admin audit log** — new `admin_audit_log` table (migration 0007) records every admin mutation (`approve_recruiter`, `reject_recruiter`, `flag_entity`) with `admin_email`, `action`, `entity_type`, `entity_code`, and a `details_json` payload; `write_audit_log` service helper used across all admin mutations
+- **Manual entity flagging** — `POST /api/v1/admin/entities/{type}/{code}/flag` allows admins to set a job or profile to `under_review` without waiting for 3 reports; writes an audit log entry
+- **Admin session invalidation on email removal** — `validate_session` now checks that admin session emails are still present in `ADMIN_EMAILS` config on every request; sessions for removed admin emails are deleted immediately
 - **Backend test coverage (Phase 7)** — 9 new tests in `tests/test_coverage_gaps.py` covering: verification resend 503 on email failure, profile creation 503 on email failure in production mode, job update 422 on invalid `contact_method`/field combinations, view count increment on job/profile GET detail, admin recruiter rejection invalidates all sessions, profile removal succeeds with GCS delete failure
 
 ### Fixed
