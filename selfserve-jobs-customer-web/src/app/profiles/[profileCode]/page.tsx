@@ -4,7 +4,6 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ProfileDetail } from '@/components/profiles/ProfileDetail';
 import { ProfileCard } from '@/components/profiles/ProfileCard';
-import { ViewTracker } from '@/components/shared/ViewTracker';
 import { Breadcrumbs } from '@/components/seo/Breadcrumbs';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { personSchema } from '@/lib/schema';
@@ -62,7 +61,6 @@ export default async function ProfileDetailPage({ params }: PageProps) {
   return (
     <>
       <JsonLd data={personSchema(profile)} />
-      <ViewTracker entityType="profile" code={profileCode} />
       <div className="hero-gradient">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <Breadcrumbs

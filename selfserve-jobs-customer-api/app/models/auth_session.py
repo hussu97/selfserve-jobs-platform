@@ -20,4 +20,6 @@ class AuthSession(Base):
     user_type: Mapped[str | None] = mapped_column(VARCHAR(20), nullable=True)
     recruiter_code: Mapped[str | None] = mapped_column(VARCHAR(12), nullable=True)
     expires_at: Mapped[datetime] = mapped_column(TIMESTAMPTZ, nullable=False)
+    # Tracks last API activity; used to enforce inactivity timeout for admin sessions
+    last_active_at: Mapped[datetime | None] = mapped_column(TIMESTAMPTZ, nullable=True)
     created_at: Mapped[datetime] = mapped_column(TIMESTAMPTZ, nullable=False, server_default=func.now())

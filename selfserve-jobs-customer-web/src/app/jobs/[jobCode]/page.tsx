@@ -1,14 +1,17 @@
+import { cache } from 'react';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { JobDetail } from '@/components/jobs/JobDetail';
 import { JobCard } from '@/components/jobs/JobCard';
-import { ViewTracker } from '@/components/shared/ViewTracker';
 import { Breadcrumbs } from '@/components/seo/Breadcrumbs';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { jobPostingSchema } from '@/lib/schema';
 import { getJob, getJobs } from '@/lib/api';
 import { truncate } from '@/lib/utils';
+
+// Deduplicate the getJob fetch between generateMetadata and the page component
+const getJobCached = cache(getJob);
 
 interface PageProps {
   params: Promise<{ jobCode: string }>;
@@ -17,7 +20,7 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { jobCode } = await params;
   try {
-    const job = await getJob(jobCode);
+    const job = await getJobCached(jobCode);
     const title = `${job.job_title} at ${job.company_name}`;
     const description = `${job.job_title} position at ${job.company_name} in ${job.company_city}, ${job.company_country}. ${truncate(job.description, 120)}`;
     return {
@@ -44,7 +47,7 @@ export default async function JobDetailPage({ params }: PageProps) {
 
   let job;
   try {
-    job = await getJob(jobCode);
+    job = await getJobCached(jobCode);
   } catch {
     notFound();
   }
@@ -57,7 +60,6 @@ export default async function JobDetailPage({ params }: PageProps) {
   return (
     <>
       <JsonLd data={jobPostingSchema(job)} />
-      <ViewTracker entityType="job" code={jobCode} />
       <div className="hero-gradient">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <Breadcrumbs

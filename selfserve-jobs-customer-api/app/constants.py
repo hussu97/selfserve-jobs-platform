@@ -16,8 +16,13 @@ MAX_ACTIVE_PROFILES_PER_EMAIL: int = 2
 
 # Auth / login tokens
 SESSION_EXPIRY_DAYS: int = 30
+ADMIN_SESSION_EXPIRY_DAYS: int = 7
+ADMIN_SESSION_INACTIVITY_HOURS: int = 1
 LOGIN_TOKEN_EXPIRY_MINUTES: int = 15
 LOGIN_RATE_LIMIT_PER_HOUR: int = 5
+
+# Pagination
+MAX_PAGE: int = 200  # Cap OFFSET-based pagination to prevent expensive full-table scans
 
 # Verification
 VERIFICATION_EXPIRY_HOURS: int = 24

@@ -77,9 +77,14 @@ async def approve_recruiter(db: AsyncSession, code: str) -> Recruiter:
 
 
 async def reject_recruiter(db: AsyncSession, code: str) -> Recruiter:
-    """Move recruiter to rejected status."""
+    """Move recruiter to rejected status and invalidate all active sessions."""
+    from sqlalchemy import delete
+
+    from app.models.auth_session import AuthSession
+
     recruiter = await get_by_code(db, code)
     recruiter.status = "rejected"
+    await db.execute(delete(AuthSession).where(AuthSession.email == recruiter.email))
     await db.flush()
     return recruiter
 

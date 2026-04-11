@@ -1,8 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
+from app.constants import MAX_PAGE
 from app.dependencies import get_session, require_active_recruiter, require_edit_token
+from app.limiter import limiter
 from app.models.auth_session import AuthSession
 from app.schemas.job import (
     JobCreate,
@@ -20,7 +22,7 @@ settings = get_settings()
 
 @router.get("", response_model=JobListResponse)
 async def list_jobs(
-    page: int = Query(1, ge=1),
+    page: int = Query(1, ge=1, le=MAX_PAGE),
     per_page: int = Query(20, ge=1, le=50),
     search: str | None = Query(None, description="Full-text search"),
     country: str | None = Query(None),
@@ -60,16 +62,10 @@ async def get_job(
     return JobResponse.model_validate(job)
 
 
-@router.post("/{code}/view", status_code=status.HTTP_204_NO_CONTENT)
-async def track_job_view(
-    code: str,
-    db: AsyncSession = Depends(get_session),
-):
-    await job_service.increment_view_count(db, code)
-
-
 @router.post("", response_model=JobCreateResponse, status_code=status.HTTP_201_CREATED)
+@limiter.limit("10/hour")
 async def create_job(
+    request: Request,
     data: JobCreate,
     recruiter_session: AuthSession = Depends(require_active_recruiter),
     db: AsyncSession = Depends(get_session),

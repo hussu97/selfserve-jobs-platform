@@ -104,6 +104,15 @@ class JobUpdate(BaseModel):
             return v
         return [s.strip() for s in v if s.strip()]
 
+    @model_validator(mode="after")
+    def validate_contact_consistency(self) -> "JobUpdate":
+        # Only enforce contact consistency when contact_method is explicitly being updated
+        if self.contact_method == "email" and self.contact_email is None:
+            raise ValueError("contact_email is required when setting contact_method to 'email'")
+        if self.contact_method == "url" and self.contact_url is None:
+            raise ValueError("contact_url is required when setting contact_method to 'url'")
+        return self
+
 
 class JobResponse(BaseModel):
     """Full job detail — used for GET /jobs/{code}, PUT, DELETE responses."""

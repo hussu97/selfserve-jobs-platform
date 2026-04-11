@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dependencies import get_session
+from app.limiter import limiter
 from app.schemas.report import ReportCreate, ReportResponse
 from app.services import report_service
 
@@ -9,7 +10,9 @@ router = APIRouter(prefix="/api/v1/reports", tags=["reports"])
 
 
 @router.post("", response_model=ReportResponse, status_code=status.HTTP_201_CREATED)
+@limiter.limit("10/hour")
 async def submit_report(
+    request: Request,
     data: ReportCreate,
     db: AsyncSession = Depends(get_session),
 ):

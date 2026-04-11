@@ -93,7 +93,14 @@ async def increment_view_count(db: AsyncSession, profile_code: str) -> None:
 
 
 async def get_profile_detail(db: AsyncSession, profile_code: str) -> Profile:
-    """Get profile detail without incrementing view count."""
+    """Get profile detail. Increments view count atomically first so the response reflects the current count.
+
+    Intentional preview behaviour: pending_verification listings are accessible by direct URL.
+    They are not surfaced in browse/list endpoints until status = 'active'.
+    """
+    await db.execute(
+        update(Profile).where(Profile.profile_code == profile_code).values(view_count=Profile.view_count + 1)
+    )
     profile = await get_profile_by_code(db, profile_code)
     if profile.status not in ("active", "pending_verification"):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
@@ -202,7 +209,20 @@ async def update_profile(
             detail="Cannot edit a removed profile",
         )
 
-    update_data = data.model_dump(exclude_unset=True)
+    _UPDATABLE_FIELDS = {
+        "person_name",
+        "contact_number",
+        "brief",
+        "current_city",
+        "current_country",
+        "years_of_experience",
+        "current_title",
+        "notice_period",
+        "relocation_preference",
+        "linkedin_profile_link",
+        "key_skills",
+    }
+    update_data = {k: v for k, v in data.model_dump(exclude_unset=True).items() if k in _UPDATABLE_FIELDS}
     for field, value in update_data.items():
         setattr(profile, field, value)
 

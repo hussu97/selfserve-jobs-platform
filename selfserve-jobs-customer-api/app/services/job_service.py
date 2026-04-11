@@ -101,7 +101,14 @@ async def increment_view_count(db: AsyncSession, job_code: str) -> None:
 
 
 async def get_job_detail(db: AsyncSession, job_code: str) -> Job:
-    """Get job detail without incrementing view count."""
+    """Get job detail. Increments view count atomically first so the response reflects the current count.
+
+    Intentional preview behaviour: pending_verification listings are accessible by direct URL
+    (e.g. the creator's email contains the link). This allows the owner to preview their listing
+    before the verification email is clicked. Listings are not surfaced in browse/list endpoints
+    until status = 'active'.
+    """
+    await db.execute(update(Job).where(Job.job_code == job_code).values(view_count=Job.view_count + 1))
     job = await get_job_by_code(db, job_code)
     if job.status not in ("active", "pending_verification"):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
@@ -201,7 +208,23 @@ async def update_job(
             detail="Cannot edit a removed listing",
         )
 
-    update_data = data.model_dump(exclude_unset=True)
+    _UPDATABLE_FIELDS = {
+        "job_title",
+        "company_name",
+        "company_city",
+        "company_country",
+        "employment_type",
+        "deadline_date",
+        "description",
+        "key_skills",
+        "contact_method",
+        "contact_email",
+        "contact_url",
+        "salary_min",
+        "salary_max",
+        "salary_currency",
+    }
+    update_data = {k: v for k, v in data.model_dump(exclude_unset=True).items() if k in _UPDATABLE_FIELDS}
     if "contact_email" in update_data and update_data["contact_email"]:
         update_data["contact_email"] = str(update_data["contact_email"])
 

@@ -2,9 +2,10 @@ import math
 from datetime import UTC, datetime
 
 from fastapi import HTTPException, status
-from sqlalchemy import func, or_, select
+from sqlalchemy import delete, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.models.auth_session import AuthSession
 from app.models.job import Job
 from app.models.profile import Profile
 from app.models.recruiter import Recruiter
@@ -166,6 +167,8 @@ async def reject_recruiter_with_reason(
     recruiter.rejection_reason_code = reason_code
     recruiter.rejection_comment = comment
     recruiter.reviewed_at = datetime.now(UTC)
+    # Invalidate all active sessions for the rejected recruiter
+    await db.execute(delete(AuthSession).where(AuthSession.email == recruiter.email))
     await db.flush()
 
     return recruiter, reason.name

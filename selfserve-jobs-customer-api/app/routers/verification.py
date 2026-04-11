@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
 from app.dependencies import get_session
+from app.limiter import limiter
 from app.schemas.common import MessageResponse
 from app.schemas.verification import (
     ResendVerificationRequest,
@@ -16,7 +17,9 @@ settings = get_settings()
 
 
 @router.post("", response_model=VerificationResponse)
+@limiter.limit("5/minute")
 async def verify_email(
+    request: Request,
     data: VerificationRequest,
     db: AsyncSession = Depends(get_session),
 ):
@@ -38,7 +41,9 @@ async def verify_email(
 
 
 @router.post("/resend", response_model=MessageResponse)
+@limiter.limit("3/day")
 async def resend_verification(
+    request: Request,
     data: ResendVerificationRequest,
     db: AsyncSession = Depends(get_session),
 ):

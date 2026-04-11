@@ -126,10 +126,6 @@ export async function deleteJob(code: string, editToken: string): Promise<void> 
   });
 }
 
-export async function trackJobView(code: string): Promise<void> {
-  return request<void>(`/jobs/${code}/view`, { method: 'POST' });
-}
-
 // Profiles
 export async function getProfiles(filters: ProfileFilters = {}): Promise<PaginatedResponse<ProfileListItem>> {
   const params: Record<string, string | string[] | number | boolean | undefined | null> = {
@@ -173,10 +169,6 @@ export async function deleteProfile(code: string, editToken: string): Promise<vo
     method: 'DELETE',
     headers: { 'X-Edit-Token': editToken },
   });
-}
-
-export async function trackProfileView(code: string): Promise<void> {
-  return request<void>(`/profiles/${code}/view`, { method: 'POST' });
 }
 
 // Resume

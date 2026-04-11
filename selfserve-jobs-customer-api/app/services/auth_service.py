@@ -5,7 +5,13 @@ from fastapi import HTTPException, status
 from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.constants import LOGIN_RATE_LIMIT_PER_HOUR, LOGIN_TOKEN_EXPIRY_MINUTES, SESSION_EXPIRY_DAYS
+from app.constants import (
+    ADMIN_SESSION_EXPIRY_DAYS,
+    ADMIN_SESSION_INACTIVITY_HOURS,
+    LOGIN_RATE_LIMIT_PER_HOUR,
+    LOGIN_TOKEN_EXPIRY_MINUTES,
+    SESSION_EXPIRY_DAYS,
+)
 from app.models.auth_session import AuthSession
 from app.models.job import Job
 from app.models.login_token import LoginToken
@@ -83,19 +89,23 @@ async def create_session(db: AsyncSession, email: str) -> AuthSession:
     if email in settings.admin_email_list:
         user_type = "admin"
         recruiter_code = None
+        expiry = timedelta(days=ADMIN_SESSION_EXPIRY_DAYS)
     elif recruiter:
         user_type = "recruiter"
         recruiter_code = recruiter.recruiter_code
+        expiry = timedelta(days=SESSION_EXPIRY_DAYS)
     else:
         user_type = None
         recruiter_code = None
+        expiry = timedelta(days=SESSION_EXPIRY_DAYS)
 
     session = AuthSession(
         session_token=generate_token(64),
         email=email,
         user_type=user_type,
         recruiter_code=recruiter_code,
-        expires_at=now + timedelta(days=SESSION_EXPIRY_DAYS),
+        expires_at=now + expiry,
+        last_active_at=now,
     )
     db.add(session)
     await db.flush()
@@ -103,7 +113,7 @@ async def create_session(db: AsyncSession, email: str) -> AuthSession:
 
 
 async def validate_session(db: AsyncSession, session_token: str) -> AuthSession | None:
-    """Check token exists and hasn't expired."""
+    """Check token exists and hasn't expired. Enforces 1-hour inactivity timeout for admin sessions."""
     now = datetime.now(UTC)
     result = await db.execute(
         select(AuthSession).where(
@@ -113,7 +123,22 @@ async def validate_session(db: AsyncSession, session_token: str) -> AuthSession 
             )
         )
     )
-    return result.scalar_one_or_none()
+    session = result.scalar_one_or_none()
+    if session is None:
+        return None
+
+    # Admin sessions expire after 1 hour of inactivity
+    if session.user_type == "admin" and session.last_active_at is not None:
+        idle_limit = timedelta(hours=ADMIN_SESSION_INACTIVITY_HOURS)
+        if now - session.last_active_at > idle_limit:
+            await db.delete(session)
+            await db.flush()
+            return None
+
+    # Update last_active_at for activity tracking
+    session.last_active_at = now
+    await db.flush()
+    return session
 
 
 async def delete_session(db: AsyncSession, session_token: str) -> None:

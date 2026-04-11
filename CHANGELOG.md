@@ -6,6 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+- **HTTP rate limiting via slowapi** — `POST /jobs`, `POST /profiles` limited to 10/hour/IP; `POST /verify` limited to 5/minute/IP; `POST /verify/resend` limited to 3/day/IP; `POST /reports` limited to 10/hour/IP; returns HTTP 429 on excess
+- **Admin inactivity timeout** — admin sessions now expire after 1 hour of inactivity (`last_active_at` column on `auth_session`); `validate_session` bumps this field on every API call and deletes the session if idle too long
+- **DB indexes (migration 0006)** — added `ix_job_email`, `ix_profile_email`, `ix_job_status_expires_at`, `ix_profile_status_expires_at`, `ix_email_verification_entity`, `ix_job_email_status`, `ix_profile_email_status` for query performance; added unique constraint `uq_report_entity_reporter` on `(entity_type, entity_code, reporter_email)` to atomically prevent duplicate reports at DB level
+
+### Fixed
+- **Stale view count in detail responses** — `get_job_detail` and `get_profile_detail` now execute an atomic `UPDATE view_count+1` before fetching, so the returned object reflects the current count; removed separate `POST /jobs/{code}/view` and `POST /profiles/{code}/view` endpoints and `ViewTracker` client component (view is now counted server-side on each GET detail)
+- **Missing contact_method validator on `JobUpdate`** — added `model_validator` to `JobUpdate` enforcing that `contact_email` is provided when `contact_method='email'` and `contact_url` is provided when `contact_method='url'`
+- **Status field bypassable via update payload** — `update_job` and `update_profile` services now whitelist updatable fields explicitly instead of blindly applying `model_dump(exclude_unset=True)`, preventing `status` or other protected fields from being injected via the update body
+- **Race condition in duplicate report detection** — added DB-level unique constraint `(entity_type, entity_code, reporter_email)` on `report` table; concurrent submissions that bypass the in-memory check will now receive a DB integrity error
+- **Admin session expiry reduced** — admin sessions now use `ADMIN_SESSION_EXPIRY_DAYS=7` (down from 30) instead of the shared `SESSION_EXPIRY_DAYS` constant
+- **Sessions not invalidated on recruiter rejection** — `reject_recruiter` in `recruiter_service.py` and `reject_recruiter_with_reason` in `admin_service.py` now DELETE all `auth_session` rows for the rejected recruiter's email before flushing
+- **React cache missing on job detail page** — `getJob` was called independently in `generateMetadata` and the page component, counting two views per SSR render; now wrapped with `cache()` matching the existing pattern on profile detail page
+
+### Changed
+- **Max pagination guard** — `GET /jobs` and `GET /profiles` `page` query param now capped at `MAX_PAGE=200` (HTTP 422 beyond); prevents expensive OFFSET queries on deep pages
+
 ### Security
 - **Remove hardcoded dev DB credentials from `alembic.ini`** — replaced `postgresql+asyncpg://jobs4u:jobs4u_dev@...` with placeholder `driver://`; runtime override in `alembic/env.py` already supplies the real URL
 - **Remove default DB URL from `app/config.py`** — `database_url` field no longer has a default value; startup fails with a clear pydantic validation error if `DATABASE_URL` env var is not set

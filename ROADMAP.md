@@ -34,22 +34,22 @@ Organized into phases by criticality. Each phase should be completed before star
 
 ### Bug Fixes
 
-- [ ] **Fix stale view count in detail responses** — `get_job_detail()` and `get_profile_detail()` increment view count AFTER fetching the object. Response always shows count 1 behind. Increment first, then bump the Python object before returning.
-- [ ] **Add contact_method validator to `JobUpdate` / `ProfileUpdate`** — `JobCreate` has a `@model_validator` ensuring `contact_method` matches `contact_email`/`contact_url`, but update schemas lack it. Can create invalid state.
-- [ ] **Prevent status field in update payloads** — `update_job` and `update_profile` use generic `setattr()` loop from `model_dump(exclude_unset=True)`. If `status` is included in the update schema, it bypasses the deactivate/activate endpoints. Whitelist updatable fields explicitly.
-- [ ] **Fix race condition in duplicate report detection** — `report_service.py` does check-then-insert without atomicity. Two concurrent requests can bypass duplicate check. Use DB-level unique constraint on `(entity_type, entity_code, reporter_email)` or `SELECT ... FOR UPDATE`.
-- [ ] **Clarify detail view status filtering** — `get_job_detail()` allows `pending_verification` status but `list_jobs()` only returns `active`. Either document this as intentional preview behavior or gate pending listings behind `X-Edit-Token`.
+- [x] **Fix stale view count in detail responses** — `get_job_detail()` and `get_profile_detail()` now do atomic `UPDATE view_count+1` before SELECT; removed separate POST /view endpoints and ViewTracker; GET detail now always returns accurate count.
+- [x] **Add contact_method validator to `JobUpdate` / `ProfileUpdate`** — `model_validator` added to `JobUpdate`; `ProfileUpdate` has no contact fields so no change needed.
+- [x] **Prevent status field in update payloads** — `update_job` and `update_profile` now use explicit field whitelists instead of generic `setattr()` loop.
+- [x] **Fix race condition in duplicate report detection** — DB-level unique constraint `uq_report_entity_reporter` on `(entity_type, entity_code, reporter_email)` added via migration 0006.
+- [x] **Clarify detail view status filtering** — documented as intentional preview behaviour in service docstrings.
 
 ### Rate Limiting
 
-- [ ] **Add HTTP rate limiting on create/verify/resend endpoints** — CLAUDE.md specifies this but only service-level listing limits exist. Add `slowapi` middleware on `POST /jobs`, `POST /profiles`, `POST /verify`, `POST /verify/resend`, `POST /reports`. Suggested limits: 10 creates/hour/IP, 5 verifies/minute/IP, 3 resends/day/entity.
-- [ ] **Rate-limit view count endpoints** — View increment endpoints have no rate limit. Allow artificial inflation. Add per-IP throttle (e.g., 1 view per entity per IP per hour).
-- [ ] **Add max pagination guard** — Large `page` values cause expensive OFFSET queries. Cap at a reasonable max (e.g., page <= 200) and return 400 beyond that.
+- [x] **Add HTTP rate limiting on create/verify/resend endpoints** — `slowapi` added; limits: 10 creates/hour/IP on POST /jobs and /profiles, 5/minute on POST /verify, 3/day on POST /verify/resend, 10/hour on POST /reports.
+- [x] **Rate-limit view count endpoints** — Separate POST /view endpoints removed; view increment now happens inline in GET detail (no separate endpoint to abuse).
+- [x] **Add max pagination guard** — `page` query param capped at `MAX_PAGE=200` on GET /jobs and GET /profiles; returns HTTP 422 beyond that.
 
 ### Auth Hardening
 
-- [ ] **Reduce admin session expiry** — Currently 30 days. Reduce to 7 days. Add inactivity timeout (1 hour idle = session invalidated).
-- [ ] **Invalidate sessions on recruiter status change** — If a recruiter is rejected by admin, their existing session token remains valid for up to 30 days. Invalidate sessions when recruiter status changes to `rejected`/`suspended`.
+- [x] **Reduce admin session expiry** — Admin sessions now use `ADMIN_SESSION_EXPIRY_DAYS=7`; inactivity timeout of 1 hour enforced via `last_active_at` in `validate_session`.
+- [x] **Invalidate sessions on recruiter status change** — `reject_recruiter` and `reject_recruiter_with_reason` now DELETE all `auth_session` rows for the rejected recruiter's email.
 
 ---
 

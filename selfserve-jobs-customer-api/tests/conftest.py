@@ -38,6 +38,7 @@ from sqlalchemy.ext.asyncio import (  # noqa: E402
 from app.config import get_settings  # noqa: E402
 from app.database import Base  # noqa: E402
 from app.dependencies import get_session  # noqa: E402
+from app.limiter import limiter  # noqa: E402
 from app.main import app  # noqa: E402
 
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
@@ -48,6 +49,13 @@ def clear_settings_cache():
     get_settings.cache_clear()
     yield
     get_settings.cache_clear()
+
+
+@pytest.fixture(autouse=True)
+def reset_rate_limiter():
+    """Reset slowapi in-memory rate limit counters before each test."""
+    limiter.reset()
+    yield
 
 
 @pytest.fixture
