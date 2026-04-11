@@ -124,7 +124,7 @@ async def create_profile(
                 entity_type="profile",
                 entity_code=profile.profile_code,
             )
-            await email_service.send_verification_email(
+            sent = await email_service.send_verification_email(
                 db=db,
                 email=profile.email,
                 entity_type="profile",
@@ -133,6 +133,11 @@ async def create_profile(
                 edit_token=profile.edit_token,
                 frontend_url=settings.frontend_url,
             )
+            if not sent:
+                raise HTTPException(
+                    status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                    detail="Profile created but verification email could not be sent. Please try again.",
+                )
             message = "Profile created. Please check your email to verify and activate your profile."
     else:
         # Non-production: auto-activate immediately (email_verified=False stays as audit flag)

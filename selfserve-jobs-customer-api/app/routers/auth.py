@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
@@ -30,12 +30,17 @@ async def login(
 ):
     if settings.is_production:
         token = await auth_service.create_login_token(db, data.email)
-        await email_service.send_login_email(
+        sent = await email_service.send_login_email(
             db=db,
             email=data.email,
             login_token=token.token,
             frontend_url=settings.frontend_url,
         )
+        if not sent:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Login email could not be sent. Please try again later.",
+            )
         return LoginResponse(message="Check your email for a login link.")
     else:
         # Non-production: skip email, create session immediately

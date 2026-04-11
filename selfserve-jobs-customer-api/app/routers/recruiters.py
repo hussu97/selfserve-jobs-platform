@@ -34,13 +34,18 @@ async def register_recruiter(
                 entity_type="recruiter",
                 entity_code=recruiter.recruiter_code,
             )
-            await email_service.send_recruiter_verification_email(
+            sent = await email_service.send_recruiter_verification_email(
                 db=db,
                 email=recruiter.email,
                 recruiter_code=recruiter.recruiter_code,
                 verification_code=verification.verification_code,
                 frontend_url=settings.frontend_url,
             )
+            if not sent:
+                raise HTTPException(
+                    status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                    detail="Recruiter registered but verification email could not be sent. Please try again.",
+                )
             message = "Check your email to verify your address. After verification, your account will be reviewed."
     else:
         # Non-production: auto-advance to pending_approval
