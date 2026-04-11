@@ -147,29 +147,29 @@ Organized into phases by criticality. Each phase should be completed before star
 
 ### Backend Tests
 
-- [ ] **Test email failure scenarios** — No tests for when Resend API is down or returns errors. Mock failures and verify routers return 503.
-- [ ] **Test verification flow end-to-end** — Create entity, send verification, verify, check status transitions. Include expired code and resend scenarios.
-- [ ] **Test update validators** — Ensure `contact_method`/`contact_email`/`contact_url` consistency enforced on updates (once Phase 2 fix is in).
-- [ ] **Test view count atomicity** — Concurrent view increments should all succeed and produce correct final count.
-- [ ] **Test rate limiting under load** — Verify rate limits actually reject excess requests (once Phase 2 limits are in).
-- [ ] **Test admin rejection flow** — Create recruiter, admin rejects, verify session invalidated, verify entity status.
-- [ ] **Test report auto-hide threshold** — Submit 3 reports for same entity, verify status changes to `under_review`.
-- [ ] **Test GCS upload failure handling** — Mock GCS errors and verify graceful fallback.
+- [x] **Test email failure scenarios** — Background-task architecture tested in `test_coverage_gaps.py`; both profile creation and verify/resend return success even when Resend is down.
+- [x] **Test verification flow end-to-end** — `test_verification.py`: create entity, verify, status transitions, expired code rejection, double-use prevention, and resend rate limit.
+- [x] **Test update validators** — `test_coverage_gaps.py`: contact_method/email/url consistency enforced on PUT /jobs.
+- [x] **Test view count atomicity** — `test_coverage_gaps.py`: sequential multi-request accumulation verified; full concurrent test deferred to PostgreSQL integration suite.
+- [x] **Test rate limiting under load** — `test_coverage_gaps.py`: IP-based 429 verified on POST /verify (5/min), POST /jobs (10/hr), POST /reports (10/hr).
+- [x] **Test admin rejection flow** — `test_admin.py` + `test_coverage_gaps.py`: rejection status change and session invalidation both covered.
+- [x] **Test report auto-hide threshold** — `test_reports.py`: 3 reports from distinct emails trigger `under_review`; 2 do not.
+- [x] **Test GCS upload failure handling** — `test_coverage_gaps.py`: profile removal returns 200 and sets status=removed even when GCS delete throws.
 
 ### Frontend Tests
 
-- [ ] **Test form submission and validation** — All form components (JobForm, ProfileForm) with valid/invalid data, error states, loading states.
-- [ ] **Test search and filter interactions** — Debounce behavior, URL parameter sync, empty results, filter clearing.
-- [ ] **Test error boundary rendering** — Trigger errors in child components, verify error UI renders correctly.
-- [ ] **Test authentication flows** — Login, session persistence, logout, expired session handling.
-- [ ] **Test responsive layouts** — Key pages at mobile/tablet/desktop breakpoints.
+- [x] **Test form submission and validation** — `validation.test.ts`: full coverage of `validateJobForm` and `validateProfileForm` including required fields, salary rules, contact method consistency, and `isJobFormValid`/`isProfileFormValid` helpers.
+- [x] **Test search and filter interactions** — `SearchBar.test.tsx`: rendering, onChange, clear button show/hide, clear action, searching spinner, spinner/clear mutual exclusion.
+- [x] **Test error boundary rendering** — `error-boundary.test.tsx`: GlobalError label, heading, message, "Try again" button, "Go home" link, reset callback, console.error side-effect, re-render stability.
+- [x] **Test authentication flows** — `AuthContext.test.tsx`: initial state, login, logout, localStorage persistence, role flags, updateRecruiterStatus, session restore on mount, corrupt storage resilience.
+- [x] **Test responsive layouts** — `e2e/responsive.spec.ts`: key pages verified at 375 px / 768 px / 1280 px for visible main content and no horizontal scroll.
 
 ### CI Improvements
 
 - [x] **Add dependency caching to CI** — `test-api.yml` caches `~/.cache/uv` keyed on `pyproject.toml` hash.
 - [x] **Add security scanning to CI** — `bandit -r app/ -ll` added to `test-api.yml`; `npm audit --audit-level=high` added to `test-web.yml`; both non-blocking.
-- [ ] **Add E2E test suite** — No Playwright/Cypress tests. Add critical path E2E: create listing -> verify email -> browse -> view detail -> manage -> delete.
-- [ ] **Parallelize API and web test jobs** — Currently sequential. Run in parallel GitHub Actions jobs.
+- [x] **Add E2E test suite** — Playwright scaffold added: `playwright.config.ts` (Desktop Chrome, Mobile Chrome, Tablet projects), `e2e/smoke.spec.ts`, `e2e/responsive.spec.ts`, `e2e/critical-path.spec.ts`. Full create→verify→delete flow gated behind `E2E_FULL_FLOW=true`. CI workflow: `.github/workflows/e2e.yml` (manual dispatch, `BASE_URL` override, artifact upload).
+- [x] **Parallelize API and web test jobs** — `.github/workflows/test-all.yml` added: single workflow with `test-api` and `test-web` as parallel jobs using reusable workflow references.
 
 ---
 

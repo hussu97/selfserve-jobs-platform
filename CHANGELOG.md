@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+- **Phase 7 — Test Coverage & CI Hardening (full implementation)**
+  - *Backend — rate limiting:* `test_coverage_gaps.py` extended with `test_verify_ip_rate_limit` (POST /verify, 5/minute), `test_create_job_ip_rate_limit` (POST /jobs, 10/hour), and `test_report_ip_rate_limit` (POST /reports, 10/hour) — verifies slowapi middleware rejects the N+1 request with HTTP 429 after counting all requests regardless of their response status
+  - *Backend — view count:* `test_view_count_accumulates_over_multiple_requests` — verifies five sequential GET /jobs/{code} requests each increment the counter atomically so the final count equals 5
+  - *Frontend — search:* `SearchBar.test.tsx` — covers rendering, custom placeholder, onChange fired on each keystroke, clear button visibility, clear action, searching spinner, and mutual exclusion of spinner vs clear button
+  - *Frontend — auth:* `AuthContext.test.tsx` — covers initial state, login/logout, localStorage persistence, role flags (isAdmin, isActiveRecruiter, isPendingRecruiter), updateRecruiterStatus, session restore on mount, corrupt storage handling, and useAuth outside provider guard
+  - *Frontend — error boundary:* `error-boundary.test.tsx` — covers GlobalError: "Something went wrong" label, heading, descriptive message, "Try again" button, "Go home" link, reset() callback, console.error on mount, and re-render stability
+  - *CI — parallelization:* `.github/workflows/test-all.yml` — single workflow with two parallel jobs (`test-api` / `test-web`) using reusable workflow references; triggered on PRs that touch either layer or workflow files
+  - *CI — E2E:* `.github/workflows/e2e.yml` — manual `workflow_dispatch` workflow that installs Playwright Chromium, runs E2E tests against a `BASE_URL` input, and uploads the HTML report as an artifact
+  - *E2E — Playwright scaffold:* `playwright.config.ts` — Desktop Chrome, Mobile Chrome (Pixel 5), and Tablet projects; `webServer` auto-starts dev server locally; `retries: 2` in CI; `BASE_URL` override for staging
+  - *E2E — smoke tests:* `e2e/smoke.spec.ts` — homepage, jobs list, and profiles list smoke checks (HTTP 200, main region visible, search input present)
+  - *E2E — responsive tests:* `e2e/responsive.spec.ts` — key pages tested at 375 px / 768 px / 1280 px viewports for visible main content and absence of horizontal scroll
+  - *E2E — critical-path tests:* `e2e/critical-path.spec.ts` — browse, search, and clear interactions always run; full create→verify→manage→delete flow gated behind `E2E_FULL_FLOW=true`
+  - `@playwright/test ^1.50.0` added to `devDependencies`; `e2e`, `e2e:ui`, and `e2e:install` npm scripts added
+
 ### Fixed
 - **Migration 0008** — `json_array_length()` does not work on `jsonb` columns; replaced with `jsonb_array_length()` in both `chk_job_key_skills_max_length` and `chk_profile_key_skills_max_length` CHECK constraints
 - **Deploy workflow** — `ADMIN_EMAILS` and `ADMIN_NOTIFICATION_EMAIL` env vars were missing from `deploy-api.yml`; both now passed from GitHub secrets to Cloud Run on every deploy so they no longer need to be set manually in the GCP console

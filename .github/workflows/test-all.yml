@@ -1,0 +1,24 @@
+name: Test All
+
+# Runs both API and web test suites in parallel.
+# Use this workflow when you need a single combined status check — e.g. in
+# branch protection rules for changes that touch both layers simultaneously.
+# Individual deploy workflows still call their own test workflow directly.
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'selfserve-jobs-customer-api/**'
+      - 'selfserve-jobs-customer-web/**'
+      - 'docker-compose.yml'
+      - '.github/workflows/**'
+      - 'README.md'
+
+jobs:
+  test-api:
+    uses: ./.github/workflows/test-api.yml
+
+  test-web:
+    uses: ./.github/workflows/test-web.yml

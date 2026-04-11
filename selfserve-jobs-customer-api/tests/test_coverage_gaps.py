@@ -1,4 +1,4 @@
-"""Phase 7 test coverage gaps: email failures, update validators, view count, GCS errors."""
+"""Phase 7 test coverage gaps: email failures, update validators, view count, rate limits, GCS errors."""
 
 from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock, patch
@@ -299,6 +299,120 @@ async def test_reject_recruiter_invalidates_all_sessions(client, db_session):
 # ---------------------------------------------------------------------------
 # GCS delete failure — graceful handling on profile removal
 # ---------------------------------------------------------------------------
+
+
+# ---------------------------------------------------------------------------
+# Rate limiting — IP-based limits on create/submit endpoints
+# ---------------------------------------------------------------------------
+
+
+_VALID_JOB_PAYLOAD = {
+    "job_title": "Software Engineer",
+    "company_name": "Acme Corp",
+    "company_city": "London",
+    "company_country": "United Kingdom",
+    "employment_type": "full_time",
+    "description": "A great opportunity for a talented software engineer.",
+    "contact_method": "email",
+    "contact_email": "hiring@example.com",
+    "key_skills": ["Python", "FastAPI"],
+}
+
+
+async def test_verify_ip_rate_limit(client):
+    """POST /verify is limited to 5 requests per minute per IP.
+
+    Sends 5 requests with invalid codes (all return 400) then asserts
+    the 6th is rejected with 429 by the slowapi middleware.
+    """
+    for _ in range(5):
+        await client.post("/api/v1/verify", json={"code": "invalid-code-that-does-not-exist-00"})
+
+    r = await client.post("/api/v1/verify", json={"code": "another-invalid-code-xxxxxxxxxxxxxx"})
+    assert r.status_code == 429
+
+
+async def test_create_job_ip_rate_limit(client, db_session):
+    """POST /jobs is limited to 10 requests per hour per IP.
+
+    After 10 requests (first 5 succeed; requests 6-10 fail with 409 due to
+    the max-active-jobs-per-email business rule), the 11th is rejected with
+    429 by the slowapi middleware.  The rate limiter counts all requests
+    regardless of their HTTP response status.
+    """
+    token = await _make_recruiter_session(db_session, email="rljobs@ratelimitgap.com")
+
+    for _ in range(10):
+        await client.post(
+            "/api/v1/jobs",
+            json=_VALID_JOB_PAYLOAD,
+            headers={"Authorization": f"Bearer {token}"},
+        )
+
+    r = await client.post(
+        "/api/v1/jobs",
+        json=_VALID_JOB_PAYLOAD,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert r.status_code == 429
+
+
+async def test_report_ip_rate_limit(client, db_session):
+    """POST /reports is limited to 10 requests per hour per IP.
+
+    Submits 10 reports against a single job from different reporter emails
+    (each is accepted; after the REPORT_THRESHOLD the job is under_review
+    but still reportable).  The 11th request is rejected with 429.
+    """
+    job = await _make_active_job(db_session, job_code="rljob000001")
+
+    for i in range(10):
+        await client.post(
+            "/api/v1/reports",
+            json={
+                "entity_type": "job",
+                "entity_code": job.job_code,
+                "reporter_email": f"rl_reporter{i}@example.com",
+                "reason": "spam",
+            },
+        )
+
+    r = await client.post(
+        "/api/v1/reports",
+        json={
+            "entity_type": "job",
+            "entity_code": job.job_code,
+            "reporter_email": "rl_reporter10@example.com",
+            "reason": "spam",
+        },
+    )
+    assert r.status_code == 429
+
+
+# ---------------------------------------------------------------------------
+# View count — multiple sequential increments accumulate correctly
+# ---------------------------------------------------------------------------
+
+
+async def test_view_count_accumulates_over_multiple_requests(client, db_session):
+    """Multiple sequential GET /jobs/{code} requests each add 1 to view_count.
+
+    This test verifies that the atomic UPDATE ensures no increments are lost.
+    Full concurrency testing (asyncio.gather) is deferred to integration tests
+    that run against PostgreSQL where true parallel write semantics apply.
+    """
+    from sqlalchemy import select
+
+    N = 5
+    job = await _make_active_job(db_session, job_code="accumview001", view_count=0)
+
+    for _ in range(N):
+        r = await client.get(f"/api/v1/jobs/{job.job_code}")
+        assert r.status_code == 200
+
+    result = await db_session.execute(select(Job).where(Job.job_code == job.job_code))
+    updated = result.scalar_one()
+    assert updated.view_count == N
 
 
 async def test_profile_removal_succeeds_even_if_gcs_delete_fails(client, db_session):
