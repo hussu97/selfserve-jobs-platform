@@ -267,6 +267,6 @@ Organized into phases by criticality. Each phase should be completed before star
 
 - [x] **Add error boundaries** — `error.tsx` files in `app/`, `app/jobs/`, `app/profiles/` with user-friendly fallback UI.
 - [x] **Add OG images for social sharing** — `opengraph-image.tsx` with dynamic social cards on job and profile detail pages.
-- [x] **Paginate sitemap** — `sitemap.ts` refactored to use `generateSitemaps()` for sitemap index with paginated children.
+- [ ] **Paginate sitemap** — `sitemap.ts` currently uses a single `sitemap()` export with a 50,000-URL cap and warning. Refactor to use `generateSitemaps()` for a proper sitemap index with paginated children when URL count grows.
 - [x] **Replace hardcoded color values** — Audit of raw hex values replaced with CSS custom properties.
 - [x] **Add frontend file upload size validation** — 5MB size check before upload begins.
