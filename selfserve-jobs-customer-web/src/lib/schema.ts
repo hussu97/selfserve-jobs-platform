@@ -10,7 +10,7 @@ export function organizationSchema() {
     logo: `${SITE_URL}/logo.png`,
     description:
       'A free, no-signup job board connecting tech talent with employers across the UAE. No fees, no algorithms, no middlemen.',
-    foundingDate: '2024',
+    foundingDate: '2026',
     founders: [
       { '@type': 'Person', name: 'Hussain Abbasi' },
       { '@type': 'Person', name: 'Tejasvie Subrahmanyam' },
