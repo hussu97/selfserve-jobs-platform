@@ -27,6 +27,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Validate required secrets
+        run: |
+          missing=()
+          [[ -z "${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}" ]] && missing+=("GCP_WORKLOAD_IDENTITY_PROVIDER")
+          [[ -z "${{ secrets.GCP_SERVICE_ACCOUNT }}" ]] && missing+=("GCP_SERVICE_ACCOUNT")
+          [[ -z "${{ secrets.GCP_PROJECT_ID }}" ]] && missing+=("GCP_PROJECT_ID")
+          [[ -z "${{ secrets.GCP_REGION }}" ]] && missing+=("GCP_REGION")
+          if [[ ${#missing[@]} -gt 0 ]]; then
+            echo "❌ Missing required secrets: ${missing[*]}"
+            exit 1
+          fi
+          echo "✅ All required secrets present"
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
@@ -54,3 +67,21 @@ jobs:
             --platform managed \
             --allow-unauthenticated \
             --port 8080
+
+      - name: Post-deploy health check
+        run: |
+          SERVICE_URL=$(gcloud run services describe selfserve-jobs-customer-api \
+            --region "${{ secrets.GCP_REGION }}" \
+            --format "value(status.url)")
+          echo "Service URL: $SERVICE_URL"
+          for i in 1 2 3 4 5; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${SERVICE_URL}/api/v1/health" || echo "000")
+            if [[ "$STATUS" == "200" ]]; then
+              echo "✅ Health check passed (attempt $i)"
+              exit 0
+            fi
+            echo "⏳ Attempt $i: got HTTP $STATUS, retrying in 10s..."
+            sleep 10
+          done
+          echo "❌ Health check failed after 5 attempts"
+          exit 1

@@ -1,9 +1,11 @@
 import logging
+import uuid
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from pythonjsonlogger.json import JsonFormatter as _JsonFormatter
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
@@ -11,19 +13,59 @@ from app.config import get_settings
 from app.limiter import limiter
 from app.routers import admin, auth, jobs, management, meta, profiles, recruiters, reports, upload, verification
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
+settings = get_settings()
+
+
+def _configure_logging() -> None:
+    """Set up structured JSON logging for production, plain text for development."""
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.INFO)
+
+    if root_logger.handlers:
+        root_logger.handlers.clear()
+
+    handler = logging.StreamHandler()
+    if settings.log_format == "json":
+        formatter = _JsonFormatter(
+            fmt="%(asctime)s %(name)s %(levelname)s %(message)s",
+            rename_fields={"asctime": "timestamp", "levelname": "level", "name": "logger"},
+        )
+    else:
+        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    handler.setFormatter(formatter)
+    root_logger.addHandler(handler)
+
+
+_configure_logging()
 logger = logging.getLogger(__name__)
 
-settings = get_settings()
+
+def _configure_sentry() -> None:
+    if not settings.sentry_dsn:
+        return
+    try:
+        import sentry_sdk
+        from sentry_sdk.integrations.fastapi import FastApiIntegration
+        from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
+
+        sentry_sdk.init(
+            dsn=settings.sentry_dsn,
+            environment=settings.environment,
+            integrations=[FastApiIntegration(), SqlalchemyIntegration()],
+            traces_sample_rate=0.1,
+        )
+        logger.info("Sentry error tracking initialised")
+    except Exception as exc:
+        logger.warning("Failed to initialise Sentry: %s", exc)
+
+
+_configure_sentry()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Startup and shutdown lifecycle manager."""
-    logger.info("Starting selfserve-jobs-customer-api (environment: %s)", settings.environment)
+    logger.info("Starting selfserve-jobs-customer-api", extra={"environment": settings.environment})
 
     logger.info("Running Alembic migrations...")
     try:
@@ -41,7 +83,7 @@ async def lifespan(app: FastAPI):
         await loop.run_in_executor(None, lambda: command.upgrade(alembic_cfg, "head"))
         logger.info("Alembic migrations completed successfully")
     except Exception as exc:
-        logger.error("Failed to run Alembic. migrations: %s", exc)
+        logger.error("Failed to run Alembic migrations: %s", exc)
         raise
 
     yield
@@ -74,7 +116,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization", "X-Session-Token", "X-Edit-Token"],
-    expose_headers=["X-Edit-Token"],
+    expose_headers=["X-Edit-Token", "X-Request-Id"],
 )
 
 # Cache-Control middleware — improves CDN + browser caching for SEO crawlability
@@ -90,8 +132,18 @@ _CACHE_RULES = [
 
 _NO_CACHE_METHODS = {"POST", "PUT", "DELETE", "PATCH"}
 
-
 _MAX_BODY_SIZE = 10 * 1024 * 1024  # 10 MB
+
+
+@app.middleware("http")
+async def request_id_middleware(request: Request, call_next) -> Response:
+    """Attach a unique X-Request-Id to every request for log correlation."""
+    request_id = request.headers.get("X-Request-Id") or str(uuid.uuid4())
+    # Stash on request state so handlers can reference it
+    request.state.request_id = request_id
+    response = await call_next(request)
+    response.headers["X-Request-Id"] = request_id
+    return response
 
 
 @app.middleware("http")
@@ -143,7 +195,18 @@ app.include_router(meta.router)
 
 @app.get("/api/v1/health", tags=["health"])
 async def health_check():
-    return JSONResponse(content={"status": "ok"})
+    """Health check endpoint. Returns 200 if the DB is reachable, 503 otherwise."""
+    from sqlalchemy import text
+
+    from app.database import async_session_factory
+
+    try:
+        async with async_session_factory() as session:
+            await session.execute(text("SELECT 1"))
+        return JSONResponse(content={"status": "ok", "db": "ok"})
+    except Exception as exc:
+        logger.error("Health check DB probe failed: %s", exc)
+        return JSONResponse(status_code=503, content={"status": "degraded", "db": "unreachable"})
 
 
 @app.get("/", include_in_schema=False)

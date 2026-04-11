@@ -7,6 +7,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- **Structured JSON logging** — `pythonjsonlogger` replaces `basicConfig`; production uses JSON format (toggled via `LOG_FORMAT=json` env var), development uses plain text; all log records include `timestamp`, `level`, `logger`
+- **Request correlation IDs** — `request_id_middleware` generates a UUID per request (or echoes `X-Request-Id` header if supplied) and returns it in `X-Request-Id` response header; `request.state.request_id` is available to handlers
+- **Sentry error tracking** — `sentry-sdk[fastapi]` integrated; initialised at startup when `SENTRY_DSN` env var is set; includes FastAPI and SQLAlchemy integrations; traces sampled at 10%
+- **DB query timeout** — PostgreSQL connections now set `statement_timeout=30000ms` via `server_settings` in `connect_args`
+- **Slow query logging** — SQLAlchemy engine event hooks log a WARNING for any query exceeding 500ms, including elapsed time and truncated statement
+- **Connection pool event logging** — `connect` and `checkin` engine events log at DEBUG level for pool visibility
+- **Health check DB probe** — `GET /api/v1/health` now runs `SELECT 1` against the DB and returns `{"db": "ok"}` (200) or `{"db": "unreachable"}` (503)
 - **HTTP rate limiting via slowapi** — `POST /jobs`, `POST /profiles` limited to 10/hour/IP; `POST /verify` limited to 5/minute/IP; `POST /verify/resend` limited to 3/day/IP; `POST /reports` limited to 10/hour/IP; returns HTTP 429 on excess
 - **Admin inactivity timeout** — admin sessions now expire after 1 hour of inactivity (`last_active_at` column on `auth_session`); `validate_session` bumps this field on every API call and deletes the session if idle too long
 - **DB indexes (migration 0006)** — added `ix_job_email`, `ix_profile_email`, `ix_job_status_expires_at`, `ix_profile_status_expires_at`, `ix_email_verification_entity`, `ix_job_email_status`, `ix_profile_email_status` for query performance; added unique constraint `uq_report_entity_reporter` on `(entity_type, entity_code, reporter_email)` to atomically prevent duplicate reports at DB level
@@ -21,6 +28,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **React cache missing on job detail page** — `getJob` was called independently in `generateMetadata` and the page component, counting two views per SSR render; now wrapped with `cache()` matching the existing pattern on profile detail page
 
 ### Changed
+- **Dockerfile hardened** — multi-stage build (builder + runtime), pinned base image digest (`python:3.12-slim@sha256:804ddf3...`), non-root user `appuser`, `HEALTHCHECK` pointing to `/api/v1/health`
+- **`.dockerignore` added** — excludes `.env*`, `.venv`, `__pycache__`, `tests/`, `*.md`, `uv.lock` from build context
+- **CI: dependency caching** — `test-api.yml` now caches `~/.cache/uv` keyed on `pyproject.toml` hash
+- **CI: bandit security scan** — `test-api.yml` runs `bandit -r app/ -ll` on every run; failures are non-blocking (`|| true`) to avoid blocking on informational findings
+- **CI: npm audit security scan** — `test-web.yml` runs `npm audit --audit-level=high` after tests; non-blocking
+- **CI: pre-deploy secrets validation** — `deploy-api.yml` validates all 4 required GCP secrets are non-empty before attempting auth
+- **CI: post-deploy health check** — `deploy-api.yml` polls `/api/v1/health` up to 5 times after deploy, failing the workflow if it never returns 200
 - **Max pagination guard** — `GET /jobs` and `GET /profiles` `page` query param now capped at `MAX_PAGE=200` (HTTP 422 beyond); prevents expensive OFFSET queries on deep pages
 
 ### Security

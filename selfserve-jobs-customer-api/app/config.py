@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     environment: str = "development"
     admin_notification_email: str = ""
     admin_emails: str = ""
+    sentry_dsn: str = ""
+    log_format: str = "json"  # "json" in production, "text" in development
 
     model_config = SettingsConfigDict(
         env_file=".env",

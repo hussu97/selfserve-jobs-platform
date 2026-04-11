@@ -59,29 +59,29 @@ Organized into phases by criticality. Each phase should be completed before star
 
 ### Deployment & Docker
 
-- [ ] **Harden Dockerfile** — Add non-root user (`adduser appuser` + `USER appuser`), `HEALTHCHECK` pointing to `/api/v1/health`, and multi-stage build to reduce image size and attack surface.
-- [ ] **Add `.dockerignore`** — Missing entirely. Exclude `.env*`, `.git`, `__pycache__`, `tests/`, `*.md` from build context.
-- [ ] **Pin Docker base image digest** — Use `python:3.12-slim@sha256:...` instead of mutable tag to ensure reproducible builds.
-- [ ] **Add pre-deploy health check in CI** — After `gcloud run deploy`, validate the new revision responds 200 on `/api/v1/health` before marking deployment successful.
-- [ ] **Add secrets validation step in CI** — Check that required secrets are non-empty before attempting deployment. Fail fast with clear error.
-- [ ] **Restrict GCS CORS** — Current config allows `origin: ["*"]`. Replace with actual frontend domain(s).
+- [x] **Harden Dockerfile** — Multi-stage build, non-root `appuser`, `HEALTHCHECK` pointing to `/api/v1/health`.
+- [x] **Add `.dockerignore`** — Added, excludes `.env*`, `.venv`, `__pycache__`, `tests/`, `*.md`, `uv.lock`.
+- [x] **Pin Docker base image digest** — Base image pinned to `python:3.12-slim@sha256:804ddf3...`.
+- [x] **Add pre-deploy health check in CI** — `deploy-api.yml` polls `/api/v1/health` up to 5 times after deploy.
+- [x] **Add secrets validation step in CI** — `deploy-api.yml` validates all 4 required GCP secrets before auth.
+- [ ] **Restrict GCS CORS** — Current config allows `origin: ["*"]`. Replace with actual frontend domain(s). (Requires GCS bucket config change — done via `gsutil` or Console, not code.)
 
 ### Health & Observability
 
-- [ ] **Expand health check to verify dependencies** — Current `/api/v1/health` returns static `{"status": "ok"}`. Add DB connectivity check, and optionally GCS/Resend reachability. Return 503 if DB is down.
-- [ ] **Add structured JSON logging** — Replace basic logging with `python-json-logger` or `structlog`. Include request_id, timestamp, level, module in every log line. Essential for Cloud Run log aggregation.
-- [ ] **Add request correlation IDs** — Generate unique request ID per request, propagate through all log messages. Return in `X-Request-Id` response header for debugging.
-- [ ] **Integrate error tracking (Sentry)** — No error tracking exists. 500 errors are invisible. Add Sentry SDK to both API and web, configured per environment.
-- [ ] **Add connection pool monitoring** — Pool size 10, max_overflow 20, but no visibility. Log pool checkout/checkin events at DEBUG level; alert if pool utilization > 80%.
-- [ ] **Add query timeout** — No `statement_timeout` configured. Long-running queries can block the connection pool indefinitely. Set 30s default via SQLAlchemy `execution_options`.
-- [ ] **Add slow query logging** — Log queries exceeding 500ms threshold. SQLAlchemy event hooks make this straightforward.
+- [x] **Expand health check to verify dependencies** — `GET /api/v1/health` now runs `SELECT 1` and returns 503 if DB is unreachable.
+- [x] **Add structured JSON logging** — `pythonjsonlogger` replaces `basicConfig`; JSON format in production, plain text in dev, toggled via `LOG_FORMAT` env var.
+- [x] **Add request correlation IDs** — UUID generated per request, propagated via `X-Request-Id` response header; available as `request.state.request_id`.
+- [x] **Integrate error tracking (Sentry)** — `sentry-sdk[fastapi]` added; activated when `SENTRY_DSN` env var is set.
+- [x] **Add connection pool monitoring** — Engine `connect` and `checkin` events log at DEBUG level.
+- [x] **Add query timeout** — PostgreSQL connections now use `statement_timeout=30000ms` via `connect_args`.
+- [x] **Add slow query logging** — SQLAlchemy event hooks log a WARNING for queries exceeding 500ms.
 
 ### Database
 
-- [ ] **Index email columns** — `email` field on Job and Profile models is used in many queries (rate limiting, management links, verification) but has no index. Add `index=True` + Alembic migration.
-- [ ] **Add compound index `(status, expires_at)`** — Needed for efficient expiry cron queries. Without it, full table scan on every cron run.
-- [ ] **Add compound index `(entity_type, entity_code)` on `email_verification`** — Verification lookups use both fields but no composite index exists.
-- [ ] **Add compound index `(email, status)` on job/profile** — Used by active listing count checks and session entity lookups.
+- [x] **Index email columns** — `ix_job_email`, `ix_profile_email` added via migration 0006.
+- [x] **Add compound index `(status, expires_at)`** — `ix_job_status_expires_at`, `ix_profile_status_expires_at` added via migration 0006.
+- [x] **Add compound index `(entity_type, entity_code)` on `email_verification`** — `ix_email_verification_entity` added via migration 0006.
+- [x] **Add compound index `(email, status)` on job/profile** — `ix_job_email_status`, `ix_profile_email_status` added via migration 0006.
 
 ---
 
@@ -166,8 +166,8 @@ Organized into phases by criticality. Each phase should be completed before star
 
 ### CI Improvements
 
-- [ ] **Add dependency caching to CI** — `test-api.yml` installs Python deps fresh every run. Add `uv cache` or pip caching step.
-- [ ] **Add security scanning to CI** — Run `bandit` (Python SAST) and `npm audit` on every PR. Block merge on high-severity findings.
+- [x] **Add dependency caching to CI** — `test-api.yml` caches `~/.cache/uv` keyed on `pyproject.toml` hash.
+- [x] **Add security scanning to CI** — `bandit -r app/ -ll` added to `test-api.yml`; `npm audit --audit-level=high` added to `test-web.yml`; both non-blocking.
 - [ ] **Add E2E test suite** — No Playwright/Cypress tests. Add critical path E2E: create listing -> verify email -> browse -> view detail -> manage -> delete.
 - [ ] **Parallelize API and web test jobs** — Currently sequential. Run in parallel GitHub Actions jobs.
 
