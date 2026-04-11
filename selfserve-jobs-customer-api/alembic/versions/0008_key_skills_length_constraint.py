@@ -20,19 +20,19 @@ depends_on: Sequence[str] | None = None
 
 def upgrade() -> None:
     # PostgreSQL-only: CHECK constraints on JSONB array length.
-    # Using json_array_length() which works for both JSON and JSONB columns.
+    # key_skills is JSONB, so jsonb_array_length() is required (not json_array_length()).
     # The constraint is NOT VALID on existing rows (skips table scan) and only
     # enforces on new/updated rows going forward.
     op.execute(
         sa.text(
             "ALTER TABLE job ADD CONSTRAINT chk_job_key_skills_max_length "
-            "CHECK (json_array_length(key_skills) <= 30) NOT VALID"
+            "CHECK (jsonb_array_length(key_skills) <= 30) NOT VALID"
         )
     )
     op.execute(
         sa.text(
             "ALTER TABLE profile ADD CONSTRAINT chk_profile_key_skills_max_length "
-            "CHECK (json_array_length(key_skills) <= 30) NOT VALID"
+            "CHECK (jsonb_array_length(key_skills) <= 30) NOT VALID"
         )
     )
 
