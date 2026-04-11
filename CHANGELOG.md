@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+- **Phase 6 — SEO & Structured Data (full implementation)**
+  - *OG image:* `app/opengraph-image.tsx` added — branded `ImageResponse` (1200×630) with design-system palette (sage green, forest, cream); serves as site-wide default OG/Twitter card for all pages without a page-specific image; replaces broken `/og-default.png` reference in root layout metadata
+  - *Canonical URLs:* `alternates.canonical` already present on `/jobs/[jobCode]` and `/profiles/[profileCode]` `generateMetadata` — confirmed complete
+  - *Breadcrumbs:* `Breadcrumbs.tsx` renders both visual trail and `BreadcrumbList` JSON-LD on all job/profile detail pages and blog post pages — confirmed complete
+  - *Robots:* `/admin/` already in `PRIVATE_PATHS` disallow list in `robots.ts` — confirmed complete
+  - *Blog structured data:* `articleSchema` JSON-LD, `og:type: 'article'`, author metadata, and canonical URL already on `/blog/[slug]` — confirmed complete
+  - *Sitemap validation:* 50,000 URL hard cap and 45,000 warn threshold already enforced in `sitemap.ts` — confirmed complete
+
 ### Changed
 - **`POST /profiles` verification email sent as BackgroundTask** — `send_verification_email` moved off the request thread using FastAPI `BackgroundTasks`; the handler now returns as soon as the profile and verification records are flushed (~100–150 ms), cutting profile creation latency from ~1.2 s to ~150 ms. The db session stays alive until after background tasks complete so the email log write still commits in the same transaction. The now-unreachable 503 guard (raised if email send failed) has been removed; resend is available if the email is not received.
 - **Resume upload now happens immediately on file selection, not on form submit** — as soon as the user picks a PDF, the frontend calls `POST /upload/resume/signed-url` and starts a direct browser-to-GCS PUT upload via XHR; form submission only calls `POST /profiles` (no upload step), cutting the end-to-end wait from ~2.7 s to ~1.2 s

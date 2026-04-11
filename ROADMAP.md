@@ -132,12 +132,12 @@ Organized into phases by criticality. Each phase should be completed before star
 
 > Search engine visibility and social sharing improvements.
 
-- [ ] **Add canonical URLs to detail pages** — `/jobs/[jobCode]` and `/profiles/[profileCode]` lack canonical link tags. Risk of duplicate content if accessed via multiple URL patterns.
-- [ ] **Add breadcrumb structured data** — `Breadcrumbs.tsx` component exists but is never rendered on list or detail pages. Add to job/profile routes with BreadcrumbList schema.
-- [ ] **Add default Open Graph image** — Root layout has title/description metadata but no `og:image`. Add branded fallback image for pages without custom OG.
-- [ ] **Disallow admin routes in robots.txt** — `robots.ts` doesn't exclude `/admin/*`. Add `disallow: ['/admin/']`.
-- [ ] **Add blog post structured data** — Blog pages missing `Article` schema, `og:type: "article"`, and author metadata.
-- [ ] **Validate sitemap size** — Dynamic sitemap generates multiple files but doesn't enforce the 50,000 URL / 50MB per-file limits. Add validation.
+- [x] **Add canonical URLs to detail pages** — `/jobs/[jobCode]` and `/profiles/[profileCode]` lack canonical link tags. Risk of duplicate content if accessed via multiple URL patterns.
+- [x] **Add breadcrumb structured data** — `Breadcrumbs.tsx` component exists but is never rendered on list or detail pages. Add to job/profile routes with BreadcrumbList schema.
+- [x] **Add default Open Graph image** — Root layout has title/description metadata but no `og:image`. Add branded fallback image for pages without custom OG.
+- [x] **Disallow admin routes in robots.txt** — `robots.ts` doesn't exclude `/admin/*`. Add `disallow: ['/admin/']`.
+- [x] **Add blog post structured data** — Blog pages missing `Article` schema, `og:type: "article"`, and author metadata.
+- [x] **Validate sitemap size** — Dynamic sitemap generates multiple files but doesn't enforce the 50,000 URL / 50MB per-file limits. Add validation.
 
 ---
 
