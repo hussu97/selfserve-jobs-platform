@@ -7,7 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Fixed
-- **Next.js logo image aspect-ratio warning** — added `style={{ height: 'auto' }}` to all three logo `<Image>` usages (Header, Footer, MobileNav) so Tailwind preflight's `max-width: 100%` doesn't distort aspect ratio
+- **Next.js logo image aspect-ratio warning** — added explicit `style={{ width: 'Xpx', height: 'Ypx' }}` inline styles to all three logo `<Image>` usages (Header, Footer, MobileNav); Tailwind preflight's `height: auto` was making computed height differ from the `height` attribute while width matched exactly, triggering the "one dimension modified" warning
 - **Next.js smooth-scroll route transition warning** — added `data-scroll-behavior="smooth"` to the `<html>` element in `layout.tsx`
 
 ### Added
