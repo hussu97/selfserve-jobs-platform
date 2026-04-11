@@ -34,6 +34,13 @@ jobs:
           [[ -z "${{ secrets.GCP_SERVICE_ACCOUNT }}" ]] && missing+=("GCP_SERVICE_ACCOUNT")
           [[ -z "${{ secrets.GCP_PROJECT_ID }}" ]] && missing+=("GCP_PROJECT_ID")
           [[ -z "${{ secrets.GCP_REGION }}" ]] && missing+=("GCP_REGION")
+          [[ -z "${{ secrets.GCP_CLOUDSQL_INSTANCE }}" ]] && missing+=("GCP_CLOUDSQL_INSTANCE")
+          [[ -z "${{ secrets.GCP_DATABASE_URL }}" ]] && missing+=("GCP_DATABASE_URL")
+          [[ -z "${{ secrets.GCS_BUCKET_NAME }}" ]] && missing+=("GCS_BUCKET_NAME")
+          [[ -z "${{ secrets.RESEND_API_KEY }}" ]] && missing+=("RESEND_API_KEY")
+          [[ -z "${{ secrets.RESEND_FROM_EMAIL }}" ]] && missing+=("RESEND_FROM_EMAIL")
+          [[ -z "${{ secrets.FRONTEND_URL }}" ]] && missing+=("FRONTEND_URL")
+          [[ -z "${{ secrets.INTERNAL_API_SECRET }}" ]] && missing+=("INTERNAL_API_SECRET")
           if [[ ${#missing[@]} -gt 0 ]]; then
             echo "❌ Missing required secrets: ${missing[*]}"
             exit 1
@@ -60,13 +67,61 @@ jobs:
           docker push "$IMAGE"
 
       - name: Deploy to Cloud Run
+        env:
+          DATABASE_URL: ${{ secrets.GCP_DATABASE_URL }}
+          GCS_BUCKET_NAME: ${{ secrets.GCS_BUCKET_NAME }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          RESEND_FROM_EMAIL: ${{ secrets.RESEND_FROM_EMAIL }}
+          FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
+          INTERNAL_API_SECRET: ${{ secrets.INTERNAL_API_SECRET }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         run: |
+          # Build a YAML env-vars file for Cloud Run. Using --env-vars-file rather
+          # than --set-env-vars avoids shell-escaping headaches with values that
+          # contain special characters (e.g. DATABASE_URL query strings, commas
+          # in admin_emails). Values are single-quoted YAML scalars — any literal
+          # single quote in a value would need to be doubled, but none of our
+          # values contain one.
+          emit_yaml_scalar() {
+            # $1 = key, $2 = value. Emits nothing if value is empty.
+            local key="$1" value="$2"
+            if [[ -n "$value" ]]; then
+              # Escape embedded single quotes by doubling them (YAML spec).
+              value="${value//\'/\'\'}"
+              printf "%s: '%s'\n" "$key" "$value"
+            fi
+          }
+
+          ENV_FILE="$(mktemp --suffix=.yaml)"
+          {
+            emit_yaml_scalar "ENVIRONMENT" "production"
+            emit_yaml_scalar "LOG_FORMAT" "json"
+            emit_yaml_scalar "DATABASE_URL" "$DATABASE_URL"
+            emit_yaml_scalar "GCS_BUCKET_NAME" "$GCS_BUCKET_NAME"
+            emit_yaml_scalar "RESEND_API_KEY" "$RESEND_API_KEY"
+            emit_yaml_scalar "RESEND_FROM_EMAIL" "$RESEND_FROM_EMAIL"
+            emit_yaml_scalar "FRONTEND_URL" "$FRONTEND_URL"
+            emit_yaml_scalar "INTERNAL_API_SECRET" "$INTERNAL_API_SECRET"
+            emit_yaml_scalar "SENTRY_DSN" "$SENTRY_DSN"
+          } > "$ENV_FILE"
+
           gcloud run deploy selfserve-jobs-customer-api \
             --image "$IMAGE" \
             --region "${{ secrets.GCP_REGION }}" \
             --platform managed \
             --allow-unauthenticated \
-            --port 8080
+            --port 8080 \
+            --service-account "${{ secrets.GCP_SERVICE_ACCOUNT }}" \
+            --add-cloudsql-instances "${{ secrets.GCP_CLOUDSQL_INSTANCE }}" \
+            --env-vars-file "$ENV_FILE" \
+            --memory 512Mi \
+            --cpu 1 \
+            --min-instances 0 \
+            --max-instances 10 \
+            --timeout 300 \
+            --cpu-boost
+
+          rm -f "$ENV_FILE"
 
       - name: Post-deploy health check
         run: |

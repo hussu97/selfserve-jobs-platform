@@ -280,7 +280,9 @@ gcloud run services update $API_SERVICE_NAME \
 
 ## 10. GitHub Actions Secrets
 
-Configure these secrets in your GitHub repo (**Settings → Secrets and variables → Actions**):
+Configure these secrets in your GitHub repo (**Settings → Secrets and variables → Actions**). The API deploy workflow (`deploy-api.yml`) passes runtime config to Cloud Run on every deploy — without these, the container fails to start because `DATABASE_URL` is a required Pydantic setting (no default).
+
+### Core GCP auth
 
 | Secret | Value |
 |--------|-------|
@@ -289,6 +291,21 @@ Configure these secrets in your GitHub repo (**Settings → Secrets and variable
 | `GCP_WORKLOAD_IDENTITY_PROVIDER` | See Workload Identity setup below |
 | `GCP_SERVICE_ACCOUNT` | `${API_SERVICE_NAME}@${PROJECT_ID}.iam.gserviceaccount.com` |
 | `VERCEL_TOKEN` | From vercel.com → Account Settings → Tokens |
+
+### API runtime config (Cloud Run env vars)
+
+| Secret | Value | Notes |
+|--------|-------|-------|
+| `GCP_CLOUDSQL_INSTANCE` | `$DB_CONNECTION_NAME` — `PROJECT_ID:REGION:DB_INSTANCE` | Passed to `--add-cloudsql-instances`; attaches the Unix socket at `/cloudsql/$GCP_CLOUDSQL_INSTANCE` |
+| `GCP_DATABASE_URL` | `postgresql+asyncpg://$DB_USER:$DB_PASSWORD@/$DB_NAME?host=/cloudsql/$DB_CONNECTION_NAME` | Full async DSN; the `host=` query arg routes through the Cloud SQL socket |
+| `GCS_BUCKET_NAME` | `$BUCKET_NAME` from step 0 | Bucket for resume uploads |
+| `RESEND_API_KEY` | `re_...` | Resend API key (see step 7) |
+| `RESEND_FROM_EMAIL` | e.g. `hirebridge <noreply@hirebridgeuae.com>` | Must match a verified Resend domain |
+| `FRONTEND_URL` | e.g. `https://hirebridgeuae.com` | Used for CORS allow-list and links in outgoing emails |
+| `INTERNAL_API_SECRET` | Long random string | Shared secret for `POST /api/v1/internal/*` cron endpoints (`X-Internal-Secret` header) |
+| `SENTRY_DSN` | (optional) `https://...@sentry.io/...` | Enables Sentry error tracking when set |
+
+> **Note:** The workflow also hard-codes `ENVIRONMENT=production` and `LOG_FORMAT=json` on every deploy. `ENVIRONMENT` controls dev/prod behaviour in `config.py`; `LOG_FORMAT=json` switches to structured JSON logging for Cloud Logging.
 
 ### Workload Identity Federation (keyless auth for GitHub Actions)
 
