@@ -18,16 +18,20 @@ RESEND_WINDOW_HOURS = 24
 
 async def create_verification(
     db: AsyncSession,
-    email: str,
     entity_type: str,
     entity_code: str,
+    user_code: str | None = None,
 ) -> EmailVerification:
-    """Create a new email verification record."""
+    """Create a new email verification record.
+
+    *user_code* must be provided for 'job' and 'profile' entity types.
+    It is null for 'recruiter' entities (which have their own account system).
+    """
     code = generate_verification_code(64)
     now = datetime.now(UTC)
     verification = EmailVerification(
         verification_code=code,
-        email=email,
+        user_code=user_code,
         entity_type=entity_type,
         entity_code=entity_code,
         expires_at=now + timedelta(hours=VERIFICATION_EXPIRY_HOURS),
@@ -77,44 +81,54 @@ async def verify_code(
         recruiter = await recruiter_service.activate_recruiter(db, verification.entity_code)
         await db.flush()
 
-        # Auto-create session
+        # Fetch recruiter email for session creation
+        from app.models.recruiter import Recruiter
+
+        recruiter_row = await db.execute(select(Recruiter).where(Recruiter.recruiter_code == verification.entity_code))
+        recruiter_obj = recruiter_row.scalar_one()
+
         from app.services.auth_service import create_session
 
-        session = await create_session(db, verification.email)
+        session = await create_session(db, recruiter_obj.email)
 
         return {
             "entity_type": "recruiter",
             "entity_code": verification.entity_code,
-            "email": verification.email,
+            "email": recruiter_obj.email,
             "session_token": session.session_token,
             "recruiter_status": recruiter.status,
             "user_type": session.user_type,
         }
 
-    # Activate ALL pending jobs and profiles for this email — one verified email
+    # Activate ALL pending jobs and profiles for this user_code — one verified email
     # confirms ownership of the address, so all pending listings under it go live.
     await db.execute(
         update(Job)
-        .where(and_(Job.email == verification.email, Job.status == "pending_verification"))
+        .where(and_(Job.user_code == verification.user_code, Job.status == "pending_verification"))
         .values(email_verified=True, status="active", updated_at=now)
     )
     await db.execute(
         update(Profile)
-        .where(and_(Profile.email == verification.email, Profile.status == "pending_verification"))
+        .where(and_(Profile.user_code == verification.user_code, Profile.status == "pending_verification"))
         .values(email_verified=True, status="active", updated_at=now)
     )
 
     await db.flush()
 
-    # Auto-create an auth session so the user is logged in immediately after verifying
+    # Fetch user email from user_sensitive for session creation and response
+    from app.models.user_sensitive import UserSensitive
+
+    user_row = await db.execute(select(UserSensitive).where(UserSensitive.user_code == verification.user_code))
+    user = user_row.scalar_one()
+
     from app.services.auth_service import create_session
 
-    session = await create_session(db, verification.email)
+    session = await create_session(db, user.user_email)
 
     return {
         "entity_type": verification.entity_type,
         "entity_code": verification.entity_code,
-        "email": verification.email,
+        "email": user.user_email,
         "session_token": session.session_token,
         "user_type": session.user_type,
     }
@@ -125,16 +139,27 @@ async def get_pending_entity_for_resend(
     entity_type: str,
     email: str,
     entity_code: str | None,
-) -> tuple[str, str]:
-    """Resolve the entity code and edit token for a resend request.
+) -> tuple[str, str, str]:
+    """Resolve the entity code, edit token, and user_code for a resend request.
 
-    Returns ``(entity_code, edit_token)``. Raises 404 if no matching pending entity
-    is found for the given email, and 400 for an invalid entity_type.
+    Returns ``(entity_code, edit_token, user_code)``. Raises 404 if no matching
+    pending entity is found for the given email, and 400 for an invalid entity_type.
     """
+    from app.models.user_sensitive import UserSensitive
+
+    # Resolve email → user_code
+    user_row = await db.execute(select(UserSensitive).where(UserSensitive.user_email == email))
+    user = user_row.scalar_one_or_none()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Pending {entity_type} not found for this email",
+        )
+
     if entity_type == "job":
         query = select(Job).where(
             and_(
-                Job.email == email,
+                Job.user_code == user.user_code,
                 Job.status == "pending_verification",
             )
         )
@@ -147,12 +172,12 @@ async def get_pending_entity_for_resend(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Pending job not found for this email",
             )
-        return entity.job_code, entity.edit_token
+        return entity.job_code, entity.edit_token, user.user_code
 
     if entity_type == "profile":
         query = select(Profile).where(
             and_(
-                Profile.email == email,
+                Profile.user_code == user.user_code,
                 Profile.status == "pending_verification",
             )
         )
@@ -165,7 +190,7 @@ async def get_pending_entity_for_resend(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Pending profile not found for this email",
             )
-        return entity.profile_code, entity.edit_token
+        return entity.profile_code, entity.edit_token, user.user_code
 
     raise HTTPException(
         status_code=status.HTTP_400_BAD_REQUEST,
@@ -173,12 +198,12 @@ async def get_pending_entity_for_resend(
     )
 
 
-async def is_email_verified(db: AsyncSession, email: str) -> bool:
-    """Return True if this email has at least one completed verification record."""
+async def is_email_verified(db: AsyncSession, user_code: str) -> bool:
+    """Return True if this user_code has at least one completed verification record."""
     result = await db.execute(
         select(func.count(EmailVerification.id)).where(
             and_(
-                EmailVerification.email == email,
+                EmailVerification.user_code == user_code,
                 EmailVerification.verified_at.is_not(None),
             )
         )

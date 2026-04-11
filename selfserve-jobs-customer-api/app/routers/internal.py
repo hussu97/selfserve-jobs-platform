@@ -12,6 +12,7 @@ from app.models.email_log import EmailLog
 from app.models.job import Job
 from app.models.login_token import LoginToken
 from app.models.profile import Profile
+from app.models.user_sensitive import UserSensitive
 from app.services import email_service
 
 router = APIRouter(prefix="/api/v1/internal", tags=["internal"])
@@ -64,8 +65,11 @@ async def expire_listings(db: AsyncSession = Depends(get_db)):
     warn_from = now + timedelta(days=7) - timedelta(hours=1)
     warn_to = now + timedelta(days=7) + timedelta(hours=1)
 
+    # Join with user_sensitive to get the owner email in a single query
     warning_jobs_result = await db.execute(
-        select(Job).where(
+        select(Job, UserSensitive)
+        .join(UserSensitive, Job.user_code == UserSensitive.user_code)
+        .where(
             and_(
                 Job.status == "active",
                 Job.expires_at >= warn_from,
@@ -73,10 +77,12 @@ async def expire_listings(db: AsyncSession = Depends(get_db)):
             )
         )
     )
-    warning_jobs = warning_jobs_result.scalars().all()
+    warning_jobs = warning_jobs_result.all()
 
     warning_profiles_result = await db.execute(
-        select(Profile).where(
+        select(Profile, UserSensitive)
+        .join(UserSensitive, Profile.user_code == UserSensitive.user_code)
+        .where(
             and_(
                 Profile.status == "active",
                 Profile.expires_at >= warn_from,
@@ -84,17 +90,17 @@ async def expire_listings(db: AsyncSession = Depends(get_db)):
             )
         )
     )
-    warning_profiles = warning_profiles_result.scalars().all()
+    warning_profiles = warning_profiles_result.all()
 
     email_sent = 0
     email_failed = 0
 
-    for job in warning_jobs:
+    for job, user in warning_jobs:
         manage_url = f"{settings.frontend_url}/manage/job/{job.job_code}?token={job.edit_token}"
         days_remaining = max(1, (job.expires_at.replace(tzinfo=UTC) - now).days)
         sent = await email_service.send_expiry_warning_email(
             db=db,
-            email=job.email,
+            email=user.user_email,
             entity_type="job",
             entity_code=job.job_code,
             entity_title=job.job_title,
@@ -106,12 +112,12 @@ async def expire_listings(db: AsyncSession = Depends(get_db)):
         else:
             email_failed += 1
 
-    for profile in warning_profiles:
+    for profile, user in warning_profiles:
         manage_url = f"{settings.frontend_url}/manage/profile/{profile.profile_code}?token={profile.edit_token}"
         days_remaining = max(1, (profile.expires_at.replace(tzinfo=UTC) - now).days)
         sent = await email_service.send_expiry_warning_email(
             db=db,
-            email=profile.email,
+            email=user.user_email,
             entity_type="profile",
             entity_code=profile.profile_code,
             entity_title=profile.current_title,

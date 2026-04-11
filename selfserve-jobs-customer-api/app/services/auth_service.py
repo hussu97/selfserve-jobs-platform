@@ -16,6 +16,7 @@ from app.models.auth_session import AuthSession
 from app.models.job import Job
 from app.models.login_token import LoginToken
 from app.models.profile import Profile
+from app.models.user_sensitive import UserSensitive
 from app.services.code_generator import generate_token
 
 logger = logging.getLogger(__name__)
@@ -162,11 +163,18 @@ async def delete_session(db: AsyncSession, session_token: str) -> None:
 
 async def get_entities_for_session(db: AsyncSession, email: str) -> dict:
     """Return all jobs and profiles for the given email with edit_tokens."""
+    # Resolve email → user_code (single indexed lookup)
+    user_row = await db.execute(select(UserSensitive).where(UserSensitive.user_email == email))
+    user = user_row.scalar_one_or_none()
+
+    if not user:
+        return {"jobs": [], "profiles": []}
+
     jobs_result = await db.execute(
         select(Job)
         .where(
             and_(
-                Job.email == email,
+                Job.user_code == user.user_code,
                 Job.status.notin_(["removed"]),
             )
         )
@@ -178,7 +186,7 @@ async def get_entities_for_session(db: AsyncSession, email: str) -> dict:
         select(Profile)
         .where(
             and_(
-                Profile.email == email,
+                Profile.user_code == user.user_code,
                 Profile.status.notin_(["removed"]),
             )
         )

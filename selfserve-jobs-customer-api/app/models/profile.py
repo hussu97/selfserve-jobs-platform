@@ -30,10 +30,10 @@ class Profile(Base):
 
     id: Mapped[int] = mapped_column(BIGINT_COMPAT, primary_key=True, autoincrement=True)
     profile_code: Mapped[str] = mapped_column(VARCHAR(12), unique=True, nullable=False, index=True)
+    # user_code references user_sensitive.user_code (no DB-level FK per project conventions)
+    user_code: Mapped[str] = mapped_column(VARCHAR(12), nullable=False, index=True)
     person_name: Mapped[str] = mapped_column(VARCHAR(200), nullable=False)
-    email: Mapped[str] = mapped_column(VARCHAR(320), nullable=False)
     email_verified: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-    contact_number: Mapped[str | None] = mapped_column(VARCHAR(30), nullable=True)
     resume_gcs_path: Mapped[str | None] = mapped_column(VARCHAR(500), nullable=True)
     resume_original_filename: Mapped[str | None] = mapped_column(VARCHAR(255), nullable=True)
     brief: Mapped[str] = mapped_column(Text, nullable=False)

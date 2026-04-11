@@ -3,7 +3,8 @@
 from datetime import UTC, datetime, timedelta
 
 from app.models.profile import Profile
-from app.services.code_generator import generate_token
+from app.models.user_sensitive import UserSensitive
+from app.services.code_generator import generate_code, generate_token
 
 VALID_PROFILE_PAYLOAD = {
     "person_name": "Jane Smith",
@@ -20,15 +21,24 @@ VALID_PROFILE_PAYLOAD = {
 }
 
 
-async def _make_profile(db_session, **overrides) -> Profile:
+async def _make_profile(db_session, *, email="jane@example.com", phone="+44 7700 900123", **overrides) -> Profile:
     now = datetime.now(UTC)
+
+    # Create a user_sensitive row for this email (one row per unique email)
+    user = UserSensitive(
+        user_code=generate_code(12),
+        user_email=email,
+        user_phone=phone,
+    )
+    db_session.add(user)
+    await db_session.flush()
+
     edit_token = generate_token(64)
     fields = dict(
         profile_code="testprof001",
+        user_code=user.user_code,
         person_name="Jane Smith",
-        email="jane@example.com",
         email_verified=True,
-        contact_number="+44 7700 900123",
         brief="Experienced engineer.",
         current_city="Manchester",
         current_country="United Kingdom",

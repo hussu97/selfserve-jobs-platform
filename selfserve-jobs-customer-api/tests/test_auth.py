@@ -5,7 +5,22 @@ from datetime import UTC, datetime, timedelta
 from app.models.auth_session import AuthSession
 from app.models.job import Job
 from app.models.login_token import LoginToken
-from app.services.code_generator import generate_token
+from app.models.user_sensitive import UserSensitive
+from app.services.code_generator import generate_code, generate_token
+
+
+async def _make_user(db_session, *, email: str) -> UserSensitive:
+    from sqlalchemy import select
+
+    result = await db_session.execute(select(UserSensitive).where(UserSensitive.user_email == email))
+    existing = result.scalar_one_or_none()
+    if existing:
+        return existing
+    user = UserSensitive(user_code=generate_code(12), user_email=email)
+    db_session.add(user)
+    await db_session.flush()
+    return user
+
 
 # ---------------------------------------------------------------------------
 # POST /auth/login (non-production auto-login)
@@ -197,9 +212,10 @@ async def test_entities_returns_jobs_and_profiles(client, db_session):
     )
     db_session.add(session)
 
+    user = await _make_user(db_session, email="owner@example.com")
     job = Job(
         job_code="testjob0001",
-        email="owner@example.com",
+        user_code=user.user_code,
         email_verified=True,
         job_title="Test Engineer",
         company_name="Acme",
@@ -240,9 +256,10 @@ async def test_entities_returns_jobs_and_profiles(client, db_session):
 async def test_job_deactivate_activate_cycle(client, db_session):
     now = datetime.now(UTC)
     edit_token = generate_token(64)
+    user = await _make_user(db_session, email="toggle@example.com")
     job = Job(
         job_code="togglejob01",
-        email="toggle@example.com",
+        user_code=user.user_code,
         email_verified=True,
         job_title="Toggle Job",
         company_name="Co",
@@ -283,9 +300,10 @@ async def test_job_deactivate_activate_cycle(client, db_session):
 async def test_deactivate_non_active_job_rejected(client, db_session):
     now = datetime.now(UTC)
     edit_token = generate_token(64)
+    user = await _make_user(db_session, email="pend@example.com")
     job = Job(
         job_code="pendingj001",
-        email="pend@example.com",
+        user_code=user.user_code,
         email_verified=False,
         job_title="Pending Job",
         company_name="Co",

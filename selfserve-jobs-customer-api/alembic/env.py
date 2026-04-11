@@ -10,7 +10,7 @@ from app.config import get_settings
 
 # Import all models so Alembic can detect them
 from app.database import Base  # noqa: F401
-from app.models import email_verification, job, profile, report  # noqa: F401
+from app.models import email_verification, job, profile, report, user_sensitive  # noqa: F401
 
 settings = get_settings()
 

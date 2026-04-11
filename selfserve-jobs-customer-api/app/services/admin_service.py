@@ -12,6 +12,7 @@ from app.models.profile import Profile
 from app.models.recruiter import Recruiter
 from app.models.recruiter_rejection_reason import RecruiterRejectionReason
 from app.models.report import Report
+from app.models.user_sensitive import UserSensitive
 from app.schemas.admin import (
     AdminRecruiterItem,
     AdminRecruiterListResponse,
@@ -31,22 +32,37 @@ async def list_users(
     per_page: int = 20,
 ) -> AdminUserListResponse:
     """List talent profiles with optional search and status filter."""
-    query = select(Profile)
+    # Join with user_sensitive to enable email search and to include email in the response
+    base = select(Profile, UserSensitive).join(UserSensitive, Profile.user_code == UserSensitive.user_code)
     if search:
         term = f"%{search.strip()}%"
-        query = query.where(or_(Profile.person_name.ilike(term), Profile.email.ilike(term)))
+        base = base.where(or_(Profile.person_name.ilike(term), UserSensitive.user_email.ilike(term)))
     if status:
-        query = query.where(Profile.status == status)
+        base = base.where(Profile.status == status)
 
-    count_result = await db.execute(select(func.count()).select_from(query.subquery()))
+    count_result = await db.execute(select(func.count()).select_from(base.subquery()))
     total = count_result.scalar_one()
 
     offset = (page - 1) * per_page
-    result = await db.execute(query.order_by(Profile.created_at.desc()).offset(offset).limit(per_page))
-    profiles = result.scalars().all()
+    result = await db.execute(base.order_by(Profile.created_at.desc()).offset(offset).limit(per_page))
+    rows = result.all()
+
+    items = [
+        AdminUserItem(
+            profile_code=profile.profile_code,
+            person_name=profile.person_name,
+            email=user.user_email,
+            email_verified=profile.email_verified,
+            status=profile.status,
+            current_title=profile.current_title,
+            created_at=profile.created_at,
+            view_count=profile.view_count,
+        )
+        for profile, user in rows
+    ]
 
     return AdminUserListResponse(
-        items=[AdminUserItem.model_validate(p) for p in profiles],
+        items=items,
         total=total,
         page=page,
         per_page=per_page,

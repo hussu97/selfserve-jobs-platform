@@ -31,14 +31,12 @@ class FlagEntityRequest(BaseModel):
 class AdminUserItem(BaseModel):
     profile_code: str
     person_name: str
-    email: str
+    email: str  # sourced from user_sensitive
     email_verified: bool
     status: str
     current_title: str | None
     created_at: datetime
     view_count: int
-
-    model_config = {"from_attributes": True}
 
 
 class AdminUserListResponse(BaseModel):

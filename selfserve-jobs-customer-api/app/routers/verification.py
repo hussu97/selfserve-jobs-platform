@@ -48,7 +48,7 @@ async def resend_verification(
     background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_session),
 ):
-    entity_code, edit_token = await verification_service.get_pending_entity_for_resend(
+    entity_code, edit_token, user_code = await verification_service.get_pending_entity_for_resend(
         db=db,
         entity_type=data.entity_type,
         email=data.email,
@@ -59,7 +59,7 @@ async def resend_verification(
 
     verification = await verification_service.create_verification(
         db=db,
-        email=data.email,
+        user_code=user_code,
         entity_type=data.entity_type,
         entity_code=entity_code,
     )

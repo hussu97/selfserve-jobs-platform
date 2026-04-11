@@ -9,17 +9,19 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.constants import MAX_ACTIVE_PROFILES_PER_EMAIL, PROFILE_EXPIRY_DAYS
 from app.models.profile import Profile
+from app.models.user_sensitive import UserSensitive
 from app.schemas.profile import ProfileCreate, ProfileUpdate
+from app.services import user_service
 from app.services.code_generator import generate_code, generate_token
 
 logger = logging.getLogger(__name__)
 
 
-async def get_active_profile_count_for_email(db: AsyncSession, email: str) -> int:
+async def get_active_profile_count_for_user(db: AsyncSession, user_code: str) -> int:
     result = await db.execute(
         select(func.count(Profile.id)).where(
             and_(
-                Profile.email == email,
+                Profile.user_code == user_code,
                 Profile.status.in_(["active", "pending_verification"]),
             )
         )
@@ -27,9 +29,10 @@ async def get_active_profile_count_for_email(db: AsyncSession, email: str) -> in
     return result.scalar_one()
 
 
-async def create_profile(db: AsyncSession, data: ProfileCreate) -> Profile:
-    """Create a new profile."""
-    active_count = await get_active_profile_count_for_email(db, data.email)
+async def create_profile(db: AsyncSession, data: ProfileCreate) -> tuple[Profile, UserSensitive]:
+    """Create a new profile. Returns (profile, user_sensitive)."""
+    user = await user_service.get_or_create_user(db, data.email, data.contact_number)
+    active_count = await get_active_profile_count_for_user(db, user.user_code)
     if active_count >= MAX_ACTIVE_PROFILES_PER_EMAIL:
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
@@ -39,10 +42,9 @@ async def create_profile(db: AsyncSession, data: ProfileCreate) -> Profile:
     now = datetime.now(UTC)
     profile = Profile(
         profile_code=generate_code(12),
+        user_code=user.user_code,
         person_name=data.person_name,
-        email=data.email,
         email_verified=False,
-        contact_number=data.contact_number,
         brief=data.brief,
         current_city=data.current_city,
         current_country=data.current_country,
@@ -62,7 +64,7 @@ async def create_profile(db: AsyncSession, data: ProfileCreate) -> Profile:
     )
     db.add(profile)
     await db.flush()
-    return profile
+    return profile, user
 
 
 async def get_profile_by_code(db: AsyncSession, profile_code: str) -> Profile:
@@ -328,13 +330,19 @@ async def get_entities_for_email(
     """Return all active/pending jobs and profiles for a given email with management links."""
     from app.models.job import Job
 
+    # Resolve email → user_code first (single indexed lookup)
+    existing_user = await user_service.get_by_email(db, email)
+    if not existing_user:
+        return []
+
+    user_code = existing_user.user_code
     entities = []
 
     # Jobs
     job_result = await db.execute(
         select(Job).where(
             and_(
-                Job.email == email,
+                Job.user_code == user_code,
                 Job.status.in_(["active", "pending_verification"]),
             )
         )
@@ -354,7 +362,7 @@ async def get_entities_for_email(
     profile_result = await db.execute(
         select(Profile).where(
             and_(
-                Profile.email == email,
+                Profile.user_code == user_code,
                 Profile.status.in_(["active", "pending_verification"]),
             )
         )

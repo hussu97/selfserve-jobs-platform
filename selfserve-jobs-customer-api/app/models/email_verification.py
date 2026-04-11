@@ -17,7 +17,8 @@ class EmailVerification(Base):
 
     id: Mapped[int] = mapped_column(BIGINT_COMPAT, primary_key=True, autoincrement=True)
     verification_code: Mapped[str] = mapped_column(VARCHAR(64), unique=True, nullable=False, index=True)
-    email: Mapped[str] = mapped_column(VARCHAR(320), nullable=False)
+    # user_code references user_sensitive.user_code; null for recruiter entity type.
+    user_code: Mapped[str | None] = mapped_column(VARCHAR(12), nullable=True, index=True)
     entity_type: Mapped[str] = mapped_column(VARCHAR(10), nullable=False)
     entity_code: Mapped[str] = mapped_column(VARCHAR(12), nullable=False, index=True)
     verified_at: Mapped[datetime | None] = mapped_column(TIMESTAMPTZ, nullable=True)

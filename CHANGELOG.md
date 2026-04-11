@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+- **Consolidated PII into `user_sensitive` table** — introduced a new `user_sensitive` table (`user_code`, `user_email`, `user_phone`) as the single source of truth for user email addresses and phone numbers. `job`, `profile`, and `email_verification` tables now store a `user_code` foreign reference instead of duplicating the email. `profile.contact_number` has moved to `user_sensitive.user_phone`. All service-layer operations that previously filtered by email now do a single indexed lookup on `user_sensitive` and then filter by `user_code` — no regression in query performance. `internal.py` expiry-warning queries use a JOIN to fetch owner email in one round-trip. `admin_service.list_users` JOINs `user_sensitive` to enable email search without a separate lookup. Existing data is migrated automatically by Alembic migration `0010_user_sensitive`.
+
 ### Fixed
 - **Lock file sync** — ran `npm install` in `selfserve-jobs-customer-web/` to regenerate `package-lock.json` after `next` was bumped to `^16.2.3`; resolves `npm ci` failures in CI
 - **Admin can now post jobs** — `isActiveRecruiter` in `AuthContext` was gated on `userType === 'recruiter'`, excluding admins; fixed to also return `true` when `isAdmin`

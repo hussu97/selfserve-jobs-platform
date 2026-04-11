@@ -4,56 +4,50 @@ from datetime import UTC, datetime, timedelta
 
 from app.models.job import Job
 from app.models.profile import Profile
-from app.services.code_generator import generate_token
+from app.models.user_sensitive import UserSensitive
+from app.services.code_generator import generate_code, generate_token
 
 # ---------------------------------------------------------------------------
 # Fixtures / helpers
 # ---------------------------------------------------------------------------
 
-VALID_JOB = dict(
-    job_code="repjob00001",
-    email="owner@example.com",
-    email_verified=True,
-    job_title="Test Job",
-    company_name="Acme",
-    company_city="Dubai",
-    company_country="UAE",
-    employment_type="full_time",
-    description="Test description",
-    key_skills=[],
-    contact_method="email",
-    contact_email="owner@example.com",
-    status="active",
-    view_count=0,
-)
 
-VALID_PROFILE = dict(
-    profile_code="repprof0001",
-    person_name="Jane Smith",
-    email="jane@example.com",
-    email_verified=True,
-    contact_number="+44 7700 900123",
-    brief="Experienced engineer.",
-    current_city="London",
-    current_country="United Kingdom",
-    years_of_experience=5,
-    current_title="Engineer",
-    relocation_preference="open",
-    key_skills=["Python"],
-    status="active",
-    view_count=0,
-)
+async def _make_user(db_session, *, email: str) -> UserSensitive:
+    from sqlalchemy import select
+
+    result = await db_session.execute(select(UserSensitive).where(UserSensitive.user_email == email))
+    existing = result.scalar_one_or_none()
+    if existing:
+        return existing
+    user = UserSensitive(user_code=generate_code(12), user_email=email)
+    db_session.add(user)
+    await db_session.flush()
+    return user
 
 
-async def _make_job(db_session, **overrides) -> Job:
+async def _make_job(db_session, *, email="owner@example.com", **overrides) -> Job:
     now = datetime.now(UTC)
-    fields = {
-        **VALID_JOB,
-        "edit_token": generate_token(64),
-        "expires_at": now + timedelta(days=60),
-        "created_at": now,
-        "updated_at": now,
-    }
+    user = await _make_user(db_session, email=email)
+    fields = dict(
+        job_code="repjob00001",
+        user_code=user.user_code,
+        email_verified=True,
+        job_title="Test Job",
+        company_name="Acme",
+        company_city="Dubai",
+        company_country="UAE",
+        employment_type="full_time",
+        description="Test description",
+        key_skills=[],
+        contact_method="email",
+        contact_email=email,
+        status="active",
+        view_count=0,
+        edit_token=generate_token(64),
+        expires_at=now + timedelta(days=60),
+        created_at=now,
+        updated_at=now,
+    )
     fields.update(overrides)
     job = Job(**fields)
     db_session.add(job)
@@ -61,15 +55,28 @@ async def _make_job(db_session, **overrides) -> Job:
     return job
 
 
-async def _make_profile(db_session, **overrides) -> Profile:
+async def _make_profile(db_session, *, email="jane@example.com", **overrides) -> Profile:
     now = datetime.now(UTC)
-    fields = {
-        **VALID_PROFILE,
-        "edit_token": generate_token(64),
-        "expires_at": now + timedelta(days=180),
-        "created_at": now,
-        "updated_at": now,
-    }
+    user = await _make_user(db_session, email=email)
+    fields = dict(
+        profile_code="repprof0001",
+        user_code=user.user_code,
+        person_name="Jane Smith",
+        email_verified=True,
+        brief="Experienced engineer.",
+        current_city="London",
+        current_country="United Kingdom",
+        years_of_experience=5,
+        current_title="Engineer",
+        relocation_preference="open",
+        key_skills=["Python"],
+        status="active",
+        view_count=0,
+        edit_token=generate_token(64),
+        expires_at=now + timedelta(days=180),
+        created_at=now,
+        updated_at=now,
+    )
     fields.update(overrides)
     profile = Profile(**fields)
     db_session.add(profile)

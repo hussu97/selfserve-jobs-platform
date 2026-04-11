@@ -30,7 +30,8 @@ class Job(Base):
 
     id: Mapped[int] = mapped_column(BIGINT_COMPAT, primary_key=True, autoincrement=True)
     job_code: Mapped[str] = mapped_column(VARCHAR(12), unique=True, nullable=False, index=True)
-    email: Mapped[str] = mapped_column(VARCHAR(320), nullable=False)
+    # user_code references user_sensitive.user_code (no DB-level FK per project conventions)
+    user_code: Mapped[str] = mapped_column(VARCHAR(12), nullable=False, index=True)
     email_verified: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     job_title: Mapped[str] = mapped_column(VARCHAR(200), nullable=False)
     company_name: Mapped[str] = mapped_column(VARCHAR(200), nullable=False)

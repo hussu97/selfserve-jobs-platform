@@ -7,7 +7,8 @@ from app.models.auth_session import AuthSession
 from app.models.job import Job
 from app.models.profile import Profile
 from app.models.recruiter import Recruiter
-from app.services.code_generator import generate_token
+from app.models.user_sensitive import UserSensitive
+from app.services.code_generator import generate_code, generate_token
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -39,11 +40,26 @@ async def _make_recruiter_session(db_session, email="recruiter@test.com"):
     return session.session_token
 
 
-async def _make_active_job(db_session, **overrides) -> Job:
+async def _make_user(db_session, *, email: str, phone: str | None = None) -> UserSensitive:
+    """Get-or-create a UserSensitive row. Safe to call multiple times with the same email."""
+    from sqlalchemy import select
+
+    result = await db_session.execute(select(UserSensitive).where(UserSensitive.user_email == email))
+    existing = result.scalar_one_or_none()
+    if existing:
+        return existing
+    user = UserSensitive(user_code=generate_code(12), user_email=email, user_phone=phone)
+    db_session.add(user)
+    await db_session.flush()
+    return user
+
+
+async def _make_active_job(db_session, *, email="owner@gaptest.com", **overrides) -> Job:
     now = datetime.now(UTC)
+    user = await _make_user(db_session, email=email)
     defaults = dict(
         job_code="gapjob00001",
-        email="owner@gaptest.com",
+        user_code=user.user_code,
         email_verified=True,
         job_title="Gap Test Job",
         company_name="GapCo",
@@ -53,7 +69,7 @@ async def _make_active_job(db_session, **overrides) -> Job:
         description="Test description text",
         key_skills=[],
         contact_method="email",
-        contact_email="owner@gaptest.com",
+        contact_email=email,
         status="active",
         view_count=0,
         edit_token=generate_token(64),
@@ -68,14 +84,16 @@ async def _make_active_job(db_session, **overrides) -> Job:
     return job
 
 
-async def _make_active_profile(db_session, **overrides) -> Profile:
+async def _make_active_profile(
+    db_session, *, email="prof@gaptest.com", phone="+1 555 000 0000", **overrides
+) -> Profile:
     now = datetime.now(UTC)
+    user = await _make_user(db_session, email=email, phone=phone)
     defaults = dict(
         profile_code="gapprof0001",
+        user_code=user.user_code,
         person_name="Gap User",
-        email="prof@gaptest.com",
         email_verified=True,
-        contact_number="+1 555 000 0000",
         brief="A sufficient professional brief that easily passes the length check.",
         current_city="London",
         current_country="United Kingdom",
@@ -102,7 +120,7 @@ async def test_verification_resend_returns_200_regardless_of_email_outcome(clien
     The email is sent as a background task after the response, so delivery
     failures cannot block or fail the endpoint.
     """
-    job = await _make_active_job(
+    await _make_active_job(
         db_session,
         job_code="emailfail01",
         email="emailfail@test.com",
@@ -115,8 +133,8 @@ async def test_verification_resend_returns_200_regardless_of_email_outcome(clien
             "/api/v1/verify/resend",
             json={
                 "entity_type": "job",
-                "email": job.email,
-                "entity_code": job.job_code,
+                "email": "emailfail@test.com",
+                "entity_code": "emailfail01",
             },
         )
     assert response.status_code == 200

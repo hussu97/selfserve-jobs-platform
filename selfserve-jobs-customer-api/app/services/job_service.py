@@ -10,16 +10,17 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.constants import JOB_EXPIRY_DAYS, MAX_ACTIVE_JOBS_PER_EMAIL
 from app.models.job import Job
 from app.schemas.job import JobCreate, JobUpdate
+from app.services import user_service
 from app.services.code_generator import generate_code, generate_token
 
 logger = logging.getLogger(__name__)
 
 
-async def get_active_job_count_for_email(db: AsyncSession, email: str) -> int:
+async def get_active_job_count_for_user(db: AsyncSession, user_code: str) -> int:
     result = await db.execute(
         select(func.count(Job.id)).where(
             and_(
-                Job.email == email,
+                Job.user_code == user_code,
                 Job.status.in_(["active", "pending_verification"]),
             )
         )
@@ -34,8 +35,9 @@ async def create_job(
     recruiter_code: str,
 ) -> Job:
     """Create a new job listing. Requires a verified recruiter session."""
-    # Rate limit check (based on recruiter email)
-    active_count = await get_active_job_count_for_email(db, recruiter_email)
+    # Upsert user_sensitive for the recruiter and rate-limit by user_code
+    user = await user_service.get_or_create_user(db, recruiter_email)
+    active_count = await get_active_job_count_for_user(db, user.user_code)
     if active_count >= MAX_ACTIVE_JOBS_PER_EMAIL:
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
@@ -45,7 +47,7 @@ async def create_job(
     now = datetime.now(UTC)
     job = Job(
         job_code=generate_code(12),
-        email=recruiter_email,
+        user_code=user.user_code,
         email_verified=True,  # Recruiter is already verified
         job_title=data.job_title,
         company_name=data.company_name,

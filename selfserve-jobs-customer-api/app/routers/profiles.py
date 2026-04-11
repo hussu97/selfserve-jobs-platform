@@ -15,7 +15,14 @@ from app.schemas.profile import (
     ProfileUpdate,
     ResumeUrlResponse,
 )
-from app.services import email_service, profile_service, recruiter_service, storage_service, verification_service
+from app.services import (
+    email_service,
+    profile_service,
+    recruiter_service,
+    storage_service,
+    user_service,
+    verification_service,
+)
 
 router = APIRouter(prefix="/api/v1/profiles", tags=["profiles"])
 settings = get_settings()
@@ -80,16 +87,27 @@ async def get_profile(
     db: AsyncSession = Depends(get_session),
 ):
     profile = await profile_service.get_profile_detail(db, code)
-    # Include sensitive fields for active recruiters or the profile owner
     include_sensitive = False
     is_owner = False
+    profile_user = None
+
     if optional_session:
-        if optional_session.email == profile.email:
-            is_owner = True
-        elif optional_session.user_type == "recruiter":
+        if optional_session.user_type == "recruiter":
             recruiter = await recruiter_service.get_by_email(db, optional_session.email)
-            include_sensitive = recruiter is not None and recruiter.status == "active"
-    return ProfileResponse.from_orm_with_resume(profile, include_sensitive=include_sensitive, is_owner=is_owner)
+            if recruiter is not None and recruiter.status == "active":
+                include_sensitive = True
+                # Fetch user_sensitive so we can include email/phone in the response
+                profile_user = await user_service.get_by_code(db, profile.user_code)
+        else:
+            # Check if this session belongs to the profile owner via user_sensitive
+            session_user = await user_service.get_by_email(db, optional_session.email)
+            if session_user and session_user.user_code == profile.user_code:
+                is_owner = True
+                profile_user = session_user
+
+    return ProfileResponse.from_orm_with_resume(
+        profile, user=profile_user, include_sensitive=include_sensitive, is_owner=is_owner
+    )
 
 
 @router.post("", response_model=ProfileCreateResponse, status_code=status.HTTP_201_CREATED)
@@ -106,10 +124,10 @@ async def create_profile(
             detail="Invalid submission",
         )
 
-    profile = await profile_service.create_profile(db, data)
+    profile, user = await profile_service.create_profile(db, data)
 
     if settings.is_production:
-        if await verification_service.is_email_verified(db, profile.email):
+        if await verification_service.is_email_verified(db, user.user_code):
             # Email already verified from a previous flow — activate immediately
             await profile_service.activate_profile(db, profile.profile_code)
             message = "Profile created and is now live."
@@ -117,14 +135,14 @@ async def create_profile(
             # Create verification record and send email
             verification = await verification_service.create_verification(
                 db=db,
-                email=profile.email,
+                user_code=user.user_code,
                 entity_type="profile",
                 entity_code=profile.profile_code,
             )
             background_tasks.add_task(
                 email_service.send_verification_email,
                 db=db,
-                email=profile.email,
+                email=user.user_email,
                 entity_type="profile",
                 entity_code=profile.profile_code,
                 verification_code=verification.verification_code,

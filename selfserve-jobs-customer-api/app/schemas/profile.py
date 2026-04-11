@@ -119,10 +119,17 @@ class ProfileResponse(BaseModel):
     def from_orm_with_resume(
         cls,
         obj,
+        user=None,
         include_sensitive: bool = False,
         is_owner: bool = False,
     ) -> "ProfileResponse":
-        show_sensitive = include_sensitive or is_owner
+        """Build a ProfileResponse from a Profile ORM object.
+
+        *user* is the UserSensitive instance for this profile — only needed when
+        sensitive fields (email, contact_number) should be included in the response.
+        Pass ``user=None`` to suppress sensitive fields regardless of other flags.
+        """
+        show_sensitive = (include_sensitive or is_owner) and user is not None
         data = {
             "code": obj.profile_code,
             "person_name": obj.person_name,
@@ -144,8 +151,8 @@ class ProfileResponse(BaseModel):
             "has_resume": bool(obj.resume_gcs_path),
             "is_verified": obj.email_verified,
             "is_active": obj.status == "active",
-            "email": obj.email if show_sensitive else None,
-            "contact_number": obj.contact_number if show_sensitive else None,
+            "email": user.user_email if show_sensitive else None,
+            "contact_number": user.user_phone if show_sensitive else None,
             "is_owner": is_owner,
         }
         return cls(**data)
