@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/Input';
 import { CountrySelect } from '@/components/shared/CountrySelect';
 import { PhoneInput } from '@/components/ui/PhoneInput';
 import { StatusBanner } from '@/components/shared/StatusBanner';
-import { createProfile, getResumeUploadUrl, uploadResumeDirect } from '@/lib/api';
+import { createProfile, getResumeUploadUrl, uploadResumeWithProgress } from '@/lib/api';
 import { validateProfileForm } from '@/lib/validation';
 import { trackEvent } from '@/lib/analytics';
 import { useAuth } from '@/context/AuthContext';
@@ -30,6 +30,7 @@ interface ProfileFormProps {
   onSuccess?: (code: string) => void;
 }
 
+type UploadState = 'idle' | 'uploading' | 'done' | 'error';
 type FormErrors = Partial<Record<keyof CreateProfileRequest | 'general' | 'resume', string>>;
 
 export function ProfileForm({ onSuccess }: ProfileFormProps) {
@@ -42,6 +43,9 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
   });
   const [skillInput, setSkillInput] = useState('');
   const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [resumeKey, setResumeKey] = useState<string | null>(null);
+  const [uploadState, setUploadState] = useState<UploadState>('idle');
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
   const [successData, setSuccessData] = useState<{ code: string; message: string } | null>(null);
@@ -81,6 +85,45 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
     set('key_skills', (form.key_skills ?? []).filter((s) => s !== skill));
   };
 
+  const handleFileSelect = async (file: File | null) => {
+    if (!file) {
+      setResumeFile(null);
+      setResumeKey(null);
+      setUploadState('idle');
+      setUploadProgress(0);
+      setErrors((prev) => ({ ...prev, resume: undefined }));
+      return;
+    }
+
+    if (file.type !== 'application/pdf') {
+      setErrors((prev) => ({ ...prev, resume: 'Only PDF files are accepted' }));
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setErrors((prev) => ({ ...prev, resume: 'File must be under 5 MB' }));
+      return;
+    }
+
+    setResumeFile(file);
+    setErrors((prev) => ({ ...prev, resume: undefined }));
+    setUploadState('uploading');
+    setUploadProgress(0);
+    setResumeKey(null);
+
+    try {
+      const { resume_key: key, upload_url: uploadUrl } = await getResumeUploadUrl();
+      if (uploadUrl) {
+        await uploadResumeWithProgress(file, uploadUrl, (pct) => setUploadProgress(pct));
+      }
+      setResumeKey(key);
+      setUploadState('done');
+      setUploadProgress(100);
+    } catch {
+      setUploadState('error');
+      setErrors((prev) => ({ ...prev, resume: 'Upload failed. Please try again.' }));
+    }
+  };
+
   const validate = (): boolean => {
     const errs: FormErrors = {};
     if (!form.person_name?.trim()) errs.person_name = 'Name is required';
@@ -95,10 +138,10 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
     if (!phoneVal || phoneVal.length < 5) errs.contact_number = 'Contact number is required';
     if (!resumeFile) {
       errs.resume = 'Resume is required';
-    } else if (resumeFile.type !== 'application/pdf') {
-      errs.resume = 'Only PDF files are accepted';
-    } else if (resumeFile.size > 5 * 1024 * 1024) {
-      errs.resume = 'File must be under 5 MB';
+    } else if (uploadState === 'uploading') {
+      errs.resume = 'Please wait for the upload to finish';
+    } else if (uploadState === 'error') {
+      errs.resume = 'Upload failed — please re-upload your resume';
     }
     setErrors(errs);
     if (Object.keys(errs).length > 0) {
@@ -114,17 +157,9 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
 
     setLoading(true);
     try {
-      // Get a signed GCS PUT URL and upload the resume directly from the browser.
-      // In dev mode upload_url is null (no GCS bucket) — skip the upload and use
-      // the placeholder resume_key so the rest of the form submission proceeds.
-      const { resume_key: resumeKey, upload_url: uploadUrl } = await getResumeUploadUrl();
-      if (uploadUrl) {
-        await uploadResumeDirect(resumeFile!, uploadUrl);
-      }
-
       const payload: CreateProfileRequest = {
         ...(form as CreateProfileRequest),
-        resume_key: resumeKey,
+        resume_key: resumeKey ?? '',
       };
 
       const result = await createProfile(payload);
@@ -273,11 +308,16 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
         addSkill={addSkill}
         removeSkill={removeSkill}
         resumeFile={resumeFile}
-        setResumeFile={setResumeFile}
-        setErrors={setErrors}
+        onFileSelect={handleFileSelect}
+        uploadState={uploadState}
+        uploadProgress={uploadProgress}
       />
 
-      <button type="submit" disabled={loading} className="self-start bg-secondary text-white px-10 py-4 rounded-xl font-label text-sm uppercase tracking-widest hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer inline-flex items-center gap-2">
+      <button
+        type="submit"
+        disabled={loading || uploadState === 'uploading'}
+        className="self-start bg-secondary text-white px-10 py-4 rounded-xl font-label text-sm uppercase tracking-widest hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer inline-flex items-center gap-2"
+      >
         {loading && (
           <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />

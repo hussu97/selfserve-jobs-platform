@@ -7,6 +7,7 @@ import { SkillTag } from '@/components/shared/SkillTag';
 import { NOTICE_PERIODS, RELOCATION_PREFERENCES } from '@/lib/constants';
 import type { CreateProfileRequest } from '@/lib/types';
 
+type UploadState = 'idle' | 'uploading' | 'done' | 'error';
 type FormErrors = Partial<Record<keyof CreateProfileRequest | 'general' | 'resume', string>>;
 
 interface ProfileFormLowerProps {
@@ -18,8 +19,9 @@ interface ProfileFormLowerProps {
   addSkill: (s: string) => void;
   removeSkill: (s: string) => void;
   resumeFile: File | null;
-  setResumeFile: (f: File | null) => void;
-  setErrors: React.Dispatch<React.SetStateAction<FormErrors>>;
+  onFileSelect: (file: File | null) => void;
+  uploadState: UploadState;
+  uploadProgress: number;
 }
 
 export default function ProfileFormLower({
@@ -31,8 +33,9 @@ export default function ProfileFormLower({
   addSkill,
   removeSkill,
   resumeFile,
-  setResumeFile,
-  setErrors,
+  onFileSelect,
+  uploadState,
+  uploadProgress,
 }: ProfileFormLowerProps) {
   return (
     <>
@@ -124,53 +127,78 @@ export default function ProfileFormLower({
         <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-text-muted -mt-2">
           Required <span className="text-primary">*</span> — PDF only, max 5 MB
         </p>
+
+        {/* Dropzone */}
         <div
-          className={`bg-surface rounded-2xl p-8 border-2 border-dashed text-center transition-colors hover:border-primary/50 ${resumeFile ? 'border-primary' : errors.resume ? 'border-red-400' : 'border-border'}`}
+          className={`bg-surface rounded-2xl p-8 border-2 border-dashed text-center transition-colors ${
+            uploadState === 'done'
+              ? 'border-primary'
+              : uploadState === 'error' || errors.resume
+              ? 'border-red-400'
+              : uploadState === 'uploading'
+              ? 'border-primary/50'
+              : 'border-border hover:border-primary/50'
+          }`}
         >
-          {resumeFile ? (
-            <div className="flex items-center justify-center gap-3">
-              <svg className="h-5 w-5 text-primary" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          {uploadState === 'uploading' && resumeFile ? (
+            /* Uploading — progress bar */
+            <div className="flex flex-col items-center gap-3">
+              <svg className="h-5 w-5 text-primary animate-pulse" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                 <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
               </svg>
-              <span className="text-sm font-medium text-text-main">
-                {resumeFile.name}
-              </span>
+              <span className="text-sm font-medium text-text-main truncate max-w-xs">{resumeFile.name}</span>
+              <div className="w-full max-w-xs">
+                <div className="h-1.5 w-full bg-surface-lowest rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-primary rounded-full transition-all duration-200"
+                    style={{ width: `${uploadProgress}%` }}
+                  />
+                </div>
+                <p className="text-[11px] text-text-muted mt-1.5 uppercase tracking-wider">{uploadProgress}% uploaded</p>
+              </div>
+            </div>
+          ) : uploadState === 'done' && resumeFile ? (
+            /* Done — success state */
+            <div className="flex items-center justify-center gap-3">
+              <svg className="h-5 w-5 text-primary flex-shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <span className="text-sm font-medium text-text-main truncate max-w-xs">{resumeFile.name}</span>
               <button
                 type="button"
-                onClick={() => setResumeFile(null)}
-                className="text-xs hover:opacity-70 text-text-muted"
+                onClick={() => onFileSelect(null)}
+                className="text-xs hover:opacity-70 text-text-muted flex-shrink-0"
               >
                 Remove
               </button>
             </div>
           ) : (
+            /* Idle / error — file picker */
             <label className="cursor-pointer">
               <div className="flex flex-col items-center gap-2">
                 <svg className="h-8 w-8 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
                 </svg>
                 <span className="text-sm font-medium text-text-main">
-                  Click to upload PDF
+                  {uploadState === 'error' ? 'Try again — click to re-upload' : 'Click to upload PDF'}
                 </span>
-                <span className="text-xs text-text-muted">
-                  PDF only, max 5 MB
-                </span>
+                <span className="text-xs text-text-muted">PDF only, max 5 MB</span>
               </div>
               <input
                 type="file"
                 accept=".pdf,application/pdf"
                 className="sr-only"
                 onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    setResumeFile(file);
-                    setErrors((prev) => ({ ...prev, resume: undefined }));
-                  }
+                  const file = e.target.files?.[0] ?? null;
+                  onFileSelect(file);
+                  // reset input so the same file can be re-selected after an error
+                  e.target.value = '';
                 }}
               />
             </label>
           )}
         </div>
+
         {errors.resume && <p className="text-xs text-red-600">{errors.resume}</p>}
       </div>
     </>

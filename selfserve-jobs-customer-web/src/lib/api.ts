@@ -242,16 +242,32 @@ export async function getResumeUploadUrl(): Promise<{ resume_key: string; upload
   });
 }
 
-/** Upload a file directly to GCS using a signed PUT URL. */
-export async function uploadResumeDirect(file: File, uploadUrl: string): Promise<void> {
-  const response = await fetch(uploadUrl, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/pdf' },
-    body: file,
+/** Upload a file directly to GCS using XHR so upload progress can be tracked. */
+export function uploadResumeWithProgress(
+  file: File,
+  uploadUrl: string,
+  onProgress: (percent: number) => void,
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.upload.addEventListener('progress', (e) => {
+      if (e.lengthComputable) {
+        onProgress(Math.round((e.loaded / e.total) * 100));
+      }
+    });
+    xhr.addEventListener('load', () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve();
+      } else {
+        reject(new Error(`Upload failed with status ${xhr.status}`));
+      }
+    });
+    xhr.addEventListener('error', () => reject(new Error('Upload failed')));
+    xhr.addEventListener('abort', () => reject(new Error('Upload cancelled')));
+    xhr.open('PUT', uploadUrl);
+    xhr.setRequestHeader('Content-Type', 'application/pdf');
+    xhr.send(file);
   });
-  if (!response.ok) {
-    throw new Error(`Direct upload failed with status ${response.status}`);
-  }
 }
 
 // Verification

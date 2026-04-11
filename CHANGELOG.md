@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+- **Resume upload now happens immediately on file selection, not on form submit** — as soon as the user picks a PDF, the frontend calls `POST /upload/resume/signed-url` and starts a direct browser-to-GCS PUT upload via XHR; form submission only calls `POST /profiles` (no upload step), cutting the end-to-end wait from ~2.7 s to ~1.2 s
+- **Upload progress bar on resume section** — XHR `upload.onprogress` drives a real percentage bar during the upload; the dropzone cycles through `idle → uploading (with %) → done (green checkmark) → error (retry prompt)` states
+- **"Create Profile" button disabled during upload** — button is disabled while `uploadState === 'uploading'`; re-enabled when upload completes or errors out so the user knows they must fix the file first
+- **`uploadResumeWithProgress` replaces `uploadResumeDirect` in `api.ts`** — XHR-based implementation with an `onProgress` callback; dev-mode behaviour unchanged (signed URL is `null`, upload is skipped, state moves directly to `done`)
+
 ### Added
 - **Phase 5 — Frontend Quality & Accessibility (full implementation)**
   - *Accessibility:* Modal component now stores focus trigger on open, returns focus to trigger on close, and moves focus to first focusable element inside dialog; `role="alertdialog"` variant added for destructive confirmations (prevents backdrop-click dismiss, hides close button); `aria-labelledby` wires title to dialog element
