@@ -6,7 +6,7 @@ import { ProfileCard } from '@/components/profiles/ProfileCard';
 import { ProfileFilters } from '@/components/profiles/ProfileFilters';
 import { SearchBar } from '@/components/shared/SearchBar';
 import { Pagination } from '@/components/shared/Pagination';
-import { Spinner } from '@/components/ui/Spinner';
+import { ProfileCardSkeleton } from '@/components/ui/Skeleton';
 import { StatusBanner } from '@/components/shared/StatusBanner';
 import { getProfiles } from '@/lib/api';
 import type { ProfileFilters as ProfileFiltersType, ProfileListItem, RelocationPreference } from '@/lib/types';
@@ -69,6 +69,7 @@ function ProfilesContent() {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [searching, setSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchProfiles = useCallback(async (f: ProfileFiltersType) => {
@@ -105,10 +106,12 @@ function ProfilesContent() {
 
   const handleSearchChange = (value: string) => {
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+    setSearching(true);
+    setFilters((prev) => ({ ...prev, search: value || undefined }));
     searchTimerRef.current = setTimeout(() => {
+      setSearching(false);
       applyFilters({ ...filters, search: value || undefined, page: 1 });
     }, 350);
-    setFilters((prev) => ({ ...prev, search: value || undefined }));
   };
 
   const handleFiltersChange = (newFilters: ProfileFiltersType) => {
@@ -146,6 +149,7 @@ function ProfilesContent() {
             value={filters.search ?? ''}
             onChange={handleSearchChange}
             placeholder="Search by name, title, or skill…"
+            searching={searching}
           />
         </div>
 
@@ -156,19 +160,16 @@ function ProfilesContent() {
           </aside>
 
           {/* Main content */}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0" aria-busy={loading} aria-live="polite">
             {error && (
               <StatusBanner type="error" message={error} className="mb-6" />
             )}
 
             {loading ? (
-              <div className="flex items-center justify-center py-24">
-                <div className="flex flex-col items-center gap-3">
-                  <Spinner size="lg" />
-                  <p className="text-sm text-text-muted">
-                    Loading profiles…
-                  </p>
-                </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-6">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <ProfileCardSkeleton key={i} />
+                ))}
               </div>
             ) : profiles.length === 0 ? (
               <div className="text-center py-20 rounded-2xl bg-surface-lowest shadow-ambient">
@@ -184,15 +185,19 @@ function ProfilesContent() {
                 <h3 className="text-lg font-semibold mb-2 font-heading text-text-main">
                   No profiles found
                 </h3>
-                <p className="text-sm mb-4 text-text-muted">
-                  Try adjusting your search or removing some filters.
+                <p className="text-sm mb-2 text-text-muted">
+                  {filters.search || filters.country || filters.relocation_preference || filters.skills?.length
+                    ? 'Try broadening your search — remove a filter or use fewer keywords.'
+                    : 'No profiles have been posted yet. Check back soon.'}
                 </p>
-                <button
-                  onClick={() => applyFilters({ page: 1 })}
-                  className="text-sm font-semibold text-primary hover:opacity-70 transition-opacity"
-                >
-                  Clear all filters
-                </button>
+                {(filters.search || filters.country || filters.relocation_preference || filters.skills?.length) && (
+                  <button
+                    onClick={() => applyFilters({ page: 1 })}
+                    className="mt-2 text-sm font-semibold text-primary hover:opacity-70 transition-opacity"
+                  >
+                    Clear all filters
+                  </button>
+                )}
               </div>
             ) : (
               <>

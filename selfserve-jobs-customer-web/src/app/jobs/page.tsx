@@ -6,7 +6,7 @@ import { JobCard } from '@/components/jobs/JobCard';
 import { JobFilters } from '@/components/jobs/JobFilters';
 import { SearchBar } from '@/components/shared/SearchBar';
 import { Pagination } from '@/components/shared/Pagination';
-import { Spinner } from '@/components/ui/Spinner';
+import { JobCardSkeleton } from '@/components/ui/Skeleton';
 import { StatusBanner } from '@/components/shared/StatusBanner';
 import { getJobs } from '@/lib/api';
 import type { JobFilters as JobFiltersType, JobListItem } from '@/lib/types';
@@ -63,6 +63,7 @@ function JobsContent() {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [searching, setSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchJobs = useCallback(async (f: JobFiltersType) => {
@@ -101,11 +102,12 @@ function JobsContent() {
 
   const handleSearchChange = (value: string) => {
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+    setSearching(true);
+    setFilters((prev) => ({ ...prev, search: value || undefined }));
     searchTimerRef.current = setTimeout(() => {
+      setSearching(false);
       applyFilters({ ...filters, search: value || undefined, page: 1 });
     }, 350);
-    // Update local state immediately for responsive UI
-    setFilters((prev) => ({ ...prev, search: value || undefined }));
   };
 
   const handleFiltersChange = (newFilters: JobFiltersType) => {
@@ -143,6 +145,7 @@ function JobsContent() {
             value={filters.search ?? ''}
             onChange={handleSearchChange}
             placeholder="Search by title, company, or skill…"
+            searching={searching}
           />
         </div>
 
@@ -153,19 +156,16 @@ function JobsContent() {
           </aside>
 
           {/* Main content */}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0" aria-busy={loading} aria-live="polite">
             {error && (
               <StatusBanner type="error" message={error} className="mb-6" />
             )}
 
             {loading ? (
-              <div className="flex items-center justify-center py-24">
-                <div className="flex flex-col items-center gap-3">
-                  <Spinner size="lg" />
-                  <p className="text-sm text-text-muted">
-                    Loading jobs…
-                  </p>
-                </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-6">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <JobCardSkeleton key={i} />
+                ))}
               </div>
             ) : jobs.length === 0 ? (
               <div className="text-center py-20 rounded-2xl bg-surface-lowest shadow-ambient">
@@ -181,15 +181,19 @@ function JobsContent() {
                 <h3 className="text-lg font-semibold mb-2 font-heading text-text-main">
                   No jobs found
                 </h3>
-                <p className="text-sm mb-4 text-text-muted">
-                  Try adjusting your search or removing some filters.
+                <p className="text-sm mb-2 text-text-muted">
+                  {filters.search || filters.country || filters.employment_type?.length || filters.skills?.length
+                    ? 'Try broadening your search — remove a filter or use fewer keywords.'
+                    : 'No jobs have been posted yet. Check back soon.'}
                 </p>
-                <button
-                  onClick={() => applyFilters({ page: 1 })}
-                  className="text-sm font-semibold text-primary hover:opacity-70 transition-opacity"
-                >
-                  Clear all filters
-                </button>
+                {(filters.search || filters.country || filters.employment_type?.length || filters.skills?.length) && (
+                  <button
+                    onClick={() => applyFilters({ page: 1 })}
+                    className="mt-2 text-sm font-semibold text-primary hover:opacity-70 transition-opacity"
+                  >
+                    Clear all filters
+                  </button>
+                )}
               </div>
             ) : (
               <>

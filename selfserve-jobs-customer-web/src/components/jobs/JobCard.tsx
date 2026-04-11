@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import Link from 'next/link';
 import { SkillTag } from '@/components/shared/SkillTag';
 import { EmploymentTypeBadge } from '@/components/shared/EmploymentTypeBadge';
@@ -8,7 +9,7 @@ interface JobCardProps {
   job: JobListItem;
 }
 
-export function JobCard({ job }: JobCardProps) {
+export const JobCard = memo(function JobCard({ job }: JobCardProps) {
   const displaySkills = job.key_skills.slice(0, 4);
   const extraSkills = job.key_skills.length - displaySkills.length;
 
@@ -74,4 +75,4 @@ export function JobCard({ job }: JobCardProps) {
       </article>
     </Link>
   );
-}
+});

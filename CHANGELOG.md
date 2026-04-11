@@ -7,6 +7,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- **Skip-to-main-content link** — first focusable element in root layout; visible on focus, invisible otherwise (`sr-only focus:not-sr-only`)
+- **Toast notification system** — `ToastContext` + `ToastProvider` with `useToast()` hook; auto-dismisses after 4s; `aria-live="polite"` region for screen readers; success/error/info variants
+- **Card skeleton loading** — `JobCardSkeleton` and `ProfileCardSkeleton` components replace spinner on browse pages; layout matches final card structure for zero layout shift
 - **Internal cron endpoints** — `POST /api/v1/internal/expire-listings` transitions active listings past `expires_at` to `expired` and sends 7-day expiry warning emails (hourly window ±1h); `POST /api/v1/internal/cleanup` deletes expired `auth_session` / `login_token` rows and `email_log` rows older than 90 days; both endpoints are protected by a shared secret (`X-Internal-Secret` header, `INTERNAL_API_SECRET` env var)
 - **Expiry warning email template** — `email_templates/expiry_warning.py` renders a Sage & Stone styled 7-day expiry reminder; `email_service.send_expiry_warning_email()` added as the corresponding send function
 - **`INTERNAL_API_SECRET` config field** — new `Settings` field for the cron shared secret; empty string disables the endpoint with 503
@@ -24,6 +27,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **DB indexes (migration 0006)** — added `ix_job_email`, `ix_profile_email`, `ix_job_status_expires_at`, `ix_profile_status_expires_at`, `ix_email_verification_entity`, `ix_job_email_status`, `ix_profile_email_status` for query performance; added unique constraint `uq_report_entity_reporter` on `(entity_type, entity_code, reporter_email)` to atomically prevent duplicate reports at DB level
 
 ### Fixed
+- **Search loading indicator** — `SearchBar` now accepts `searching` prop; shows spinner during 350ms debounce window; browse pages pass state correctly
+- **Improved empty state messaging** — browse pages detect whether filters are active and show context-appropriate messages ("Try broadening your search" vs "No jobs posted yet")
+- **`aria-current="page"`** — nav links now set `aria-current="page"` on the active route
+- **`aria-busy` on content regions** — browse list containers set `aria-busy` during loading
+- **Keyboard dropdown navigation** — `CreateListingDropdown` now supports Enter/Space to open, Escape to close, ArrowDown/ArrowUp to navigate items; `aria-haspopup`/`aria-expanded` attributes added; items have `role="menuitem"`
+- **`aria-expanded` on mobile menu button** — hamburger menu button now reflects open state
+- **React.memo on `JobCard` and `ProfileCard`** — cards no longer re-render on filter changes that don't affect their props
+- **Analytics deferred to `lazyOnload`** — Umami script strategy changed from `afterInteractive` to `lazyOnload`; non-critical analytics no longer blocks interactivity
 - **Stale view count in detail responses** — `get_job_detail` and `get_profile_detail` now execute an atomic `UPDATE view_count+1` before fetching, so the returned object reflects the current count; removed separate `POST /jobs/{code}/view` and `POST /profiles/{code}/view` endpoints and `ViewTracker` client component (view is now counted server-side on each GET detail)
 - **Missing contact_method validator on `JobUpdate`** — added `model_validator` to `JobUpdate` enforcing that `contact_email` is provided when `contact_method='email'` and `contact_url` is provided when `contact_method='url'`
 - **Status field bypassable via update payload** — `update_job` and `update_profile` services now whitelist updatable fields explicitly instead of blindly applying `model_dump(exclude_unset=True)`, preventing `status` or other protected fields from being injected via the update body

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -13,46 +13,89 @@ const NAV_LINKS = [
   { href: '/jobs', label: 'Jobs' },
 ];
 
+const DROPDOWN_ITEMS = [
+  { href: '/jobs/new', label: 'Post a Job' },
+  { href: '/profiles/new', label: 'Create Profile' },
+];
+
 function CreateListingDropdown() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const itemRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+
+  const close = useCallback(() => setOpen(false), []);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node)) close();
     }
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
-  }, []);
+  }, [close]);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      close();
+      buttonRef.current?.focus();
+      return;
+    }
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      setOpen((o) => !o);
+      if (!open) {
+        setTimeout(() => itemRefs.current[0]?.focus(), 0);
+      }
+      return;
+    }
+    if (!open) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      const focused = document.activeElement;
+      const idx = itemRefs.current.indexOf(focused as HTMLAnchorElement);
+      itemRefs.current[(idx + 1) % itemRefs.current.length]?.focus();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      const focused = document.activeElement;
+      const idx = itemRefs.current.indexOf(focused as HTMLAnchorElement);
+      const prev = (idx - 1 + itemRefs.current.length) % itemRefs.current.length;
+      itemRefs.current[prev]?.focus();
+    }
+  };
 
   return (
-    <div className="relative" ref={ref}>
+    <div className="relative" ref={ref} onKeyDown={handleKeyDown}>
       <button
-        onClick={() => setOpen((o) => !o)}
-        style={{ outline: 'none' }}
-        className="flex items-center gap-1 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-text-muted transition-all hover:text-text-main hover:bg-surface/60 rounded-xl"
+        ref={buttonRef}
+        onClick={() => {
+          setOpen((o) => {
+            if (!o) setTimeout(() => itemRefs.current[0]?.focus(), 0);
+            return !o;
+          });
+        }}
+        aria-haspopup="true"
+        aria-expanded={open}
+        className="flex items-center gap-1 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-text-muted transition-all hover:text-text-main hover:bg-surface/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/40"
       >
         Create Listing
-        <svg className={`w-3 h-3 transition-transform ${open ? 'rotate-180' : ''}`} viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth={2}>
+        <svg className={`w-3 h-3 transition-transform ${open ? 'rotate-180' : ''}`} viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
           <path d="M2 4l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </button>
       {open && (
-        <div className="absolute right-0 top-full mt-1 w-44 bg-surface-lowest rounded-xl shadow-[0_4px_24px_rgba(28,28,26,0.12)] border border-border/20 overflow-hidden z-50">
-          <Link
-            href="/jobs/new"
-            onClick={() => setOpen(false)}
-            className="block px-4 py-3 text-sm text-text-main hover:bg-surface transition-colors"
-          >
-            Post a Job
-          </Link>
-          <Link
-            href="/profiles/new"
-            onClick={() => setOpen(false)}
-            className="block px-4 py-3 text-sm text-text-main hover:bg-surface transition-colors"
-          >
-            Create Profile
-          </Link>
+        <div role="menu" className="absolute right-0 top-full mt-1 w-44 bg-surface-lowest rounded-xl shadow-[0_4px_24px_rgba(28,28,26,0.12)] border border-border/20 overflow-hidden z-50">
+          {DROPDOWN_ITEMS.map((item, i) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              role="menuitem"
+              ref={(el) => { itemRefs.current[i] = el; }}
+              onClick={close}
+              className="block px-4 py-3 text-sm text-text-main hover:bg-surface transition-colors focus:outline-none focus:bg-surface"
+            >
+              {item.label}
+            </Link>
+          ))}
         </div>
       )}
     </div>
@@ -81,13 +124,14 @@ export function Header() {
               <Image src="/logo.png" alt="hirebridge" width={140} height={64} priority style={{ width: '140px', height: '64px' }} />
             </Link>
 
-            <nav className="hidden md:flex items-center gap-6">
+            <nav aria-label="Main navigation" className="hidden md:flex items-center gap-6">
               {NAV_LINKS.map((link) => {
                 const isActive = pathname.startsWith(link.href);
                 return (
                   <Link
                     key={link.href}
                     href={link.href}
+                    aria-current={isActive ? 'page' : undefined}
                     className={cn(
                       'font-heading text-base tracking-tight transition-all',
                       isActive
@@ -101,6 +145,7 @@ export function Header() {
               })}
               <Link
                 href="/about"
+                aria-current={pathname === '/about' ? 'page' : undefined}
                 className={cn(
                   'font-heading text-base tracking-tight transition-all',
                   pathname === '/about'
@@ -118,6 +163,7 @@ export function Header() {
                   <CreateListingDropdown />
                   <Link
                     href="/account"
+                    aria-current={pathname.startsWith('/account') ? 'page' : undefined}
                     className={cn(
                       'w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all',
                       pathname.startsWith('/account')
@@ -151,6 +197,7 @@ export function Header() {
               className="md:hidden p-2 -mr-1 rounded-full transition-colors text-text-muted hover:text-text-main hover:bg-surface"
               onClick={() => setMobileOpen(true)}
               aria-label="Open menu"
+              aria-expanded={mobileOpen}
             >
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.75} stroke="currentColor" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />

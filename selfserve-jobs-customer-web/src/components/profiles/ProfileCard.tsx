@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/Badge';
 import { SkillTag } from '@/components/shared/SkillTag';
@@ -14,7 +15,7 @@ const RELOCATION_BADGE: Record<string, 'success' | 'default' | 'warning'> = {
   no: 'default',
 };
 
-export function ProfileCard({ profile }: ProfileCardProps) {
+export const ProfileCard = memo(function ProfileCard({ profile }: ProfileCardProps) {
   const displaySkills = profile.key_skills.slice(0, 4);
   const extraSkills = profile.key_skills.length - displaySkills.length;
   const initial = profile.person_name.charAt(0).toUpperCase();
@@ -95,4 +96,4 @@ export function ProfileCard({ profile }: ProfileCardProps) {
       </article>
     </Link>
   );
-}
+});

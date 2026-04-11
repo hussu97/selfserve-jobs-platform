@@ -9,6 +9,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Analytics } from '@vercel/analytics/next';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { organizationSchema, websiteSchema } from '@/lib/schema';
+import { ToastProvider } from '@/context/ToastContext';
 
 const newsreader = Newsreader({
   subsets: ['latin'],
@@ -85,10 +86,18 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${newsreader.variable} ${manrope.variable}`} data-scroll-behavior="smooth">
       <body className="flex flex-col min-h-screen" style={{ backgroundColor: 'var(--color-bg)' }}>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[300] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-primary focus:text-white focus:text-sm focus:font-semibold focus:shadow-ambient-hover"
+        >
+          Skip to main content
+        </a>
         <JsonLd data={[organizationSchema(), websiteSchema()]} />
         <AuthProvider>
-          <Header />
-          <AppShell>{children}</AppShell>
+          <ToastProvider>
+            <Header />
+            <AppShell>{children}</AppShell>
+          </ToastProvider>
         </AuthProvider>
         {process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID && (
           <Script
@@ -99,7 +108,7 @@ export default function RootLayout({
                 ? `${process.env.NEXT_PUBLIC_SITE_URL}/stats`
                 : undefined
             }
-            strategy="afterInteractive"
+            strategy="lazyOnload"
           />
         )}
         <SpeedInsights />
