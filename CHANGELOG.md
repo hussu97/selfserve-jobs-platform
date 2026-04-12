@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Fixed
+- **Auto sign-out on expired session** — API calls that receive a 401 now fire a `auth:unauthorized` DOM event; `AuthContext` listens and immediately clears the session from state and `localStorage`, which causes auth-gated pages (`/account`, `/admin`) to redirect to login automatically instead of showing a stale "Session expired or invalid" error with no way out
 - **Profile/job update 422 — missing `Content-Type: application/json`** — `request()` in `src/lib/api.ts` spread `...fetchOptions` after the merged `headers` object, causing the `headers` key to be overridden by the caller-supplied headers (e.g. `{ 'X-Edit-Token': token }`). PUT requests with custom headers silently lost `Content-Type: application/json`, so FastAPI received the body as a raw string and rejected it with "Input should be a valid dictionary". Fixed by destructuring `headers` out of options before spreading the remainder.
 
 ### Added

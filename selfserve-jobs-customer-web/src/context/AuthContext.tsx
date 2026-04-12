@@ -77,6 +77,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem(STORAGE_KEY);
   }, []);
 
+  // Auto-logout when any API call receives a 401 (expired/invalid session token)
+  useEffect(() => {
+    const handler = () => logoutFn();
+    window.addEventListener('auth:unauthorized', handler);
+    return () => window.removeEventListener('auth:unauthorized', handler);
+  }, [logoutFn]);
+
   const updateRecruiterStatus = useCallback((status: string) => {
     setAuth((prev) => {
       const next = { ...prev, recruiterStatus: status };

@@ -100,6 +100,10 @@ async function request<T>(
     } catch {
       // ignore JSON parse errors
     }
+    // Signal auth listeners to clear session on 401 so stale localStorage tokens are purged
+    if (response.status === 401 && typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('auth:unauthorized'));
+    }
     throw new ApiError(response.status, errorMessage);
   }
 
