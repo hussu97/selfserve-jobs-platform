@@ -83,7 +83,7 @@ function VerifyContent() {
     setResendMessage('');
     try {
       const res = await resendVerification(resendEmail.trim(), resendEntityType);
-      setResendMessage(res.message || 'Verification email sent. Check your inbox.');
+      setResendMessage(res.message || 'Verification email sent. Check your inbox — if you don\'t see it, check your spam or junk folder.');
     } catch (err) {
       setResendError(err instanceof Error ? err.message : 'Failed to resend. Please try again.');
     } finally {
@@ -103,7 +103,7 @@ function VerifyContent() {
           Check your email
         </h1>
         <p className="text-sm text-text-muted">
-          No verification code found. Check your email for the verification link we sent when you created your listing.
+          No verification code found. Check your email for the verification link we sent when you created your listing. If you don&apos;t see it, check your spam or junk folder.
         </p>
         <Link
           href="/"

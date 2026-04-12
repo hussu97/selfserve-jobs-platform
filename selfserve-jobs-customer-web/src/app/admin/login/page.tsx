@@ -75,7 +75,7 @@ export default function AdminLoginPage() {
                 </div>
               ) : (
                 <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-                  We sent a sign-in link to <strong>{email}</strong>. It expires in 15 minutes.
+                  We sent a sign-in link to <strong>{email}</strong>. It expires in 15 minutes. If you don&apos;t see it, check your spam or junk folder.
                 </p>
               )}
               <button

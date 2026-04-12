@@ -193,13 +193,13 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
         <p className="mb-6 text-sm text-text-muted">
           {isLive
             ? 'Your profile is now live and visible to employers.'
-            : "Check your email and click the verification link to publish your profile. It won't appear publicly until verified."}
+            : "Check your email and click the verification link to publish your profile. It won't appear publicly until verified. If you don't see it, check your spam or junk folder."}
         </p>
         {!isLive && (
           <StatusBanner
             type="info"
             title="Next steps"
-            message="A verification email has been sent to the address you provided. The link expires in 24 hours."
+            message="A verification email has been sent to the address you provided. The link expires in 24 hours. If you don't see it, check your spam or junk folder."
           />
         )}
       </div>

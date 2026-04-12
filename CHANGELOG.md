@@ -7,6 +7,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Changed
+- **Email verification messages now mention spam/junk folder** — all "check your email" prompts across the frontend (verify page, profile creation, login, recruiter registration, admin login) now include a note to check the spam or junk folder if the email isn't visible
+
+### Changed
 - **E2E test suite audited and updated** — `smoke.spec.ts` expanded from 7 to 22 tests, covering `/about`, `/faq`, `/contact`, `/profiles/new`, `/jobs/new`, `/recruiter/register`, `/verify` (no-code state), and `/report` (no-code state); `critical-path.spec.ts` fixed broken profiles navigation selector (was matching "Create Profile" → `/profiles/new` instead of "Talent" nav link → `/profiles`), added recruiter form validation tests, and added mocked verify/manage invalid-state tests; `responsive.spec.ts` expanded from 3 to 8 key pages (added `/about`, `/faq`, `/contact`, `/profiles/new`, `/recruiter/register`)
 
 ### Changed
