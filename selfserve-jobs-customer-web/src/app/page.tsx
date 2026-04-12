@@ -59,7 +59,7 @@ export default async function HomePage() {
             className="anim-fade-up anim-delay-2 text-lg sm:text-xl leading-relaxed mb-12 max-w-3xl mx-auto font-light"
             style={{ color: '#c3c8c0' }}
           >
-            If recent events have shaken your career in the UAE, hear this: you&apos;re not alone.
+            If recent events have shaken your career in the UAE, hear this: you are not alone.
             This is a place where talent is truly valued and opportunities are real — no algorithms, no spam, no cost.
           </p>
 
