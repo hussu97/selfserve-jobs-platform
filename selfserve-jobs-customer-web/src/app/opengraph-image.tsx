@@ -10,109 +10,107 @@ export default function Image() {
     (
       <div
         style={{
-          width: '100%',
-          height: '100%',
+          width: '1200px',
+          height: '630px',
+          background: '#fcf9f5',
           display: 'flex',
           flexDirection: 'column',
-          backgroundColor: '#fcf9f5',
-          padding: '64px',
-          fontFamily: 'serif',
+          justifyContent: 'space-between',
+          padding: '72px 80px',
         }}
       >
-        {/* Top bar */}
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '64px' }}>
-          <span style={{ fontSize: 32, fontStyle: 'italic', color: '#384B3B', fontFamily: 'serif' }}>
-            hirebridge
-          </span>
-          <div style={{ flex: 1 }} />
-          <span
-            style={{
-              fontSize: 11,
-              letterSpacing: '0.15em',
-              textTransform: 'uppercase',
-              color: '#8BA888',
-              fontFamily: 'sans-serif',
-            }}
-          >
-            Free · No Signup Required
-          </span>
+        {/* Logo */}
+        <div
+          style={{
+            fontSize: '30px',
+            fontStyle: 'italic',
+            color: '#384B3B',
+            fontFamily: 'serif',
+            letterSpacing: '-0.5px',
+          }}
+        >
+          hirebridge
         </div>
 
-        {/* Main content */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          <p
+        {/* Headline block */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+          <div
             style={{
-              fontSize: 13,
-              letterSpacing: '0.18em',
+              fontSize: '11px',
+              letterSpacing: '0.2em',
               textTransform: 'uppercase',
               color: '#8BA888',
               fontFamily: 'sans-serif',
-              marginBottom: '20px',
             }}
           >
             UAE Jobs &amp; Talent
-          </p>
-          <h1
+          </div>
+          <div
             style={{
-              fontSize: 72,
-              color: '#384B3B',
+              fontSize: '76px',
+              fontWeight: '600',
+              color: '#1c1c1a',
+              lineHeight: '1.05',
+              letterSpacing: '-2px',
               fontFamily: 'serif',
-              fontStyle: 'italic',
-              lineHeight: 1.1,
-              marginBottom: '32px',
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '18px',
             }}
           >
-            Find <span style={{ color: '#8C4E32' }}>Extraordinary</span> Talent
-          </h1>
-          <p
+            <span>Find</span>
+            <span style={{ color: '#8C4E32', fontStyle: 'italic' }}>Extraordinary</span>
+            <span>Talent</span>
+          </div>
+          <div
             style={{
-              fontSize: 22,
+              fontSize: '24px',
               color: '#434843',
               fontFamily: 'sans-serif',
-              lineHeight: 1.5,
-              maxWidth: '680px',
+              fontWeight: '400',
+              lineHeight: '1.45',
+              maxWidth: '700px',
             }}
           >
             Post jobs and talent profiles across Dubai, Abu Dhabi, and the Emirates — no account needed.
-          </p>
+          </div>
         </div>
 
-        {/* Tag pills row */}
-        <div style={{ display: 'flex', gap: '10px', marginBottom: '32px', flexWrap: 'wrap' }}>
-          {['Dubai Jobs', 'Abu Dhabi', 'All Industries', 'Remote UAE', 'Talent Profiles'].map((tag) => (
-            <span
-              key={tag}
-              style={{
-                fontSize: 12,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                color: '#384B3B',
-                backgroundColor: '#8BA888',
-                padding: '6px 14px',
-                borderRadius: '999px',
-                fontFamily: 'sans-serif',
-              }}
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-
-        {/* Bottom bar */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            paddingTop: '24px',
-            borderTop: '1px solid #c3c8c0',
-          }}
-        >
-          <span style={{ fontSize: 13, color: '#434843', fontFamily: 'sans-serif' }}>
-            hirebridgeuae.com · No fees · No middlemen · No algorithms
-          </span>
+        {/* Bottom row */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            {['Dubai Jobs', 'Abu Dhabi', 'All Industries', 'No Signup'].map((tag) => (
+              <div
+                key={tag}
+                style={{
+                  background: '#8BA888',
+                  color: '#ffffff',
+                  padding: '7px 18px',
+                  borderRadius: '999px',
+                  fontSize: '12px',
+                  fontFamily: 'sans-serif',
+                  fontWeight: '600',
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                }}
+              >
+                {tag}
+              </div>
+            ))}
+          </div>
+          <div
+            style={{
+              fontSize: '18px',
+              color: '#8C4E32',
+              fontFamily: 'sans-serif',
+              fontWeight: '500',
+            }}
+          >
+            hirebridgeuae.com
+          </div>
         </div>
       </div>
     ),
-    { ...size }
+    { ...size },
   );
 }

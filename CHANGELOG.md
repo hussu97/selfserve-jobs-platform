@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+- **Redesigned OG image** (`opengraph-image.tsx`) — cleaner layout with proper headline hierarchy, "Find Extraordinary Talent" with italic terracotta emphasis, sage green tag pills, and domain lockup; removes old bordered bottom bar
+
 ### Fixed
 - **Umami analytics events not recorded for UAE visitors** — UAE ISPs (e& / du) use deep packet inspection that matches on `/stats/api/send` URL patterns and Umami's JSON payload shape. Replaced the client-side Next.js rewrite for event collection with a server-side Next.js API route (`src/app/api/send/route.ts`) that receives events from the browser and forwards them to Umami from the server, preserving the user's real IP via `X-Forwarded-For` for accurate geo attribution. Also renamed the script proxy path from `/stats/script.js` to `/lib/app.js` to avoid URL pattern matching on "stats".
 
