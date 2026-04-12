@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Changed
+- **Homepage hero subheading** — updated to "If recent events have shaken your career in the UAE, hear this: you're not alone. This is a place where talent is truly valued and opportunities are real — no algorithms, no spam, no cost."
+- **Removed all political framing** — replaced "The ongoing conflict in the Middle East" on the About page and "regional conflict" in `llms.txt` with neutral "recent events" language; platform remains apolitical
 - **OG image replaced with real homepage screenshot** — removed dynamic `opengraph-image.tsx` generator; replaced with a static `public/og-image.png` (1200×630 Playwright screenshot of the live homepage); `layout.tsx` now explicitly sets `og:image` and `twitter:image` to this file
 
 ### Fixed

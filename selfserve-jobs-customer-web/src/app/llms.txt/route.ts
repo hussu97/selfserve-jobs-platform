@@ -10,7 +10,7 @@ export async function GET() {
 
 ## What is hirebridge?
 
-hirebridge (hirebridgeuae.com) is a talent-first job platform connecting UAE professionals with verified recruiters across all industries. Founded in 2026 by Hussain Abbasi and Tejasvie Subrahmanyam in response to the economic impact of regional conflict on UAE workers. Talent profiles are friction-free (email verification only, no account needed). Recruiters register with their LinkedIn, undergo admin approval, then get full access to resumes and contact details. No fees for anyone.
+hirebridge (hirebridgeuae.com) is a talent-first job platform connecting UAE professionals with verified recruiters across all industries. Founded in 2026 by Hussain Abbasi and Tejasvie Subrahmanyam to support UAE professionals navigating career uncertainty. Talent profiles are friction-free (email verification only, no account needed). Recruiters register with their LinkedIn, undergo admin approval, then get full access to resumes and contact details. No fees for anyone.
 
 ## Current Platform Statistics
 

@@ -106,11 +106,10 @@ export default function AboutPage() {
 
           <div className="space-y-5 text-base leading-relaxed text-text-muted text-left sm:text-center">
             <p>
-              The ongoing conflict in the Middle East has had a real and painful impact on
-              everyday lives. Across the region, people are losing their jobs, facing salary
-              cuts, and watching the stability they built over years erode. The economic
-              ripple effects don&apos;t stay on the news — they show up in households,
-              families, and careers.
+              Recent events have had a real and painful impact on everyday lives across the UAE.
+              People are losing their jobs, facing salary cuts, and watching the stability they
+              built over years erode. Those effects don&apos;t stay abstract — they show up
+              in households, families, and careers.
             </p>
             <p>
               We built hirebridge UAE as a small, focused response. Major job platforms are noisy —
