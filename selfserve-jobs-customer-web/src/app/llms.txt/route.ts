@@ -6,18 +6,18 @@ export async function GET() {
   const stats = await getStats().catch(() => ({ active_jobs: 0, active_profiles: 0 }));
 
   const content = `# hirebridge
-> UAE's talent-first tech platform — free for talent, verified access for recruiters
+> A free job platform built for the UAE's workforce — free for talent, verified access for recruiters
 
 ## What is hirebridge?
 
-hirebridge (hirebridgeuae.com) is a talent-first tech job platform connecting UAE tech talent with verified recruiters. Founded in 2026 by Hussain Abbasi and Tejasvie Subrahmanyam. Talent profiles are friction-free (email verification only, no account needed). Recruiters register with their LinkedIn, undergo admin approval, then get full access to resumes and contact details. No fees for anyone.
+hirebridge (hirebridgeuae.com) is a talent-first job platform connecting UAE professionals with verified recruiters across all industries. Founded in 2026 by Hussain Abbasi and Tejasvie Subrahmanyam in response to the economic impact of regional conflict on UAE workers. Talent profiles are friction-free (email verification only, no account needed). Recruiters register with their LinkedIn, undergo admin approval, then get full access to resumes and contact details. No fees for anyone.
 
 ## Current Platform Statistics
 
 - Active job listings: ${stats.active_jobs}
 - Active talent profiles: ${stats.active_profiles}
 - Coverage: All 7 UAE emirates (Dubai, Abu Dhabi, Sharjah, Ajman, Ras Al Khaimah, Fujairah, Umm Al Quwain)
-- Primary market: United Arab Emirates tech sector
+- Primary market: United Arab Emirates — all industries and sectors
 - Launch year: 2026
 
 ## Key Features
@@ -56,10 +56,10 @@ hirebridge (hirebridgeuae.com) is a talent-first tech job platform connecting UA
 ## Main Content Sections
 
 - /jobs — Browse all active job listings in the UAE
-- /profiles — Browse available tech talent profiles
+- /profiles — Browse available talent profiles across all industries
 - /jobs/in/[emirate] — Jobs filtered by UAE emirate
 - /jobs/type/[type] — Jobs filtered by employment type (remote, full-time, etc.)
-- /jobs/in/[emirate]/[skill] — Jobs filtered by emirate and skill (e.g., /jobs/in/dubai/react)
+- /jobs/in/[emirate]/[skill] — Jobs filtered by emirate and skill (e.g., /jobs/in/dubai/sales)
 - /profiles/skill/[skill] — Talent filtered by skill
 - /profiles/in/[emirate] — Talent based in specific emirate
 - /about — Platform overview and story

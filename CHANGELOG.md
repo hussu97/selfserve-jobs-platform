@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Changed
+- **Removed "tech" framing across all platform copy** — replaced "UAE's talent-first tech platform" with "Built for the UAE's workforce" in the footer and mobile nav; updated the About page hero heading to "A job platform built for our community" and revised its metadata and subheading to reflect the general, cross-industry nature of the platform; updated `llms.txt` to describe hirebridge as a cross-industry platform for UAE professionals rather than "UAE tech talent", added context about the regional conflict motivation, and broadened the primary market from "UAE tech sector" to all industries
 - **Homepage hero redesigned with UAE flag background** — replaced the light cream hero with an editorial dark-background hero featuring the ethereal UAE flag image (`/uae-flag-background.png`) at 40% opacity with a silk-weave mask fade; headline updated to "Your Talent is Still Your Power." with new supportive copy; hero CTAs changed to "Post your Story" (→ `/profiles/new`) and "Discover Roles" (→ `/jobs`)
 - **"Our Story" section removed from homepage** — content lives on the `/about` page; removed redundant inline summary
 - **"Ready to get started?" CTA strip replaced with Browse section** — new two-card grid ("Browse Talent" / "Discover Roles") with live active profile and job counts, replacing both the primary CTA strip and the inline browse buttons that were previously in the hero

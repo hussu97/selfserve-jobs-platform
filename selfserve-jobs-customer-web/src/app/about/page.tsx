@@ -2,9 +2,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: "About hirebridge — UAE's Talent-First Tech Platform",
+  title: "About hirebridge — A Free Job Platform Built for the UAE",
   description:
-    "hirebridge is a free UAE talent-first tech platform. Talent profiles are friction-free. Recruiters register for verified access to sensitive candidate data. Learn how it works.",
+    "hirebridge is a free UAE job platform built for people who need it most. Talent profiles are friction-free. Recruiters register for verified access to candidate data. Learn how it works.",
   alternates: { canonical: '/about' },
 };
 
@@ -84,12 +84,12 @@ export default function AboutPage() {
             About hirebridge
           </span>
           <h1 className="font-heading text-4xl sm:text-5xl text-primary mb-6">
-            UAE&apos;s talent-first tech <em>platform</em>
+            A job platform built for our <em>community</em>
           </h1>
           <p className="text-lg leading-relaxed text-text-muted max-w-2xl mx-auto">
-            hirebridge puts talent at the centre. Professionals create profiles with nothing more than an email
-            verification. Recruiters register for a verified account and get approved before accessing sensitive
-            candidate data. Free to post · Free to browse · Always.
+            hirebridge puts people first. Professionals list themselves with nothing more than an email verification.
+            Recruiters register for a verified account and get approved before accessing candidate data.
+            No fees, no algorithms, no noise — ever.
           </p>
         </div>
       </section>

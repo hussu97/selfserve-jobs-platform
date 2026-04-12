@@ -203,7 +203,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
           </div>
         ) : (
           <div className="px-5 py-4 bg-surface text-[10px] uppercase tracking-widest text-text-muted">
-            UAE&apos;s talent-first tech platform
+            Built for the UAE&apos;s workforce
           </div>
         )}
       </div>

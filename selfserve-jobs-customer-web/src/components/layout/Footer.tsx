@@ -48,7 +48,7 @@ export function Footer() {
           <div className="col-span-2 sm:col-span-1 flex flex-col gap-2">
             <Image src="/logo.png" alt="hirebridge" width={120} height={54} style={{ width: '120px', height: '54px' }} />
             <p className="text-xs text-text-muted leading-relaxed mt-1">
-              UAE&apos;s talent-first tech platform
+              Built for the UAE&apos;s workforce
             </p>
             <p className="text-xs text-text-muted leading-relaxed">
               Free to post · Free to browse · Always
