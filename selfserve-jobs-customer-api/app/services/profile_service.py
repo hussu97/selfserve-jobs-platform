@@ -224,9 +224,23 @@ async def update_profile(
         "linkedin_profile_link",
         "key_skills",
     }
-    update_data = {k: v for k, v in data.model_dump(exclude_unset=True).items() if k in _UPDATABLE_FIELDS}
+    all_unset = data.model_dump(exclude_unset=True)
+    update_data = {k: v for k, v in all_unset.items() if k in _UPDATABLE_FIELDS}
     for field, value in update_data.items():
         setattr(profile, field, value)
+
+    # Handle resume replace / removal (only when resume_key is explicitly sent)
+    if "resume_key" in all_unset:
+        new_path = all_unset["resume_key"] or None
+        old_path = profile.resume_gcs_path
+        if old_path and old_path != new_path:
+            from app.services import storage_service
+
+            try:
+                await storage_service.delete_file(old_path)
+            except Exception as exc:
+                logger.warning("Failed to delete old resume %s: %s", old_path, exc)
+        profile.resume_gcs_path = new_path
 
     profile.updated_at = datetime.now(UTC)
     await db.flush()

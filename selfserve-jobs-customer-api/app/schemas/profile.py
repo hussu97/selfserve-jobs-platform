@@ -74,6 +74,9 @@ class ProfileUpdate(BaseModel):
     relocation_preference: RELOCATION_PREFERENCES | None = None
     linkedin_profile_link: str | None = Field(None, max_length=500)
     key_skills: list[str] | None = Field(None, max_length=30)
+    # When explicitly sent as null → remove resume. When a GCS path → replace resume.
+    # Omitting this field entirely → no change to resume.
+    resume_key: str | None = Field(default=None, max_length=500)
 
     @field_validator("key_skills", mode="before")
     @classmethod
