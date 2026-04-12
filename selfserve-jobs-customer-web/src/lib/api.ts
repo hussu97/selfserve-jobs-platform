@@ -73,11 +73,11 @@ async function request<T>(
   path: string,
   options: RequestInit & { next?: { revalidate?: number | false; tags?: string[] }; clientCache?: boolean } = {}
 ): Promise<T> {
-  const { next, clientCache, ...fetchOptions } = options;
+  const { next, clientCache, headers: optionHeaders, ...restOptions } = options;
   const url = `${API_URL}/api/v1${path}`;
 
   // Client-side GET cache — only in browser, only for explicit opt-in GET requests
-  const isGet = !fetchOptions.method || fetchOptions.method === 'GET';
+  const isGet = !restOptions.method || restOptions.method === 'GET';
   if (clientCache && isGet && typeof window !== 'undefined') {
     const cached = _cacheGet<T>(url);
     if (cached !== undefined) return cached;
@@ -86,10 +86,10 @@ async function request<T>(
   const response = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
-      ...fetchOptions.headers,
+      ...optionHeaders,
     },
     ...(next ? { next } : {}),
-    ...fetchOptions,
+    ...restOptions,
   });
 
   if (!response.ok) {
