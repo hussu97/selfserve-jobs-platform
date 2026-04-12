@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+- **ESLint `react-hooks/set-state-in-effect` error in `CitySelect`** — replaced the `useEffect` that called `setShowOther(false)` on country change with derived state: `showOther` is now computed as `showOtherForCountry === country`, so it resets automatically without an effect when the country prop changes; removed unused `useEffect` import
+
 ### Added
 - **Country-first city selection in job and profile creation forms** — country must now be selected before city; city field renders as a dropdown of major cities for the chosen country (covering all Middle East countries and all major world countries), with "Other" as the last option which reveals a freetext input stored as the city value; unsupported countries fall back directly to a freetext input; selecting a new country resets the city field
 - **`CitySelect` component** (`src/components/shared/CitySelect.tsx`) — new shared component encapsulating the country-aware city dropdown + freetext fallback logic
