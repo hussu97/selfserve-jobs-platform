@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Select } from '@/components/ui/Select';
 import { Input } from '@/components/ui/Input';
 import { COUNTRY_CITIES } from '@/lib/city-data';
@@ -29,13 +29,9 @@ export function CitySelect({
   const cities = country ? (COUNTRY_CITIES[country] ?? []) : [];
   const hasCities = cities.length > 0;
 
-  // Track whether the user has chosen "Other" from the dropdown
-  const [showOther, setShowOther] = useState(false);
-
-  // Reset other-mode whenever country changes
-  useEffect(() => {
-    setShowOther(false);
-  }, [country]);
+  // Track which country "Other" was chosen for — resets automatically when country changes
+  const [showOtherForCountry, setShowOtherForCountry] = useState<string | null>(null);
+  const showOther = showOtherForCountry === country;
 
   if (!country) {
     return (
@@ -82,10 +78,10 @@ export function CitySelect({
         value={selectValue}
         onChange={(e) => {
           if (e.target.value === OTHER_VALUE) {
-            setShowOther(true);
+            setShowOtherForCountry(country);
             onChange('');
           } else {
-            setShowOther(false);
+            setShowOtherForCountry(null);
             onChange(e.target.value);
           }
         }}
