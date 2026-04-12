@@ -70,7 +70,7 @@ export default async function HomePage() {
               className="inline-flex items-center justify-center px-10 py-4 rounded-2xl text-base font-semibold transition-all hover:-translate-y-0.5 active:scale-[0.98]"
               style={{ backgroundColor: '#384B3B', color: '#fcf9f5', boxShadow: '0 8px 24px rgba(0,0,0,0.4)' }}
             >
-              Post your Story
+              Get Hired
             </Link>
             <Link
               href="/jobs"

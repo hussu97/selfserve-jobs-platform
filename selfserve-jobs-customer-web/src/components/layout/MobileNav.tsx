@@ -174,7 +174,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
             onClick={onClose}
             className="px-4 py-3 rounded-full text-xs font-semibold uppercase tracking-widest transition-colors hover:bg-surface text-text-main"
           >
-            Create Profile
+            Get Hired
           </Link>
 
           {!isLoggedIn && (

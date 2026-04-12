@@ -15,7 +15,7 @@ const NAV_LINKS = [
 
 const DROPDOWN_ITEMS = [
   { href: '/jobs/new', label: 'Post a Job' },
-  { href: '/profiles/new', label: 'Create Profile' },
+  { href: '/profiles/new', label: 'Get Hired' },
 ];
 
 function CreateListingDropdown() {
