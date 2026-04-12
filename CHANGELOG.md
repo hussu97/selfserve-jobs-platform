@@ -13,6 +13,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 - **Quick-add skill pills on job and profile forms** — a "Quick add" row of 10 pill buttons appears below the skills text input on both the job and profile creation forms; pills show the top 10 resume skills relevant to the Middle East market (Microsoft Office, Project Management, Data Analysis, Communication, Customer Service, Leadership, Sales, Problem Solving, Teamwork, Bilingual AR/EN); pills disappear as skills are added to prevent duplicates
+- **`TOP_SKILLS` replaced with 25 general Middle East skills** — removed the tech-heavy skill list (React, Python, JavaScript, etc.) from `seo-constants.ts` and replaced with 25 broadly applicable cross-industry skills matching what Gulf recruiters actually search for (Project Management, Sales, Customer Service, Financial Analysis, Business Development, Supply Chain Management, etc.); these drive all sitemap skill landing pages (`/jobs/in/{emirate}/{skill}`, `/profiles/skill/{skill}`)
+- **Footer "Popular Skills" updated** — replaced tech skill links (React, Python, etc.) with high-volume general skills: Sales, Project Management, Customer Service, Business Development, Marketing, Financial Analysis
+- **Job form quick-add expanded to 15 pills** — increased from 10 to 15 skills and updated the list to match recruiter priorities: Project Management, Communication, Sales, Customer Service, Leadership, Data Analysis, Business Development, Financial Analysis, Operations Management, Marketing, Account Management, Negotiation, Strategic Planning, Microsoft Excel, Supply Chain Management
 - **`@vercel/speed-insights` reinstalled** — package reinstalled and `<SpeedInsights />` component re-added to `layout.tsx`; Vercel Speed Insights retained for Core Web Vitals monitoring while Vercel Analytics remains removed
 
 ### Removed

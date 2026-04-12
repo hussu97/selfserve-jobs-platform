@@ -19,11 +19,12 @@ const JOB_TYPE_LINKS = [
 ];
 
 const SKILL_LINKS = [
-  { href: '/jobs/in/dubai/react', label: 'React' },
-  { href: '/jobs/in/dubai/python', label: 'Python' },
-  { href: '/jobs/in/dubai/javascript', label: 'JavaScript' },
-  { href: '/jobs/in/dubai/node-js', label: 'Node.js' },
-  { href: '/jobs/in/dubai/product-management', label: 'Product Management' },
+  { href: '/jobs/in/dubai/sales', label: 'Sales' },
+  { href: '/jobs/in/dubai/project-management', label: 'Project Management' },
+  { href: '/jobs/in/dubai/customer-service', label: 'Customer Service' },
+  { href: '/jobs/in/dubai/business-development', label: 'Business Development' },
+  { href: '/jobs/in/dubai/marketing', label: 'Marketing' },
+  { href: '/jobs/in/dubai/financial-analysis', label: 'Financial Analysis' },
 ];
 
 const RESOURCE_LINKS = [

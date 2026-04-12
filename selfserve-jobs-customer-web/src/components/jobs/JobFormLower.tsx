@@ -88,7 +88,7 @@ export default function JobFormLower({
           </Button>
         </div>
         {(() => {
-          const suggestions = ['Microsoft Office', 'Project Management', 'Data Analysis', 'Communication', 'Customer Service', 'Leadership', 'Sales', 'Problem Solving', 'Teamwork', 'Bilingual (AR/EN)'];
+          const suggestions = ['Project Management', 'Communication', 'Sales', 'Customer Service', 'Leadership', 'Data Analysis', 'Business Development', 'Financial Analysis', 'Operations Management', 'Marketing', 'Account Management', 'Negotiation', 'Strategic Planning', 'Microsoft Excel', 'Supply Chain Management'];
           const remaining = suggestions.filter((s) => !(form.key_skills ?? []).map((k) => k.toLowerCase()).includes(s.toLowerCase()));
           if (remaining.length === 0) return null;
           return (
