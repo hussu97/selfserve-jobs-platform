@@ -65,7 +65,7 @@ class ProfileCreate(BaseModel):
 class ProfileUpdate(BaseModel):
     person_name: str | None = Field(None, min_length=2, max_length=200)
     contact_number: str | None = Field(None, max_length=30)
-    brief: str | None = Field(None, min_length=50)
+    brief: str | None = Field(None, min_length=0)
     current_city: str | None = Field(None, min_length=1, max_length=100)
     current_country: str | None = Field(None, min_length=2, max_length=100)
     years_of_experience: int | None = Field(None, ge=0, le=50)
