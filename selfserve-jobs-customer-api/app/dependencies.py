@@ -60,7 +60,9 @@ async def require_active_recruiter(
     session: AuthSession = Depends(get_current_session),
     db: AsyncSession = Depends(get_session),
 ) -> AuthSession:
-    """Require the caller to be an authenticated, admin-approved recruiter."""
+    """Require the caller to be an active recruiter or an admin (admins have recruiter-level access)."""
+    if session.user_type == "admin":
+        return session
     if session.user_type != "recruiter":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

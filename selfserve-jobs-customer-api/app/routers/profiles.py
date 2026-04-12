@@ -92,7 +92,11 @@ async def get_profile(
     profile_user = None
 
     if optional_session:
-        if optional_session.user_type == "recruiter":
+        if optional_session.user_type == "admin":
+            # Admins always get full sensitive access
+            include_sensitive = True
+            profile_user = await user_service.get_by_code(db, profile.user_code)
+        elif optional_session.user_type == "recruiter":
             recruiter = await recruiter_service.get_by_email(db, optional_session.email)
             if recruiter is not None and recruiter.status == "active":
                 include_sensitive = True
