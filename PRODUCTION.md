@@ -312,6 +312,7 @@ Configure these secrets in your GitHub repo (**Settings → Secrets and variable
 | `SENTRY_DSN` | (optional) `https://...@sentry.io/...` | Enables Sentry error tracking when set |
 | `ADMIN_EMAILS` | (optional) comma-separated list e.g. `admin@example.com,ops@example.com` | Comma-separated list of admin email addresses used for access control |
 | `ADMIN_NOTIFICATION_EMAIL` | (optional) e.g. `admin@example.com` | Destination address for report/flag notification emails |
+| `GOOGLE_INDEXING_CREDENTIALS` | (optional) Full JSON string of GCP service-account key | Enables Google Indexing API notifications — see step 11a |
 
 > **Note:** The workflow also hard-codes `ENVIRONMENT=production` and `LOG_FORMAT=json` on every deploy. `ENVIRONMENT` controls dev/prod behaviour in `config.py`; `LOG_FORMAT=json` switches to structured JSON logging for Cloud Logging.
 
@@ -354,7 +355,125 @@ gcloud iam workload-identity-pools providers describe "github-provider" \
 # This is your GCP_WORKLOAD_IDENTITY_PROVIDER secret value
 ```
 
-## 11. Verification Checklist
+## 11. Cloud Scheduler (Cron Jobs)
+
+Two scheduled jobs keep the platform healthy. Both call internal API endpoints protected by `X-Internal-Secret`.
+
+### Prerequisites
+
+Enable the Cloud Scheduler API if not already enabled:
+
+```bash
+gcloud services enable cloudscheduler.googleapis.com
+```
+
+### Job 1 — `expire-listings` (runs every hour)
+
+Transitions listings past their `expires_at` to `expired`, sends 7-day expiry warning emails, and fires `URL_DELETED` to the Google Indexing API for each expired listing.
+
+```bash
+export API_URL=$(gcloud run services describe $API_SERVICE_NAME --region $REGION --format='value(status.url)')
+export INTERNAL_API_SECRET="your-internal-api-secret"   # same value as the GitHub secret
+
+gcloud scheduler jobs create http expire-listings \
+  --location=$REGION \
+  --schedule="0 * * * *" \
+  --uri="${API_URL}/api/v1/internal/expire-listings" \
+  --http-method=POST \
+  --headers="X-Internal-Secret=${INTERNAL_API_SECRET},Content-Type=application/json" \
+  --time-zone="UTC" \
+  --attempt-deadline=60s \
+  --description="Expire overdue listings and send 7-day warnings"
+```
+
+### Job 2 — `cleanup` (runs daily at 03:00 UTC)
+
+Purges expired auth sessions, used login tokens, and email log rows older than 90 days.
+
+```bash
+gcloud scheduler jobs create http cleanup-stale-data \
+  --location=$REGION \
+  --schedule="0 3 * * *" \
+  --uri="${API_URL}/api/v1/internal/cleanup" \
+  --http-method=POST \
+  --headers="X-Internal-Secret=${INTERNAL_API_SECRET},Content-Type=application/json" \
+  --time-zone="UTC" \
+  --attempt-deadline=60s \
+  --description="Delete expired sessions, tokens, and old email logs"
+```
+
+### Verify jobs were created
+
+```bash
+gcloud scheduler jobs list --location=$REGION
+```
+
+### Run manually (force trigger)
+
+```bash
+gcloud scheduler jobs run expire-listings --location=$REGION
+gcloud scheduler jobs run cleanup-stale-data --location=$REGION
+```
+
+### Update an existing job (e.g. if API URL changes)
+
+```bash
+gcloud scheduler jobs update http expire-listings \
+  --location=$REGION \
+  --uri="${API_URL}/api/v1/internal/expire-listings"
+```
+
+---
+
+## 11a. Google Indexing API (optional — faster Google for Jobs indexing)
+
+When `GOOGLE_INDEXING_CREDENTIALS` is set, the API notifies Google whenever a listing goes live (`URL_UPDATED`) or expires/is removed (`URL_DELETED`). This gets new jobs into Google for Jobs within minutes instead of waiting for a crawl cycle.
+
+### Setup
+
+1. **Create a service account** (separate from the Cloud Run SA — this one only needs Indexing API access):
+
+```bash
+gcloud iam service-accounts create indexing-api \
+  --display-name="Google Indexing API"
+
+export INDEXING_SA_EMAIL="indexing-api@${PROJECT_ID}.iam.gserviceaccount.com"
+
+# Create and download a JSON key
+gcloud iam service-accounts keys create /tmp/indexing-sa-key.json \
+  --iam-account=$INDEXING_SA_EMAIL
+
+cat /tmp/indexing-sa-key.json   # copy this entire JSON blob
+```
+
+2. **Verify domain ownership** — in [Google Search Console](https://search.google.com/search-console):
+   - Add property for `https://hirebridgeuae.com`
+   - Go to **Settings → Users and permissions → Add user**
+   - Enter the service account email (`indexing-api@...`) with **Owner** permission
+   - The Indexing API rejects requests from non-owners regardless of GCP permissions
+
+3. **Set the env var** on Cloud Run:
+
+```bash
+export INDEXING_CREDENTIALS=$(cat /tmp/indexing-sa-key.json)
+
+gcloud run services update $API_SERVICE_NAME \
+  --region $REGION \
+  --update-env-vars "GOOGLE_INDEXING_CREDENTIALS=${INDEXING_CREDENTIALS}"
+
+# Remove the local key file
+rm /tmp/indexing-sa-key.json
+```
+
+4. **Add to GitHub secrets** so `deploy-api.yml` preserves the env var on future deploys:
+   - Secret name: `GOOGLE_INDEXING_CREDENTIALS`
+   - Value: the full JSON string from step 1
+
+> **Note:** The Indexing API is a no-op when `GOOGLE_INDEXING_CREDENTIALS` is empty — safe to deploy without it and add later.
+
+---
+
+## 13. Verification Checklist
 
 After completing setup, verify everything works:
 
@@ -368,7 +487,7 @@ After completing setup, verify everything works:
 - [ ] GitHub Actions workflows appear in GitHub → Actions tab
 - [ ] Push a change to `selfserve-jobs-customer-api/` — CI runs automatically
 
-## 12. Umami Analytics
+## 14. Umami Analytics
 
 Umami Cloud is integrated with adblock bypass via a proxy rewrite. The proxy is already configured in `selfserve-jobs-customer-web/next.config.ts` — requests to `/stats/script.js` and `/stats/api/send` are transparently forwarded to Umami Cloud, so adblockers have no known pattern to block.
 
@@ -402,7 +521,7 @@ The analytics script only loads when `NEXT_PUBLIC_UMAMI_WEBSITE_ID` is set. Leav
 
 ---
 
-## 13. Troubleshooting
+## 15. Troubleshooting
 
 Common failure modes and how to resolve them.
 
