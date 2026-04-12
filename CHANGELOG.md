@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Changed
 - **Homepage hero subheading** — updated to "If recent events have shaken your career in the UAE, hear this: you're not alone. This is a place where talent is truly valued and opportunities are real — no algorithms, no spam, no cost."
 - **Removed all political framing** — replaced "The ongoing conflict in the Middle East" on the About page and "regional conflict" in `llms.txt` with neutral "recent events" language; platform remains apolitical
-- **OG image replaced with real homepage screenshot** — removed dynamic `opengraph-image.tsx` generator; replaced with a static `public/og-image.png` (1200×630 Playwright screenshot of the live homepage); `layout.tsx` now explicitly sets `og:image` and `twitter:image` to this file
+- **OG image replaced with real homepage screenshot** — retaken at 1200×630 to reflect latest copy — removed dynamic `opengraph-image.tsx` generator; replaced with a static `public/og-image.png` (1200×630 Playwright screenshot of the live homepage); `layout.tsx` now explicitly sets `og:image` and `twitter:image` to this file
 
 ### Fixed
 - **Umami analytics events not recorded for UAE visitors** — UAE ISPs (e& / du) use deep packet inspection that matches on `/stats/api/send` URL patterns and Umami's JSON payload shape. Replaced the client-side Next.js rewrite for event collection with a server-side Next.js API route (`src/app/api/send/route.ts`) that receives events from the browser and forwards them to Umami from the server, preserving the user's real IP via `X-Forwarded-For` for accurate geo attribution. Also renamed the script proxy path from `/stats/script.js` to `/lib/app.js` to avoid URL pattern matching on "stats".
