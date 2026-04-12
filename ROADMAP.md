@@ -181,8 +181,6 @@ Organized into phases by criticality. Each phase should be completed before star
 - [x] **Add E2E test suite** — Playwright scaffold added: `playwright.config.ts` (Desktop Chrome, Mobile Chrome, Tablet projects), `e2e/smoke.spec.ts`, `e2e/responsive.spec.ts`, `e2e/critical-path.spec.ts`. Full create→verify→delete flow gated behind `E2E_FULL_FLOW=true`. CI workflow: `.github/workflows/e2e.yml` (manual dispatch, `BASE_URL` override, artifact upload).
 - [x] **Parallelize API and web test jobs** — `.github/workflows/test-all.yml` added: single workflow with `test-api` and `test-web` as parallel jobs using reusable workflow references.
 - [ ] **Add API contract testing** — Use `schemathesis` to auto-generate fuzz tests from the OpenAPI spec, catching schema drift between Pydantic models and actual API responses.
-- [ ] **Add OWASP ZAP DAST scanning in CI** — Run automated dynamic application security testing against staging on each deploy to catch injection flaws and broken auth.
-- [ ] **Add preview deployments for frontend PRs** — Configure Vercel preview deployments that point to a staging API, so every frontend PR gets a live URL for review.
 
 ---
 
