@@ -100,7 +100,7 @@ export default function NewJobPage() {
             Post a <em>New</em> Job
           </h1>
           <p className="text-base text-[var(--color-text-muted)]">
-            Your listing goes live immediately. Reach verified tech talent across the UAE.
+            Your listing goes live immediately. Reach verified talent across the UAE.
           </p>
         </div>
 

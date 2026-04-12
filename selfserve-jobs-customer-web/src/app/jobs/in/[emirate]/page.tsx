@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!emirate) return { title: 'Not Found' };
 
   const title = `Jobs in ${emirate.name}, UAE`;
-  const description = `Browse active tech jobs in ${emirate.name}, UAE. Find full-time, remote, contract, and freelance opportunities. No signup required — apply directly to employers.`;
+  const description = `Browse active jobs in ${emirate.name}, UAE. Find full-time, remote, contract, and freelance opportunities across all industries. No signup required — apply directly to employers.`;
 
   return {
     title,
@@ -50,7 +50,7 @@ export default async function EmirateJobsPage({ params }: PageProps) {
   const schemas = [
     collectionPageSchema({
       name: `Jobs in ${emirate.name}, UAE`,
-      description: `Active tech jobs in ${emirate.name}, United Arab Emirates`,
+      description: `Active jobs in ${emirate.name}, United Arab Emirates`,
       url: pageUrl,
       numberOfItems: total,
     }),

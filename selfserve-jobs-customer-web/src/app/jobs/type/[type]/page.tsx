@@ -51,7 +51,7 @@ export default async function EmploymentTypePage({ params }: PageProps) {
   const schemas = [
     collectionPageSchema({
       name: `${employmentType.labelPlural} in UAE`,
-      description: `Active ${employmentType.label.toLowerCase()} tech jobs across the United Arab Emirates`,
+      description: `Active ${employmentType.label.toLowerCase()} jobs across the United Arab Emirates`,
       url: `/jobs/type/${typeSlug}`,
       numberOfItems: total,
     }),

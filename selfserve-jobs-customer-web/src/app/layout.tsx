@@ -30,34 +30,34 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://hirebridgeuae.com'
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'hirebridge — UAE Tech Jobs & Talent, No Signup Required',
+    default: 'hirebridge — UAE Jobs & Talent, No Signup Required',
     template: '%s | hirebridge',
   },
   description:
-    'hirebridge is a free UAE job board connecting tech talent with top companies in Dubai, Abu Dhabi, and across the Emirates. Post jobs or profiles without creating an account.',
+    'hirebridge is a free UAE job board connecting talent with top companies in Dubai, Abu Dhabi, and across the Emirates. Post jobs or profiles without creating an account.',
   keywords: [
     'UAE jobs',
     'Dubai jobs',
     'Abu Dhabi jobs',
-    'tech jobs UAE',
+    'jobs in UAE',
     'remote jobs UAE',
-    'software engineer jobs Dubai',
     'no signup job board',
     'free job posting UAE',
-    'Middle East tech careers',
+    'Middle East careers',
     'UAE hiring',
+    'Dubai careers',
   ],
   openGraph: {
     type: 'website',
     siteName: 'hirebridge',
-    title: 'hirebridge — UAE Tech Jobs & Talent, No Signup Required',
+    title: 'hirebridge — UAE Jobs & Talent, No Signup Required',
     description:
       'Free UAE job board. Post jobs and talent profiles without creating an account. No fees, no middlemen.',
     url: SITE_URL,
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'hirebridge — UAE Tech Jobs & Talent',
+    title: 'hirebridge — UAE Jobs & Talent',
     description:
       'Free UAE job board. Post jobs and talent profiles without creating an account. No fees, no middlemen.',
   },

@@ -9,7 +9,7 @@ export function organizationSchema() {
     url: SITE_URL,
     logo: `${SITE_URL}/logo.png`,
     description:
-      'A free, no-signup job board connecting tech talent with employers across the UAE. No fees, no algorithms, no middlemen.',
+      'A free, no-signup job board connecting talent with employers across the UAE. No fees, no algorithms, no middlemen.',
     foundingDate: '2026',
     founders: [
       { '@type': 'Person', name: 'Hussain Abbasi' },

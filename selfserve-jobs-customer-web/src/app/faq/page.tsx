@@ -29,7 +29,7 @@ const FAQ_SECTIONS: FaqSection[] = [
       {
         question: 'What is hirebridge?',
         answer:
-          "hirebridge is a free, talent-first jobs platform focused on the UAE tech market. It operates a dual model: professionals create talent profiles through a simple email-verification flow (no account needed), while recruiters register for a verified account to post jobs and access sensitive candidate data. Browsing is always free and open to everyone.",
+          "hirebridge is a free, talent-first job platform built for the UAE's workforce. It operates a dual model: professionals create talent profiles through a simple email-verification flow (no account needed), while recruiters register for a verified account to post jobs and access sensitive candidate data. Browsing is always free and open to everyone.",
         links: [{ label: 'Learn more about us', href: '/about' }],
       },
       {
@@ -90,17 +90,17 @@ const FAQ_SECTIONS: FaqSection[] = [
       {
         question: 'What are free zones in the UAE, and do they matter for jobs?',
         answer:
-          'Free zones are special economic areas (like Dubai Internet City, DIFC, Abu Dhabi Global Market) where companies get 100% foreign ownership and other benefits. Many tech and financial companies operate from free zones. As an employee, being in a free zone vs. mainland company generally makes little practical difference — both offer standard UAE employment contracts and visa sponsorship.',
+          'Free zones are special economic areas (like Dubai Internet City, DIFC, Abu Dhabi Global Market) where companies get 100% foreign ownership and other benefits. Many companies across technology, finance, media, and consulting operate from free zones. As an employee, being in a free zone vs. mainland company generally makes little practical difference — both offer standard UAE employment contracts and visa sponsorship.',
       },
       {
         question: 'What is the UAE Golden Visa, and can a job help me get one?',
         answer:
-          'The UAE Golden Visa is a long-term residency visa (5 or 10 years) available to exceptional professionals, investors, and entrepreneurs. Employed tech professionals earning above AED 30,000/month with a recognised employer may qualify under the "skilled employees" category. Your employer would typically assist with this application.',
+          'The UAE Golden Visa is a long-term residency visa (5 or 10 years) available to exceptional professionals, investors, and entrepreneurs. Employed professionals earning above AED 30,000/month with a recognised employer may qualify under the "skilled employees" category. Your employer would typically assist with this application.',
       },
       {
-        question: 'What is the average tech salary in Dubai?',
+        question: 'What are professional salaries like in Dubai?',
         answer:
-          'Tech salaries in Dubai are tax-free and highly competitive. A mid-level software engineer earns approximately AED 15,000–25,000 per month (~$4,000–$6,800). Senior engineers and tech leads often earn AED 25,000–45,000. Product managers typically earn AED 20,000–40,000. All figures are gross income — there is no income tax in the UAE.',
+          'Dubai salaries are tax-free and highly competitive by global standards. A mid-level professional typically earns AED 12,000–25,000 per month depending on industry and seniority. Finance and consulting roles often command AED 20,000–40,000+. Sales, operations, and HR roles typically range from AED 8,000–20,000. All figures are gross income — there is no income tax in the UAE.',
       },
       {
         question: 'Can I work remotely from the UAE?',
@@ -165,9 +165,9 @@ const FAQ_SECTIONS: FaqSection[] = [
     title: 'Working Across the UAE Emirates',
     items: [
       {
-        question: 'Which UAE emirate has the most tech jobs?',
+        question: 'Which UAE emirate has the most jobs?',
         answer:
-          'Dubai has by far the largest tech job market in the UAE, home to Dubai Internet City (1,600+ tech companies), DIFC (fintech hub), and a dense startup ecosystem. Abu Dhabi is the fastest-growing alternative, particularly for AI, government technology, and fintech through Hub71 and ADGM.',
+          'Dubai has by far the largest job market in the UAE, with the most active hiring across all industries — from finance and hospitality to sales, logistics, and professional services. Abu Dhabi is the fastest-growing alternative, with strong demand in government, healthcare, and the energy sector. Sharjah is growing steadily, particularly in manufacturing, education, and media.',
         links: [
           { label: 'Jobs in Dubai', href: '/jobs/in/dubai' },
           { label: 'Jobs in Abu Dhabi', href: '/jobs/in/abu-dhabi' },
@@ -211,7 +211,7 @@ export default function FaqPage() {
               Frequently Asked <em>Questions</em>
             </h1>
             <p className="text-text-muted text-base">
-              Everything you need to know about finding tech jobs in the UAE, visa sponsorship, working across the Emirates, and how hirebridge works.
+              Everything you need to know about finding jobs in the UAE, visa sponsorship, working across the Emirates, and how hirebridge works.
             </p>
           </div>
         </div>

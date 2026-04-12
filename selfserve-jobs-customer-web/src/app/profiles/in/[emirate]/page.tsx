@@ -21,8 +21,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const emirate = getEmirateBySlug(emirateSlug);
   if (!emirate) return { title: 'Not Found' };
 
-  const title = `Tech Talent in ${emirate.name}, UAE`;
-  const description = `Browse available tech talent based in ${emirate.name}, UAE. Find software engineers, product managers, designers, and more. No signup required.`;
+  const title = `Talent in ${emirate.name}, UAE`;
+  const description = `Browse available talent based in ${emirate.name}, UAE. Find professionals across all industries and sectors. No signup required.`;
 
   return {
     title,
@@ -51,7 +51,7 @@ export default async function EmirateTalentPage({ params }: PageProps) {
     <>
       <JsonLd
         data={collectionPageSchema({
-          name: `Tech Talent in ${emirate.name}, UAE`,
+          name: `Talent in ${emirate.name}, UAE`,
           description: `Professionals available for hire in ${emirate.name}, United Arab Emirates`,
           url: `/profiles/in/${emirateSlug}`,
           numberOfItems: total,
@@ -70,7 +70,7 @@ export default async function EmirateTalentPage({ params }: PageProps) {
               Available for Hire · {emirate.name} · UAE
             </span>
             <h1 className="font-heading text-3xl sm:text-4xl text-primary mb-3">
-              Tech Talent in <em>{emirate.name}</em>
+              Talent in <em>{emirate.name}</em>
             </h1>
             <p className="text-text-muted text-base">
               {total > 0

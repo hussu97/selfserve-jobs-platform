@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 
 export const runtime = 'edge';
-export const alt = 'hirebridge — UAE Tech Jobs & Talent, No Signup Required';
+export const alt = 'hirebridge — UAE Jobs & Talent, No Signup Required';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -50,7 +50,7 @@ export default function Image() {
               marginBottom: '20px',
             }}
           >
-            UAE Tech Jobs &amp; Talent
+            UAE Jobs &amp; Talent
           </p>
           <h1
             style={{
@@ -79,7 +79,7 @@ export default function Image() {
 
         {/* Tag pills row */}
         <div style={{ display: 'flex', gap: '10px', marginBottom: '32px', flexWrap: 'wrap' }}>
-          {['Dubai Jobs', 'Abu Dhabi', 'Tech Roles', 'Remote UAE', 'Talent Profiles'].map((tag) => (
+          {['Dubai Jobs', 'Abu Dhabi', 'All Industries', 'Remote UAE', 'Talent Profiles'].map((tag) => (
             <span
               key={tag}
               style={{
