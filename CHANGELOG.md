@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+- **Country-first city selection in job and profile creation forms** — country must now be selected before city; city field renders as a dropdown of major cities for the chosen country (covering all Middle East countries and all major world countries), with "Other" as the last option which reveals a freetext input stored as the city value; unsupported countries fall back directly to a freetext input; selecting a new country resets the city field
+- **`CitySelect` component** (`src/components/shared/CitySelect.tsx`) — new shared component encapsulating the country-aware city dropdown + freetext fallback logic
+- **`city-data.ts` constant** (`src/lib/city-data.ts`) — comprehensive `COUNTRY_CITIES` mapping from ISO country codes to arrays of major cities for all countries in the platform, with especially thorough Middle East coverage
+- **Added missing Middle East countries** to the `COUNTRIES` list in `constants.ts`: Bahrain (BH), Iran (IR), Iraq (IQ), Kuwait (KW), Oman (OM), Palestine (PS), Qatar (QA), Syria (SY), Yemen (YE)
+
 ### Changed
 - **Email verification messages now mention spam/junk folder** — all "check your email" prompts across the frontend (verify page, profile creation, login, recruiter registration, admin login) now include a note to check the spam or junk folder if the email isn't visible
 
