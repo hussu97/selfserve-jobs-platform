@@ -18,112 +18,142 @@ export default async function HomePage() {
     <div>
 
       {/* ── Hero ─────────────────────────────────────────── */}
-      <section className="hero-gradient relative overflow-hidden">
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-28 sm:py-36 lg:py-48">
-          <div className="max-w-3xl mx-auto text-center">
-            {/* Eyebrow */}
-            <div className="anim-fade-up inline-flex items-center gap-2 mb-7 px-4 py-1.5 rounded-full bg-surface shadow-ambient text-xs font-semibold uppercase tracking-widest text-text-muted">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block" />
-              UAE&apos;s Talent-First Tech Platform
-            </div>
-
-            {/* Headline */}
-            <h1 className="anim-fade-up anim-delay-1 font-heading text-5xl sm:text-6xl lg:text-7xl leading-tight text-primary mb-6">
-              Find <span className="italic">Extraordinary</span> Talent.
-            </h1>
-
-            {/* Subheading */}
-            <p className="anim-fade-up anim-delay-2 text-lg text-text-muted leading-relaxed mb-10 max-w-xl mx-auto">
-              Talent profiles are free and friction-free. Verified recruiters get full access to resumes and contact details.
-            </p>
-
-            {/* CTAs — talent first */}
-            <div className="anim-fade-up anim-delay-3 flex flex-col sm:flex-row items-stretch sm:items-center sm:justify-center gap-3">
-              <Link
-                href="/profiles"
-                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full text-white font-semibold text-sm bg-primary-btn shadow-ambient transition-all hover:bg-primary hover:shadow-ambient-hover active:scale-[0.98]"
-              >
-                <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                  <path d="M7 8a3 3 0 100-6 3 3 0 000 6zM14.5 9a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM1.615 16.428a1.224 1.224 0 01-.569-1.175 6.002 6.002 0 0111.908 0c.058.467-.172.92-.57 1.174A9.953 9.953 0 017 17a9.953 9.953 0 01-5.385-1.572zM14.5 16h-.106c.07-.297.088-.611.048-.933a7.47 7.47 0 00-1.588-3.755 4.502 4.502 0 015.874 2.636.818.818 0 01-.36.98A7.465 7.465 0 0114.5 16z" />
-                </svg>
-                Browse Talent
-              </Link>
-              <Link
-                href="/jobs"
-                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full font-semibold text-sm text-secondary bg-surface shadow-ambient transition-all hover:bg-secondary hover:text-white hover:shadow-ambient-hover active:scale-[0.98]"
-              >
-                <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                  <path fillRule="evenodd" d="M6 3.75A2.75 2.75 0 018.75 1h2.5A2.75 2.75 0 0114 3.75v.443c.572.055 1.14.122 1.706.2C17.053 4.582 18 5.75 18 7.07v3.469c0 1.126-.694 2.191-1.83 2.54-1.952.599-4.024.921-6.17.921s-4.219-.322-6.17-.921C2.694 12.73 2 11.665 2 10.539V7.07c0-1.32.947-2.489 2.294-2.676A41.047 41.047 0 016 4.193V3.75zm6.5 0v.325a41.622 41.622 0 00-5 0V3.75c0-.69.56-1.25 1.25-1.25h2.5c.69 0 1.25.56 1.25 1.25zM10 10a1 1 0 00-1 1v.01a1 1 0 001 1h.01a1 1 0 001-1V11a1 1 0 00-1-1H10z" clipRule="evenodd" />
-                  <path d="M3 15.055v-.684c.126.053.255.1.39.142 2.092.642 4.313.987 6.61.987 2.297 0 4.518-.345 6.61-.987.135-.041.264-.089.39-.142v.684c0 1.347-.985 2.53-2.363 2.686a41.454 41.454 0 01-9.274 0C3.985 17.585 3 16.402 3 15.055z" />
-                </svg>
-                Browse Jobs
-              </Link>
-            </div>
-
-            {/* Stats — profiles first */}
-            {stats && (
-              <div className="anim-fade-up anim-delay-4 flex items-center justify-center gap-4 mt-10">
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="w-2 h-2 rounded-full bg-secondary/70 inline-block" />
-                  <span className="font-semibold text-text-main">{stats.active_profiles.toLocaleString()}</span>
-                  <span className="text-text-muted">active profiles</span>
-                </div>
-                <span className="text-border">·</span>
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="w-2 h-2 rounded-full bg-primary/70 inline-block" />
-                  <span className="font-semibold text-text-main">{stats.active_jobs.toLocaleString()}</span>
-                  <span className="text-text-muted">active jobs</span>
-                </div>
-              </div>
-            )}
-          </div>
+      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden py-28 sm:py-36" style={{ backgroundColor: '#121211' }}>
+        {/* Flowing UAE Flag Background */}
+        <div className="absolute inset-0 z-0 opacity-40 flag-weave">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            alt=""
+            aria-hidden="true"
+            src="/uae-flag-background.png"
+            className="w-full h-full object-cover"
+          />
         </div>
-      </section>
+        {/* Top/bottom fade to dark */}
+        <div
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{ background: 'linear-gradient(to bottom, #121211 0%, transparent 25%, transparent 75%, #121211 100%)' }}
+        />
 
-      {/* ── CTA strip ────────────────────────────────────── */}
-      <section className="bg-primary py-20 sm:py-28">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="font-heading text-4xl sm:text-5xl text-white mb-4">
-            Ready to get <span className="italic">started?</span>
-          </h2>
-          <p className="text-white/70 mb-10 text-lg">
-            Free to post · Free to browse · Always
+        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          {/* Eyebrow */}
+          <div
+            className="anim-fade-up inline-flex items-center gap-2 mb-8 px-5 py-2 rounded-full text-xs font-semibold uppercase tracking-widest"
+            style={{ backgroundColor: 'rgba(56,75,59,0.45)', backdropFilter: 'blur(10px)', color: '#b6ccb7', border: '1px solid rgba(182,204,183,0.2)' }}
+          >
+            <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ backgroundColor: '#8BA888' }} />
+            Supporting our community in times of change
+          </div>
+
+          {/* Headline */}
+          <h1
+            className="anim-fade-up anim-delay-1 font-heading text-5xl sm:text-7xl lg:text-8xl leading-[1.08] tracking-tight mb-8"
+            style={{ color: '#fcf9f5' }}
+          >
+            Your Talent is<br />
+            <em className="italic" style={{ color: '#b6ccb7' }}>Still Your Power.</em>
+          </h1>
+
+          {/* Subheading */}
+          <p
+            className="anim-fade-up anim-delay-2 text-lg sm:text-xl leading-relaxed mb-12 max-w-3xl mx-auto font-light"
+            style={{ color: '#c3c8c0' }}
+          >
+            To those in the UAE whose careers have been touched by recent events: you are not alone.
+            A place where talent is discovered and opportunities are real — no algorithms, no spam, always free.
           </p>
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center sm:justify-center gap-3">
+
+          {/* CTAs */}
+          <div className="anim-fade-up anim-delay-3 flex flex-col sm:flex-row items-stretch sm:items-center sm:justify-center gap-4">
             <Link
               href="/profiles/new"
-              className="inline-flex items-center justify-center px-7 py-3.5 rounded-full text-primary font-semibold text-sm bg-white shadow-ambient transition-all hover:bg-surface hover:shadow-ambient-hover active:scale-[0.98]"
+              className="inline-flex items-center justify-center px-10 py-4 rounded-2xl text-base font-semibold transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+              style={{ backgroundColor: '#384B3B', color: '#fcf9f5', boxShadow: '0 8px 24px rgba(0,0,0,0.4)' }}
             >
-              Create a Profile
+              Post your Story
             </Link>
             <Link
-              href="/recruiter/register"
-              className="inline-flex items-center justify-center px-7 py-3.5 rounded-full font-semibold text-sm text-white bg-white/10 transition-all hover:bg-white/20 active:scale-[0.98]"
+              href="/jobs"
+              className="inline-flex items-center justify-center px-10 py-4 rounded-2xl text-base font-semibold transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+              style={{ backgroundColor: 'rgba(252,249,245,0.07)', backdropFilter: 'blur(10px)', color: '#fcf9f5', border: '1px solid rgba(195,200,192,0.25)' }}
             >
-              Post a Job
+              Discover Roles
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ── Why we built this (summary) ──────────────────── */}
-      <section className="bg-surface">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
-          <p className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-4">
-            Our story
-          </p>
-          <h2 className="font-heading text-3xl sm:text-4xl text-primary mb-8">
-            Why we built <em>this</em>
-          </h2>
-          <p className="text-base leading-relaxed text-text-muted mb-6">
-            Economic disruption across the Middle East is real — people are losing jobs, facing salary cuts, and watching
-            stability erode. We built hirebridge as a focused response: a place where talent can be discovered and companies
-            post real jobs, without algorithms, spam, or pay-to-rank. Talent profiles are friction-free. Recruiters
-            register once and get verified access to contact details and resumes. Free to post · Free to browse · Always.
-          </p>
-          <Link href="/about" className="text-sm font-semibold text-secondary hover:text-secondary-hover transition-colors">
-            Read our story →
-          </Link>
+      {/* ── Browse ───────────────────────────────────────── */}
+      <section className="bg-surface py-20 sm:py-28">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <p className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-3">
+              Explore the platform
+            </p>
+            <h2 className="font-heading text-4xl sm:text-5xl text-primary">
+              Where would you like to <em>go?</em>
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {/* Browse Talent */}
+            <Link
+              href="/profiles"
+              className="group bg-surface-lowest shadow-ambient rounded-2xl p-10 flex flex-col gap-6 hover:-translate-y-1 hover:shadow-ambient-hover transition-all"
+            >
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-2">Open to work</p>
+                  <h3 className="font-heading text-3xl sm:text-4xl text-primary">
+                    Browse <em>Talent</em>
+                  </h3>
+                </div>
+                <svg className="h-6 w-6 text-text-muted group-hover:text-primary transition-colors mt-1 shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fillRule="evenodd" d="M5.22 14.78a.75.75 0 001.06 0l7.25-7.25a.75.75 0 00-1.06-1.06L5.22 13.72a.75.75 0 000 1.06z" clipRule="evenodd" />
+                  <path fillRule="evenodd" d="M7.25 6.5a.75.75 0 01.75-.75h5.5a.75.75 0 01.75.75v5.5a.75.75 0 01-1.5 0V7.25H8a.75.75 0 01-.75-.75z" clipRule="evenodd" />
+                </svg>
+              </div>
+              {stats && (
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-secondary/70 inline-block shrink-0" />
+                  <span className="font-semibold text-text-main">{stats.active_profiles.toLocaleString()}</span>
+                  <span className="text-text-muted text-sm">active profiles</span>
+                </div>
+              )}
+              <p className="text-sm text-text-muted leading-relaxed">
+                Discover verified professionals actively seeking opportunities across the UAE.
+              </p>
+            </Link>
+
+            {/* Browse Jobs */}
+            <Link
+              href="/jobs"
+              className="group bg-surface-lowest shadow-ambient rounded-2xl p-10 flex flex-col gap-6 hover:-translate-y-1 hover:shadow-ambient-hover transition-all"
+            >
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-2">Latest listings</p>
+                  <h3 className="font-heading text-3xl sm:text-4xl text-primary">
+                    Discover <em>Roles</em>
+                  </h3>
+                </div>
+                <svg className="h-6 w-6 text-text-muted group-hover:text-primary transition-colors mt-1 shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fillRule="evenodd" d="M5.22 14.78a.75.75 0 001.06 0l7.25-7.25a.75.75 0 00-1.06-1.06L5.22 13.72a.75.75 0 000 1.06z" clipRule="evenodd" />
+                  <path fillRule="evenodd" d="M7.25 6.5a.75.75 0 01.75-.75h5.5a.75.75 0 01.75.75v5.5a.75.75 0 01-1.5 0V7.25H8a.75.75 0 01-.75-.75z" clipRule="evenodd" />
+                </svg>
+              </div>
+              {stats && (
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-primary/70 inline-block shrink-0" />
+                  <span className="font-semibold text-text-main">{stats.active_jobs.toLocaleString()}</span>
+                  <span className="text-text-muted text-sm">active jobs</span>
+                </div>
+              )}
+              <p className="text-sm text-text-muted leading-relaxed">
+                Verified opportunities from vetted companies — no spam, no pay-to-rank, always free.
+              </p>
+            </Link>
+          </div>
         </div>
       </section>
 
