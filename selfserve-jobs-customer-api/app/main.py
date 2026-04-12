@@ -140,12 +140,27 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 
+def _make_json_safe(obj: object) -> object:
+    """Recursively convert non-JSON-serialisable values (bytes, Exception, etc.) to strings."""
+    if isinstance(obj, bytes):
+        return obj.decode("utf-8", errors="replace")
+    if isinstance(obj, dict):
+        return {k: _make_json_safe(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [_make_json_safe(v) for v in obj]
+    try:
+        import json
+
+        json.dumps(obj)
+        return obj
+    except TypeError:
+        return str(obj)
+
+
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
     """Log 422 validation errors with field details for easier debugging."""
-    # str() the ctx values so non-serializable objects (e.g. ValueError) don't break JSON serialisation.
-    errors = exc.errors()
-    safe_errors = [{**e, "ctx": {k: str(v) for k, v in e["ctx"].items()}} if "ctx" in e else e for e in errors]
+    safe_errors = _make_json_safe(exc.errors())
     logger.warning(
         "Request validation failed: %s %s — %s",
         request.method,
