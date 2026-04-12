@@ -12,6 +12,7 @@ import { Select } from '@/components/ui/Select';
 import { StatusBanner } from '@/components/shared/StatusBanner';
 import { SkillTag } from '@/components/shared/SkillTag';
 import { CountrySelect } from '@/components/shared/CountrySelect';
+import { CitySelect } from '@/components/shared/CitySelect';
 import { useToast } from '@/context/ToastContext';
 import {
   validateToken,
@@ -409,17 +410,18 @@ function ManageContent() {
                 onChange={(e) => setJobField('company_name', e.target.value)}
                 required
               />
-              <Input
-                label="City"
-                value={jobForm.company_city ?? ''}
-                onChange={(e) => setJobField('company_city', e.target.value)}
-                required
-              />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
               <CountrySelect
                 value={jobForm.company_country ?? ''}
                 onChange={(e) => setJobField('company_country', e.target.value)}
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+              <CitySelect
+                label="City"
+                country={jobForm.company_country ?? ''}
+                value={jobForm.company_city ?? ''}
+                onChange={(city) => setJobField('company_city', city)}
+                required
               />
               <Input
                 label="Application deadline (optional)"
@@ -552,15 +554,16 @@ function ManageContent() {
               />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-              <Input
-                label="Current city"
-                value={profileForm.current_city ?? ''}
-                onChange={(e) => setProfileField('current_city', e.target.value)}
-                required
-              />
               <CountrySelect
                 value={profileForm.current_country ?? ''}
                 onChange={(e) => setProfileField('current_country', e.target.value)}
+              />
+              <CitySelect
+                label="Current city"
+                country={profileForm.current_country ?? ''}
+                value={profileForm.current_city ?? ''}
+                onChange={(city) => setProfileField('current_city', city)}
+                required
               />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">

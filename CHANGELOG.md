@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+- **`CitySelect` added to edit job and edit profile forms** — the city field in `/manage/[entityType]/[code]` now uses the `CitySelect` component (country-aware dropdown with "Other" freetext fallback) instead of a plain text input for both job (`company_city`) and profile (`current_city`); country field is now ordered before the city field in both forms so country is always selected first
+
 ### Fixed
 - **ESLint `react-hooks/set-state-in-effect` error in `CitySelect`** — replaced the `useEffect` that called `setShowOther(false)` on country change with derived state: `showOther` is now computed as `showOtherForCountry === country`, so it resets automatically without an effect when the country prop changes; removed unused `useEffect` import
 
