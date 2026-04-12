@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+- **Edit profile section numbers now match create profile** — restructured the edit profile form in `/manage/[entityType]/[code]` from 3 combined sections into 5 separate sections (01 Personal information, 02 Availability, 03 Professional brief, 04 Key skills, 05 Resume) to match the section numbering on the create profile form.
+
 ### Added
 - **Resume management in profile edit page** — the manage profile page (`/manage/profile/[code]`) now has a "Resume" section (Section 03) that shows the current resume status and lets the owner replace or remove it. Uploading uses the existing signed-URL GCS flow with a progress bar identical to the create-profile form.
 
