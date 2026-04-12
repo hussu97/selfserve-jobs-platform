@@ -63,7 +63,7 @@ export default function LoginPage() {
               </div>
               <h2 className="font-heading text-xl text-primary mb-2">Check your email</h2>
               <p className="text-sm text-text-muted mb-6">
-                We sent a sign-in link to <strong>{email}</strong>. It expires in 15 minutes.
+                We sent a sign-in link to <strong>{email}</strong>. It expires in 15 minutes. If you don&apos;t see it, check your spam or junk folder.
               </p>
               <button
                 onClick={() => { setSent(false); setEmail(''); }}

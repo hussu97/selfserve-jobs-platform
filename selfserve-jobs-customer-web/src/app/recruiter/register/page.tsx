@@ -87,7 +87,7 @@ export default function RecruiterRegisterPage() {
             We&apos;ve sent a verification link to <strong>{form.email}</strong>.
           </p>
           <p className="text-[var(--color-text-muted)]">
-            Once verified, your application will be reviewed by our team. We&apos;ll notify you when approved — typically within 1–2 business days.
+            Once verified, your application will be reviewed by our team. We&apos;ll notify you when approved — typically within 1–2 business days. If you don&apos;t see the email, check your spam or junk folder.
           </p>
         </div>
       </div>
