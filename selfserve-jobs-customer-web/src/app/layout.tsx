@@ -54,12 +54,14 @@ export const metadata: Metadata = {
     description:
       'Free UAE job board. Post jobs and talent profiles without creating an account. No fees, no middlemen.',
     url: SITE_URL,
+    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'hirebridge — UAE Jobs & Talent',
     description:
       'Free UAE job board. Post jobs and talent profiles without creating an account. No fees, no middlemen.',
+    images: ['/og-image.png'],
   },
   robots: {
     index: true,

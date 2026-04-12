@@ -7,7 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Changed
-- **Redesigned OG image** (`opengraph-image.tsx`) — cleaner layout with proper headline hierarchy, "Find Extraordinary Talent" with italic terracotta emphasis, sage green tag pills, and domain lockup; removes old bordered bottom bar
+- **OG image replaced with real homepage screenshot** — removed dynamic `opengraph-image.tsx` generator; replaced with a static `public/og-image.png` (1200×630 Playwright screenshot of the live homepage); `layout.tsx` now explicitly sets `og:image` and `twitter:image` to this file
 
 ### Fixed
 - **Umami analytics events not recorded for UAE visitors** — UAE ISPs (e& / du) use deep packet inspection that matches on `/stats/api/send` URL patterns and Umami's JSON payload shape. Replaced the client-side Next.js rewrite for event collection with a server-side Next.js API route (`src/app/api/send/route.ts`) that receives events from the browser and forwards them to Umami from the server, preserving the user's real IP via `X-Forwarded-For` for accurate geo attribution. Also renamed the script proxy path from `/stats/script.js` to `/lib/app.js` to avoid URL pattern matching on "stats".
