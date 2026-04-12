@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **"Ready to get started?" CTA strip replaced with Browse section** — new two-card grid ("Browse Talent" / "Discover Roles") with live active profile and job counts, replacing both the primary CTA strip and the inline browse buttons that were previously in the hero
 
 ### Added
+- **Quick-add skill pills on job and profile forms** — a "Quick add" row of 10 pill buttons appears below the skills text input on both the job and profile creation forms; pills show the top 10 resume skills relevant to the Middle East market (Microsoft Office, Project Management, Data Analysis, Communication, Customer Service, Leadership, Sales, Problem Solving, Teamwork, Bilingual AR/EN); pills disappear as skills are added to prevent duplicates
 - **`@vercel/speed-insights` reinstalled** — package reinstalled and `<SpeedInsights />` component re-added to `layout.tsx`; Vercel Speed Insights retained for Core Web Vitals monitoring while Vercel Analytics remains removed
 
 ### Removed

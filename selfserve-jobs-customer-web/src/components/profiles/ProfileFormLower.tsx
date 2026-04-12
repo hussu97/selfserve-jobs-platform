@@ -108,6 +108,26 @@ export default function ProfileFormLower({
             Add
           </Button>
         </div>
+        {(() => {
+          const suggestions = ['Microsoft Office', 'Project Management', 'Data Analysis', 'Communication', 'Customer Service', 'Leadership', 'Sales', 'Problem Solving', 'Teamwork', 'Bilingual (AR/EN)'];
+          const remaining = suggestions.filter((s) => !(form.key_skills ?? []).map((k) => k.toLowerCase()).includes(s.toLowerCase()));
+          if (remaining.length === 0) return null;
+          return (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-text-muted shrink-0">Quick add</span>
+              {remaining.map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => addSkill(s)}
+                  className="px-3 py-1 rounded-full text-[11px] font-medium uppercase tracking-wider bg-surface text-accent-dark border border-accent/40 hover:bg-accent/10 hover:border-accent transition-colors"
+                >
+                  + {s}
+                </button>
+              ))}
+            </div>
+          );
+        })()}
         {errors.key_skills && <p className="text-xs text-red-600">{errors.key_skills}</p>}
         {(form.key_skills?.length ?? 0) > 0 && (
           <div className="flex flex-wrap gap-2 bg-surface rounded-2xl p-4">
