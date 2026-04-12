@@ -112,6 +112,8 @@ async def get_job_detail(db: AsyncSession, job_code: str) -> Job:
     """
     await db.execute(update(Job).where(Job.job_code == job_code).values(view_count=Job.view_count + 1))
     job = await get_job_by_code(db, job_code)
+    if job.status in ("expired", "removed"):
+        raise HTTPException(status_code=status.HTTP_410_GONE, detail="Job listing is no longer available")
     if job.status not in ("active", "pending_verification"):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
     return job
@@ -248,6 +250,11 @@ async def remove_job(
     job.status = "removed"
     job.updated_at = datetime.now(UTC)
     await db.flush()
+
+    from app.config import get_settings as _get_settings
+    from app.services.indexing_service import notify_url_deleted
+
+    notify_url_deleted(f"{_get_settings().frontend_url}/jobs/{job_code}")
     return job
 
 

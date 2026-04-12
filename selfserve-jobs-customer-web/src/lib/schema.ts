@@ -66,6 +66,7 @@ export function jobPostingSchema(job: {
   contact_email?: string | null;
   contact_url?: string | null;
   key_skills?: string[];
+  company_logo_url?: string | null;
 }) {
   const employmentTypeMap: Record<string, string> = {
     full_time: 'FULL_TIME',
@@ -85,6 +86,7 @@ export function jobPostingSchema(job: {
     hiringOrganization: {
       '@type': 'Organization',
       name: job.company_name,
+      ...(job.company_logo_url && { logo: job.company_logo_url }),
     },
     jobLocation: {
       '@type': 'Place',

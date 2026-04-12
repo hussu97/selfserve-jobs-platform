@@ -104,6 +104,8 @@ async def get_profile_detail(db: AsyncSession, profile_code: str) -> Profile:
         update(Profile).where(Profile.profile_code == profile_code).values(view_count=Profile.view_count + 1)
     )
     profile = await get_profile_by_code(db, profile_code)
+    if profile.status in ("expired", "removed"):
+        raise HTTPException(status_code=status.HTTP_410_GONE, detail="Profile listing is no longer available")
     if profile.status not in ("active", "pending_verification"):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
     return profile
@@ -266,6 +268,10 @@ async def remove_profile(
         except Exception as exc:
             logger.warning("Failed to delete resume file %s: %s", resume_path, exc)
 
+    from app.config import get_settings as _get_settings
+    from app.services.indexing_service import notify_url_deleted
+
+    notify_url_deleted(f"{_get_settings().frontend_url}/profiles/{profile_code}")
     return profile
 
 

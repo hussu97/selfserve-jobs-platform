@@ -147,10 +147,10 @@ async def test_get_nonexistent_profile_returns_404(client):
     assert response.status_code == 404
 
 
-async def test_get_removed_profile_returns_404(client, db_session):
+async def test_get_removed_profile_returns_410(client, db_session):
     await _make_profile(db_session, profile_code="removedpr1", status="removed")
     response = await client.get("/api/v1/profiles/removedpr1")
-    assert response.status_code == 404
+    assert response.status_code == 410
 
 
 # ---------------------------------------------------------------------------

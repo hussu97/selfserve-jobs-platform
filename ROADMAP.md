@@ -65,9 +65,9 @@ Organized into phases by criticality. Each phase should be completed before star
 - [x] **Add pre-deploy health check in CI** — `deploy-api.yml` polls `/api/v1/health` up to 5 times after deploy.
 - [x] **Add secrets validation step in CI** — `deploy-api.yml` validates all 4 required GCP secrets before auth.
 - [ ] **Restrict GCS CORS** — Current config allows `origin: ["*"]`. Replace with actual frontend domain(s). (Requires GCS bucket config change — done via `gsutil` or Console, not code.)
-- [ ] **Disable interactive API docs in production** — `/api/docs`, `/api/redoc`, and `/api/openapi.json` are publicly accessible. Gate behind admin auth or disable entirely in production via `docs_url=None` when `ENVIRONMENT=production`.
-- [ ] **Add `Referrer-Policy` security header** — Missing from security headers middleware. Add `Referrer-Policy: strict-origin-when-cross-origin` to prevent leaking full URLs to third parties.
-- [ ] **Add `Permissions-Policy` security header** — Restrict browser features not used by the platform (camera, microphone, geolocation, payment) via `Permissions-Policy` header.
+- [x] **Disable interactive API docs in production** — `/api/docs`, `/api/redoc`, and `/api/openapi.json` are publicly accessible. Gate behind admin auth or disable entirely in production via `docs_url=None` when `ENVIRONMENT=production`.
+- [x] **Add `Referrer-Policy` security header** — Missing from security headers middleware. Add `Referrer-Policy: strict-origin-when-cross-origin` to prevent leaking full URLs to third parties.
+- [x] **Add `Permissions-Policy` security header** — Restrict browser features not used by the platform (camera, microphone, geolocation, payment) via `Permissions-Policy` header.
 
 ### Health & Observability
 
@@ -144,10 +144,10 @@ Organized into phases by criticality. Each phase should be completed before star
 
 ### SEO Enhancements
 
-- [ ] **Integrate Google Indexing API** — Use `URL_UPDATED` / `URL_DELETED` API calls when listings are created, verified, or expired. Gets new listings into Google for Jobs within minutes instead of waiting for crawl cycles.
-- [ ] **Return 410 Gone for expired listings** — Expired listing URLs currently return 404 or redirect. Return HTTP 410 so search engines deindex stale results faster.
-- [ ] **Add `hiringOrganization.logo` to JobPosting JSON-LD** — If companies provide a logo URL, include it in structured data for richer Google for Jobs display.
-- [ ] **Add canonical URLs with pagination** — Browse pages lack `rel="canonical"` with page parameter handling. Add to prevent duplicate content across paginated results.
+- [x] **Integrate Google Indexing API** — Use `URL_UPDATED` / `URL_DELETED` API calls when listings are created, verified, or expired. Gets new listings into Google for Jobs within minutes instead of waiting for crawl cycles.
+- [x] **Return 410 Gone for expired listings** — Expired and removed listing URLs now return HTTP 410 from the API; frontend shows a friendly "listing no longer available" page with `noindex` metadata.
+- [x] **Add `hiringOrganization.logo` to JobPosting JSON-LD** — `company_logo_url` optional field added to Job model, schemas, and types; `jobPostingSchema` conditionally includes `logo` in `hiringOrganization`.
+- [x] **Add canonical URLs with pagination** — `CanonicalTag` client component dynamically updates `<link rel="canonical">` based on the current `?page=` param; added to `/jobs` and `/profiles` browse pages.
 
 ---
 

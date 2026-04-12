@@ -102,18 +102,33 @@ async def verify_code(
 
     # Activate ALL pending jobs and profiles for this user_code — one verified email
     # confirms ownership of the address, so all pending listings under it go live.
-    await db.execute(
+    job_result = await db.execute(
         update(Job)
         .where(and_(Job.user_code == verification.user_code, Job.status == "pending_verification"))
         .values(email_verified=True, status="active", updated_at=now)
+        .returning(Job.job_code)
     )
-    await db.execute(
+    activated_job_codes = [r[0] for r in job_result.all()]
+
+    profile_result = await db.execute(
         update(Profile)
         .where(and_(Profile.user_code == verification.user_code, Profile.status == "pending_verification"))
         .values(email_verified=True, status="active", updated_at=now)
+        .returning(Profile.profile_code)
     )
+    activated_profile_codes = [r[0] for r in profile_result.all()]
 
     await db.flush()
+
+    # Notify Google Indexing API for newly activated listings
+    from app.config import get_settings as _get_settings
+    from app.services.indexing_service import notify_url_updated
+
+    _settings = _get_settings()
+    for code in activated_job_codes:
+        notify_url_updated(f"{_settings.frontend_url}/jobs/{code}")
+    for code in activated_profile_codes:
+        notify_url_updated(f"{_settings.frontend_url}/profiles/{code}")
 
     # Fetch user email from user_sensitive for session creation and response
     from app.models.user_sensitive import UserSensitive

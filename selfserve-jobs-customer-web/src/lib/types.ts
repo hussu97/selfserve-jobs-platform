@@ -46,6 +46,7 @@ export interface Job {
   salary_min?: number;
   salary_max?: number;
   salary_currency?: SalaryCurrency;
+  company_logo_url?: string | null;
   recruiter_code?: string;
   status: string;
   view_count: number;

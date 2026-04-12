@@ -11,6 +11,7 @@ import { StatusBanner } from '@/components/shared/StatusBanner';
 import { getProfiles } from '@/lib/api';
 import type { ProfileFilters as ProfileFiltersType, ProfileListItem, RelocationPreference } from '@/lib/types';
 import { ITEMS_PER_PAGE } from '@/lib/constants';
+import { CanonicalTag } from '@/components/seo/CanonicalTag';
 
 function parseFiltersFromParams(searchParams: URLSearchParams): ProfileFiltersType {
   const filters: ProfileFiltersType = {};
@@ -145,6 +146,7 @@ function ProfilesContent() {
 
   return (
     <div>
+      <CanonicalTag />
       {/* Page header */}
       <div className="hero-gradient">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12">

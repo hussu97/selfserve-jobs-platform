@@ -52,6 +52,8 @@ class Job(Base):
     salary_min: Mapped[int | None] = mapped_column(Integer, nullable=True)
     salary_max: Mapped[int | None] = mapped_column(Integer, nullable=True)
     salary_currency: Mapped[str | None] = mapped_column(VARCHAR(3), nullable=True)
+    # Optional company logo URL (set via admin or recruiter portal)
+    company_logo_url: Mapped[str | None] = mapped_column(VARCHAR(2048), nullable=True)
     # Recruiter who posted this (null for legacy jobs)
     recruiter_code: Mapped[str | None] = mapped_column(VARCHAR(12), nullable=True)
     edit_token: Mapped[str] = mapped_column(VARCHAR(64), unique=True, nullable=False)

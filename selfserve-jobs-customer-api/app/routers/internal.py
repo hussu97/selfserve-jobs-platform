@@ -60,6 +60,14 @@ async def expire_listings(db: AsyncSession = Depends(get_db)):
         len(expired_profile_codes),
     )
 
+    # Notify Google Indexing API for expired listings
+    from app.services.indexing_service import notify_url_deleted
+
+    for code in expired_job_codes:
+        notify_url_deleted(f"{settings.frontend_url}/jobs/{code}")
+    for code in expired_profile_codes:
+        notify_url_deleted(f"{settings.frontend_url}/profiles/{code}")
+
     # --- Send 7-day expiry warnings ---
     # Window: expires_at is between (now + 7d - 1h) and (now + 7d + 1h)
     warn_from = now + timedelta(days=7) - timedelta(hours=1)

@@ -50,6 +50,8 @@ class JobCreate(BaseModel):
     salary_min: int | None = Field(None, ge=0)
     salary_max: int | None = Field(None, ge=0)
     salary_currency: SALARY_CURRENCIES | None = None
+    # Optional company logo URL
+    company_logo_url: str | None = Field(None, max_length=2048)
     # Honeypot field — must be empty
     website: str | None = Field(None, exclude=True)
 
@@ -108,6 +110,7 @@ class JobUpdate(BaseModel):
     salary_min: int | None = Field(None, ge=0)
     salary_max: int | None = Field(None, ge=0)
     salary_currency: SALARY_CURRENCIES | None = None
+    company_logo_url: str | None = Field(None, max_length=2048)
 
     @field_validator("contact_url", mode="after")
     @classmethod
@@ -153,6 +156,7 @@ class JobResponse(BaseModel):
     salary_min: int | None
     salary_max: int | None
     salary_currency: str | None
+    company_logo_url: str | None
     recruiter_code: str | None
     status: str
     view_count: int
@@ -184,6 +188,7 @@ class JobResponse(BaseModel):
                 "salary_min": getattr(obj, "salary_min", None),
                 "salary_max": getattr(obj, "salary_max", None),
                 "salary_currency": getattr(obj, "salary_currency", None),
+                "company_logo_url": getattr(obj, "company_logo_url", None),
                 "recruiter_code": getattr(obj, "recruiter_code", None),
                 "status": obj.status,
                 "view_count": obj.view_count,

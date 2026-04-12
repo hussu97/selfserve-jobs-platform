@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 - **Resume management in profile edit page** — the manage profile page (`/manage/profile/[code]`) now has a "Resume" section (Section 03) that shows the current resume status and lets the owner replace or remove it. Uploading uses the existing signed-URL GCS flow with a progress bar identical to the create-profile form.
 - **Security headers: `Referrer-Policy` and `Permissions-Policy`** — added `Referrer-Policy: strict-origin-when-cross-origin` and `Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()` to `security_headers_middleware` in `app/main.py`
+- **Google Indexing API integration** — new `app/services/indexing_service.py`; fire-and-forget `notify_url_updated` / `notify_url_deleted` calls hooked into `verification_service.verify_code` (on activation), `internal.expire_listings` (on expiry), `job_service.remove_job`, and `profile_service.remove_profile`. Enabled by setting `GOOGLE_INDEXING_CREDENTIALS` env var to a GCP service-account JSON string; no-op when unset
+- **410 Gone for expired/removed listings** — `get_job_detail` and `get_profile_detail` now raise HTTP 410 (instead of 404) when status is `expired` or `removed`; frontend job/profile detail pages render a friendly "listing no longer available" UI with `robots: noindex` metadata on 410 responses
+- **`company_logo_url` field on Job** — optional `VARCHAR(2048)` column added to `job` table (migration `0011_company_logo_url`); exposed on `JobCreate`, `JobUpdate`, `JobResponse` schemas, `Job` TypeScript type, and conditionally included as `hiringOrganization.logo` in `jobPostingSchema` JSON-LD
+- **Canonical URL tags on paginated browse pages** — `CanonicalTag` client component (`src/components/seo/CanonicalTag.tsx`) dynamically updates `<link rel="canonical">` based on the current `?page=` param; added to `/jobs` and `/profiles` browse pages; filter params intentionally excluded from canonical
 
 ### Fixed
 - **Profile update endpoint now supports resume replace/remove** — `PUT /api/v1/profiles/{code}` accepts an optional `resume_key` field: a GCS path string replaces the resume, an explicit `null` removes it (and deletes the old file from GCS), and omitting the field leaves the resume untouched. Previously the update endpoint silently ignored resume changes, causing the "error while updating resume" failure.
@@ -21,6 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Changed
 - **Disable API docs in production** — FastAPI `docs_url`, `redoc_url`, and `openapi_url` now resolve to `None` when `settings.is_production` is true, reducing attack surface on Cloud Run
 - **`CitySelect` added to edit job and edit profile forms** — the city field in `/manage/[entityType]/[code]` now uses the `CitySelect` component (country-aware dropdown with "Other" freetext fallback) instead of a plain text input for both job (`company_city`) and profile (`current_city`); country field is now ordered before the city field in both forms so country is always selected first
+- **Backend test updated** — `test_get_removed_profile_returns_404` renamed to `test_get_removed_profile_returns_410` and updated to assert 410
 
 ### Fixed
 - **ESLint `react-hooks/set-state-in-effect` error in `CitySelect`** — replaced the `useEffect` that called `setShowOther(false)` on country change with derived state: `showOther` is now computed as `showOtherForCountry === country`, so it resets automatically without an effect when the country prop changes; removed unused `useEffect` import

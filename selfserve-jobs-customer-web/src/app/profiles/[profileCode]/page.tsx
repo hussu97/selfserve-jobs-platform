@@ -7,7 +7,7 @@ import { ProfileCard } from '@/components/profiles/ProfileCard';
 import { Breadcrumbs } from '@/components/seo/Breadcrumbs';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { personSchema } from '@/lib/schema';
-import { getProfile, getProfiles } from '@/lib/api';
+import { getProfile, getProfiles, ApiError } from '@/lib/api';
 import { truncate } from '@/lib/utils';
 
 // Deduplicate the getProfile fetch between generateMetadata and the page component
@@ -35,10 +35,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         canonical: `/profiles/${profileCode}`,
       },
     };
-  } catch {
-    return {
-      title: 'Profile Not Found',
-    };
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 410) {
+      return { title: 'Profile No Longer Available', robots: { index: false } };
+    }
+    return { title: 'Profile Not Found' };
   }
 }
 
@@ -48,7 +49,24 @@ export default async function ProfileDetailPage({ params }: PageProps) {
   let profile;
   try {
     profile = await getProfileCached(profileCode);
-  } catch {
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 410) {
+      return (
+        <div className="hero-gradient min-h-[60vh] flex items-center justify-center">
+          <div className="max-w-md mx-auto px-4 text-center py-20">
+            <p className="text-xs uppercase tracking-widest text-text-muted mb-4">Profile Expired</p>
+            <h1 className="font-heading text-3xl text-primary mb-4">This profile is no longer available</h1>
+            <p className="text-text-muted mb-8">The listing has expired or been removed by the candidate.</p>
+            <Link
+              href="/profiles"
+              className="inline-block px-6 py-3 rounded-full bg-primary text-white font-medium text-sm hover:bg-primary-hover transition-colors"
+            >
+              Browse talent
+            </Link>
+          </div>
+        </div>
+      );
+    }
     notFound();
   }
 

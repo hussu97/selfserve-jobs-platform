@@ -11,6 +11,7 @@ import { StatusBanner } from '@/components/shared/StatusBanner';
 import { getJobs } from '@/lib/api';
 import type { JobFilters as JobFiltersType, JobListItem } from '@/lib/types';
 import { ITEMS_PER_PAGE } from '@/lib/constants';
+import { CanonicalTag } from '@/components/seo/CanonicalTag';
 
 function parseFiltersFromParams(searchParams: URLSearchParams): JobFiltersType {
   const filters: JobFiltersType = {};
@@ -141,6 +142,7 @@ function JobsContent() {
 
   return (
     <div>
+      <CanonicalTag />
       {/* Page header */}
       <div className="hero-gradient">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12">
