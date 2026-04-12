@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+- **Resume management in profile edit page** — the manage profile page (`/manage/profile/[code]`) now has a "Resume" section (Section 03) that shows the current resume status and lets the owner replace or remove it. Uploading uses the existing signed-URL GCS flow with a progress bar identical to the create-profile form.
+
+### Fixed
+- **Profile update endpoint now supports resume replace/remove** — `PUT /api/v1/profiles/{code}` accepts an optional `resume_key` field: a GCS path string replaces the resume, an explicit `null` removes it (and deletes the old file from GCS), and omitting the field leaves the resume untouched. Previously the update endpoint silently ignored resume changes, causing the "error while updating resume" failure.
+- **`ProfileUpdate` schema** — added `resume_key: str | None` field so the PUT body can carry resume changes through to the service layer.
+- **`UpdateProfileRequest` TypeScript type** — added `resume_key?: string | null` to match the new backend field.
+
 ### Changed
 - **`CitySelect` added to edit job and edit profile forms** — the city field in `/manage/[entityType]/[code]` now uses the `CitySelect` component (country-aware dropdown with "Other" freetext fallback) instead of a plain text input for both job (`company_city`) and profile (`current_city`); country field is now ordered before the city field in both forms so country is always selected first
 

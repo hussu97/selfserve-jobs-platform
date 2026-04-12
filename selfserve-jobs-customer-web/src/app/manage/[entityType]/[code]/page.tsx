@@ -25,6 +25,8 @@ import {
   renewJob,
   renewProfile,
   requestManagementLinks,
+  getResumeUploadUrl,
+  uploadResumeWithProgress,
 } from '@/lib/api';
 import { EMPLOYMENT_TYPES, NOTICE_PERIODS, RELOCATION_PREFERENCES } from '@/lib/constants';
 import type { Job, Profile, UpdateJobRequest, UpdateProfileRequest } from '@/lib/types';
@@ -79,6 +81,16 @@ function ManageContent() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState('');
+
+  // Resume management (profile edit only)
+  type ResumeAction = 'none' | 'replace' | 'remove';
+  type ResumeUploadState = 'idle' | 'uploading' | 'done' | 'error';
+  const [resumeAction, setResumeAction] = useState<ResumeAction>('none');
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [resumeKey, setResumeKey] = useState<string | null>(null);
+  const [resumeUploadState, setResumeUploadState] = useState<ResumeUploadState>('idle');
+  const [resumeUploadProgress, setResumeUploadProgress] = useState(0);
+  const [resumeError, setResumeError] = useState('');
 
   const hasRun = useRef(false);
 
@@ -204,13 +216,65 @@ function ManageContent() {
     setProfileField('key_skills', (profileForm.key_skills ?? []).filter((s) => s !== skill));
   };
 
+  const handleResumeFileSelect = async (file: File | null) => {
+    if (!file) {
+      setResumeFile(null);
+      setResumeKey(null);
+      setResumeUploadState('idle');
+      setResumeUploadProgress(0);
+      setResumeError('');
+      return;
+    }
+    if (file.type !== 'application/pdf') {
+      setResumeError('Only PDF files are accepted');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setResumeError('File must be under 5 MB');
+      return;
+    }
+    setResumeFile(file);
+    setResumeError('');
+    setResumeUploadState('uploading');
+    setResumeUploadProgress(0);
+    setResumeKey(null);
+    try {
+      const { resume_key: key, upload_url: uploadUrl } = await getResumeUploadUrl();
+      if (uploadUrl) {
+        await uploadResumeWithProgress(file, uploadUrl, (pct) => setResumeUploadProgress(pct));
+      }
+      setResumeKey(key);
+      setResumeUploadState('done');
+      setResumeUploadProgress(100);
+    } catch {
+      setResumeUploadState('error');
+      setResumeError('Upload failed. Please try again.');
+    }
+  };
+
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (resumeAction === 'replace' && resumeUploadState !== 'done') {
+      setSaveError(resumeUploadState === 'uploading'
+        ? 'Please wait for the resume upload to finish.'
+        : 'Please select and upload a valid PDF resume.');
+      return;
+    }
     setSaving(true);
     setSaveError('');
     try {
-      const updated = await updateProfile(code, profileForm, token);
+      let payload = profileForm;
+      if (resumeAction === 'remove') {
+        payload = { ...profileForm, resume_key: null };
+      } else if (resumeAction === 'replace' && resumeKey) {
+        payload = { ...profileForm, resume_key: resumeKey };
+      }
+      const updated = await updateProfile(code, payload, token);
       setProfile(updated);
+      setResumeAction('none');
+      setResumeFile(null);
+      setResumeKey(null);
+      setResumeUploadState('idle');
       addToast('Changes saved successfully.', 'success');
     } catch (err) {
       setSaveError(err instanceof Error ? err.message : 'Failed to save changes.');
@@ -639,6 +703,139 @@ function ManageContent() {
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Section 03 — Resume */}
+          <div>
+            <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-6">
+              <span className="font-heading text-2xl italic text-secondary">03</span>
+              <h2 className="font-heading text-xl text-primary">Resume</h2>
+            </div>
+
+            {/* Current resume status */}
+            {resumeAction === 'remove' ? (
+              <div className="flex items-center justify-between bg-red-50 rounded-xl px-4 py-3 mb-4">
+                <span className="text-sm text-red-700">Resume will be removed when you save</span>
+                <button
+                  type="button"
+                  onClick={() => setResumeAction('none')}
+                  className="text-xs text-text-muted hover:opacity-70"
+                >
+                  Undo
+                </button>
+              </div>
+            ) : profile?.has_resume && resumeAction !== 'replace' ? (
+              <div className="flex items-center justify-between bg-surface rounded-xl px-4 py-3 mb-4">
+                <div className="flex items-center gap-2">
+                  <svg className="h-4 w-4 text-primary flex-shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
+                  </svg>
+                  <span className="text-sm text-text-main">Resume on file</span>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => { setResumeAction('replace'); setResumeFile(null); setResumeKey(null); setResumeUploadState('idle'); setResumeError(''); }}
+                    className="text-xs text-secondary hover:opacity-70 font-medium"
+                  >
+                    Replace
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setResumeAction('remove')}
+                    className="text-xs text-red-600 hover:opacity-70 font-medium"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            ) : !profile?.has_resume && resumeAction === 'none' ? (
+              <p className="text-sm text-text-muted mb-4">No resume uploaded.</p>
+            ) : null}
+
+            {/* Upload area — shown when replacing or adding for the first time */}
+            {(resumeAction === 'replace' || (!profile?.has_resume && resumeAction !== 'remove')) && (
+              <div>
+                {resumeAction === 'replace' && (
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-sm text-text-muted">Upload new resume (PDF, max 5 MB)</p>
+                    <button
+                      type="button"
+                      onClick={() => { setResumeAction('none'); setResumeFile(null); setResumeKey(null); setResumeUploadState('idle'); setResumeError(''); }}
+                      className="text-xs text-text-muted hover:opacity-70"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                )}
+                <div
+                  className={`bg-surface rounded-2xl p-6 border-2 border-dashed text-center transition-colors ${
+                    resumeUploadState === 'done'
+                      ? 'border-primary'
+                      : resumeUploadState === 'error' || resumeError
+                      ? 'border-red-400'
+                      : resumeUploadState === 'uploading'
+                      ? 'border-primary/50'
+                      : 'border-border hover:border-primary/50'
+                  }`}
+                >
+                  {resumeUploadState === 'uploading' && resumeFile ? (
+                    <div className="flex flex-col items-center gap-3">
+                      <svg className="h-5 w-5 text-primary animate-pulse" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
+                      </svg>
+                      <span className="text-sm font-medium text-text-main truncate max-w-xs">{resumeFile.name}</span>
+                      <div className="w-full max-w-xs">
+                        <div className="h-1.5 w-full bg-surface-lowest rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-primary rounded-full transition-all duration-200"
+                            style={{ width: `${resumeUploadProgress}%` }}
+                          />
+                        </div>
+                        <p className="text-[11px] text-text-muted mt-1.5 uppercase tracking-wider">{resumeUploadProgress}% uploaded</p>
+                      </div>
+                    </div>
+                  ) : resumeUploadState === 'done' && resumeFile ? (
+                    <div className="flex items-center justify-center gap-3">
+                      <svg className="h-5 w-5 text-primary flex-shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      <span className="text-sm font-medium text-text-main truncate max-w-xs">{resumeFile.name}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleResumeFileSelect(null)}
+                        className="text-xs hover:opacity-70 text-text-muted flex-shrink-0"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="cursor-pointer">
+                      <div className="flex flex-col items-center gap-2">
+                        <svg className="h-8 w-8 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+                        </svg>
+                        <span className="text-sm font-medium text-text-main">
+                          {resumeUploadState === 'error' ? 'Try again — click to re-upload' : 'Click to upload PDF'}
+                        </span>
+                        <span className="text-xs text-text-muted">PDF only, max 5 MB</span>
+                      </div>
+                      <input
+                        type="file"
+                        accept=".pdf,application/pdf"
+                        className="sr-only"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0] ?? null;
+                          handleResumeFileSelect(file);
+                          e.target.value = '';
+                        }}
+                      />
+                    </label>
+                  )}
+                </div>
+                {resumeError && <p className="text-xs text-red-600 mt-2">{resumeError}</p>}
+              </div>
+            )}
           </div>
 
           <Button type="submit" size="lg" loading={saving} className="self-start rounded-full">

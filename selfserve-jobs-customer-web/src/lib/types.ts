@@ -186,6 +186,8 @@ export interface UpdateProfileRequest {
   relocation_preference?: RelocationPreference;
   linkedin_profile_link?: string;
   key_skills?: string[];
+  // Explicitly null → remove resume. GCS path string → replace resume. Omit → no change.
+  resume_key?: string | null;
 }
 
 export interface VerificationResponse {
