@@ -7,6 +7,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Changed
+- **E2E test suite audited and updated** — `smoke.spec.ts` expanded from 7 to 22 tests, covering `/about`, `/faq`, `/contact`, `/profiles/new`, `/jobs/new`, `/recruiter/register`, `/verify` (no-code state), and `/report` (no-code state); `critical-path.spec.ts` fixed broken profiles navigation selector (was matching "Create Profile" → `/profiles/new` instead of "Talent" nav link → `/profiles`), added recruiter form validation tests, and added mocked verify/manage invalid-state tests; `responsive.spec.ts` expanded from 3 to 8 key pages (added `/about`, `/faq`, `/contact`, `/profiles/new`, `/recruiter/register`)
+
+### Changed
 - **Homepage hero subheading** — updated to "If recent events have shaken your career in the UAE, hear this: you're not alone. This is a place where talent is truly valued and opportunities are real — no algorithms, no spam, no cost."
 - **Removed all political framing** — replaced "The ongoing conflict in the Middle East" on the About page and "regional conflict" in `llms.txt` with neutral "recent events" language; platform remains apolitical
 - **OG image replaced with real homepage screenshot** — retaken at 1200×630 to reflect latest copy — removed dynamic `opengraph-image.tsx` generator; replaced with a static `public/og-image.png` (1200×630 Playwright screenshot of the live homepage); `layout.tsx` now explicitly sets `og:image` and `twitter:image` to this file

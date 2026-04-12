@@ -18,6 +18,11 @@ const KEY_PAGES = [
   { label: 'homepage', path: '/' },
   { label: 'jobs list', path: '/jobs' },
   { label: 'profiles list', path: '/profiles' },
+  { label: 'about', path: '/about' },
+  { label: 'faq', path: '/faq' },
+  { label: 'contact', path: '/contact' },
+  { label: 'create talent profile', path: '/profiles/new' },
+  { label: 'recruiter register', path: '/recruiter/register' },
 ];
 
 for (const viewport of VIEWPORTS) {

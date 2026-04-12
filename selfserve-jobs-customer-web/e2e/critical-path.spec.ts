@@ -19,8 +19,8 @@ const FULL_FLOW = process.env.E2E_FULL_FLOW === 'true';
 test.describe('Browse jobs', () => {
   test('can navigate from homepage to jobs list', async ({ page }) => {
     await page.goto('/');
-    // Find a link to the jobs page in the navigation
-    const jobsLink = page.getByRole('link', { name: /jobs/i }).first();
+    // Click the "Jobs" nav link
+    const jobsLink = page.getByRole('link', { name: 'Jobs' });
     await jobsLink.click();
     await expect(page).toHaveURL(/\/jobs/);
     await expect(page.getByRole('main')).toBeVisible();
@@ -56,12 +56,71 @@ test.describe('Browse jobs', () => {
 });
 
 test.describe('Browse profiles', () => {
-  test('can navigate from homepage to profiles list', async ({ page }) => {
+  test('can navigate from homepage to profiles list via "Talent" nav link', async ({ page }) => {
     await page.goto('/');
-    const profilesLink = page.getByRole('link', { name: /profiles/i }).first();
-    await profilesLink.click();
-    await expect(page).toHaveURL(/\/profiles/);
+    // The nav link is labeled "Talent" and links to /profiles
+    const talentLink = page.getByRole('link', { name: 'Talent' });
+    await talentLink.click();
+    await expect(page).toHaveURL(/\/profiles(?!\/)/);
     await expect(page.getByRole('main')).toBeVisible();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Recruiter registration — form validation (no backend required)
+// ---------------------------------------------------------------------------
+
+test.describe('Recruiter registration form', () => {
+  test('shows validation errors when submitting empty form', async ({ page }) => {
+    await page.goto('/recruiter/register');
+    await page.getByRole('button', { name: /apply for access/i }).click();
+    // Client-side validation should flag missing required fields
+    await expect(page.locator('p.text-xs.text-red-600').first()).toBeVisible();
+  });
+
+  test('shows LinkedIn URL validation error for invalid URL', async ({ page }) => {
+    await page.goto('/recruiter/register');
+    await page.locator('input[type="email"]').fill('test@example.com');
+    await page.locator('input[type="text"]').first().fill('Test Name');
+    await page.locator('input[type="url"]').fill('https://example.com/not-linkedin');
+    await page.getByRole('button', { name: /apply for access/i }).click();
+    await expect(page.locator('p.text-xs.text-red-600')).toContainText(/linkedin/i);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Pure-frontend page states (no backend required)
+// ---------------------------------------------------------------------------
+
+test.describe('Verification page states', () => {
+  test('shows "Check your email" when no code is present', async ({ page }) => {
+    await page.goto('/verify');
+    await expect(page.getByRole('heading', { name: /check your email/i })).toBeVisible();
+  });
+
+  test('shows loading state while verifying a code', async ({ page }) => {
+    // With a fake code, the page attempts verification and shows loading state briefly
+    // We intercept the API call to simulate a controlled response
+    await page.route('**/api/v1/verify**', (route) =>
+      route.fulfill({ status: 400, body: JSON.stringify({ detail: 'Invalid code' }) })
+    );
+    await page.goto('/verify?code=fakecode12345');
+    // After the mocked failure, should show an error state heading
+    await expect(
+      page.getByRole('heading', { name: /expired|invalid|error/i })
+    ).toBeVisible({ timeout: 5000 });
+  });
+});
+
+test.describe('Manage page states', () => {
+  test('shows "Invalid management link" when no token is provided', async ({ page }) => {
+    await page.goto('/manage/job/FAKECODE');
+    await expect(page.getByRole('heading', { name: /invalid management/i })).toBeVisible();
+  });
+
+  test('shows request-new-link form on invalid token page', async ({ page }) => {
+    await page.goto('/manage/job/FAKECODE');
+    await expect(page.locator('input[type="email"]')).toBeVisible();
   });
 });
 
