@@ -101,12 +101,9 @@ export default function RootLayout({
           <Script
             src="/stats/script.js"
             data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID}
-            data-host-url={
-              process.env.NEXT_PUBLIC_SITE_URL
-                ? `${process.env.NEXT_PUBLIC_SITE_URL}/stats`
-                : undefined
-            }
-            strategy="lazyOnload"
+            data-host-url={`${SITE_URL}/stats`}
+            data-do-not-track="false"
+            strategy="afterInteractive"
           />
         )}
       </body>
