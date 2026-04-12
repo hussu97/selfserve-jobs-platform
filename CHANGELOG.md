@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Removed
+- **`@vercel/analytics` and `@vercel/speed-insights`** — uninstalled packages (components were already removed from `layout.tsx` in a prior commit but packages remained in `package.json`)
+
 ### Fixed
 - **Umami tracking reliability improvements** — fixed three issues causing missed page views and events, particularly for UAE users: (1) `data-host-url` was conditionally `undefined` when `NEXT_PUBLIC_SITE_URL` was unset, causing Umami to send beacons directly to `cloud.umami.is` instead of through the `/stats/api/send` proxy — UAE ISPs (Etisalat/du) block external analytics domains, so this silently dropped all tracking for those users; fixed by using the `SITE_URL` constant (which already has the `hirebridgeuae.com` fallback) so the proxy is always used; (2) Umami respects the browser `Do Not Track` header by default — UAE corporate/government devices commonly have DNT enabled; added `data-do-not-track="false"` to ensure all users are tracked regardless of DNT setting; (3) `strategy="lazyOnload"` defers the script until after the page is fully idle, causing missed events on mobile/slow connections where users navigate away before the script fires; changed to `strategy="afterInteractive"` which loads as soon as the page is interactive
 
