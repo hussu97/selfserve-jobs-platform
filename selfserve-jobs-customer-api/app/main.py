@@ -3,6 +3,7 @@ import uuid
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request, Response
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pythonjsonlogger.json import JsonFormatter as _JsonFormatter
@@ -137,6 +138,22 @@ app = FastAPI(
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
+    """Log 422 validation errors with field details for easier debugging."""
+    # str() the ctx values so non-serializable objects (e.g. ValueError) don't break JSON serialisation.
+    errors = exc.errors()
+    safe_errors = [{**e, "ctx": {k: str(v) for k, v in e["ctx"].items()}} if "ctx" in e else e for e in errors]
+    logger.warning(
+        "Request validation failed: %s %s — %s",
+        request.method,
+        request.url.path,
+        safe_errors,
+        extra={"validation_errors": safe_errors, "path": request.url.path, "method": request.method},
+    )
+    return JSONResponse(status_code=422, content={"detail": safe_errors})
 
 
 def _custom_openapi() -> dict:

@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+- **Request validation error logging** — added a `RequestValidationError` exception handler in `app/main.py` that logs 422 errors with the full field-level detail to Cloud Logging, making it possible to diagnose future validation failures without needing DevTools access
+
 ### Fixed
 - **Edit profile section numbers now match create profile** — restructured the edit profile form in `/manage/[entityType]/[code]` from 3 combined sections into 5 separate sections (01 Personal information, 02 Availability, 03 Professional brief, 04 Key skills, 05 Resume) to match the section numbering on the create profile form.
 - **Profile update 422 on empty brief** — `ProfileUpdate.brief` had `min_length=50` but `ProfileCreate.brief` allows empty strings (`min_length=0`). Users who created profiles without a brief could not save edits from the manage page — the PUT always sent the current (empty) brief and Pydantic rejected it. Changed `ProfileUpdate.brief` to `min_length=0` to match creation behaviour.
