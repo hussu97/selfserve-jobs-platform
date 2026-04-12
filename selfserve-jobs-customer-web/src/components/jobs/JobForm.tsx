@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { CountrySelect } from '@/components/shared/CountrySelect';
+import { CitySelect } from '@/components/shared/CitySelect';
 import { StatusBanner } from '@/components/shared/StatusBanner';
 import { EMPLOYMENT_TYPES } from '@/lib/constants';
 import { createJob } from '@/lib/api';
@@ -189,21 +190,24 @@ export function JobForm({ onSuccess }: JobFormProps) {
             error={errors.company_name}
             required
           />
-          <Input
-            label="City"
-            placeholder="Dubai"
-            value={form.company_city ?? ''}
-            onChange={(e) => set('company_city', e.target.value)}
-            onBlur={() => blurField('company_city')}
-            error={errors.company_city}
+          <CountrySelect
+            value={form.company_country ?? ''}
+            onChange={(e) => {
+              set('company_country', e.target.value);
+              set('company_city', '');
+            }}
+            error={errors.company_country}
             required
           />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <CountrySelect
-            value={form.company_country ?? ''}
-            onChange={(e) => set('company_country', e.target.value)}
-            error={errors.company_country}
+          <CitySelect
+            label="City"
+            country={form.company_country ?? ''}
+            value={form.company_city ?? ''}
+            onChange={(city) => set('company_city', city)}
+            onBlur={() => blurField('company_city')}
+            error={errors.company_city}
             required
           />
           <Input

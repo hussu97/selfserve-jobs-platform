@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { Input } from '@/components/ui/Input';
 import { CountrySelect } from '@/components/shared/CountrySelect';
+import { CitySelect } from '@/components/shared/CitySelect';
 import { PhoneInput } from '@/components/ui/PhoneInput';
 import { StatusBanner } from '@/components/shared/StatusBanner';
 import { createProfile, getResumeUploadUrl, uploadResumeWithProgress } from '@/lib/api';
@@ -260,19 +261,22 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
           />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Input
-            label="Current city"
-            placeholder="Dubai"
-            value={form.current_city ?? ''}
-            onChange={(e) => set('current_city', e.target.value)}
-            onBlur={() => blurField('current_city')}
-            error={errors.current_city}
-            required
-          />
           <CountrySelect
             value={form.current_country ?? ''}
-            onChange={(e) => set('current_country', e.target.value)}
+            onChange={(e) => {
+              set('current_country', e.target.value);
+              set('current_city', '');
+            }}
             error={errors.current_country}
+            required
+          />
+          <CitySelect
+            label="Current city"
+            country={form.current_country ?? ''}
+            value={form.current_city ?? ''}
+            onChange={(city) => set('current_city', city)}
+            onBlur={() => blurField('current_city')}
+            error={errors.current_city}
             required
           />
         </div>
