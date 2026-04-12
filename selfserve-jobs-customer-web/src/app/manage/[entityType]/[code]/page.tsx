@@ -597,11 +597,11 @@ function ManageContent() {
       {/* Profile edit form */}
       {!isJobs && (
         <form onSubmit={handleSaveProfile} className="flex flex-col gap-6">
-          {/* Section 01 */}
+          {/* Section 01 — Personal information */}
           <div>
             <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-6">
               <span className="font-heading text-2xl italic text-secondary">01</span>
-              <h2 className="font-heading text-xl text-primary">Personal Details</h2>
+              <h2 className="font-heading text-xl text-primary">Personal information</h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input
@@ -646,7 +646,15 @@ function ManageContent() {
                 onChange={(e) => setProfileField('linkedin_profile_link', e.target.value || undefined)}
               />
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+          </div>
+
+          {/* Section 02 — Availability */}
+          <div>
+            <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-6">
+              <span className="font-heading text-2xl italic text-secondary">02</span>
+              <h2 className="font-heading text-xl text-primary">Availability</h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Select
                 label="Notice period"
                 options={NOTICE_PERIODS}
@@ -662,11 +670,11 @@ function ManageContent() {
             </div>
           </div>
 
-          {/* Section 02 */}
+          {/* Section 03 — Professional brief */}
           <div>
             <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-6">
-              <span className="font-heading text-2xl italic text-secondary">02</span>
-              <h2 className="font-heading text-xl text-primary">Professional Brief & Skills</h2>
+              <span className="font-heading text-2xl italic text-secondary">03</span>
+              <h2 className="font-heading text-xl text-primary">Professional brief</h2>
             </div>
             <MarkdownEditor
               label="Professional brief"
@@ -675,8 +683,15 @@ function ManageContent() {
               hint="Markdown formatting supported."
               required
             />
-            <div className="flex flex-col gap-2 mt-4">
-              <p className="text-sm font-medium text-text-main">Key skills</p>
+          </div>
+
+          {/* Section 04 — Key skills */}
+          <div>
+            <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-6">
+              <span className="font-heading text-2xl italic text-secondary">04</span>
+              <h2 className="font-heading text-xl text-primary">Key skills</h2>
+            </div>
+            <div className="flex flex-col gap-2">
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -705,10 +720,10 @@ function ManageContent() {
             </div>
           </div>
 
-          {/* Section 03 — Resume */}
+          {/* Section 05 — Resume */}
           <div>
             <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-6">
-              <span className="font-heading text-2xl italic text-secondary">03</span>
+              <span className="font-heading text-2xl italic text-secondary">05</span>
               <h2 className="font-heading text-xl text-primary">Resume</h2>
             </div>
 
