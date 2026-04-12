@@ -101,9 +101,9 @@ export default function RootLayout({
         <SpeedInsights />
         {process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID && (
           <Script
-            src="/stats/script.js"
+            src="/lib/app.js"
             data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID}
-            data-host-url={`${SITE_URL}/stats`}
+            data-host-url={SITE_URL}
             data-do-not-track="false"
             strategy="afterInteractive"
           />

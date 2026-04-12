@@ -4,13 +4,12 @@ import { withSentryConfig } from '@sentry/nextjs';
 const nextConfig: NextConfig = {
   async rewrites() {
     return [
+      // Proxy the Umami script through a non-analytics-looking path.
+      // Events are forwarded server-side via src/app/api/send/route.ts
+      // so UAE's deep packet inspection does not intercept them.
       {
-        source: '/stats/script.js',
+        source: '/lib/app.js',
         destination: 'https://cloud.umami.is/script.js',
-      },
-      {
-        source: '/stats/api/send',
-        destination: 'https://cloud.umami.is/api/send',
       },
     ];
   },
