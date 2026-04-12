@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Elevated Portal | Curated Talent Discovery</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Manrope:wght@200..800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface": "#fcf9f5",
+                        "surface-dim": "#121211",
+                        "surface-bright": "#31302e",
+                        "on-secondary-fixed": "#360f00",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed-variant": "#d7c3b0",
+                        "on-primary-fixed": "#0d1f12",
+                        "error-container": "#93000a",
+                        "inverse-on-surface": "#1c1c1a",
+                        "surface-container-low": "#1c1c1a",
+                        "surface": "#1c1c1a",
+                        "inverse-surface": "#fcf9f5",
+                        "error": "#ffdad6",
+                        "secondary-container": "#793f25",
+                        "secondary-fixed-dim": "#ffb596",
+                        "primary-fixed": "#d2e8d3",
+                        "surface-variant": "#434843",
+                        "on-primary-container": "#d2e8d3",
+                        "tertiary-fixed-dim": "#d7c3b0",
+                        "on-surface-variant": "#c3c8c0",
+                        "background": "#1c1c1a",
+                        "on-error-container": "#ffdad6",
+                        "surface-tint": "#b6ccb7",
+                        "on-secondary-container": "#ffdbcd",
+                        "inverse-primary": "#384b3b",
+                        "outline": "#8d928c",
+                        "tertiary-container": "#524436",
+                        "on-tertiary": "#1c1c1a",
+                        "on-secondary": "#1c1c1a",
+                        "surface-container": "#232321",
+                        "on-primary": "#1c1c1a",
+                        "surface-container-high": "#2d2d2b",
+                        "on-tertiary-container": "#f4dfcb",
+                        "primary": "#b6ccb7",
+                        "tertiary": "#d7c3b0",
+                        "surface-container-lowest": "#121211",
+                        "on-tertiary-fixed": "#241a0e",
+                        "on-primary-fixed-variant": "#b6ccb7",
+                        "outline-variant": "#434843",
+                        "surface-container-highest": "#383836",
+                        "on-secondary-fixed-variant": "#8c4e32",
+                        "tertiary-fixed": "#f4dfcb",
+                        "secondary-fixed": "#ffdbcd",
+                        "primary-fixed-dim": "#b6ccb7",
+                        "secondary": "#ffb596",
+                        "primary-container": "#384b3b",
+                        "on-background": "#fcf9f5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Newsreader"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .editorial-shadow {
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        .hero-gradient {
+            background: radial-gradient(circle at center, #232321 0%, #1c1c1a 100%);
+        }
+        .flag-weave {
+            mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+            -webkit-mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary selection:text-on-primary">
+<!-- Top Navigation Bar -->
+<nav class="bg-[#1c1c1a]/80 backdrop-blur-xl font-['Newsreader'] tracking-tight docked full-width top-0 z-50 sticky no-line tonal-transition">
+<div class="flex justify-between items-center px-8 py-4 max-w-screen-2xl mx-auto w-full">
+<div class="text-2xl font-serif italic text-primary">
+            The Elevated Portal
+        </div>
+<div class="hidden md:flex items-center space-x-12">
+<a class="text-on-surface font-semibold border-b-2 border-primary pb-1" href="#">Discover</a>
+<a class="text-on-surface-variant opacity-80 hover:opacity-100 transition-opacity hover:text-on-surface duration-300" href="#">Support</a>
+<a class="text-on-surface-variant opacity-80 hover:opacity-100 transition-opacity hover:text-on-surface duration-300" href="#">Talent</a>
+<a class="text-on-surface-variant opacity-80 hover:opacity-100 transition-opacity hover:text-on-surface duration-300" href="#">Story</a>
+</div>
+<div class="flex items-center space-x-6">
+<button class="text-on-surface-variant opacity-80 hover:opacity-100 transition-opacity scale-95 duration-200 ease-in-out">Sign In</button>
+<button class="bg-primary text-on-primary px-8 py-2.5 rounded-full font-label text-sm font-semibold hover:bg-primary-fixed transition-colors scale-95 duration-200 ease-in-out">
+                Post a Job
+            </button>
+</div>
+</div>
+</nav>
+<main>
+<!-- Hero Section -->
+<section class="relative min-h-[90vh] flex items-center justify-center overflow-hidden py-24 px-6 bg-surface-container-lowest">
+<!-- Flowing Background Image -->
+<div class="absolute inset-0 z-0 opacity-40 flag-weave">
+<img alt="Ethereal UAE Flag" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDzHANQIPoGCNO4G_4MD9tGdzUNNQKMXae6yBla8cRdIwPQXeodvSXBzGWD-W00q7nkXOIjy9b56Xy6EJU_bIC6pytNnqa-pkLa4YD7PRIcqCU-1bstp9VGy12B2MONYFaezNER8jl0KEdzxjqWTheBR0rww2TJWUlVOjxP5fI5IjUf3rTJjvk8dI-xbsBUfF5OPfKULB--O4PbcjgPCgPkD7S9em1qsDXhQ3BClrSjTkhKnv_qi-CUvyv33bymuyj35mmPChAPfY0"/>
+<div class="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background"></div>
+</div>
+<div class="relative z-10 max-w-5xl mx-auto text-center">
+<div class="inline-flex items-center px-4 py-1.5 mb-8 rounded-full bg-surface-container-high/60 backdrop-blur-md text-primary text-xs font-label uppercase tracking-widest border border-primary/20">
+                Supporting our community in times of change
+            </div>
+<h1 class="font-headline text-5xl md:text-8xl text-on-surface leading-[1.1] tracking-tight mb-8">
+                Your Talent is <br/>
+<span class="italic text-primary">Still Your Power.</span>
+</h1>
+<p class="font-body text-xl md:text-2xl text-on-surface-variant max-w-3xl mx-auto mb-14 leading-relaxed font-light">
+                To those in the UAE whose lives and careers have been touched by recent events: you are not alone. We are a sanctuary for your professional journey, connecting exceptional people with teams who value human resilience and ready to support your next chapter.
+            </p>
+<div class="flex flex-col sm:flex-row items-center justify-center gap-6">
+<button class="w-full sm:w-auto bg-primary text-on-primary px-12 py-5 rounded-2xl text-lg font-label font-bold tracking-tight hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300">
+                    Share Your Story
+                </button>
+<button class="w-full sm:w-auto bg-surface-container-highest/50 backdrop-blur-md text-on-surface border border-outline-variant px-12 py-5 rounded-2xl text-lg font-label font-bold tracking-tight hover:bg-surface-container-highest transition-all duration-300">
+                    Find Support
+                </button>
+</div>
+<p class="mt-12 text-sm text-on-surface-variant/60 font-body">
+                Recruiters here are actively looking to provide meaningful opportunities.
+            </p>
+</div>
+</section>
+<!-- How It Works Section - Bento Grid Layout -->
+<section class="py-32 px-8 bg-surface-container-low">
+<div class="max-w-7xl mx-auto">
+<div class="text-center mb-24">
+<h2 class="font-headline text-5xl text-on-surface mb-6">The Elevated Journey</h2>
+<p class="font-body text-on-surface-variant max-w-xl mx-auto">Our process is designed for precision, favoring quality over quantity to ensure every connection is meaningful.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+<!-- Step 1 -->
+<div class="md:col-span-7 bg-surface-container-highest/40 backdrop-blur-sm p-12 rounded-2xl editorial-shadow flex flex-col justify-between group border border-outline-variant">
+<div>
+<span class="text-secondary font-serif italic text-4xl mb-6 block">01</span>
+<h3 class="font-headline text-3xl mb-4">Curated Curation</h3>
+<p class="font-body text-on-surface-variant leading-relaxed mb-8">
+                            We don't just list jobs; we tell stories. Every opportunity is vetted for vision and cultural alignment before it enters our portal.
+                        </p>
+</div>
+<div class="rounded-xl overflow-hidden h-64">
+<img alt="Storytelling" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-80" data-alt="Close-up of elegant hands sketching a brand concept on heavy grain paper with a vintage fountain pen and soft side lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXHRRpd7gF1eYNnyPGTh0rb3bUQkcT0zYiBMB4TnUQb6bWG193jEpinFysskJ2LYpunULADQdF0XnghIF59r7BzAlbbcxwLLr4QSQo3m8li4dWA66qLWKJhjdkJOCsjNYEtftu08s0eE6M-_4ESLFucbyxK1EUR0c9WX40xdTlP40g2dOBEd8iy1UBLw-QtbUf1Y0Cf5EyfHj_2yBFkqxOSg0dC-zRJu6a4lvkxYhMYyx_Os0Wr3aB5I5o_iigvs1kK2VoKsMNMWY"/>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="md:col-span-5 bg-surface-container-highest/40 backdrop-blur-sm p-12 rounded-2xl editorial-shadow group border border-outline-variant">
+<span class="text-secondary font-serif italic text-4xl mb-6 block">02</span>
+<h3 class="font-headline text-3xl mb-4">Direct Connection</h3>
+<p class="font-body text-on-surface-variant leading-relaxed mb-8">
+                        Bypass the algorithm. Our platform facilitates direct dialogue between visionaries and creators.
+                    </p>
+<div class="rounded-xl overflow-hidden h-80">
+<img alt="Meeting" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-80" data-alt="Two professionals in a deep, focused conversation across a minimalist marble table in a bright, modern interior space" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCa2nnyPV4GnBt-DB_UICV_29zX7itCWoqv5B5Kvxr2VJdwcb8YDcsk3sFXY21GYqbNu6TEHJWvZ7a2mfHwuMgFt7Nf_N8wnysh1u6RJ_BW1_maWS8kHcoTQip605iv5mpwFHgbGh2zocTQBolqlUBKBZrNYDO3zdO352rm1QaK5dk9kia8VoXnK-Utlxfec3ABstdEUbinlMk1W4yWrYSv1SqvLyWLCnl81egsVIfV12ky9TWb-XQ4qqRxRsU8T9xY_desZb4Xcs0"/>
+</div>
+</div>
+<!-- Step 3 -->
+<div class="md:col-span-4 bg-surface-container-highest/40 backdrop-blur-sm p-12 rounded-2xl editorial-shadow group border border-outline-variant">
+<span class="text-secondary font-serif italic text-4xl mb-6 block">03</span>
+<h3 class="font-headline text-3xl mb-4">Seamless Flow</h3>
+<p class="font-body text-on-surface-variant leading-relaxed">
+                        A refined application process that respects your time and honors your craft.
+                    </p>
+<div class="mt-8 flex items-center justify-center">
+<span class="material-symbols-outlined text-7xl text-primary" style="font-variation-settings: 'FILL' 0;">all_inclusive</span>
+</div>
+</div>
+<!-- Step 4 -->
+<div class="md:col-span-8 bg-primary-container text-on-primary-container p-12 rounded-2xl editorial-shadow flex flex-col md:flex-row items-center gap-12 border border-primary/20">
+<div class="flex-1">
+<span class="text-primary font-serif italic text-4xl mb-6 block">04</span>
+<h3 class="font-headline text-3xl mb-4 text-primary">The Result</h3>
+<p class="font-body opacity-90 leading-relaxed text-lg">
+                            Partnerships that define industries. Join the ranks of the most innovative studios and top-tier talent in the global market.
+                        </p>
+</div>
+<div class="w-full md:w-1/3 bg-black/30 backdrop-blur-md p-8 rounded-xl border border-white/10">
+<div class="flex flex-col space-y-4">
+<div class="h-2 w-3/4 bg-primary/30 rounded"></div>
+<div class="h-2 w-full bg-primary/30 rounded"></div>
+<div class="h-2 w-1/2 bg-primary/30 rounded"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="py-32 px-8 bg-surface">
+<div class="max-w-5xl mx-auto rounded-3xl bg-surface-container-high p-16 text-center border border-outline-variant/30">
+<h2 class="font-headline text-5xl mb-8">Ready to Elevate Your Future?</h2>
+<div class="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-8">
+<button class="bg-primary text-on-primary px-16 py-5 rounded-2xl font-bold hover:opacity-90 transition-opacity">
+                    Discover Roles
+                </button>
+<button class="border border-outline-variant px-16 py-5 rounded-2xl font-bold text-on-surface hover:bg-surface-container-highest transition-colors">
+                    Post Your Story
+                </button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-dim full-width py-16 tonal-grounding border-t border-outline-variant/20">
+<div class="flex flex-col md:flex-row justify-between items-center px-12 space-y-8 md:space-y-0 w-full max-w-screen-2xl mx-auto">
+<div class="text-lg font-serif text-primary">
+            The Elevated Portal
+        </div>
+<div class="flex flex-wrap justify-center gap-8 font-['Manrope'] text-sm tracking-wide uppercase">
+<a class="text-on-surface-variant hover:text-primary transition-all opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-primary transition-all opacity-80 hover:opacity-100" href="#">Terms of Service</a>
+<a class="text-on-surface-variant hover:text-primary transition-all opacity-80 hover:opacity-100" href="#">Editorial Guidelines</a>
+<a class="text-on-surface-variant hover:text-primary transition-all opacity-80 hover:opacity-100" href="#">Contact</a>
+<a class="text-on-surface-variant hover:text-primary transition-all opacity-80 hover:opacity-100" href="#">Careers</a>
+</div>
+<div class="text-on-surface-variant font-['Manrope'] text-xs opacity-60">
+            © 2026 The Elevated Portal. Curated for the exceptional.
+        </div>
+</div>
+</footer>
+</body></html>
