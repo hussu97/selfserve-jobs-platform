@@ -91,7 +91,7 @@ export default async function HomePage() {
           alt=""
           aria-hidden="true"
           src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1920&q=80"
-          className="absolute inset-0 w-full h-full object-cover opacity-20"
+          className="absolute inset-0 w-full h-full object-cover opacity-25"
         />
         <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, #1a2e1c 0%, transparent 30%, transparent 70%, #1a2e1c 100%)' }} />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -174,7 +174,7 @@ export default async function HomePage() {
           alt=""
           aria-hidden="true"
           src="https://images.unsplash.com/photo-1578895101408-1a36b834405b?auto=format&fit=crop&w=1920&q=80"
-          className="absolute inset-0 w-full h-full object-cover opacity-[0.06]"
+          className="absolute inset-0 w-full h-full object-cover opacity-[0.10]"
         />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
           <div className="text-center mb-12">
@@ -246,7 +246,7 @@ export default async function HomePage() {
           alt=""
           aria-hidden="true"
           src="https://images.unsplash.com/photo-1548266652-99cf27701ced?auto=format&fit=crop&w=1920&q=80"
-          className="absolute inset-0 w-full h-full object-cover opacity-[0.07]"
+          className="absolute inset-0 w-full h-full object-cover opacity-[0.11]"
         />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Section header */}
@@ -313,7 +313,7 @@ export default async function HomePage() {
           alt=""
           aria-hidden="true"
           src="https://images.unsplash.com/photo-1547483238-f400e65ccd56?auto=format&fit=crop&w=1920&q=80"
-          className="absolute inset-0 w-full h-full object-cover opacity-[0.07]"
+          className="absolute inset-0 w-full h-full object-cover opacity-[0.11]"
         />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Section header */}

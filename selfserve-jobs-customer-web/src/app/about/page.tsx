@@ -84,8 +84,8 @@ export default function AboutPage() {
         <img
           alt=""
           aria-hidden="true"
-          src="https://images.unsplash.com/photo-1533929736458-ca588d08c8be?auto=format&fit=crop&w=1920&q=80"
-          className="absolute inset-0 w-full h-full object-cover opacity-30"
+          src="https://images.unsplash.com/photo-1617358750-d41d2490cf85?auto=format&fit=crop&w=1920&q=80"
+          className="absolute inset-0 w-full h-full object-cover opacity-[0.35]"
         />
         <div
           className="absolute inset-0 pointer-events-none"
@@ -114,7 +114,7 @@ export default function AboutPage() {
           alt=""
           aria-hidden="true"
           src="https://images.unsplash.com/photo-1579547621706-1a9c79d5c9f1?auto=format&fit=crop&w=1920&q=80"
-          className="absolute inset-0 w-full h-full object-cover opacity-[0.06]"
+          className="absolute inset-0 w-full h-full object-cover opacity-[0.10]"
         />
         <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
           <span className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-4 block">
@@ -253,7 +253,7 @@ export default function AboutPage() {
           alt=""
           aria-hidden="true"
           src="https://images.unsplash.com/photo-1582672060674-bc2bd808a8b5?auto=format&fit=crop&w=1920&q=80"
-          className="absolute inset-0 w-full h-full object-cover opacity-[0.06]"
+          className="absolute inset-0 w-full h-full object-cover opacity-[0.10]"
         />
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center mb-12">
