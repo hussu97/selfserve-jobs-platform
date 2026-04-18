@@ -84,7 +84,7 @@ export default function AboutPage() {
         <img
           alt=""
           aria-hidden="true"
-          src="https://images.unsplash.com/photo-1570554521137-8b96bbff3db1?auto=format&fit=crop&w=1920&q=80"
+          src="https://images.unsplash.com/photo-1620937170928-a03bb6261277?auto=format&fit=crop&w=1920&q=80"
           className="absolute inset-0 w-full h-full object-cover opacity-[0.35]"
         />
         <div

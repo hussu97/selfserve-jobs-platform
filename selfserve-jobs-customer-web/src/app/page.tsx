@@ -312,7 +312,7 @@ export default async function HomePage() {
         <img
           alt=""
           aria-hidden="true"
-          src="https://images.unsplash.com/photo-1509316785289-025f5b846b35?auto=format&fit=crop&w=1920&q=80"
+          src="https://images.unsplash.com/photo-1562350683-774f43c5bdca?auto=format&fit=crop&w=1920&q=80"
           className="absolute inset-0 w-full h-full object-cover opacity-[0.15]"
         />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
