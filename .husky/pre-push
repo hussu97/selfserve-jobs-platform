@@ -1,0 +1,72 @@
+#!/usr/bin/env sh
+
+set -e
+
+export PATH="$HOME/.local/bin:$PATH"
+
+RUN_API=0
+RUN_WEB=0
+
+# Inspect each ref being pushed to determine which apps changed
+while IFS=' ' read -r local_ref local_sha remote_ref remote_sha; do
+  # Skip branch deletions
+  [ "$local_sha" = "0000000000000000000000000000000000000000" ] && continue
+
+  if [ "$remote_sha" = "0000000000000000000000000000000000000000" ]; then
+    # New remote branch — diff against origin/main if it exists, else all commits
+    CHANGED=$(git diff --name-only "origin/main...$local_sha" 2>/dev/null \
+      || git log --name-only --pretty=format: "$local_sha")
+  else
+    CHANGED=$(git diff --name-only "$remote_sha...$local_sha")
+  fi
+
+  echo "$CHANGED" | grep -q '^selfserve-jobs-customer-api/' && RUN_API=1
+  echo "$CHANGED" | grep -q '^selfserve-jobs-customer-web/' && RUN_WEB=1
+done
+
+# --- Backend (mirrors .github/workflows/test-api.yml) ---
+if [ "$RUN_API" = "1" ]; then
+  echo ""
+  echo "==> [pre-push] Backend checks (mirrors CI test-api.yml)..."
+  cd selfserve-jobs-customer-api
+
+  echo "  ruff check..."
+  uv run ruff check .
+
+  echo "  ruff format --check..."
+  uv run ruff format --check .
+
+  echo "  bandit security scan..."
+  uv run bandit -r app/ -ll -q || true
+
+  echo "  pytest..."
+  uv run pytest tests/ -v --tb=short
+
+  cd ..
+  echo "==> Backend checks passed."
+fi
+
+# --- Frontend (mirrors .github/workflows/test-web.yml) ---
+if [ "$RUN_WEB" = "1" ]; then
+  echo ""
+  echo "==> [pre-push] Frontend checks (mirrors CI test-web.yml)..."
+  cd selfserve-jobs-customer-web
+
+  echo "  eslint..."
+  npm run lint
+
+  echo "  typecheck..."
+  npm run typecheck
+
+  echo "  vitest..."
+  npm test
+
+  echo "  npm audit (high severity)..."
+  npm audit --audit-level=high || true
+
+  cd ..
+  echo "==> Frontend checks passed."
+fi
+
+echo ""
+echo "Pre-push checks passed."
