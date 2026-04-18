@@ -354,3 +354,23 @@ async def test_create_profile_stores_employment_status(client):
     payload = {**VALID_PROFILE_PAYLOAD, "email": "empnew@example.com", "current_employment_status": "open_to_work"}
     r = await client.post("/api/v1/profiles", json=payload)
     assert r.status_code == 201
+
+
+async def test_list_profiles_filter_by_employment_status(client, db_session):
+    """employment_status query param filters profiles to matching statuses only."""
+    await _make_profile(
+        db_session, profile_code="empfilt01", email="ef1@example.com", current_employment_status="open_to_work"
+    )
+    await _make_profile(
+        db_session, profile_code="empfilt02", email="ef2@example.com", current_employment_status="full_time"
+    )
+    await _make_profile(
+        db_session, profile_code="empfilt03", email="ef3@example.com", current_employment_status="contract"
+    )
+
+    r = await client.get("/api/v1/profiles?employment_status=open_to_work&employment_status=contract")
+    assert r.status_code == 200
+    codes = [item["code"] for item in r.json()["items"]]
+    assert "empfilt01" in codes
+    assert "empfilt03" in codes
+    assert "empfilt02" not in codes

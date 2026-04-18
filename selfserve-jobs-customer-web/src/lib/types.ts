@@ -292,6 +292,7 @@ export interface ProfileFilters {
   min_experience?: number;
   max_experience?: number;
   relocation_preference?: RelocationPreference;
+  employment_status?: EmploymentStatus[];
   skills?: string[];
   sort?: 'newest' | 'oldest';
   page?: number;

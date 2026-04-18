@@ -38,6 +38,7 @@ async def list_profiles(
     min_experience: int | None = Query(None, ge=0),
     max_experience: int | None = Query(None, le=50),
     relocation_preference: str | None = Query(None),
+    employment_status: list[str] | None = Query(None),
     sort: str = Query("newest", pattern="^(newest|oldest)$"),
     db: AsyncSession = Depends(get_session),
 ):
@@ -51,6 +52,7 @@ async def list_profiles(
         min_experience=min_experience,
         max_experience=max_experience,
         relocation_preference=relocation_preference,
+        employment_status=employment_status,
         sort=sort,
     )
     items = [ProfileListItem(**profile_service.to_list_item(p)) for p in result["items"]]

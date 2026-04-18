@@ -23,6 +23,7 @@ function parseFiltersFromParams(searchParams: URLSearchParams): ProfileFiltersTy
   const max_experience = searchParams.get('max_experience');
   const relocation_preference = searchParams.get('relocation_preference') as RelocationPreference | null;
   const skills = searchParams.getAll('skills');
+  const employment_status = searchParams.getAll('employment_status');
 
   if (search) filters.search = search;
   if (country) filters.country = country;
@@ -32,6 +33,7 @@ function parseFiltersFromParams(searchParams: URLSearchParams): ProfileFiltersTy
   if (max_experience) filters.max_experience = parseInt(max_experience);
   if (relocation_preference) filters.relocation_preference = relocation_preference;
   if (skills.length) filters.skills = skills;
+  if (employment_status.length) filters.employment_status = employment_status as ProfileFiltersType['employment_status'];
 
   return filters;
 }
@@ -46,6 +48,7 @@ function filtersToParams(filters: ProfileFiltersType): URLSearchParams {
   if (filters.max_experience !== undefined) params.set('max_experience', String(filters.max_experience));
   if (filters.relocation_preference) params.set('relocation_preference', filters.relocation_preference);
   filters.skills?.forEach((s) => params.append('skills', s));
+  filters.employment_status?.forEach((s) => params.append('employment_status', s));
   return params;
 }
 

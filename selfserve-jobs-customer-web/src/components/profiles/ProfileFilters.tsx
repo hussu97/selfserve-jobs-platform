@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
 import { SkillTag } from '@/components/shared/SkillTag';
-import { COUNTRIES, POPULAR_SKILLS, RELOCATION_PREFERENCES } from '@/lib/constants';
-import type { ProfileFilters, RelocationPreference } from '@/lib/types';
+import { COUNTRIES, EMPLOYMENT_STATUSES, POPULAR_SKILLS, RELOCATION_PREFERENCES } from '@/lib/constants';
+import type { EmploymentStatus, ProfileFilters, RelocationPreference } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
 interface ProfileFiltersProps {
@@ -15,7 +15,7 @@ interface ProfileFiltersProps {
 }
 
 const SORT_OPTIONS = [
-  { value: 'newest', label: 'Newest first' },
+  { value: 'newest', label: 'Recommended' },
   { value: 'oldest', label: 'Oldest first' },
 ];
 
@@ -60,6 +60,14 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
     return `${min_experience}-${max_experience}`;
   };
 
+  const toggleEmploymentStatus = (status: EmploymentStatus) => {
+    const current = filters.employment_status ?? [];
+    const updated = current.includes(status)
+      ? current.filter((s) => s !== status)
+      : [...current, status];
+    updateFilter('employment_status', updated.length ? updated : undefined);
+  };
+
   const addSkill = (skill: string) => {
     const trimmed = skill.trim();
     if (!trimmed) return;
@@ -83,7 +91,8 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
     !!filters.country ||
     !!filters.relocation_preference ||
     filters.min_experience !== undefined ||
-    (filters.skills?.length ?? 0) > 0;
+    (filters.skills?.length ?? 0) > 0 ||
+    (filters.employment_status?.length ?? 0) > 0;
 
   const filterContent = (
     <div className="flex flex-col gap-5">
@@ -152,6 +161,31 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
               Clear selection
             </button>
           )}
+        </div>
+      </div>
+
+      {/* Employment Status */}
+      <div className="flex flex-col gap-2">
+        <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-text-muted">
+          Employment status
+        </p>
+        <div className="flex flex-col gap-1.5">
+          {EMPLOYMENT_STATUSES.map((es) => (
+            <label
+              key={es.value}
+              className="flex items-center gap-2.5 cursor-pointer group"
+            >
+              <input
+                type="checkbox"
+                checked={(filters.employment_status ?? []).includes(es.value)}
+                onChange={() => toggleEmploymentStatus(es.value)}
+                className="rounded text-primary focus:ring-primary cursor-pointer"
+              />
+              <span className="text-sm group-hover:text-primary transition-colors text-text-main">
+                {es.label}
+              </span>
+            </label>
+          ))}
         </div>
       </div>
 
