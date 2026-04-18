@@ -1,5 +1,5 @@
-import { EMPLOYMENT_TYPES, NOTICE_PERIODS, RELOCATION_PREFERENCES, COUNTRIES } from './constants';
-import type { EmploymentType, NoticePeriod, RelocationPreference } from './types';
+import { EMPLOYMENT_STATUSES, EMPLOYMENT_TYPES, NOTICE_PERIODS, RELOCATION_PREFERENCES, COUNTRIES } from './constants';
+import type { EmploymentStatus, EmploymentType, NoticePeriod, RelocationPreference } from './types';
 
 export function formatDate(dateStr: string): string {
   const date = new Date(dateStr);
@@ -50,6 +50,10 @@ export function getNoticePeriodLabel(period: NoticePeriod): string {
 
 export function getRelocationLabel(pref: RelocationPreference): string {
   return RELOCATION_PREFERENCES.find((r) => r.value === pref)?.label ?? pref;
+}
+
+export function getEmploymentStatusLabel(status: EmploymentStatus | string): string {
+  return EMPLOYMENT_STATUSES.find((s) => s.value === status)?.label ?? status;
 }
 
 export function getCountryLabel(code: string): string {

@@ -29,6 +29,7 @@ const validProfile: CreateProfileRequest = {
   years_of_experience: 8,
   notice_period: 'immediate',
   relocation_preference: 'open',
+  current_employment_status: 'full_time',
 };
 
 // ---------------------------------------------------------------------------

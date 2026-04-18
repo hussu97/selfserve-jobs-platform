@@ -10,6 +10,9 @@ PROFILE_STATUSES = Literal["pending_verification", "active", "removed", "expired
 # Notice period values used by frontend
 NOTICE_PERIODS = Literal["immediate", "1_week", "2_weeks", "1_month", "3_months", "6_months"]
 
+# Current employment status — sort priority: open_to_work → part_time → full_time → remote → contract → freelance
+EMPLOYMENT_STATUSES = Literal["open_to_work", "part_time", "full_time", "remote", "contract", "freelance"]
+
 
 class ProfileCreate(BaseModel):
     model_config = {
@@ -45,6 +48,7 @@ class ProfileCreate(BaseModel):
     current_title: str = Field(..., min_length=2, max_length=200)
     notice_period: NOTICE_PERIODS | None = None
     relocation_preference: RELOCATION_PREFERENCES = "open"
+    current_employment_status: EMPLOYMENT_STATUSES = "full_time"
     linkedin_profile_link: str | None = Field(None, max_length=500)
     key_skills: list[str] = Field(default_factory=list, max_length=30)
     resume_key: str | None = Field(None, max_length=500)
@@ -72,6 +76,7 @@ class ProfileUpdate(BaseModel):
     current_title: str | None = Field(None, min_length=2, max_length=200)
     notice_period: NOTICE_PERIODS | None = None
     relocation_preference: RELOCATION_PREFERENCES | None = None
+    current_employment_status: EMPLOYMENT_STATUSES | None = None
     linkedin_profile_link: str | None = Field(None, max_length=500)
     key_skills: list[str] | None = Field(None, max_length=30)
     # When explicitly sent as null → remove resume. When a GCS path → replace resume.
@@ -98,6 +103,7 @@ class ProfileResponse(BaseModel):
     current_title: str
     notice_period: str | None
     relocation_preference: str
+    current_employment_status: str
     linkedin_profile_link: str | None
     key_skills: list[str]
     brief: str
@@ -142,6 +148,7 @@ class ProfileResponse(BaseModel):
             "current_title": obj.current_title,
             "notice_period": obj.notice_period,
             "relocation_preference": obj.relocation_preference,
+            "current_employment_status": obj.current_employment_status,
             "linkedin_profile_link": obj.linkedin_profile_link,
             "key_skills": obj.key_skills or [],
             "brief": obj.brief,
@@ -172,6 +179,7 @@ class ProfileListItem(BaseModel):
     current_title: str
     notice_period: str | None
     relocation_preference: str
+    current_employment_status: str
     key_skills: list[str]
     status: str
     view_count: int

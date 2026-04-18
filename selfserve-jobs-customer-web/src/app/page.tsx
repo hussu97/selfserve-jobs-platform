@@ -84,13 +84,22 @@ export default async function HomePage() {
       </section>
 
       {/* ── Browse ───────────────────────────────────────── */}
-      <section className="bg-surface py-20 sm:py-28">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative overflow-hidden py-20 sm:py-28" style={{ backgroundColor: '#1a2e1c' }}>
+        {/* Dubai Marina background */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          alt=""
+          aria-hidden="true"
+          src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1920&q=80"
+          className="absolute inset-0 w-full h-full object-cover opacity-20"
+        />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, #1a2e1c 0%, transparent 30%, transparent 70%, #1a2e1c 100%)' }} />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
-            <p className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-3">
+            <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#8BA888' }}>
               Explore the platform
             </p>
-            <h2 className="font-heading text-4xl sm:text-5xl text-primary">
+            <h2 className="font-heading text-4xl sm:text-5xl" style={{ color: '#fcf9f5' }}>
               Where would you like to <em>go?</em>
             </h2>
           </div>
@@ -158,8 +167,16 @@ export default async function HomePage() {
       </section>
 
       {/* ── How it works ─────────────────────────────────── */}
-      <section className="bg-bg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
+      <section className="relative overflow-hidden bg-bg">
+        {/* Burj Khalifa background */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          alt=""
+          aria-hidden="true"
+          src="https://images.unsplash.com/photo-1578895101408-1a36b834405b?auto=format&fit=crop&w=1920&q=80"
+          className="absolute inset-0 w-full h-full object-cover opacity-[0.06]"
+        />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
           <div className="text-center mb-12">
             <p className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-3">
               How it works
@@ -222,8 +239,16 @@ export default async function HomePage() {
       </section>
 
       {/* ── Available Talent ─────────────────────────────── (TALENT FIRST) */}
-      <section className="bg-surface py-20 sm:py-28">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative overflow-hidden bg-surface py-20 sm:py-28">
+        {/* Dubai Creek / traditional abra boats background */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          alt=""
+          aria-hidden="true"
+          src="https://images.unsplash.com/photo-1548266652-99cf27701ced?auto=format&fit=crop&w=1920&q=80"
+          className="absolute inset-0 w-full h-full object-cover opacity-[0.07]"
+        />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Section header */}
           <div className="flex items-end justify-between mb-10">
             <div>
@@ -281,8 +306,16 @@ export default async function HomePage() {
       </section>
 
       {/* ── Recent Jobs ──────────────────────────────────── */}
-      <section className="bg-bg py-20 sm:py-28">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative overflow-hidden bg-bg py-20 sm:py-28">
+        {/* UAE desert dunes background */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          alt=""
+          aria-hidden="true"
+          src="https://images.unsplash.com/photo-1547483238-f400e65ccd56?auto=format&fit=crop&w=1920&q=80"
+          className="absolute inset-0 w-full h-full object-cover opacity-[0.07]"
+        />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Section header */}
           <div className="flex items-end justify-between mb-10">
             <div>

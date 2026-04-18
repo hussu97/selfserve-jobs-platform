@@ -20,6 +20,7 @@ const baseProfile: ProfileListItem = {
   key_skills: ['Python', 'React', 'PostgreSQL'],
   notice_period: 'immediate',
   relocation_preference: 'yes',
+  current_employment_status: 'full_time',
   created_at: new Date(Date.now() - 1000 * 60 * 60).toISOString(), // 1 hour ago
 };
 
@@ -92,5 +93,16 @@ describe('ProfileCard', () => {
     const profile: ProfileListItem = { ...baseProfile, key_skills: [] };
     render(<ProfileCard profile={profile} />);
     expect(screen.queryByText('Python')).toBeNull();
+  });
+
+  it('renders employment status badge for full_time', () => {
+    render(<ProfileCard profile={baseProfile} />);
+    expect(screen.getByText('Full-time')).toBeInTheDocument();
+  });
+
+  it('renders "Open to work" badge prominently for open_to_work status', () => {
+    const profile: ProfileListItem = { ...baseProfile, current_employment_status: 'open_to_work' };
+    render(<ProfileCard profile={profile} />);
+    expect(screen.getByText('Open to work')).toBeInTheDocument();
   });
 });

@@ -58,6 +58,7 @@ class Job(Base):
     recruiter_code: Mapped[str | None] = mapped_column(VARCHAR(12), nullable=True)
     edit_token: Mapped[str] = mapped_column(VARCHAR(64), unique=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(TIMESTAMPTZ, nullable=False, server_default=func.now())
+    last_renewed_at: Mapped[datetime] = mapped_column(TIMESTAMPTZ, nullable=False, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         TIMESTAMPTZ, nullable=False, server_default=func.now(), onupdate=func.now()
     )

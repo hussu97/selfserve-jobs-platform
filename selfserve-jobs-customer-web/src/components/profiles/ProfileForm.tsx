@@ -39,6 +39,7 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
   const [form, setForm] = useState<Partial<CreateProfileRequest>>({
     notice_period: 'immediate',
     relocation_preference: 'open',
+    current_employment_status: 'full_time',
     contact_number: '+971 ',
     email: sessionEmail ?? undefined,
   });

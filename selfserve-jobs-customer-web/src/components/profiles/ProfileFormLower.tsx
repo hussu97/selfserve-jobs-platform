@@ -4,7 +4,7 @@ import { MarkdownEditor } from '@/components/ui/MarkdownEditor';
 import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
 import { SkillTag } from '@/components/shared/SkillTag';
-import { NOTICE_PERIODS, RELOCATION_PREFERENCES } from '@/lib/constants';
+import { EMPLOYMENT_STATUSES, NOTICE_PERIODS, RELOCATION_PREFERENCES } from '@/lib/constants';
 import type { CreateProfileRequest } from '@/lib/types';
 
 type UploadState = 'idle' | 'uploading' | 'done' | 'error';
@@ -47,10 +47,10 @@ export default function ProfileFormLower({
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Select
-            label="Notice period"
-            options={NOTICE_PERIODS}
-            value={form.notice_period ?? 'immediate'}
-            onChange={(e) => set('notice_period', e.target.value as CreateProfileRequest['notice_period'])}
+            label="Current employment status"
+            options={EMPLOYMENT_STATUSES}
+            value={form.current_employment_status ?? 'full_time'}
+            onChange={(e) => set('current_employment_status', e.target.value as CreateProfileRequest['current_employment_status'])}
             required
           />
           <Select
@@ -58,6 +58,15 @@ export default function ProfileFormLower({
             options={RELOCATION_PREFERENCES}
             value={form.relocation_preference ?? 'open'}
             onChange={(e) => set('relocation_preference', e.target.value as CreateProfileRequest['relocation_preference'])}
+            required
+          />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Select
+            label="Notice period"
+            options={NOTICE_PERIODS}
+            value={form.notice_period ?? 'immediate'}
+            onChange={(e) => set('notice_period', e.target.value as CreateProfileRequest['notice_period'])}
             required
           />
         </div>

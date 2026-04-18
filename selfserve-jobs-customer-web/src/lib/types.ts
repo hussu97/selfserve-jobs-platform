@@ -19,6 +19,14 @@ export type NoticePeriod =
 
 export type RelocationPreference = 'yes' | 'no' | 'open';
 
+export type EmploymentStatus =
+  | 'open_to_work'
+  | 'part_time'
+  | 'full_time'
+  | 'remote'
+  | 'contract'
+  | 'freelance';
+
 export type EntityType = 'job' | 'profile';
 
 export type ReportReason =
@@ -84,6 +92,7 @@ export interface Profile {
   key_skills: string[];
   notice_period: NoticePeriod;
   relocation_preference: RelocationPreference;
+  current_employment_status: EmploymentStatus;
   linkedin_profile_link?: string;
   email?: string;
   contact_number?: string;
@@ -109,6 +118,7 @@ export interface ProfileListItem {
   key_skills: string[];
   notice_period: NoticePeriod;
   relocation_preference: RelocationPreference;
+  current_employment_status: EmploymentStatus;
   created_at: string;
 }
 
@@ -156,6 +166,7 @@ export interface CreateProfileRequest {
   current_title: string;
   notice_period: NoticePeriod;
   relocation_preference: RelocationPreference;
+  current_employment_status: EmploymentStatus;
   linkedin_profile_link?: string;
   key_skills: string[];
   resume_key?: string;
@@ -185,6 +196,7 @@ export interface UpdateProfileRequest {
   current_title?: string;
   notice_period?: NoticePeriod;
   relocation_preference?: RelocationPreference;
+  current_employment_status?: EmploymentStatus;
   linkedin_profile_link?: string;
   key_skills?: string[];
   // Explicitly null → remove resume. GCS path string → replace resume. Omit → no change.

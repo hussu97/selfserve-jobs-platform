@@ -78,15 +78,27 @@ export default function AboutPage() {
   return (
     <div>
       {/* Hero */}
-      <section className="hero-gradient">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 text-center">
-          <span className="text-xs font-semibold uppercase tracking-widest text-secondary mb-4 block">
+      <section className="relative overflow-hidden min-h-[50vh] flex items-center" style={{ backgroundColor: '#121211' }}>
+        {/* Sheikh Zayed Grand Mosque background */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          alt=""
+          aria-hidden="true"
+          src="https://images.unsplash.com/photo-1533929736458-ca588d08c8be?auto=format&fit=crop&w=1920&q=80"
+          className="absolute inset-0 w-full h-full object-cover opacity-30"
+        />
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: 'linear-gradient(to bottom, #121211 0%, transparent 25%, transparent 75%, #121211 100%)' }}
+        />
+        <div className="relative z-10 w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32 text-center">
+          <span className="text-xs font-semibold uppercase tracking-widest mb-4 block" style={{ color: '#8BA888' }}>
             About hirebridge
           </span>
-          <h1 className="font-heading text-4xl sm:text-5xl text-primary mb-6">
+          <h1 className="font-heading text-4xl sm:text-5xl mb-6" style={{ color: '#fcf9f5' }}>
             A job platform built for our <em>community</em>
           </h1>
-          <p className="text-lg leading-relaxed text-text-muted max-w-2xl mx-auto">
+          <p className="text-lg leading-relaxed max-w-2xl mx-auto" style={{ color: '#c3c8c0' }}>
             hirebridge puts people first. Professionals list themselves with nothing more than an email verification.
             Recruiters register for a verified account and get approved before accessing candidate data.
             No fees, no algorithms, no noise — ever.
@@ -95,8 +107,16 @@ export default function AboutPage() {
       </section>
 
       {/* Our Story */}
-      <section className="bg-surface">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+      <section className="relative overflow-hidden bg-surface">
+        {/* Al Fahidi historical district / old Dubai background */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          alt=""
+          aria-hidden="true"
+          src="https://images.unsplash.com/photo-1579547621706-1a9c79d5c9f1?auto=format&fit=crop&w=1920&q=80"
+          className="absolute inset-0 w-full h-full object-cover opacity-[0.06]"
+        />
+        <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
           <span className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-4 block">
             Our story
           </span>
@@ -226,8 +246,16 @@ export default function AboutPage() {
       </section>
 
       {/* Values */}
-      <section className="bg-bg">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <section className="relative overflow-hidden bg-bg">
+        {/* Palm Jumeirah aerial background */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          alt=""
+          aria-hidden="true"
+          src="https://images.unsplash.com/photo-1582672060674-bc2bd808a8b5?auto=format&fit=crop&w=1920&q=80"
+          className="absolute inset-0 w-full h-full object-cover opacity-[0.06]"
+        />
+        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center mb-12">
             <span className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-3 block">
               Our principles

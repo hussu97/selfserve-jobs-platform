@@ -1,4 +1,4 @@
-import type { EmploymentType, NoticePeriod, RelocationPreference } from './types';
+import type { EmploymentStatus, EmploymentType, NoticePeriod, RelocationPreference } from './types';
 
 export const EMPLOYMENT_TYPES: { value: EmploymentType; label: string }[] = [
   { value: 'full_time', label: 'Full-time' },
@@ -17,6 +17,15 @@ export const NOTICE_PERIODS: { value: NoticePeriod; label: string }[] = [
   { value: '1_month', label: '1 Month' },
   { value: '3_months', label: '3 Months' },
   { value: '6_months', label: '6 Months' },
+];
+
+export const EMPLOYMENT_STATUSES: { value: EmploymentStatus; label: string }[] = [
+  { value: 'open_to_work', label: 'Open to work' },
+  { value: 'part_time', label: 'Part-time' },
+  { value: 'full_time', label: 'Full-time' },
+  { value: 'remote', label: 'Remote' },
+  { value: 'contract', label: 'Contract' },
+  { value: 'freelance', label: 'Freelancing' },
 ];
 
 export const RELOCATION_PREFERENCES: { value: RelocationPreference; label: string }[] = [

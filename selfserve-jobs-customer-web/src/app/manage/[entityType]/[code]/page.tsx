@@ -28,7 +28,7 @@ import {
   getResumeUploadUrl,
   uploadResumeWithProgress,
 } from '@/lib/api';
-import { EMPLOYMENT_TYPES, NOTICE_PERIODS, RELOCATION_PREFERENCES } from '@/lib/constants';
+import { EMPLOYMENT_STATUSES, EMPLOYMENT_TYPES, NOTICE_PERIODS, RELOCATION_PREFERENCES } from '@/lib/constants';
 import type { Job, Profile, UpdateJobRequest, UpdateProfileRequest } from '@/lib/types';
 
 type PageState = 'loading' | 'invalid' | 'valid' | 'deleted';
@@ -135,6 +135,7 @@ function ManageContent() {
               current_title: p.current_title,
               notice_period: p.notice_period,
               relocation_preference: p.relocation_preference,
+              current_employment_status: p.current_employment_status,
               linkedin_profile_link: p.linkedin_profile_link,
               key_skills: [...p.key_skills],
             });
@@ -656,16 +657,24 @@ function ManageContent() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Select
-                label="Notice period"
-                options={NOTICE_PERIODS}
-                value={profileForm.notice_period ?? 'immediate'}
-                onChange={(e) => setProfileField('notice_period', e.target.value as UpdateProfileRequest['notice_period'])}
+                label="Current employment status"
+                options={EMPLOYMENT_STATUSES}
+                value={profileForm.current_employment_status ?? 'full_time'}
+                onChange={(e) => setProfileField('current_employment_status', e.target.value as UpdateProfileRequest['current_employment_status'])}
               />
               <Select
                 label="Open to relocation?"
                 options={RELOCATION_PREFERENCES}
                 value={profileForm.relocation_preference ?? 'open'}
                 onChange={(e) => setProfileField('relocation_preference', e.target.value as UpdateProfileRequest['relocation_preference'])}
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Select
+                label="Notice period"
+                options={NOTICE_PERIODS}
+                value={profileForm.notice_period ?? 'immediate'}
+                onChange={(e) => setProfileField('notice_period', e.target.value as UpdateProfileRequest['notice_period'])}
               />
             </div>
           </div>

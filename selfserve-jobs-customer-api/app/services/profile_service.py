@@ -3,7 +3,7 @@ import math
 from datetime import UTC, datetime, timedelta
 
 from fastapi import HTTPException, status
-from sqlalchemy import and_, func, select, update
+from sqlalchemy import and_, case, func, select, update
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -52,6 +52,7 @@ async def create_profile(db: AsyncSession, data: ProfileCreate) -> tuple[Profile
         current_title=data.current_title,
         notice_period=data.notice_period,
         relocation_preference=data.relocation_preference,
+        current_employment_status=data.current_employment_status,
         linkedin_profile_link=data.linkedin_profile_link,
         key_skills=data.key_skills or [],
         resume_gcs_path=data.resume_key or None,
@@ -60,6 +61,7 @@ async def create_profile(db: AsyncSession, data: ProfileCreate) -> tuple[Profile
         expires_at=now + timedelta(days=PROFILE_EXPIRY_DAYS),
         edit_token=generate_token(64),
         created_at=now,
+        last_renewed_at=now,
         updated_at=now,
     )
     db.add(profile)
@@ -158,9 +160,18 @@ async def list_profiles(
     total = total_result.scalar_one()
 
     if sort == "oldest":
-        base_query = base_query.order_by(Profile.created_at.asc())
+        base_query = base_query.order_by(Profile.last_renewed_at.asc())
     else:
-        base_query = base_query.order_by(Profile.created_at.desc())
+        # Default: employment status priority (actively seeking first), then most recently renewed
+        _employment_order = case(
+            (Profile.current_employment_status == "open_to_work", 1),
+            (Profile.current_employment_status == "part_time", 2),
+            (Profile.current_employment_status == "full_time", 3),
+            (Profile.current_employment_status == "remote", 4),
+            (Profile.current_employment_status == "contract", 5),
+            else_=6,
+        )
+        base_query = base_query.order_by(_employment_order.asc(), Profile.last_renewed_at.desc())
 
     offset = (page - 1) * per_page
     base_query = base_query.offset(offset).limit(per_page)
@@ -190,6 +201,7 @@ def to_list_item(p: Profile) -> dict:
         "current_title": p.current_title,
         "notice_period": p.notice_period,
         "relocation_preference": p.relocation_preference,
+        "current_employment_status": p.current_employment_status,
         "key_skills": p.key_skills or [],
         "status": p.status,
         "view_count": p.view_count,
@@ -223,6 +235,7 @@ async def update_profile(
         "current_title",
         "notice_period",
         "relocation_preference",
+        "current_employment_status",
         "linkedin_profile_link",
         "key_skills",
     }
@@ -421,6 +434,7 @@ async def renew_profile(db: AsyncSession, profile_code: str, edit_token: str) ->
     profile.expires_at = base + timedelta(days=RENEWAL_EXTENSION_DAYS)
     profile.renewal_count += 1
     profile.status = "active"
+    profile.last_renewed_at = now
     profile.updated_at = now
     await db.flush()
     return profile

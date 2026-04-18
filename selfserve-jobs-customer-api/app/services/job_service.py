@@ -69,6 +69,7 @@ async def create_job(
         expires_at=now + timedelta(days=JOB_EXPIRY_DAYS),
         edit_token=generate_token(64),
         created_at=now,
+        last_renewed_at=now,
         updated_at=now,
     )
     db.add(job)
@@ -173,11 +174,11 @@ async def list_jobs(
 
     # Sort
     if sort == "oldest":
-        base_query = base_query.order_by(Job.created_at.asc())
+        base_query = base_query.order_by(Job.last_renewed_at.asc())
     elif sort == "deadline":
         base_query = base_query.order_by(Job.deadline_date.asc().nulls_last())
-    else:  # newest
-        base_query = base_query.order_by(Job.created_at.desc())
+    else:  # newest — use last_renewed_at so renewals bump to top
+        base_query = base_query.order_by(Job.last_renewed_at.desc())
 
     # Paginate
     offset = (page - 1) * per_page
@@ -331,6 +332,7 @@ async def renew_job(db: AsyncSession, job_code: str, edit_token: str) -> Job:
     job.expires_at = base + timedelta(days=RENEWAL_EXTENSION_DAYS)
     job.renewal_count += 1
     job.status = "active"
+    job.last_renewed_at = now
     job.updated_at = now
     await db.flush()
     return job

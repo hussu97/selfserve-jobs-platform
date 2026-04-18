@@ -2,7 +2,7 @@ import { memo } from 'react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/Badge';
 import { SkillTag } from '@/components/shared/SkillTag';
-import { getCountryLabel, getRelocationLabel, getNoticePeriodLabel, formatExperience, timeAgo } from '@/lib/utils';
+import { getCountryLabel, getRelocationLabel, getNoticePeriodLabel, getEmploymentStatusLabel, formatExperience, timeAgo } from '@/lib/utils';
 import type { ProfileListItem } from '@/lib/types';
 
 interface ProfileCardProps {
@@ -25,11 +25,23 @@ export const ProfileCard = memo(function ProfileCard({ profile }: ProfileCardPro
     <Link href={`/profiles/${profile.code}`} className="block group">
       <article className="h-full flex flex-col bg-surface-lowest rounded-2xl shadow-ambient transition-all duration-300 hover:shadow-ambient-hover hover:-translate-y-1 p-6 gap-4">
 
-        {/* Row 1: Relocation badge + time posted */}
+        {/* Row 1: Employment status badge + relocation badge + time posted */}
         <div className="flex items-center justify-between gap-2">
-          <Badge variant={RELOCATION_BADGE[profile.relocation_preference] ?? 'default'} size="sm">
-            {getRelocationLabel(profile.relocation_preference)}
-          </Badge>
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {profile.current_employment_status === 'open_to_work' ? (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider bg-accent/20 text-accent-dark">
+                <span className="w-1.5 h-1.5 rounded-full bg-accent-dark inline-block" />
+                Open to work
+              </span>
+            ) : (
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium uppercase tracking-wider bg-surface text-text-muted">
+                {getEmploymentStatusLabel(profile.current_employment_status)}
+              </span>
+            )}
+            <Badge variant={RELOCATION_BADGE[profile.relocation_preference] ?? 'default'} size="sm">
+              {getRelocationLabel(profile.relocation_preference)}
+            </Badge>
+          </div>
           <span className="text-xs text-text-muted whitespace-nowrap">{timeAgo(profile.created_at)}</span>
         </div>
 

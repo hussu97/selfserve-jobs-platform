@@ -17,6 +17,7 @@ VALID_PROFILE_PAYLOAD = {
     "years_of_experience": 8,
     "current_title": "Senior Software Engineer",
     "relocation_preference": "open",
+    "current_employment_status": "full_time",
     "key_skills": ["Python", "Django", "PostgreSQL"],
 }
 
@@ -45,12 +46,14 @@ async def _make_profile(db_session, *, email="jane@example.com", phone="+44 7700
         years_of_experience=8,
         current_title="Senior Software Engineer",
         relocation_preference="open",
+        current_employment_status="full_time",
         key_skills=["Python"],
         status="active",
         view_count=0,
         edit_token=edit_token,
         expires_at=now + timedelta(days=180),
         created_at=now,
+        last_renewed_at=now,
         updated_at=now,
     )
     fields.update(overrides)
@@ -272,3 +275,82 @@ async def test_validate_token_invalid_entity_type(client):
         params={"entity_type": "recruiter", "code": "abc", "token": "tok"},
     )
     assert r.status_code == 400
+
+
+# ---------------------------------------------------------------------------
+# Employment status — sort order and field in response
+# ---------------------------------------------------------------------------
+
+
+async def test_list_profiles_employment_status_in_response(client, db_session):
+    """Employment status is included in list response items."""
+    await _make_profile(
+        db_session,
+        profile_code="empstat001",
+        email="empstat1@example.com",
+        current_employment_status="open_to_work",
+    )
+    r = await client.get("/api/v1/profiles")
+    assert r.status_code == 200
+    items = r.json()["items"]
+    assert len(items) >= 1
+    assert items[0]["current_employment_status"] == "open_to_work"
+
+
+async def test_list_profiles_default_sort_open_to_work_first(client, db_session):
+    """Default sort surfaces open_to_work profiles before full_time profiles."""
+    now = datetime.now(UTC)
+    # Create full_time first (older timestamp), open_to_work second (newer timestamp)
+    await _make_profile(
+        db_session,
+        profile_code="sortfull001",
+        email="sortfull@example.com",
+        current_employment_status="full_time",
+        created_at=now - timedelta(hours=2),
+        last_renewed_at=now - timedelta(hours=2),
+    )
+    await _make_profile(
+        db_session,
+        profile_code="sortopen001",
+        email="sortopen@example.com",
+        current_employment_status="open_to_work",
+        created_at=now - timedelta(hours=1),
+        last_renewed_at=now - timedelta(hours=1),
+    )
+    r = await client.get("/api/v1/profiles")
+    assert r.status_code == 200
+    items = r.json()["items"]
+    codes = [i["code"] for i in items]
+    assert codes.index("sortopen001") < codes.index("sortfull001")
+
+
+async def test_renew_profile_updates_last_renewed_at(client, db_session):
+    """Renewing a profile sets last_renewed_at to now, bumping recency."""
+    now = datetime.now(UTC)
+    old_time = now - timedelta(days=10)
+    profile = await _make_profile(
+        db_session,
+        profile_code="renewbump01",
+        email="renewbump@example.com",
+        last_renewed_at=old_time,
+        created_at=old_time,
+    )
+    r = await client.post(
+        f"/api/v1/profiles/{profile.profile_code}/renew",
+        headers={"X-Edit-Token": profile.edit_token},
+    )
+    assert r.status_code == 200
+    await db_session.refresh(profile)
+    # Strip tz for SQLite compat — SQLite returns naive datetimes
+    renewed = profile.last_renewed_at
+    if renewed.tzinfo:
+        renewed = renewed.replace(tzinfo=None)
+    threshold = old_time.replace(tzinfo=None) + timedelta(days=5)
+    assert renewed > threshold
+
+
+async def test_create_profile_stores_employment_status(client):
+    """Employment status sent at creation is stored and returned."""
+    payload = {**VALID_PROFILE_PAYLOAD, "email": "empnew@example.com", "current_employment_status": "open_to_work"}
+    r = await client.post("/api/v1/profiles", json=payload)
+    assert r.status_code == 201
