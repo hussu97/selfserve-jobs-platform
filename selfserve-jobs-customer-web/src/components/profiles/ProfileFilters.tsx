@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
 import { SkillTag } from '@/components/shared/SkillTag';
-import { COUNTRIES, EMPLOYMENT_STATUSES, POPULAR_SKILLS, RELOCATION_PREFERENCES } from '@/lib/constants';
-import type { EmploymentStatus, ProfileFilters, RelocationPreference } from '@/lib/types';
+import { COUNTRIES, EMPLOYMENT_STATUSES, NOTICE_PERIODS, POPULAR_SKILLS, RELOCATION_PREFERENCES } from '@/lib/constants';
+import type { EmploymentStatus, NoticePeriod, ProfileFilters, RelocationPreference } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
 interface ProfileFiltersProps {
@@ -60,12 +60,41 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
     return `${min_experience}-${max_experience}`;
   };
 
+  const isImmediateAndOpenToWork =
+    (filters.employment_status ?? []).includes('open_to_work') &&
+    (filters.notice_period ?? []).includes('immediate');
+
+  const toggleImmediateAndOpenToWork = () => {
+    if (isImmediateAndOpenToWork) {
+      const newStatus = (filters.employment_status ?? []).filter((s) => s !== 'open_to_work');
+      const newNotice = (filters.notice_period ?? []).filter((n) => n !== 'immediate');
+      onChange({
+        ...filters,
+        employment_status: newStatus.length ? newStatus : undefined,
+        notice_period: newNotice.length ? newNotice : undefined,
+        page: 1,
+      });
+    } else {
+      const newStatus = [...new Set([...(filters.employment_status ?? []), 'open_to_work' as EmploymentStatus])];
+      const newNotice = [...new Set([...(filters.notice_period ?? []), 'immediate' as NoticePeriod])];
+      onChange({ ...filters, employment_status: newStatus, notice_period: newNotice, page: 1 });
+    }
+  };
+
   const toggleEmploymentStatus = (status: EmploymentStatus) => {
     const current = filters.employment_status ?? [];
     const updated = current.includes(status)
       ? current.filter((s) => s !== status)
       : [...current, status];
     updateFilter('employment_status', updated.length ? updated : undefined);
+  };
+
+  const toggleNoticePeriod = (period: NoticePeriod) => {
+    const current = filters.notice_period ?? [];
+    const updated = current.includes(period)
+      ? current.filter((p) => p !== period)
+      : [...current, period];
+    updateFilter('notice_period', updated.length ? updated : undefined);
   };
 
   const addSkill = (skill: string) => {
@@ -92,7 +121,8 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
     !!filters.relocation_preference ||
     filters.min_experience !== undefined ||
     (filters.skills?.length ?? 0) > 0 ||
-    (filters.employment_status?.length ?? 0) > 0;
+    (filters.employment_status?.length ?? 0) > 0 ||
+    (filters.notice_period?.length ?? 0) > 0;
 
   const filterContent = (
     <div className="flex flex-col gap-5">
@@ -108,6 +138,29 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
             Clear all
           </button>
         )}
+      </div>
+
+      {/* Immediate & Open to Work — quick filter */}
+      <div className={cn(
+        'rounded-xl p-3 transition-colors',
+        isImmediateAndOpenToWork ? 'bg-accent/20' : 'bg-surface'
+      )}>
+        <label className="flex items-start gap-3 cursor-pointer group">
+          <input
+            type="checkbox"
+            checked={isImmediateAndOpenToWork}
+            onChange={toggleImmediateAndOpenToWork}
+            className="mt-0.5 rounded text-primary focus:ring-primary cursor-pointer"
+          />
+          <div>
+            <span className="text-sm font-semibold text-primary group-hover:opacity-70 transition-opacity">
+              Immediate &amp; Open to Work
+            </span>
+            <p className="text-xs text-text-muted mt-0.5">
+              Available to start right away
+            </p>
+          </div>
+        </label>
       </div>
 
       <Select
@@ -183,6 +236,31 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
               />
               <span className="text-sm group-hover:text-primary transition-colors text-text-main">
                 {es.label}
+              </span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* Notice Period */}
+      <div className="flex flex-col gap-2">
+        <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-text-muted">
+          Notice period
+        </p>
+        <div className="flex flex-col gap-1.5">
+          {NOTICE_PERIODS.map((np) => (
+            <label
+              key={np.value}
+              className="flex items-center gap-2.5 cursor-pointer group"
+            >
+              <input
+                type="checkbox"
+                checked={(filters.notice_period ?? []).includes(np.value)}
+                onChange={() => toggleNoticePeriod(np.value)}
+                className="rounded text-primary focus:ring-primary cursor-pointer"
+              />
+              <span className="text-sm group-hover:text-primary transition-colors text-text-main">
+                {np.label}
               </span>
             </label>
           ))}

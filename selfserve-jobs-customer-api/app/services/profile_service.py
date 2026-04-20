@@ -124,6 +124,7 @@ async def list_profiles(
     max_experience: int | None = None,
     relocation_preference: str | None = None,
     employment_status: list[str] | None = None,
+    notice_period: list[str] | None = None,
     sort: str = "newest",
 ) -> dict:
     per_page = min(per_page, 50)
@@ -156,6 +157,9 @@ async def list_profiles(
 
     if employment_status:
         filters.append(Profile.current_employment_status.in_(employment_status))
+
+    if notice_period:
+        filters.append(Profile.notice_period.in_(notice_period))
 
     base_query = select(Profile).where(and_(*filters))
 

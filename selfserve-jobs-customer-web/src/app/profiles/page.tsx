@@ -9,7 +9,7 @@ import { Pagination } from '@/components/shared/Pagination';
 import { ProfileCardSkeleton } from '@/components/ui/Skeleton';
 import { StatusBanner } from '@/components/shared/StatusBanner';
 import { getProfiles } from '@/lib/api';
-import type { ProfileFilters as ProfileFiltersType, ProfileListItem, RelocationPreference } from '@/lib/types';
+import type { ProfileFilters as ProfileFiltersType, ProfileListItem, RelocationPreference, NoticePeriod } from '@/lib/types';
 import { ITEMS_PER_PAGE } from '@/lib/constants';
 import { CanonicalTag } from '@/components/seo/CanonicalTag';
 
@@ -24,6 +24,7 @@ function parseFiltersFromParams(searchParams: URLSearchParams): ProfileFiltersTy
   const relocation_preference = searchParams.get('relocation_preference') as RelocationPreference | null;
   const skills = searchParams.getAll('skills');
   const employment_status = searchParams.getAll('employment_status');
+  const notice_period = searchParams.getAll('notice_period');
 
   if (search) filters.search = search;
   if (country) filters.country = country;
@@ -34,6 +35,7 @@ function parseFiltersFromParams(searchParams: URLSearchParams): ProfileFiltersTy
   if (relocation_preference) filters.relocation_preference = relocation_preference;
   if (skills.length) filters.skills = skills;
   if (employment_status.length) filters.employment_status = employment_status as ProfileFiltersType['employment_status'];
+  if (notice_period.length) filters.notice_period = notice_period as NoticePeriod[];
 
   return filters;
 }
@@ -49,6 +51,7 @@ function filtersToParams(filters: ProfileFiltersType): URLSearchParams {
   if (filters.relocation_preference) params.set('relocation_preference', filters.relocation_preference);
   filters.skills?.forEach((s) => params.append('skills', s));
   filters.employment_status?.forEach((s) => params.append('employment_status', s));
+  filters.notice_period?.forEach((n) => params.append('notice_period', n));
   return params;
 }
 

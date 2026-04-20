@@ -191,6 +191,7 @@ export async function getProfiles(filters: ProfileFilters = {}): Promise<Paginat
   if (filters.relocation_preference) params.relocation_preference = filters.relocation_preference;
   if (filters.skills?.length) params.skills = filters.skills;
   if (filters.employment_status?.length) params.employment_status = filters.employment_status;
+  if (filters.notice_period?.length) params.notice_period = filters.notice_period;
   if (filters.sort) params.sort = filters.sort;
 
   return request<PaginatedResponse<ProfileListItem>>(`/profiles${buildQueryString(params)}`, {
