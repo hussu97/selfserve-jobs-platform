@@ -195,6 +195,45 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
       />
 
       <Select
+        label="Experience"
+        options={EXPERIENCE_OPTIONS}
+        value={getExperienceValue()}
+        onChange={(e) => setExperienceRange(e.target.value)}
+      />
+
+      {/* Relocation */}
+      <div className="flex flex-col gap-2">
+        <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-text-muted">
+          Relocation
+        </p>
+        <div className="flex flex-col gap-1.5">
+          {RELOCATION_PREFERENCES.map((rp) => (
+            <label key={rp.value} className="flex items-center gap-2.5 cursor-pointer group">
+              <input
+                type="radio"
+                name="relocation"
+                value={rp.value}
+                checked={filters.relocation_preference === rp.value}
+                onChange={() => updateFilter('relocation_preference', rp.value as RelocationPreference)}
+                className="cursor-pointer"
+              />
+              <span className="text-sm group-hover:text-primary transition-colors text-text-main">
+                {rp.label}
+              </span>
+            </label>
+          ))}
+          {filters.relocation_preference && (
+            <button
+              onClick={() => updateFilter('relocation_preference', undefined)}
+              className="text-xs text-left cursor-pointer hover:opacity-70 text-text-muted"
+            >
+              Clear selection
+            </button>
+          )}
+        </div>
+      </div>
+
+      <Select
         label="Country"
         placeholder="All countries"
         options={COUNTRIES}
@@ -251,45 +290,6 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
           )}
         </div>
       )}
-
-      <Select
-        label="Experience"
-        options={EXPERIENCE_OPTIONS}
-        value={getExperienceValue()}
-        onChange={(e) => setExperienceRange(e.target.value)}
-      />
-
-      {/* Relocation */}
-      <div className="flex flex-col gap-2">
-        <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-text-muted">
-          Relocation
-        </p>
-        <div className="flex flex-col gap-1.5">
-          {RELOCATION_PREFERENCES.map((rp) => (
-            <label key={rp.value} className="flex items-center gap-2.5 cursor-pointer group">
-              <input
-                type="radio"
-                name="relocation"
-                value={rp.value}
-                checked={filters.relocation_preference === rp.value}
-                onChange={() => updateFilter('relocation_preference', rp.value as RelocationPreference)}
-                className="cursor-pointer"
-              />
-              <span className="text-sm group-hover:text-primary transition-colors text-text-main">
-                {rp.label}
-              </span>
-            </label>
-          ))}
-          {filters.relocation_preference && (
-            <button
-              onClick={() => updateFilter('relocation_preference', undefined)}
-              className="text-xs text-left cursor-pointer hover:opacity-70 text-text-muted"
-            >
-              Clear selection
-            </button>
-          )}
-        </div>
-      </div>
 
       {/* Skills */}
       <div className="flex flex-col gap-2">
