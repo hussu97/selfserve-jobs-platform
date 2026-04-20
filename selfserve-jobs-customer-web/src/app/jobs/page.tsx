@@ -77,6 +77,17 @@ function JobsContent() {
   const pathname = usePathname();
   const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Initialise synchronously so the first render and initial fetch agree
+  const isMobileRef = useRef(
+    typeof window !== 'undefined' ? window.matchMedia('(max-width: 1023px)').matches : false
+  );
+  const [isMobile, setIsMobile] = useState(isMobileRef.current);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const nextPageRef = useRef(2);
+  const filtersRef = useRef<JobFiltersType>({});
+  const loadMoreFnRef = useRef<() => void>(() => {});
+
   const [filters, setFilters] = useState<JobFiltersType>(() =>
     parseFiltersFromParams(searchParams)
   );
@@ -87,30 +98,47 @@ function JobsContent() {
   const [searching, setSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchJobs = useCallback(async (f: JobFiltersType) => {
-    setLoading(true);
-    setError(null);
+  const fetchJobs = useCallback(async (f: JobFiltersType, append = false) => {
+    if (append) {
+      setLoadingMore(true);
+    } else {
+      setLoading(true);
+      setError(null);
+    }
+    filtersRef.current = f;
     try {
       const result = await getJobs({ ...f, per_page: ITEMS_PER_PAGE });
-      setJobs(result.items);
+      if (append) {
+        setJobs((prev) => [...prev, ...result.items]);
+      } else {
+        setJobs(result.items);
+      }
       setTotalPages(result.total_pages);
       setTotal(result.total);
+      nextPageRef.current = (f.page ?? 1) + 1;
     } catch {
-      setError('Failed to load jobs. Please try again.');
-      setJobs([]);
+      if (!append) {
+        setError('Failed to load jobs. Please try again.');
+        setJobs([]);
+      }
     } finally {
-      setLoading(false);
+      if (append) {
+        setLoadingMore(false);
+      } else {
+        setLoading(false);
+      }
     }
   }, []);
 
-  // Sync filters to URL and fetch
   const applyFilters = useCallback(
     (newFilters: JobFiltersType) => {
-      setFilters(newFilters);
-      const params = filtersToParams(newFilters);
+      const f = isMobileRef.current ? { ...newFilters, page: 1 } : newFilters;
+      nextPageRef.current = 2;
+      setFilters(f);
+      const params = filtersToParams(f);
       const qs = params.toString();
       router.replace(`${pathname}${qs ? `?${qs}` : ''}`, { scroll: false });
-      fetchJobs(newFilters);
+      fetchJobs(f);
     },
     [router, pathname, fetchJobs]
   );
@@ -120,6 +148,40 @@ function JobsContent() {
     fetchJobs(filters);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Track mobile/desktop via matchMedia
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 1023px)');
+    isMobileRef.current = mq.matches;
+    setIsMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => {
+      isMobileRef.current = e.matches;
+      setIsMobile(e.matches);
+    };
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
+  // Keep load-more logic current without recreating the observer
+  useEffect(() => {
+    loadMoreFnRef.current = () => {
+      if (loadingMore || loading || nextPageRef.current > totalPages) return;
+      fetchJobs({ ...filtersRef.current, page: nextPageRef.current }, true);
+    };
+  }, [loadingMore, loading, totalPages, fetchJobs]);
+
+  // Infinite scroll — mobile only
+  useEffect(() => {
+    if (!isMobile) return;
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) loadMoreFnRef.current(); },
+      { rootMargin: '300px 0px' }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [isMobile]);
 
   const handleSearchChange = (value: string) => {
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
@@ -140,10 +202,11 @@ function JobsContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const allLoaded = !loading && !loadingMore && nextPageRef.current > totalPages && jobs.length > 0;
+
   return (
     <div>
       <CanonicalTag />
-      {/* Page header */}
       <div className="hero-gradient">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12">
           <p className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-3">
@@ -161,7 +224,6 @@ function JobsContent() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Search */}
         <div className="mb-8">
           <SearchBar
             value={filters.search ?? ''}
@@ -172,12 +234,10 @@ function JobsContent() {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar filters */}
           <aside className="w-full lg:w-64 lg:flex-shrink-0">
             <JobFilters filters={filters} onChange={handleFiltersChange} />
           </aside>
 
-          {/* Main content */}
           <div className="flex-1 min-w-0" aria-busy={loading} aria-live="polite">
             {error && (
               <StatusBanner type="error" message={error} className="mb-6" />
@@ -225,13 +285,29 @@ function JobsContent() {
                   ))}
                 </div>
 
-                <div className="mt-10">
-                  <Pagination
-                    page={filters.page ?? 1}
-                    totalPages={totalPages}
-                    onPageChange={handlePageChange}
-                  />
-                </div>
+                {isMobile ? (
+                  <>
+                    <div ref={sentinelRef} className="h-4 mt-6" />
+                    {loadingMore && (
+                      <div className="flex justify-center py-6">
+                        <div className="h-6 w-6 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                      </div>
+                    )}
+                    {allLoaded && (
+                      <p className="text-center text-xs text-text-muted uppercase tracking-widest py-6">
+                        All {total.toLocaleString()} jobs loaded
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <div className="mt-10">
+                    <Pagination
+                      page={filters.page ?? 1}
+                      totalPages={totalPages}
+                      onPageChange={handlePageChange}
+                    />
+                  </div>
+                )}
               </>
             )}
           </div>
