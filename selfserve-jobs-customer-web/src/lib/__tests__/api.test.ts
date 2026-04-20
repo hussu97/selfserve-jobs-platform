@@ -75,16 +75,16 @@ describe('getJob', () => {
 
 describe('getJobs', () => {
   it('constructs the correct URL with default pagination', async () => {
-    mockOkResponse({ items: [], total: 0, page: 1, per_page: 12, total_pages: 0 });
+    mockOkResponse({ items: [], total: 0, page: 1, per_page: 30, total_pages: 0 });
     await getJobs();
     expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('/api/v1/jobs?page=1&per_page=12'),
+      expect.stringContaining('/api/v1/jobs?page=1&per_page=30'),
       expect.any(Object)
     );
   });
 
   it('includes search param in query string when provided', async () => {
-    mockOkResponse({ items: [], total: 0, page: 1, per_page: 12, total_pages: 0 });
+    mockOkResponse({ items: [], total: 0, page: 1, per_page: 30, total_pages: 0 });
     await getJobs({ search: 'engineer' });
     expect(mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('search=engineer'),
@@ -93,7 +93,7 @@ describe('getJobs', () => {
   });
 
   it('includes multiple employment_type params for array filters', async () => {
-    mockOkResponse({ items: [], total: 0, page: 1, per_page: 12, total_pages: 0 });
+    mockOkResponse({ items: [], total: 0, page: 1, per_page: 30, total_pages: 0 });
     await getJobs({ employment_type: ['full_time', 'remote'] });
     const calledUrl = mockFetch.mock.calls[0][0] as string;
     expect(calledUrl).toContain('employment_type=full_time');

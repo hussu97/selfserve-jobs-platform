@@ -129,7 +129,7 @@ export async function getStats(): Promise<StatsResponse> {
 export async function getJobs(filters: JobFilters = {}): Promise<PaginatedResponse<JobListItem>> {
   const params: Record<string, string | string[] | number | boolean | undefined | null> = {
     page: filters.page ?? 1,
-    per_page: filters.per_page ?? 12,
+    per_page: filters.per_page ?? 30,
   };
   if (filters.search) params.search = filters.search;
   if (filters.country) params.country = filters.country;
@@ -182,7 +182,7 @@ export async function renewJob(code: string, editToken: string): Promise<Job> {
 export async function getProfiles(filters: ProfileFilters = {}): Promise<PaginatedResponse<ProfileListItem>> {
   const params: Record<string, string | string[] | number | boolean | undefined | null> = {
     page: filters.page ?? 1,
-    per_page: filters.per_page ?? 12,
+    per_page: filters.per_page ?? 30,
   };
   if (filters.search) params.search = filters.search;
   if (filters.country) params.country = filters.country;

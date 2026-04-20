@@ -163,7 +163,7 @@ export const POPULAR_SKILLS = [
   'Scrum',
 ];
 
-export const ITEMS_PER_PAGE = 12;
+export const ITEMS_PER_PAGE = 30;
 
 export const DIAL_CODES: { code: string; name: string; dialCode: string; flag: string }[] = [
   { code: 'AE', name: 'United Arab Emirates', dialCode: '+971', flag: '🇦🇪' },
