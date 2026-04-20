@@ -31,7 +31,6 @@ async def register_recruiter(
         else:
             verification = await verification_service.create_verification(
                 db=db,
-                email=recruiter.email,
                 entity_type="recruiter",
                 entity_code=recruiter.recruiter_code,
             )
