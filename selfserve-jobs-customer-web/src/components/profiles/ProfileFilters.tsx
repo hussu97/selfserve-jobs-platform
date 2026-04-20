@@ -145,16 +145,19 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
         type="button"
         onClick={toggleImmediateAndOpenToWork}
         className={cn(
-          'w-full rounded-full px-4 py-2.5 text-left transition-colors cursor-pointer',
+          'w-full rounded-full px-4 py-2.5 text-left transition-colors cursor-pointer flex items-center gap-3',
           isImmediateAndOpenToWork
             ? 'bg-primary text-white'
             : 'bg-surface text-text-main hover:bg-primary/10'
         )}
       >
-        <span className="block text-xs">Immediate &amp; Open to Work</span>
-        <span className={cn('block text-[11px] mt-0.5', isImmediateAndOpenToWork ? 'text-white/70' : 'text-text-muted')}>
-          Available to start right away
-        </span>
+        <span className="text-base leading-none">⚡</span>
+        <div>
+          <span className="block text-xs">Immediate &amp; Open to Work</span>
+          <span className={cn('block text-[11px] mt-0.5', isImmediateAndOpenToWork ? 'text-white/70' : 'text-text-muted')}>
+            Available to start right away
+          </span>
+        </div>
       </button>
 
       <Select
