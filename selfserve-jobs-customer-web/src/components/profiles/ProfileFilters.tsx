@@ -141,27 +141,21 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
       </div>
 
       {/* Immediate & Open to Work — quick filter */}
-      <div className={cn(
-        'rounded-xl p-3 transition-colors',
-        isImmediateAndOpenToWork ? 'bg-accent/20' : 'bg-surface'
-      )}>
-        <label className="flex items-start gap-3 cursor-pointer group">
-          <input
-            type="checkbox"
-            checked={isImmediateAndOpenToWork}
-            onChange={toggleImmediateAndOpenToWork}
-            className="mt-0.5 rounded text-primary focus:ring-primary cursor-pointer"
-          />
-          <div>
-            <span className="text-sm font-semibold text-primary group-hover:opacity-70 transition-opacity">
-              Immediate &amp; Open to Work
-            </span>
-            <p className="text-xs text-text-muted mt-0.5">
-              Available to start right away
-            </p>
-          </div>
-        </label>
-      </div>
+      <button
+        type="button"
+        onClick={toggleImmediateAndOpenToWork}
+        className={cn(
+          'w-full rounded-full px-4 py-2.5 text-left transition-colors cursor-pointer',
+          isImmediateAndOpenToWork
+            ? 'bg-primary text-white'
+            : 'bg-surface text-text-main hover:bg-primary/10'
+        )}
+      >
+        <span className="block text-sm font-semibold">Immediate &amp; Open to Work</span>
+        <span className={cn('block text-xs mt-0.5', isImmediateAndOpenToWork ? 'text-white/70' : 'text-text-muted')}>
+          Available to start right away
+        </span>
+      </button>
 
       <Select
         label="Sort by"
