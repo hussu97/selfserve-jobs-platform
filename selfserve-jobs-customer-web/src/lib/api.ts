@@ -204,7 +204,7 @@ export async function getProfiles(filters: ProfileFilters = {}): Promise<Paginat
 let _topSkillsCache: string[] | null = null;
 export async function getTopSkills(): Promise<string[]> {
   if (_topSkillsCache) return _topSkillsCache;
-  const result = await request<string[]>('/profiles/top-skills');
+  const result = await request<string[]>('/profiles/top-skills?limit=6');
   _topSkillsCache = result;
   return result;
 }

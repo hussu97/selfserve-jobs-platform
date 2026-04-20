@@ -318,7 +318,7 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
         )}
         {topSkillsLoading ? (
           <div className="flex flex-wrap gap-1.5 mt-1">
-            {[60, 80, 50, 70, 55, 75, 45, 65].map((w, i) => (
+            {[60, 80, 50, 70, 55, 75].map((w, i) => (
               <div
                 key={i}
                 className="h-5 rounded-full animate-pulse bg-surface"
