@@ -37,9 +37,13 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
   const [mobileOpen, setMobileOpen] = useState(false);
   const [cityIsOther, setCityIsOther] = useState(false);
   const [topSkills, setTopSkills] = useState<string[]>([]);
+  const [topSkillsLoading, setTopSkillsLoading] = useState(true);
 
   useEffect(() => {
-    getTopSkills().then(setTopSkills).catch(() => {});
+    getTopSkills()
+      .then(setTopSkills)
+      .catch(() => {})
+      .finally(() => setTopSkillsLoading(false));
   }, []);
 
   const updateFilter = <K extends keyof ProfileFilters>(key: K, value: ProfileFilters[K]) => {
@@ -312,7 +316,17 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
             ))}
           </div>
         )}
-        {topSkills.length > 0 && (
+        {topSkillsLoading ? (
+          <div className="flex flex-wrap gap-1.5 mt-1">
+            {[60, 80, 50, 70, 55, 75, 45, 65].map((w, i) => (
+              <div
+                key={i}
+                className="h-5 rounded-full animate-pulse bg-surface"
+                style={{ width: w }}
+              />
+            ))}
+          </div>
+        ) : topSkills.length > 0 ? (
           <div className="flex flex-wrap gap-1.5 mt-1">
             {topSkills
               .filter((s) => !(filters.skills ?? []).includes(s))
@@ -327,7 +341,7 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
                 </button>
               ))}
           </div>
-        )}
+        ) : null}
       </div>
 
       {/* Employment Status */}
