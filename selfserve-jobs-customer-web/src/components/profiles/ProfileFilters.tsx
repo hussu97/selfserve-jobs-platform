@@ -151,8 +151,8 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
             : 'bg-surface text-text-main hover:bg-primary/10'
         )}
       >
-        <span className="block text-sm font-semibold">Immediate &amp; Open to Work</span>
-        <span className={cn('block text-xs mt-0.5', isImmediateAndOpenToWork ? 'text-white/70' : 'text-text-muted')}>
+        <span className="block text-xs">Immediate &amp; Open to Work</span>
+        <span className={cn('block text-[11px] mt-0.5', isImmediateAndOpenToWork ? 'text-white/70' : 'text-text-muted')}>
           Available to start right away
         </span>
       </button>
