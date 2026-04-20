@@ -113,12 +113,32 @@ async def get_profile_detail(db: AsyncSession, profile_code: str) -> Profile:
     return profile
 
 
+async def get_top_skills(db: AsyncSession, limit: int = 20) -> list[str]:
+    from sqlalchemy import text
+
+    result = await db.execute(
+        text(
+            """
+            SELECT skill, COUNT(*) AS cnt
+            FROM profile, jsonb_array_elements_text(key_skills) AS skill
+            WHERE status = 'active'
+            GROUP BY skill
+            ORDER BY cnt DESC
+            LIMIT :limit
+            """
+        ),
+        {"limit": limit},
+    )
+    return [row[0] for row in result.fetchall()]
+
+
 async def list_profiles(
     db: AsyncSession,
     page: int = 1,
     per_page: int = 20,
     q: str | None = None,
     country: str | None = None,
+    city: str | None = None,
     skills: list[str] | None = None,
     min_experience: int | None = None,
     max_experience: int | None = None,
@@ -141,6 +161,9 @@ async def list_profiles(
 
     if country:
         filters.append(func.lower(Profile.current_country) == country.lower())
+
+    if city:
+        filters.append(func.lower(Profile.current_city) == city.lower())
 
     if skills:
         for skill in skills:

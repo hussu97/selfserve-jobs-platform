@@ -289,6 +289,7 @@ export interface JobFilters {
 export interface ProfileFilters {
   search?: string;
   country?: string;
+  city?: string;
   min_experience?: number;
   max_experience?: number;
   relocation_preference?: RelocationPreference;

@@ -186,6 +186,7 @@ export async function getProfiles(filters: ProfileFilters = {}): Promise<Paginat
   };
   if (filters.search) params.search = filters.search;
   if (filters.country) params.country = filters.country;
+  if (filters.city) params.city = filters.city;
   if (filters.min_experience !== undefined) params.min_experience = filters.min_experience;
   if (filters.max_experience !== undefined) params.max_experience = filters.max_experience;
   if (filters.relocation_preference) params.relocation_preference = filters.relocation_preference;
@@ -198,6 +199,14 @@ export async function getProfiles(filters: ProfileFilters = {}): Promise<Paginat
     next: { revalidate: 120 },
     clientCache: true,
   });
+}
+
+let _topSkillsCache: string[] | null = null;
+export async function getTopSkills(): Promise<string[]> {
+  if (_topSkillsCache) return _topSkillsCache;
+  const result = await request<string[]>('/profiles/top-skills');
+  _topSkillsCache = result;
+  return result;
 }
 
 export async function getProfile(code: string, sessionToken?: string): Promise<Profile> {

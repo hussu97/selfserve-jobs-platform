@@ -1,12 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
 import { SkillTag } from '@/components/shared/SkillTag';
-import { COUNTRIES, EMPLOYMENT_STATUSES, NOTICE_PERIODS, POPULAR_SKILLS, RELOCATION_PREFERENCES } from '@/lib/constants';
+import { COUNTRIES, EMPLOYMENT_STATUSES, NOTICE_PERIODS } from '@/lib/constants';
+import { COUNTRY_CITIES } from '@/lib/city-data';
+import { getTopSkills } from '@/lib/api';
 import type { EmploymentStatus, NoticePeriod, ProfileFilters, RelocationPreference } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import { RELOCATION_PREFERENCES } from '@/lib/constants';
 
 interface ProfileFiltersProps {
   filters: ProfileFilters;
@@ -27,12 +30,25 @@ const EXPERIENCE_OPTIONS = [
   { value: '10+', label: '10+ years' },
 ];
 
+const CITY_OTHER = '__other__';
+
 export function ProfileFilters({ filters, onChange, className }: ProfileFiltersProps) {
   const [skillInput, setSkillInput] = useState('');
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [cityIsOther, setCityIsOther] = useState(false);
+  const [topSkills, setTopSkills] = useState<string[]>([]);
+
+  useEffect(() => {
+    getTopSkills().then(setTopSkills).catch(() => {});
+  }, []);
 
   const updateFilter = <K extends keyof ProfileFilters>(key: K, value: ProfileFilters[K]) => {
     onChange({ ...filters, [key]: value, page: 1 });
+  };
+
+  const updateCountry = (countryCode: string | undefined) => {
+    onChange({ ...filters, country: countryCode, city: undefined, page: 1 });
+    setCityIsOther(false);
   };
 
   const setExperienceRange = (range: string) => {
@@ -113,16 +129,23 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
   };
 
   const clearAll = () => {
+    setCityIsOther(false);
     onChange({ page: 1 });
   };
 
   const hasActiveFilters =
     !!filters.country ||
+    !!filters.city ||
     !!filters.relocation_preference ||
     filters.min_experience !== undefined ||
     (filters.skills?.length ?? 0) > 0 ||
     (filters.employment_status?.length ?? 0) > 0 ||
     (filters.notice_period?.length ?? 0) > 0;
+
+  const countryCities = filters.country ? COUNTRY_CITIES[filters.country] ?? null : null;
+  const cityOptions = countryCities
+    ? [...countryCities.map((c) => ({ value: c, label: c })), { value: CITY_OTHER, label: 'Other' }]
+    : null;
 
   const filterContent = (
     <div className="flex flex-col gap-5">
@@ -172,8 +195,58 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
         placeholder="All countries"
         options={COUNTRIES}
         value={filters.country ?? ''}
-        onChange={(e) => updateFilter('country', e.target.value || undefined)}
+        onChange={(e) => updateCountry(e.target.value || undefined)}
       />
+
+      {/* City — disabled until country selected */}
+      {!filters.country ? (
+        <Select
+          label="City"
+          placeholder="Select country first"
+          options={[]}
+          value=""
+          onChange={() => {}}
+          disabled
+        />
+      ) : !cityOptions ? (
+        <div className="flex flex-col gap-1">
+          <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-text-muted">City</p>
+          <input
+            type="text"
+            placeholder="Enter city"
+            value={filters.city ?? ''}
+            onChange={(e) => updateFilter('city', e.target.value || undefined)}
+            className="w-full rounded-xl bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary text-text-main"
+          />
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2">
+          <Select
+            label="City"
+            placeholder="All cities"
+            options={cityOptions}
+            value={cityIsOther ? CITY_OTHER : (filters.city ?? '')}
+            onChange={(e) => {
+              if (e.target.value === CITY_OTHER) {
+                setCityIsOther(true);
+                updateFilter('city', undefined);
+              } else {
+                setCityIsOther(false);
+                updateFilter('city', e.target.value || undefined);
+              }
+            }}
+          />
+          {cityIsOther && (
+            <input
+              type="text"
+              placeholder="Enter city"
+              value={filters.city ?? ''}
+              onChange={(e) => updateFilter('city', e.target.value || undefined)}
+              className="w-full rounded-xl bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary text-text-main"
+            />
+          )}
+        </div>
+      )}
 
       <Select
         label="Experience"
@@ -212,6 +285,49 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
             </button>
           )}
         </div>
+      </div>
+
+      {/* Skills */}
+      <div className="flex flex-col gap-2">
+        <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-text-muted">
+          Skills
+        </p>
+        <input
+          type="text"
+          value={skillInput}
+          onChange={(e) => setSkillInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ',') {
+              e.preventDefault();
+              addSkill(skillInput);
+            }
+          }}
+          placeholder="Type and press Enter"
+          className="w-full rounded-xl bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary text-text-main"
+        />
+        {(filters.skills?.length ?? 0) > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {filters.skills?.map((skill) => (
+              <SkillTag key={skill} skill={skill} removable onRemove={removeSkill} />
+            ))}
+          </div>
+        )}
+        {topSkills.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mt-1">
+            {topSkills
+              .filter((s) => !(filters.skills ?? []).includes(s))
+              .map((skill) => (
+                <button
+                  key={skill}
+                  type="button"
+                  onClick={() => addSkill(skill)}
+                  className="text-xs px-2.5 py-0.5 rounded-full uppercase tracking-wider bg-surface hover:bg-accent/10 transition-colors cursor-pointer text-text-muted"
+                >
+                  {skill}
+                </button>
+              ))}
+          </div>
+        )}
       </div>
 
       {/* Employment Status */}
@@ -261,47 +377,6 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
               </span>
             </label>
           ))}
-        </div>
-      </div>
-
-      {/* Skills */}
-      <div className="flex flex-col gap-2">
-        <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-text-muted">
-          Skills
-        </p>
-        <input
-          type="text"
-          value={skillInput}
-          onChange={(e) => setSkillInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ',') {
-              e.preventDefault();
-              addSkill(skillInput);
-            }
-          }}
-          placeholder="Type and press Enter"
-          className="w-full rounded-xl bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary text-text-main"
-        />
-        {(filters.skills?.length ?? 0) > 0 && (
-          <div className="flex flex-wrap gap-1.5">
-            {filters.skills?.map((skill) => (
-              <SkillTag key={skill} skill={skill} removable onRemove={removeSkill} />
-            ))}
-          </div>
-        )}
-        <div className="flex flex-wrap gap-1.5 mt-1">
-          {POPULAR_SKILLS.slice(0, 8)
-            .filter((s) => !(filters.skills ?? []).includes(s))
-            .map((skill) => (
-              <button
-                key={skill}
-                type="button"
-                onClick={() => addSkill(skill)}
-                className="text-xs px-2.5 py-0.5 rounded-full uppercase tracking-wider bg-surface hover:bg-accent/10 transition-colors cursor-pointer text-text-muted"
-              >
-                {skill}
-              </button>
-            ))}
         </div>
       </div>
     </div>

@@ -28,12 +28,21 @@ router = APIRouter(prefix="/api/v1/profiles", tags=["profiles"])
 settings = get_settings()
 
 
+@router.get("/top-skills", response_model=list[str])
+async def get_top_skills(
+    limit: int = Query(20, ge=1, le=50),
+    db: AsyncSession = Depends(get_session),
+):
+    return await profile_service.get_top_skills(db, limit=limit)
+
+
 @router.get("", response_model=ProfileListResponse)
 async def list_profiles(
     page: int = Query(1, ge=1, le=MAX_PAGE),
     per_page: int = Query(20, ge=1, le=50),
     search: str | None = Query(None, description="Full-text search"),
     country: str | None = Query(None),
+    city: str | None = Query(None),
     skills: list[str] | None = Query(None),
     min_experience: int | None = Query(None, ge=0),
     max_experience: int | None = Query(None, le=50),
@@ -49,6 +58,7 @@ async def list_profiles(
         per_page=per_page,
         q=search,
         country=country,
+        city=city,
         skills=skills,
         min_experience=min_experience,
         max_experience=max_experience,

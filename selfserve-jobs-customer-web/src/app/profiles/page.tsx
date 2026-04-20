@@ -17,6 +17,7 @@ function parseFiltersFromParams(searchParams: URLSearchParams): ProfileFiltersTy
   const filters: ProfileFiltersType = {};
   const search = searchParams.get('search');
   const country = searchParams.get('country');
+  const city = searchParams.get('city');
   const sort = searchParams.get('sort') as ProfileFiltersType['sort'];
   const page = searchParams.get('page');
   const min_experience = searchParams.get('min_experience');
@@ -28,6 +29,7 @@ function parseFiltersFromParams(searchParams: URLSearchParams): ProfileFiltersTy
 
   if (search) filters.search = search;
   if (country) filters.country = country;
+  if (city) filters.city = city;
   if (sort) filters.sort = sort;
   if (page) filters.page = parseInt(page);
   if (min_experience) filters.min_experience = parseInt(min_experience);
@@ -44,6 +46,7 @@ function filtersToParams(filters: ProfileFiltersType): URLSearchParams {
   const params = new URLSearchParams();
   if (filters.search) params.set('search', filters.search);
   if (filters.country) params.set('country', filters.country);
+  if (filters.city) params.set('city', filters.city);
   if (filters.sort && filters.sort !== 'newest') params.set('sort', filters.sort);
   if (filters.page && filters.page > 1) params.set('page', String(filters.page));
   if (filters.min_experience !== undefined) params.set('min_experience', String(filters.min_experience));
