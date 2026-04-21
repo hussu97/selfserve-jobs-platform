@@ -196,7 +196,7 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
         </h2>
         <p className="mb-6 text-sm text-text-muted">
           {isLive
-            ? 'Your profile is now live and visible to employers.'
+            ? 'Your profile is now live and visible to hiring teams.'
             : "Check your email and click the verification link to publish your profile. It won't appear publicly until verified. If you don't see it, check your spam or junk folder."}
         </p>
         {!isLive && (
