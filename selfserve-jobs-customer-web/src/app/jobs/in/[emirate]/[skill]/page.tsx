@@ -117,13 +117,7 @@ export default async function EmirateSkillJobsPage({ params }: PageProps) {
                 <h2 className="font-heading text-lg text-primary mb-3">
                   {skill.name} in {emirate.name}
                 </h2>
-                <p className="text-sm text-text-muted leading-relaxed mb-3">{skillContent.intro}</p>
-                {skillContent.averageSalary && (
-                  <p className="text-sm text-text-main">
-                    <strong>Typical salary:</strong>{' '}
-                    <span className="text-text-muted">{skillContent.averageSalary}</span>
-                  </p>
-                )}
+                <p className="text-sm text-text-muted leading-relaxed">{skillContent.intro}</p>
               </div>
             )}
 

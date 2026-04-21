@@ -51,7 +51,7 @@ export default function PrivacyPage() {
                   <p className="text-sm text-text-muted">Your name, email address, contact number, current city and country, professional title, experience, skills, LinkedIn URL (optional), and resume PDF (optional). Your email address is never displayed publicly.</p>
                 </div>
                 <div className="bg-surface rounded-xl p-5">
-                  <p className="text-sm font-semibold text-text-main mb-1">When you register as a recruiter</p>
+                  <p className="text-sm font-semibold text-text-main mb-1">When you register as a hiring team member</p>
                   <p className="text-sm text-text-muted">Your name, company name, work email address, and LinkedIn profile URL. This information is stored for identity verification, admin review, and audit purposes. Recruiters are held accountable for how they handle talent data once approved.</p>
                 </div>
                 <div className="bg-surface rounded-xl p-5">

@@ -83,21 +83,26 @@ export default function ProfileFormLower({
         </p>
         <MarkdownEditor
           label="Professional brief"
-          placeholder="Tell employers about yourself, your experience, and what you're looking for. Markdown is supported."
+          placeholder="Tell hiring teams about yourself, your experience, and what you're looking for. Markdown is supported."
           value={form.brief ?? ''}
           onChange={(val) => set('brief', val)}
-          hint="Markdown formatting is rendered when employers view your profile."
+          hint="Markdown formatting is rendered when hiring teams view your profile."
         />
       </div>
 
       {/* Section 04 — Skills */}
       <div className="bg-surface-lowest shadow-ambient rounded-2xl p-8 flex flex-col gap-4">
-        <div className="flex items-center gap-4 border-l-2 border-primary/20 pl-4 mb-2">
-          <span className="font-heading text-2xl italic text-secondary">04</span>
-          <h2 className="font-heading text-xl text-primary">Key skills</h2>
+        <div className="flex items-center justify-between gap-4 border-l-2 border-primary/20 pl-4 mb-2">
+          <div className="flex items-center gap-4">
+            <span className="font-heading text-2xl italic text-secondary">04</span>
+            <h2 className="font-heading text-xl text-primary">Key skills</h2>
+          </div>
+          <span className="text-xs text-text-muted tabular-nums ml-auto">
+            {form.key_skills?.length ?? 0}/8
+          </span>
         </div>
         <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-text-muted -mt-2">
-          Required <span className="text-primary">*</span>
+          Required <span className="text-primary">*</span> — Max 8 skills
         </p>
         <div className="flex gap-2">
           <input
@@ -111,13 +116,14 @@ export default function ProfileFormLower({
               }
             }}
             placeholder="Type a skill and press Enter"
-            className="flex-1 rounded-xl bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary text-text-main"
+            disabled={(form.key_skills?.length ?? 0) >= 8}
+            className="flex-1 rounded-xl bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary text-text-main disabled:opacity-50 disabled:cursor-not-allowed"
           />
-          <Button type="button" variant="outline" size="md" className="rounded-full" onClick={() => addSkill(skillInput)}>
+          <Button type="button" variant="outline" size="md" className="rounded-full" disabled={(form.key_skills?.length ?? 0) >= 8} onClick={() => addSkill(skillInput)}>
             Add
           </Button>
         </div>
-        {(() => {
+        {(form.key_skills?.length ?? 0) < 8 && (() => {
           const suggestions = ['Microsoft Office', 'Project Management', 'Data Analysis', 'Communication', 'Customer Service', 'Leadership', 'Sales', 'Problem Solving', 'Teamwork', 'Bilingual (AR/EN)'];
           const remaining = suggestions.filter((s) => !(form.key_skills ?? []).map((k) => k.toLowerCase()).includes(s.toLowerCase()));
           if (remaining.length === 0) return null;

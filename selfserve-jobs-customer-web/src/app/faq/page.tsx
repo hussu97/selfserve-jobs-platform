@@ -29,13 +29,13 @@ const FAQ_SECTIONS: FaqSection[] = [
       {
         question: 'What is hirebridge?',
         answer:
-          "hirebridge is a free, talent-first job platform built for the UAE's workforce. It operates a dual model: professionals create talent profiles through a simple email-verification flow (no account needed), while recruiters register for a verified account to post jobs and access sensitive candidate data. Browsing is always free and open to everyone.",
+          "hirebridge is a free, talent-first job platform built for the UAE's workforce. It operates a dual model: professionals create talent profiles through a simple email-verification flow (no account needed), while hiring teams register for a verified account to post jobs and access sensitive candidate data. Browsing is always free and open to everyone.",
         links: [{ label: 'Learn more about us', href: '/about' }],
       },
       {
         question: 'Is hirebridge free to use?',
         answer:
-          'Yes, completely. Browsing jobs and talent profiles is free for everyone. Creating a talent profile is free. Recruiter registration and job posting are free. There are no premium tiers, no pay-to-rank features, and no plans to introduce them. Listings are ranked purely by recency.',
+          'Yes, completely. Browsing jobs and talent profiles is free for everyone. Creating a talent profile is free. Hiring team registration and job posting are free. There are no premium tiers, no pay-to-rank features, and no plans to introduce them. Listings are ranked purely by recency.',
       },
       {
         question: 'How long do listings stay active?',
@@ -45,7 +45,7 @@ const FAQ_SECTIONS: FaqSection[] = [
       {
         question: 'How many listings can I post?',
         answer:
-          'Each recruiter account can have up to 5 active job listings at any given time. Each email address can have up to 2 active talent profiles. Once a listing expires or is removed, you can post a new one.',
+          'Each hiring account can have up to 5 active job listings at any given time. Each email address can have up to 2 active talent profiles. Once a listing expires or is removed, you can post a new one.',
       },
     ],
   },
@@ -62,15 +62,15 @@ const FAQ_SECTIONS: FaqSection[] = [
         ],
       },
       {
-        question: 'How do I create a talent profile to get found by recruiters?',
+        question: 'How do I create a talent profile to get found by hiring teams?',
         answer:
-          'Go to /profiles/new and fill in your details — current title, location, skills, a brief bio, and optionally a resume PDF. Verify your email and your profile goes live immediately. No account registration is required. Approved recruiters can then find and contact you directly.',
+          'Go to /profiles/new and fill in your details — current title, location, skills, a brief bio, and optionally a resume PDF. Verify your email and your profile goes live immediately. No account registration is required. Approved hiring teams can then find and contact you directly.',
         links: [{ label: 'Create your profile', href: '/profiles/new' }],
       },
       {
         question: 'Who can see my contact details and resume?',
         answer:
-          'Your public profile (title, skills, location, bio) is visible to anyone browsing the platform. However, sensitive details — your email address, phone number, and resume — are only accessible to recruiters who have completed registration and received admin approval. This ensures your contact information reaches legitimate hiring parties only.',
+          'Your public profile (title, skills, location, bio) is visible to anyone browsing the platform. However, sensitive details — your email address, phone number, and resume — are only accessible to hiring teams who have completed registration and received admin approval. This ensures your contact information reaches legitimate hiring parties only.',
       },
       {
         question: 'Do I need to create an account to post a talent profile?',
@@ -85,7 +85,7 @@ const FAQ_SECTIONS: FaqSection[] = [
       {
         question: 'What is visa sponsorship in the UAE?',
         answer:
-          'Visa sponsorship means the employer handles and pays for your UAE work visa (also called an employment visa or residence permit). This includes the medical test, Emirates ID, and residence visa. Most full-time roles in the UAE include visa sponsorship. Contract and freelance roles may require you to be on your own freelance permit or visa.',
+          'Visa sponsorship means the employer handles and pays for your UAE work visa (also called an employment visa or residence permit). This includes the medical test, Emirates ID, and residence visa. Most full-time roles in the UAE include visa sponsorship. Contract and freelance roles may require you to be on your own freelance permit or visa. Note: If you are already in the UAE on a family or dependent visa (sponsored by a spouse or parent), you can still work — including in temp and contract roles — by obtaining a work permit from the Ministry of Human Resources. Your residency visa remains under your family sponsor.',
       },
       {
         question: 'What are free zones in the UAE, and do they matter for jobs?',
@@ -98,11 +98,6 @@ const FAQ_SECTIONS: FaqSection[] = [
           'The UAE Golden Visa is a long-term residency visa (5 or 10 years) available to exceptional professionals, investors, and entrepreneurs. Employed professionals earning above AED 30,000/month with a recognised employer may qualify under the "skilled employees" category. Your employer would typically assist with this application.',
       },
       {
-        question: 'What are professional salaries like in Dubai?',
-        answer:
-          'Dubai salaries are tax-free and highly competitive by global standards. A mid-level professional typically earns AED 12,000–25,000 per month depending on industry and seniority. Finance and consulting roles often command AED 20,000–40,000+. Sales, operations, and HR roles typically range from AED 8,000–20,000. All figures are gross income — there is no income tax in the UAE.',
-      },
-      {
         question: 'Can I work remotely from the UAE?',
         answer:
           "Yes. The UAE offers a Remote Work Visa (Virtual Work Programme) for professionals employed by foreign companies. Many UAE companies also offer hybrid arrangements. The UAE's central timezone (GMT+4) makes it excellent for working with teams in Europe, Asia, and Africa.",
@@ -111,33 +106,33 @@ const FAQ_SECTIONS: FaqSection[] = [
     ],
   },
   {
-    title: 'For Recruiters',
+    title: 'For Hiring Teams',
     items: [
       {
         question: 'How do I post a job on hirebridge?',
         answer:
-          'Job posting requires a recruiter account. Register at /recruiters/register with your name, company, work email, and LinkedIn profile. Once your account is approved (typically 1–2 business days), you can post jobs and access talent contact details.',
-        links: [{ label: 'Register as a recruiter', href: '/recruiters/register' }],
+          'Job posting requires a hiring account. Register at /hiring/register with your name, company, work email, and LinkedIn profile. Once your account is approved (typically 1–2 business days), you can post jobs and access talent contact details.',
+        links: [{ label: 'Register for hiring access', href: '/hiring/register' }],
       },
       {
-        question: 'How long does recruiter approval take?',
+        question: 'How long does hiring team approval take?',
         answer:
-          'We review recruiter applications within 1–2 business days. We manually check submitted information to verify that applicants represent legitimate hiring organisations. You will receive an email once your account is approved.',
+          'We review hiring team applications within 1–2 business days. We manually check submitted information to verify that applicants represent legitimate hiring organisations. You will receive an email once your account is approved.',
       },
       {
-        question: 'Is recruiter registration free?',
+        question: 'Is hiring team registration free?',
         answer:
           'Yes, completely free. There are no fees to register, no subscription charges, and no pay-to-rank features. Listings are shown in chronological order.',
       },
       {
-        question: 'What information do I need to register as a recruiter?',
+        question: 'What information do I need to register?',
         answer:
           'You need to provide your full name, company name, work email address, and a LinkedIn profile URL. This information is used to verify your identity and ensure talent data is accessed responsibly. It is stored securely and is not displayed publicly.',
       },
       {
-        question: 'What talent data can I access as an approved recruiter?',
+        question: 'What talent data can I access as an approved hiring team member?',
         answer:
-          "Once approved, you can view a candidate's full profile including their email address, phone number, and resume PDF (if uploaded). Public profile information — title, skills, location, and bio — is visible to everyone. Sensitive contact details are gated behind recruiter approval.",
+          "Once approved, you can view a candidate's full profile including their email address, phone number, and resume PDF (if uploaded). Public profile information — title, skills, location, and bio — is visible to everyone. Sensitive contact details are gated behind hiring team approval.",
       },
       {
         question: 'How do candidates contact me after seeing my job listing?',
@@ -157,7 +152,7 @@ const FAQ_SECTIONS: FaqSection[] = [
       {
         question: 'Can I post multiple jobs?',
         answer:
-          'Yes — each recruiter account can have up to 5 active job listings at a time.',
+          'Yes — each hiring account can have up to 5 active job listings at a time.',
       },
     ],
   },

@@ -4,7 +4,7 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: "About hirebridge — A Free Job Platform Built for the UAE",
   description:
-    "hirebridge is a free UAE job platform built for people who need it most. Talent profiles are friction-free. Recruiters register for verified access to candidate data. Learn how it works.",
+    "hirebridge is a free UAE job platform built for people who need it most. Talent profiles are friction-free. Hiring teams register for verified access to candidate data. Learn how it works.",
   alternates: { canonical: '/about' },
 };
 
@@ -12,7 +12,7 @@ const JOB_SEEKER_STEPS = [
   {
     step: '01',
     title: 'List yourself',
-    desc: 'Create a talent profile so recruiters and employers can find you. Just verify your email to go live — no account needed.',
+    desc: 'Create a talent profile so hiring teams can find you. Just verify your email to go live — no account needed.',
   },
   {
     step: '02',
@@ -26,7 +26,7 @@ const JOB_SEEKER_STEPS = [
   },
 ];
 
-const RECRUITER_STEPS = [
+const HIRING_TEAM_STEPS = [
   {
     step: '01',
     title: 'Register your account',
@@ -35,7 +35,7 @@ const RECRUITER_STEPS = [
   {
     step: '02',
     title: 'Get approved',
-    desc: 'We review recruiter applications within 1–2 business days to ensure talent data is accessed responsibly.',
+    desc: 'We review hiring team applications within 1–2 business days to ensure talent data is accessed responsibly.',
   },
   {
     step: '03',
@@ -61,7 +61,7 @@ const VALUES = [
       </svg>
     ),
     title: 'Verified access',
-    desc: 'Talent contact details are only accessible to approved recruiters — never exposed to anonymous browsers.',
+    desc: 'Talent contact details are only accessible to approved hiring teams — never exposed to anonymous browsers.',
   },
   {
     icon: (
@@ -100,7 +100,7 @@ export default function AboutPage() {
           </h1>
           <p className="text-lg leading-relaxed max-w-2xl mx-auto" style={{ color: '#c3c8c0' }}>
             hirebridge puts people first. Professionals list themselves with nothing more than an email verification.
-            Recruiters register for a verified account and get approved before accessing candidate data.
+            Hiring teams register for a verified account and get approved before accessing candidate data.
             No fees, no algorithms, no noise — ever.
           </p>
         </div>
@@ -133,13 +133,13 @@ export default function AboutPage() {
             </p>
             <p>
               We built hirebridge UAE as a small, focused response. Major job platforms are noisy —
-              buried in algorithms, recruiter spam, and pay-to-play rankings. We wanted
+              buried in algorithms, spam, and pay-to-play rankings. We wanted
               something simpler: a concentrated space where talent can be discovered and real
               companies post real jobs, without the clutter or the cost.
             </p>
             <p>
               The platform is designed around a dual model. Talent profiles are friction-free —
-              verify your email and you&apos;re live. Recruiters go through a lightweight registration
+              verify your email and you&apos;re live. Hiring teams go through a lightweight registration
               and approval process so that sensitive candidate data (email, phone, resume) is only
               accessed by verified parties. This keeps the platform useful for everyone while
               protecting professionals from unsolicited outreach.
@@ -205,12 +205,12 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* How it works — Recruiters */}
+      {/* How it works — Hiring Teams */}
       <section className="bg-surface">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center mb-12">
             <span className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-3 block">
-              For recruiters &amp; employers
+              For hiring teams
             </span>
             <h2 className="font-heading text-3xl sm:text-4xl text-primary mb-3">
               Access verified <em>talent</em>
@@ -221,7 +221,7 @@ export default function AboutPage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {RECRUITER_STEPS.map(({ step, title, desc }) => (
+            {HIRING_TEAM_STEPS.map(({ step, title, desc }) => (
               <div key={step} className="flex flex-col gap-3 rounded-2xl bg-surface-lowest shadow-ambient p-6">
                 <span className="font-heading text-3xl italic text-secondary">{step}</span>
                 <h3 className="font-semibold text-base font-heading text-text-main">
@@ -236,10 +236,10 @@ export default function AboutPage() {
 
           <div className="mt-10 flex justify-center">
             <Link
-              href="/recruiters/register"
+              href="/hiring/register"
               className="inline-flex items-center justify-center px-6 py-3 rounded-full text-white font-medium transition-opacity hover:opacity-90 text-sm bg-primary-btn"
             >
-              Register as a recruiter
+              Register for hiring access
             </Link>
           </div>
         </div>

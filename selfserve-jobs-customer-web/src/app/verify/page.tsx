@@ -143,10 +143,10 @@ function VerifyContent() {
             Email <em>verified</em>
           </h1>
           <p className="text-sm mb-8 text-text-muted">
-            {result.message || 'Your email has been verified. Your recruiter account is now under review.'}
+            {result.message || 'Your email has been verified. Your hiring account is now under review.'}
           </p>
           <Link
-            href="/recruiter/pending"
+            href="/hiring/pending"
             className="inline-flex items-center justify-center px-6 py-3 rounded-full text-white font-semibold transition-opacity hover:opacity-90 bg-primary-btn"
           >
             View application status →

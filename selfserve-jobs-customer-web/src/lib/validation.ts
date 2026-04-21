@@ -66,6 +66,7 @@ export function validateProfileForm(form: Partial<CreateProfileRequest>): Profil
   if (!form.current_country?.trim()) errs.current_country = 'Country is required';
   if (!form.brief?.trim()) errs.brief = 'Professional brief is required';
   if ((form.key_skills?.length ?? 0) === 0) errs.key_skills = 'At least one skill is required';
+  if ((form.key_skills?.length ?? 0) > 8) errs.key_skills = 'Maximum 8 skills allowed';
   if (form.years_of_experience == null || form.years_of_experience < 0) {
     errs.years_of_experience = 'Years of experience is required';
   }

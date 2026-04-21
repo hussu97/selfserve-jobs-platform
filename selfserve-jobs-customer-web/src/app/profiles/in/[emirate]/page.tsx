@@ -149,7 +149,7 @@ export default async function EmirateTalentPage({ params }: PageProps) {
 
             <div className="rounded-2xl bg-primary p-5 text-white">
               <p className="font-heading text-base mb-1">Based in {emirate.name}?</p>
-              <p className="text-sm opacity-80 mb-4">Get discovered by employers. Free profile.</p>
+              <p className="text-sm opacity-80 mb-4">Get discovered by hiring teams. Free profile.</p>
               <Link
                 href="/profiles/new"
                 className="block text-center px-4 py-2 rounded-full bg-white text-primary font-semibold text-sm hover:bg-surface transition-colors"

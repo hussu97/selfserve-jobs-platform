@@ -100,10 +100,10 @@ export default function RecruiterRegisterPage() {
         {/* Header */}
         <div className="mb-12">
           <p className="text-xs uppercase tracking-widest text-[var(--color-text-muted)] mb-3">
-            Recruiter Access
+            Hiring Access
           </p>
           <h1 className="font-serif text-4xl md:text-5xl text-[var(--color-text-main)] mb-4">
-            Apply for <em>Recruiter</em> Access
+            Apply for <em>Hiring</em> Access
           </h1>
           <p className="text-[var(--color-text-muted)] text-lg leading-relaxed">
             Get verified access to UAE&apos;s talent pool. Post jobs and view full candidate profiles — including contact details and resumes.
@@ -179,7 +179,7 @@ export default function RecruiterRegisterPage() {
             <span className="font-serif italic text-5xl text-[var(--color-surface)] leading-none select-none">02</span>
             <h2 className="font-serif text-2xl text-[var(--color-text-main)] mt-1 mb-2">LinkedIn Profile</h2>
             <p className="text-sm text-[var(--color-text-muted)] mb-6">
-              We use this to verify you&apos;re a legitimate recruiter. Public profiles only.
+              We use this to verify you represent a legitimate hiring team. Public profiles only.
             </p>
 
             <div>

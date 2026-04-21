@@ -22,11 +22,6 @@ export const EMIRATE_CONTENT: Record<string, EmirateContent> = {
     ],
     faqs: [
       {
-        question: 'What is the average tech salary in Dubai?',
-        answer:
-          'Tech salaries in Dubai are highly competitive and tax-free. A mid-level software engineer can expect AED 15,000–25,000 per month (approx. $4,000–$6,800). Senior engineers and tech leads often earn AED 25,000–45,000. Product managers typically earn AED 20,000–40,000 depending on experience. All figures are gross; there is no income tax in the UAE.',
-      },
-      {
         question: 'Do companies in Dubai offer visa sponsorship?',
         answer:
           'Yes — the vast majority of employers in Dubai sponsor work visas for hired candidates. The standard employment visa process is handled by the company and takes 2–4 weeks. Many companies also offer family visa sponsorship. Employers in free zones (DIFC, DIC, DMCC) handle their own visa processing.',
@@ -388,7 +383,6 @@ export const EMPLOYMENT_TYPE_CONTENT: Record<string, EmploymentTypeContent> = {
 export interface SkillContent {
   intro: string;
   demandDrivers: string[];
-  averageSalary: string;
   faqs: Array<{ question: string; answer: string }>;
 }
 
@@ -397,7 +391,6 @@ export const SKILL_CONTENT: Record<string, SkillContent> = {
     intro:
       'React developers are among the most sought-after tech professionals in the UAE. The region\'s rapid growth in e-commerce, fintech, and government digital services has driven sustained demand for skilled front-end engineers who can build high-performance web applications. Companies across Dubai Internet City, DIFC, and Abu Dhabi\'s tech sector consistently list React as a required or preferred skill for front-end and full-stack roles.',
     demandDrivers: ['E-commerce growth in GCC', 'Fintech platform development', 'Government digital transformation', 'Startup ecosystem expansion'],
-    averageSalary: 'AED 15,000–30,000 per month depending on seniority and company size',
     faqs: [
       {
         question: 'Is React in demand in Dubai and the UAE?',
@@ -410,7 +403,6 @@ export const SKILL_CONTENT: Record<string, SkillContent> = {
     intro:
       'Python is the dominant backend and data science language across the UAE tech ecosystem. Its versatility — spanning web development (Django, FastAPI), machine learning, data engineering, and automation — makes it highly valued across sectors. Abu Dhabi\'s AI initiatives, Dubai\'s fintech growth, and the broader GCC\'s investment in data infrastructure have all contributed to strong and growing Python demand.',
     demandDrivers: ['AI and machine learning projects', 'Data engineering pipelines', 'Fintech backend development', 'Government AI initiatives (Abu Dhabi)'],
-    averageSalary: 'AED 15,000–35,000 per month depending on specialisation',
     faqs: [
       {
         question: 'Are Python developers in demand in the UAE?',
@@ -423,7 +415,6 @@ export const SKILL_CONTENT: Record<string, SkillContent> = {
     intro:
       'JavaScript remains the lingua franca of web development and is one of the most in-demand skills across the UAE job market. Full-stack JavaScript developers (React/Node.js) are especially sought after, combining front-end expertise with server-side capabilities. The growth of UAE-based SaaS products, e-commerce platforms, and mobile-first applications has kept JavaScript consistently at the top of hiring lists.',
     demandDrivers: ['Full-stack web development', 'E-commerce platform development', 'SaaS product companies', 'Mobile-web hybrid applications'],
-    averageSalary: 'AED 12,000–28,000 per month',
     faqs: [
       {
         question: 'Is JavaScript a good skill for UAE jobs?',
@@ -436,7 +427,6 @@ export const SKILL_CONTENT: Record<string, SkillContent> = {
     intro:
       'Product managers are among the most valued and well-compensated tech professionals in the UAE. As companies across the region build and scale digital products — from fintech apps to government platforms to e-commerce marketplaces — experienced product leaders who can bridge business strategy and engineering execution are in high demand. The UAE product management community has grown rapidly, with active PM meetups and communities in Dubai and Abu Dhabi.',
     demandDrivers: ['Scaling digital products at regional companies', 'Government technology platforms', 'Fintech product expansion', 'E-commerce marketplace development'],
-    averageSalary: 'AED 20,000–50,000 per month depending on seniority and company stage',
     faqs: [
       {
         question: 'Are product management roles in demand in the UAE?',
@@ -449,7 +439,6 @@ export const SKILL_CONTENT: Record<string, SkillContent> = {
     intro:
       'UX/UI designers play a crucial role in the UAE\'s fast-growing digital product economy. From consumer apps and e-commerce to fintech dashboards and government portals, the demand for designers who can craft intuitive, accessible, and culturally resonant digital experiences is substantial. Dubai in particular has a thriving design community, with design studios, in-house product teams, and agencies all hiring actively.',
     demandDrivers: ['Consumer app development', 'E-commerce UX', 'Fintech product design', 'Government digital services'],
-    averageSalary: 'AED 12,000–28,000 per month',
     faqs: [
       {
         question: 'Is UX/UI design a good career in the UAE?',

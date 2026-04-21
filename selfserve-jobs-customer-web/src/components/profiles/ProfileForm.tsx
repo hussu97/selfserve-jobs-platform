@@ -77,6 +77,7 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
     const trimmed = skill.trim();
     if (!trimmed) return;
     const current = form.key_skills ?? [];
+    if (current.length >= 8) return;
     if (!current.includes(trimmed)) {
       set('key_skills', [...current, trimmed]);
     }
@@ -136,6 +137,7 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
     if (!form.current_country) errs.current_country = 'Country is required';
     if (form.years_of_experience === undefined || form.years_of_experience < 0) errs.years_of_experience = 'Experience is required';
     if ((form.key_skills?.length ?? 0) === 0) errs.key_skills = 'At least one skill is required';
+    if ((form.key_skills?.length ?? 0) > 8) errs.key_skills = 'Maximum 8 skills allowed';
     const phoneVal = form.contact_number?.replace(/[\s\-()]/g, '') ?? '';
     if (!phoneVal || phoneVal.length < 5) errs.contact_number = 'Contact number is required';
     if (!resumeFile) {

@@ -6,11 +6,11 @@ export async function GET() {
   const stats = await getStats().catch(() => ({ active_jobs: 0, active_profiles: 0 }));
 
   const content = `# hirebridge
-> A free job platform built for the UAE's workforce — free for talent, verified access for recruiters
+> A free job platform built for the UAE's workforce — free for talent, verified access for hiring teams
 
 ## What is hirebridge?
 
-hirebridge (hirebridgeuae.com) is a talent-first job platform connecting UAE professionals with verified recruiters across all industries. Founded in 2026 by Hussain Abbasi and Tejasvie Subrahmanyam to support UAE professionals navigating career uncertainty. Talent profiles are friction-free (email verification only, no account needed). Recruiters register with their LinkedIn, undergo admin approval, then get full access to resumes and contact details. No fees for anyone.
+hirebridge (hirebridgeuae.com) is a talent-first job platform connecting UAE professionals with verified hiring teams across all industries. Founded in 2026 by Hussain Abbasi and Tejasvie Subrahmanyam to support UAE professionals navigating career uncertainty. Talent profiles are friction-free (email verification only, no account needed). Hiring teams register with their LinkedIn, undergo admin approval, then get full access to resumes and contact details. No fees for anyone.
 
 ## Current Platform Statistics
 
@@ -23,14 +23,14 @@ hirebridge (hirebridgeuae.com) is a talent-first job platform connecting UAE pro
 ## Key Features
 
 - Talent: No account required — email verification only, listing goes live immediately
-- Recruiters: Free registration, admin-verified access to contact details and resumes
-- No recruiter fees or pay-to-rank algorithms
+- Hiring teams: Free registration, admin-verified access to contact details and resumes
+- No hiring team fees or pay-to-rank algorithms
 - All listings ranked purely by recency
-- Verified recruiters post jobs directly (immediately active)
+- Verified hiring teams post jobs directly (immediately active)
 - Listings expire after 60 days (jobs) or 180 days (profiles)
-- Maximum 5 active jobs per recruiter email, 2 active profiles per talent email
+- Maximum 5 active jobs per hiring team email, 2 active profiles per talent email
 - Resume upload support for talent profiles (PDF, up to 5MB)
-- Sensitive data (email, phone, resume) only visible to verified recruiters
+- Sensitive data (email, phone, resume) only visible to verified hiring teams
 
 ## Supported Employment Types
 
@@ -63,7 +63,7 @@ hirebridge (hirebridgeuae.com) is a talent-first job platform connecting UAE pro
 - /profiles/skill/[skill] — Talent filtered by skill
 - /profiles/in/[emirate] — Talent based in specific emirate
 - /about — Platform overview and story
-- /faq — Frequently asked questions about UAE jobs, work visas, salaries
+- /faq — Frequently asked questions about UAE jobs and work visas
 - /blog — UAE tech job market guides and resources
 
 ## Content Policies

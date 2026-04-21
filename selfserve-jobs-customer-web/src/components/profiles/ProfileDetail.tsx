@@ -210,16 +210,16 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
                       ) : (
                         <>
                           <p className="text-sm font-medium text-[var(--color-text-main)] mb-1">
-                            Resume available to verified recruiters
+                            Resume available to verified hiring teams
                           </p>
                           <p className="text-xs text-[var(--color-text-muted)] mb-4">
-                            Register for free recruiter access to view and download resumes
+                            Register for free hiring access to view and download resumes
                           </p>
                           <Link
-                            href="/recruiter/register"
+                            href="/hiring/register"
                             className="inline-flex items-center justify-center bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white rounded-full px-5 py-2 text-xs font-medium transition-colors"
                           >
-                            Apply for recruiter access
+                            Apply for hiring access
                           </Link>
                         </>
                       )}
@@ -235,7 +235,7 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
 
         {/* Sidebar */}
         <aside className="flex flex-col gap-4">
-          {/* Contact info — recruiter only */}
+          {/* Contact info — hiring team only */}
           <div className="bg-surface-lowest rounded-2xl shadow-ambient p-5">
             <h3 className="font-heading text-xl text-primary mb-3">Contact</h3>
             {canSeeContact && (profile.email || profile.contact_number) ? (
@@ -288,13 +288,13 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
                 ) : (
                   <>
                     <p className="text-xs text-[var(--color-text-muted)] mb-2.5">
-                      Visible to verified recruiters only
+                      Visible to verified hiring teams only
                     </p>
                     <Link
-                      href="/recruiter/register"
+                      href="/hiring/register"
                       className="inline-flex items-center text-xs font-medium text-[var(--color-secondary)] hover:text-[var(--color-secondary-hover)] transition-colors"
                     >
-                      Get recruiter access →
+                      Get hiring access →
                     </Link>
                   </>
                 )}

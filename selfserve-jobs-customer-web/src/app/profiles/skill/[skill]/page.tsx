@@ -202,7 +202,7 @@ export default async function SkillTalentPage({ params }: PageProps) {
 
             <div className="rounded-2xl bg-primary p-5 text-white">
               <p className="font-heading text-base mb-1">A {skill.name} professional?</p>
-              <p className="text-sm opacity-80 mb-4">Get found by UAE employers. Free.</p>
+              <p className="text-sm opacity-80 mb-4">Get found by UAE hiring teams. Free.</p>
               <Link
                 href="/profiles/new"
                 className="block text-center px-4 py-2 rounded-full bg-white text-primary font-semibold text-sm hover:bg-surface transition-colors"

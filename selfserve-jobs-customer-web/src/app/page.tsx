@@ -205,8 +205,8 @@ export default async function HomePage() {
                     <path fillRule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clipRule="evenodd" />
                   </svg>
                 ),
-                title: 'Recruiters apply for access',
-                desc: 'Recruiters register with their LinkedIn. After admin approval, they get full access to contact details and resumes.',
+                title: 'Hiring teams apply for access',
+                desc: 'Hiring teams register with their LinkedIn. After admin approval, they get full access to contact details and resumes.',
               },
               {
                 num: '03',
@@ -217,7 +217,7 @@ export default async function HomePage() {
                   </svg>
                 ),
                 title: 'Connect directly',
-                desc: 'Verified recruiters reach out using real contact details. No middlemen, no fees — ever.',
+                desc: 'Verified hiring teams reach out using real contact details. No middlemen, no fees — ever.',
               },
             ].map(({ num, icon, title, desc }) => (
               <div
@@ -347,7 +347,7 @@ export default async function HomePage() {
             <div className="text-center py-16 rounded-2xl bg-surface-lowest shadow-ambient">
               <p className="text-text-muted text-sm mb-4">No job listings yet.</p>
               <Link
-                href="/recruiter/register"
+                href="/hiring/register"
                 className="inline-flex items-center justify-center px-6 py-2.5 rounded-full text-white font-semibold text-sm bg-primary-btn transition-all hover:bg-primary hover:shadow-ambient-hover active:scale-[0.98]"
               >
                 Post the first job

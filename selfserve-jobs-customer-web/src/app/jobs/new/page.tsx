@@ -26,10 +26,10 @@ export default function NewJobPage() {
             Account under review
           </h1>
           <p className="text-[var(--color-text-muted)] mb-6">
-            Your recruiter account is pending approval. You&apos;ll be able to post jobs once our team reviews your application.
+            Your hiring account is pending approval. You&apos;ll be able to post jobs once our team reviews your application.
           </p>
           <Link
-            href="/recruiter/pending"
+            href="/hiring/pending"
             className="inline-flex items-center justify-center bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white rounded-full px-6 py-3 font-medium transition-colors"
           >
             View application status
@@ -50,20 +50,20 @@ export default function NewJobPage() {
             </svg>
           </div>
           <p className="text-xs uppercase tracking-widest text-[var(--color-text-muted)] mb-3">
-            Recruiter Access Required
+            Hiring Access Required
           </p>
           <h1 className="font-serif text-4xl text-[var(--color-text-main)] mb-4">
-            Post jobs as a <em>verified recruiter</em>
+            Post jobs with <em>verified hiring</em> access
           </h1>
           <p className="text-[var(--color-text-muted)] mb-8 leading-relaxed">
-            Job posting is reserved for verified recruiters. Register for access — it&apos;s free, and you&apos;ll also be able to view full candidate profiles.
+            Job posting is reserved for verified hiring teams. Register for access — it&apos;s free, and you&apos;ll also be able to view full candidate profiles.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
-              href="/recruiter/register"
+              href="/hiring/register"
               className="inline-flex items-center justify-center bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white rounded-full px-6 py-3 font-medium transition-colors"
             >
-              Apply for recruiter access
+              Apply for hiring access
             </Link>
             {!isLoggedIn && (
               <Link
@@ -94,7 +94,7 @@ export default function NewJobPage() {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-12">
           <span className="text-xs font-semibold uppercase tracking-widest text-[var(--color-text-muted)] mb-4 block">
-            Recruiter Portal
+            Hiring Portal
           </span>
           <h1 className="font-serif text-4xl sm:text-5xl text-[var(--color-text-main)] mb-4">
             Post a <em>New</em> Job

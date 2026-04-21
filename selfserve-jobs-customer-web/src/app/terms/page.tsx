@@ -32,7 +32,7 @@ export default function TermsPage() {
             <div>
               <h2 className="font-heading text-2xl text-primary mb-3">Acceptance</h2>
               <p className="text-sm leading-relaxed text-text-muted">
-                By using hirebridge — whether to browse, post a job, create a candidate profile, or register as a recruiter — you agree to these Terms of Service. If you do not agree, please do not use the platform. We reserve the right to update these terms at any time; continued use constitutes acceptance.
+                By using hirebridge — whether to browse, post a job, create a candidate profile, or register as a hiring team member — you agree to these Terms of Service. If you do not agree, please do not use the platform. We reserve the right to update these terms at any time; continued use constitutes acceptance.
               </p>
             </div>
 
@@ -73,7 +73,7 @@ export default function TermsPage() {
               <h2 className="font-heading text-2xl text-primary mb-3">Recruiter registration &amp; job posting</h2>
               <p className="text-sm leading-relaxed text-text-muted mb-4">
                 Posting jobs and accessing sensitive talent data (email, phone, resume) requires a recruiter
-                account. Registration is free. By registering and using a recruiter account you agree that:
+                account. Registration is free. By registering and using a hiring account you agree that:
               </p>
               <div className="flex flex-col gap-3">
                 <div className="flex items-start gap-3">

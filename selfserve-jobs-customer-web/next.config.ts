@@ -13,6 +13,12 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      { source: '/recruiter/register', destination: '/hiring/register', permanent: true },
+      { source: '/recruiter/pending', destination: '/hiring/pending', permanent: true },
+    ];
+  },
   images: {
     remotePatterns: [
       {
