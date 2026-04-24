@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
 from app.constants import MAX_PAGE
-from app.dependencies import get_optional_session, get_session, require_active_recruiter, require_edit_token
+from app.dependencies import get_current_session, get_optional_session, get_session, require_edit_token
 from app.limiter import limiter
 from app.models.auth_session import AuthSession
 from app.schemas.profile import (
@@ -80,16 +80,36 @@ async def list_profiles(
 @router.get("/{code}/resume", response_model=ResumeUrlResponse)
 async def get_resume_url(
     code: str,
-    _session: AuthSession = Depends(require_active_recruiter),
+    session: AuthSession = Depends(get_current_session),
     db: AsyncSession = Depends(get_session),
 ):
-    """Returns a temporary signed URL for the resume. Requires active recruiter session."""
+    """Return a temporary signed URL for the resume.
+
+    Access is limited to admins, active recruiters, and the profile owner.
+    """
     profile = await profile_service.get_profile_by_code(db, code)
     if not profile.resume_gcs_path:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="No resume uploaded for this profile",
         )
+
+    has_access = False
+    if session.user_type == "admin":
+        has_access = True
+    elif session.user_type == "recruiter":
+        recruiter = await recruiter_service.get_by_email(db, session.email)
+        has_access = recruiter is not None and recruiter.status == "active"
+    else:
+        session_user = await user_service.get_by_email(db, session.email)
+        has_access = session_user is not None and session_user.user_code == profile.user_code
+
+    if not has_access:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have permission to view this resume.",
+        )
+
     url = await storage_service.generate_signed_url(profile.resume_gcs_path, expiration_minutes=15)
     return ResumeUrlResponse(url=url, expires_in=900)
 

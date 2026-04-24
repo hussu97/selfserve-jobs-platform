@@ -14,10 +14,11 @@ import {
   formatExperience,
   timeAgo,
 } from '@/lib/utils';
-import { getResumeUrl } from '@/lib/api';
+import { getProfile as getAuthedProfile, getResumeUrl } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { trackEvent } from '@/lib/analytics';
 import type { Profile } from '@/lib/types';
+import { ResumeCarousel } from './ResumeCarousel';
 
 interface ProfileDetailProps {
   profile: Profile;
@@ -34,21 +35,36 @@ const RELOCATION_BADGE: Record<string, 'success' | 'default' | 'warning'> = {
 
 export function ProfileDetail({ profile }: ProfileDetailProps) {
   const { isActiveRecruiter, sessionToken } = useAuth();
-  const [resumeUrl, setResumeUrl] = useState<string | null>(null);
+  const [hydratedProfile, setHydratedProfile] = useState<Profile | null>(null);
+  const [resumePreview, setResumePreview] = useState<{ code: string; url: string } | null>(null);
   // For profile owners: toggle between your real data and public (masked) view
   const [showPublicView, setShowPublicView] = useState(false);
+  const resolvedProfile = sessionToken && hydratedProfile?.code === profile.code
+    ? hydratedProfile
+    : profile;
+  const visibleResumeUrl = (isActiveRecruiter || resolvedProfile.is_owner) && resumePreview?.code === resolvedProfile.code
+    ? resumePreview.url
+    : null;
 
-  const canSeeContact = profile.is_owner
+  const canSeeContact = resolvedProfile.is_owner
     ? !showPublicView
     : isActiveRecruiter;
 
   useEffect(() => {
-    if ((isActiveRecruiter || profile.is_owner) && profile.has_resume && sessionToken) {
-      getResumeUrl(profile.code, sessionToken)
-        .then((r) => setResumeUrl(r.url))
-        .catch(() => setResumeUrl(null));
+    if (!sessionToken) return;
+
+    getAuthedProfile(profile.code, sessionToken)
+      .then((nextProfile) => setHydratedProfile(nextProfile))
+      .catch(() => setHydratedProfile(null));
+  }, [profile.code, sessionToken]);
+
+  useEffect(() => {
+    if ((isActiveRecruiter || resolvedProfile.is_owner) && resolvedProfile.has_resume && sessionToken) {
+      getResumeUrl(resolvedProfile.code, sessionToken)
+        .then((r) => setResumePreview({ code: resolvedProfile.code, url: r.url }))
+        .catch(() => setResumePreview(null));
     }
-  }, [isActiveRecruiter, profile.is_owner, profile.has_resume, profile.code, sessionToken]);
+  }, [isActiveRecruiter, resolvedProfile.is_owner, resolvedProfile.has_resume, resolvedProfile.code, sessionToken]);
 
   return (
     <article className="max-w-4xl mx-auto">
@@ -64,7 +80,7 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
           Back to profiles
         </Link>
 
-        {profile.is_owner && (
+        {resolvedProfile.is_owner && (
           <div className="flex items-center gap-1 p-1 bg-surface rounded-xl text-xs font-semibold uppercase tracking-wider">
             <button
               onClick={() => setShowPublicView(false)}
@@ -85,34 +101,34 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
       {/* Header */}
       <header className="mb-8">
         <div className="flex flex-wrap items-start gap-3 mb-3">
-          <Badge variant={RELOCATION_BADGE[profile.relocation_preference] ?? 'default'} size="md">
-            {getRelocationLabel(profile.relocation_preference)}
+          <Badge variant={RELOCATION_BADGE[resolvedProfile.relocation_preference] ?? 'default'} size="md">
+            {getRelocationLabel(resolvedProfile.relocation_preference)}
           </Badge>
         </div>
 
         <h1 className="font-heading text-3xl sm:text-4xl text-primary leading-tight mb-1">
-          {profile.person_name}
+          {resolvedProfile.person_name}
         </h1>
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mb-4">
           <span className="text-secondary font-medium text-lg">
-            {profile.current_title}
+            {resolvedProfile.current_title}
           </span>
           <span className="flex items-center gap-1 text-sm text-text-muted">
             <svg className="h-4 w-4 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
               <path fillRule="evenodd" d="M9.69 18.933l.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 00.281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 103 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 002.273 1.765 11.842 11.842 0 00.976.544l.062.029.018.008.006.003zM10 11.25a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5z" clipRule="evenodd" />
             </svg>
-            {profile.current_city}, {getCountryLabel(profile.current_country)}
+            {resolvedProfile.current_city}, {getCountryLabel(resolvedProfile.current_country)}
           </span>
           <span className="text-sm text-text-muted">
-            Listed {timeAgo(profile.created_at)}
+            Listed {timeAgo(resolvedProfile.created_at)}
           </span>
         </div>
 
         {/* Skills */}
-        {profile.key_skills.length > 0 && (
+        {resolvedProfile.key_skills.length > 0 && (
           <div className="flex flex-wrap gap-2">
-            {profile.key_skills.map((skill) => (
+            {resolvedProfile.key_skills.map((skill) => (
               <SkillTag key={skill} skill={skill} size="md" />
             ))}
           </div>
@@ -130,20 +146,20 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
                 allowedElements={['p', 'ul', 'ol', 'li', 'strong', 'em', 'a', 'blockquote', 'code', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'br', 'hr']}
                 unwrapDisallowed
               >
-                {profile.brief}
+                {resolvedProfile.brief}
               </ReactMarkdown>
             </div>
           </div>
 
           {/* Resume section */}
-          {profile.has_resume && (
+          {resolvedProfile.has_resume && (
             <div className="bg-surface-lowest rounded-2xl shadow-ambient p-6 mb-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-heading text-xl text-primary">Resume</h2>
-                {canSeeContact && resumeUrl && (
+                {canSeeContact && visibleResumeUrl && (
                   <div className="flex items-center gap-1">
                     <a
-                      href={resumeUrl}
+                      href={visibleResumeUrl}
                       download
                       onClick={() => trackEvent('resume-download')}
                       className="p-1.5 rounded-lg text-text-muted hover:text-primary hover:bg-surface transition-colors"
@@ -155,7 +171,7 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
                       </svg>
                     </a>
                     <a
-                      href={resumeUrl}
+                      href={visibleResumeUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="p-1.5 rounded-lg text-text-muted hover:text-primary hover:bg-surface transition-colors"
@@ -170,26 +186,8 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
                 )}
               </div>
 
-              {canSeeContact && resumeUrl ? (
-                <div className="w-full rounded-xl overflow-hidden">
-                  <object
-                    data={resumeUrl}
-                    type="application/pdf"
-                    className="w-full"
-                    style={{ height: '700px' }}
-                  >
-                    <p className="text-sm text-text-muted">
-                      Unable to display PDF.{' '}
-                      <a
-                        href={resumeUrl}
-                        download
-                        className="text-primary hover:opacity-70 transition-opacity underline"
-                      >
-                        Download resume
-                      </a>
-                    </p>
-                  </object>
-                </div>
+              {canSeeContact && visibleResumeUrl ? (
+                <ResumeCarousel url={visibleResumeUrl} />
               ) : (
                 /* Blurred/locked resume for non-recruiters */
                 <div className="relative rounded-xl overflow-hidden" style={{ height: '300px' }}>
@@ -203,7 +201,7 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                         </svg>
                       </div>
-                      {profile.is_owner ? (
+                      {resolvedProfile.is_owner ? (
                         <p className="text-sm font-medium text-[var(--color-text-muted)]">
                           This is how the public sees your resume section
                         </p>
@@ -238,29 +236,29 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
           {/* Contact info — hiring team only */}
           <div className="bg-surface-lowest rounded-2xl shadow-ambient p-5">
             <h3 className="font-heading text-xl text-primary mb-3">Contact</h3>
-            {canSeeContact && (profile.email || profile.contact_number) ? (
+            {canSeeContact && (resolvedProfile.email || resolvedProfile.contact_number) ? (
               <div className="flex flex-col gap-2 text-sm">
-                {profile.email && (
+                {resolvedProfile.email && (
                   <a
-                    href={`mailto:${profile.email}`}
+                    href={`mailto:${resolvedProfile.email}`}
                     className="flex items-center gap-2 text-[var(--color-primary)] hover:opacity-70 transition-opacity"
                   >
                     <svg className="h-4 w-4 shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                       <path d="M3 4a2 2 0 00-2 2v1.161l8.441 4.221a1.25 1.25 0 001.118 0L19 7.162V6a2 2 0 00-2-2H3z" />
                       <path d="M19 8.839l-7.77 3.885a2.75 2.75 0 01-2.46 0L1 8.839V14a2 2 0 002 2h14a2 2 0 002-2V8.839z" />
                     </svg>
-                    {profile.email}
+                    {resolvedProfile.email}
                   </a>
                 )}
-                {profile.contact_number && (
+                {resolvedProfile.contact_number && (
                   <a
-                    href={`tel:${profile.contact_number}`}
+                    href={`tel:${resolvedProfile.contact_number}`}
                     className="flex items-center gap-2 text-[var(--color-primary)] hover:opacity-70 transition-opacity"
                   >
                     <svg className="h-4 w-4 shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                       <path fillRule="evenodd" d="M2 3.5A1.5 1.5 0 013.5 2h1.148a1.5 1.5 0 011.465 1.175l.716 3.223a1.5 1.5 0 01-1.052 1.767l-.933.267c-.41.117-.643.555-.48.95a11.542 11.542 0 006.254 6.254c.395.163.833-.07.95-.48l.267-.933a1.5 1.5 0 011.767-1.052l3.223.716A1.5 1.5 0 0118 15.352V16.5a1.5 1.5 0 01-1.5 1.5H15c-1.149 0-2.263-.15-3.326-.43A13.022 13.022 0 012.43 8.326 13.019 13.019 0 012 5V3.5z" clipRule="evenodd" />
                     </svg>
-                    {profile.contact_number}
+                    {resolvedProfile.contact_number}
                   </a>
                 )}
               </div>
@@ -281,7 +279,7 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
                     <span className="text-xs tracking-wider">●●● ●●● ●●●●</span>
                   </div>
                 </div>
-                {profile.is_owner ? (
+                {resolvedProfile.is_owner ? (
                   <p className="text-xs text-[var(--color-text-muted)]">
                     This is how the public sees your contact info
                   </p>
@@ -303,11 +301,11 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
           </div>
 
           {/* LinkedIn */}
-          {profile.linkedin_profile_link && (
+          {resolvedProfile.linkedin_profile_link && (
             <div className="bg-surface-lowest rounded-2xl shadow-ambient p-5">
               <h3 className="font-heading text-xl text-primary mb-3">Connect</h3>
               <a
-                href={profile.linkedin_profile_link}
+                href={resolvedProfile.linkedin_profile_link}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center w-full gap-2 px-4 py-3 rounded-full text-white font-medium transition-all hover:opacity-90 shadow-ambient-hover"
@@ -327,20 +325,20 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
             <dl className="flex flex-col gap-2.5 text-sm">
               <div className="flex justify-between">
                 <dt className="text-text-muted">Experience</dt>
-                <dd className="text-text-main">{formatExperience(profile.years_of_experience)}</dd>
+                <dd className="text-text-main">{formatExperience(resolvedProfile.years_of_experience)}</dd>
               </div>
               <div className="flex justify-between">
                 <dt className="text-text-muted">Available</dt>
-                <dd className="text-text-main">{getNoticePeriodLabel(profile.notice_period)}</dd>
+                <dd className="text-text-main">{getNoticePeriodLabel(resolvedProfile.notice_period)}</dd>
               </div>
               <div className="flex justify-between items-center">
                 <dt className="text-text-muted">Relocation</dt>
                 <dd>
                   <Badge
-                    variant={RELOCATION_BADGE[profile.relocation_preference] ?? 'default'}
+                    variant={RELOCATION_BADGE[resolvedProfile.relocation_preference] ?? 'default'}
                     size="sm"
                   >
-                    {getRelocationLabel(profile.relocation_preference)}
+                    {getRelocationLabel(resolvedProfile.relocation_preference)}
                   </Badge>
                 </dd>
               </div>
@@ -349,8 +347,8 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
 
           {/* Actions */}
           <div className="flex gap-2">
-            <ShareButton title={`${profile.person_name} — ${profile.current_title}`} />
-            <ReportButton entityType="profile" entityCode={profile.code} />
+            <ShareButton title={`${resolvedProfile.person_name} — ${resolvedProfile.current_title}`} />
+            <ReportButton entityType="profile" entityCode={resolvedProfile.code} />
           </div>
         </aside>
       </div>

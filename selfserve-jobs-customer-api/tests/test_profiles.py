@@ -1,8 +1,11 @@
 """Tests for profile endpoints: list, create, update, deactivate/activate, delete, token validation."""
 
 from datetime import UTC, datetime, timedelta
+from unittest.mock import AsyncMock, patch
 
+from app.models.auth_session import AuthSession
 from app.models.profile import Profile
+from app.models.recruiter import Recruiter
 from app.models.user_sensitive import UserSensitive
 from app.services.code_generator import generate_code, generate_token
 
@@ -61,6 +64,44 @@ async def _make_profile(db_session, *, email="jane@example.com", phone="+44 7700
     db_session.add(profile)
     await db_session.flush()
     return profile
+
+
+async def _make_session(
+    db_session,
+    *,
+    email: str,
+    user_type: str | None = None,
+    recruiter_code: str | None = None,
+) -> AuthSession:
+    session = AuthSession(
+        session_token=generate_token(64),
+        email=email,
+        user_type=user_type,
+        recruiter_code=recruiter_code,
+        expires_at=datetime.now(UTC) + timedelta(days=1),
+    )
+    db_session.add(session)
+    await db_session.flush()
+    return session
+
+
+async def _make_recruiter(
+    db_session,
+    *,
+    code: str,
+    email: str,
+    status: str = "active",
+) -> Recruiter:
+    recruiter = Recruiter(
+        recruiter_code=code,
+        email=email,
+        name="Test Recruiter",
+        linkedin_profile_url="https://linkedin.com/in/test-recruiter",
+        status=status,
+    )
+    db_session.add(recruiter)
+    await db_session.flush()
+    return recruiter
 
 
 # ---------------------------------------------------------------------------
@@ -154,6 +195,120 @@ async def test_get_removed_profile_returns_410(client, db_session):
     await _make_profile(db_session, profile_code="removedpr1", status="removed")
     response = await client.get("/api/v1/profiles/removedpr1")
     assert response.status_code == 410
+
+
+async def test_get_profile_detail_includes_sensitive_fields_for_active_recruiter(client, db_session):
+    await _make_profile(db_session, profile_code="recruitpr01", email="talent@example.com", phone="+971501112233")
+    recruiter = await _make_recruiter(db_session, code="recruiter001", email="recruiter@example.com")
+    session = await _make_session(
+        db_session,
+        email=recruiter.email,
+        user_type="recruiter",
+        recruiter_code=recruiter.recruiter_code,
+    )
+
+    response = await client.get(
+        "/api/v1/profiles/recruitpr01",
+        headers={"Authorization": f"Bearer {session.session_token}"},
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["email"] == "talent@example.com"
+    assert data["contact_number"] == "+971501112233"
+
+
+async def test_get_profile_detail_includes_sensitive_fields_for_admin(client, db_session):
+    await _make_profile(db_session, profile_code="adminprof01", email="talent@example.com", phone="+971509998887")
+    session = await _make_session(db_session, email="admin@example.com", user_type="admin")
+
+    with patch("app.config.get_settings") as mock_get_settings:
+        mock_get_settings.return_value.admin_email_list = ["admin@example.com"]
+        response = await client.get(
+            "/api/v1/profiles/adminprof01",
+            headers={"Authorization": f"Bearer {session.session_token}"},
+        )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["email"] == "talent@example.com"
+    assert data["contact_number"] == "+971509998887"
+
+
+async def test_get_profile_detail_marks_owner_and_includes_sensitive_fields(client, db_session):
+    await _make_profile(db_session, profile_code="ownerprof01", email="owner@example.com", phone="+971507778889")
+    session = await _make_session(db_session, email="owner@example.com")
+
+    response = await client.get(
+        "/api/v1/profiles/ownerprof01",
+        headers={"Authorization": f"Bearer {session.session_token}"},
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["is_owner"] is True
+    assert data["email"] == "owner@example.com"
+    assert data["contact_number"] == "+971507778889"
+
+
+async def test_get_resume_url_allows_active_recruiter_admin_and_owner(client, db_session):
+    await _make_profile(
+        db_session,
+        profile_code="resumeprof01",
+        email="owner@example.com",
+        resume_gcs_path="resumes/resumeprof01/test.pdf",
+    )
+    recruiter = await _make_recruiter(db_session, code="recruiter002", email="recruiter@example.com")
+    recruiter_session = await _make_session(
+        db_session,
+        email=recruiter.email,
+        user_type="recruiter",
+        recruiter_code=recruiter.recruiter_code,
+    )
+    admin_session = await _make_session(db_session, email="admin@example.com", user_type="admin")
+    owner_session = await _make_session(db_session, email="owner@example.com")
+
+    with patch("app.routers.profiles.storage_service.generate_signed_url", new_callable=AsyncMock) as mock_signed_url:
+        mock_signed_url.return_value = "https://example.com/resume.pdf"
+
+        recruiter_response = await client.get(
+            "/api/v1/profiles/resumeprof01/resume",
+            headers={"Authorization": f"Bearer {recruiter_session.session_token}"},
+        )
+        with patch("app.config.get_settings") as mock_get_settings:
+            mock_get_settings.return_value.admin_email_list = ["admin@example.com"]
+            admin_response = await client.get(
+                "/api/v1/profiles/resumeprof01/resume",
+                headers={"Authorization": f"Bearer {admin_session.session_token}"},
+            )
+        owner_response = await client.get(
+            "/api/v1/profiles/resumeprof01/resume",
+            headers={"Authorization": f"Bearer {owner_session.session_token}"},
+        )
+
+    assert recruiter_response.status_code == 200
+    assert admin_response.status_code == 200
+    assert owner_response.status_code == 200
+    assert recruiter_response.json()["url"] == "https://example.com/resume.pdf"
+    assert admin_response.json()["url"] == "https://example.com/resume.pdf"
+    assert owner_response.json()["url"] == "https://example.com/resume.pdf"
+
+
+async def test_get_resume_url_rejects_non_owner_non_recruiter_session(client, db_session):
+    await _make_profile(
+        db_session,
+        profile_code="resumeprof02",
+        email="owner@example.com",
+        resume_gcs_path="resumes/resumeprof02/test.pdf",
+    )
+    session = await _make_session(db_session, email="stranger@example.com")
+
+    response = await client.get(
+        "/api/v1/profiles/resumeprof02/resume",
+        headers={"Authorization": f"Bearer {session.session_token}"},
+    )
+
+    assert response.status_code == 403
 
 
 # ---------------------------------------------------------------------------
