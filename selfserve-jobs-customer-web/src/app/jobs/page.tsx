@@ -170,9 +170,11 @@ function JobsContent() {
     };
   }, [loadingMore, loading, totalPages, fetchJobs]);
 
-  // Infinite scroll — mobile only
+  // Infinite scroll — mobile only.
+  // Depends on `loading` so the observer re-attaches once the initial fetch
+  // completes and the sentinel div enters the DOM (it only renders after load).
   useEffect(() => {
-    if (!isMobile) return;
+    if (!isMobile || loading) return;
     const sentinel = sentinelRef.current;
     if (!sentinel) return;
     const observer = new IntersectionObserver(
@@ -181,7 +183,7 @@ function JobsContent() {
     );
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [isMobile]);
+  }, [isMobile, loading]);
 
   const handleSearchChange = (value: string) => {
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
