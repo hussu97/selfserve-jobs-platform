@@ -14,6 +14,7 @@ import { RELOCATION_PREFERENCES } from '@/lib/constants';
 interface ProfileFiltersProps {
   filters: ProfileFilters;
   onChange: (filters: ProfileFilters) => void;
+  resultCount?: number | null;
   className?: string;
 }
 
@@ -32,7 +33,7 @@ const EXPERIENCE_OPTIONS = [
 
 const CITY_OTHER = '__other__';
 
-export function ProfileFilters({ filters, onChange, className }: ProfileFiltersProps) {
+export function ProfileFilters({ filters, onChange, resultCount, className }: ProfileFiltersProps) {
   const [skillInput, setSkillInput] = useState('');
   const [mobileOpen, setMobileOpen] = useState(false);
   const [cityIsOther, setCityIsOther] = useState(false);
@@ -153,17 +154,24 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
 
   const filterContent = (
     <div className="flex flex-col gap-5">
-      <div className="flex items-center justify-between">
-        <h2 className="font-heading text-lg text-primary">
-          Filters
-        </h2>
-        {hasActiveFilters && (
-          <button
-            onClick={clearAll}
-            className="text-xs font-medium cursor-pointer hover:opacity-70 text-primary rounded-full px-3 py-1 bg-surface"
-          >
-            Clear all
-          </button>
+      <div className="flex flex-col gap-0.5">
+        <div className="flex items-center justify-between">
+          <h2 className="font-heading text-lg text-primary">
+            Filters
+          </h2>
+          {hasActiveFilters && (
+            <button
+              onClick={clearAll}
+              className="text-xs font-medium cursor-pointer hover:opacity-70 text-primary rounded-full px-3 py-1 bg-surface"
+            >
+              Clear all
+            </button>
+          )}
+        </div>
+        {resultCount != null && (
+          <p className="hidden lg:block text-xs font-semibold uppercase tracking-widest text-text-muted">
+            {resultCount.toLocaleString()} found
+          </p>
         )}
       </div>
 
@@ -399,22 +407,29 @@ export function ProfileFilters({ filters, onChange, className }: ProfileFiltersP
   return (
     <>
       <div className={cn('lg:hidden', className)}>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setMobileOpen(!mobileOpen)}
-          className="w-full justify-between rounded-full"
-        >
-          <span>Filters {hasActiveFilters && '(active)'}</span>
-          <svg
-            className={cn('h-4 w-4 transition-transform', mobileOpen && 'rotate-180')}
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            aria-hidden="true"
+        <div className="flex items-center gap-3">
+          {resultCount != null && (
+            <span className="text-xs font-semibold uppercase tracking-widest text-text-muted whitespace-nowrap">
+              {resultCount.toLocaleString()} found
+            </span>
+          )}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="flex-1 justify-between rounded-full"
           >
-            <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
-          </svg>
-        </Button>
+            <span>Filters {hasActiveFilters && '(active)'}</span>
+            <svg
+              className={cn('h-4 w-4 transition-transform', mobileOpen && 'rotate-180')}
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+            </svg>
+          </Button>
+        </div>
         {mobileOpen && (
           <div className="mt-3 bg-surface-lowest rounded-2xl shadow-ambient p-5">
             {filterContent}

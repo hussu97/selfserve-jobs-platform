@@ -214,14 +214,9 @@ function JobsContent() {
           <p className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-3">
             Opportunities
           </p>
-          <div className="flex items-end justify-between gap-4">
-            <h1 className="font-heading text-4xl sm:text-5xl text-primary">
-              Browse <span className="italic">Jobs</span>
-            </h1>
-            <span className="text-xs font-semibold uppercase tracking-widest text-text-muted pb-1">
-              {loading ? 'Loading…' : `${total.toLocaleString()} job${total !== 1 ? 's' : ''} found`}
-            </span>
-          </div>
+          <h1 className="font-heading text-4xl sm:text-5xl text-primary">
+            Browse <span className="italic">Jobs</span>
+          </h1>
         </div>
       </div>
 
@@ -237,7 +232,7 @@ function JobsContent() {
 
         <div className="flex flex-col lg:flex-row gap-8">
           <aside className="w-full lg:w-64 lg:flex-shrink-0">
-            <JobFilters filters={filters} onChange={handleFiltersChange} />
+            <JobFilters filters={filters} onChange={handleFiltersChange} resultCount={loading ? null : total} />
           </aside>
 
           <div className="flex-1 min-w-0" aria-busy={loading} aria-live="polite">

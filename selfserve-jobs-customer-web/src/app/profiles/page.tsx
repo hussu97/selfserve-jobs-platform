@@ -229,14 +229,9 @@ function ProfilesContent() {
           <p className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-3">
             Talent
           </p>
-          <div className="flex items-end justify-between gap-4">
-            <h1 className="font-heading text-4xl sm:text-5xl text-primary">
-              Discover <span className="italic">Extraordinary</span> Talent
-            </h1>
-            <span className="text-xs font-semibold uppercase tracking-widest text-text-muted pb-1">
-              {loading ? 'Loading…' : `${total.toLocaleString()} profile${total !== 1 ? 's' : ''} found`}
-            </span>
-          </div>
+          <h1 className="font-heading text-4xl sm:text-5xl text-primary">
+            Discover <span className="italic">Extraordinary</span> Talent
+          </h1>
         </div>
       </div>
 
@@ -252,7 +247,7 @@ function ProfilesContent() {
 
         <div className="flex flex-col lg:flex-row gap-8">
           <aside className="w-full lg:w-64 lg:flex-shrink-0">
-            <ProfileFilters filters={filters} onChange={handleFiltersChange} />
+            <ProfileFilters filters={filters} onChange={handleFiltersChange} resultCount={loading ? null : total} />
           </aside>
 
           <div className="flex-1 min-w-0" aria-busy={loading} aria-live="polite">
