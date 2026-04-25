@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 interface JobFiltersProps {
   filters: JobFilters;
   onChange: (filters: JobFilters) => void;
+  resultCount?: number | null;
   className?: string;
 }
 
@@ -20,7 +21,7 @@ const SORT_OPTIONS = [
   { value: 'deadline', label: 'By deadline' },
 ];
 
-export function JobFilters({ filters, onChange, className }: JobFiltersProps) {
+export function JobFilters({ filters, onChange, resultCount, className }: JobFiltersProps) {
   const [skillInput, setSkillInput] = useState('');
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -63,17 +64,24 @@ export function JobFilters({ filters, onChange, className }: JobFiltersProps) {
   const filterContent = (
     <div className="flex flex-col gap-5">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="font-heading text-lg text-primary">
-          Filters
-        </h2>
-        {hasActiveFilters && (
-          <button
-            onClick={clearAll}
-            className="text-xs font-medium cursor-pointer hover:opacity-70 text-secondary rounded-full px-3 py-1 bg-secondary/10 transition-colors"
-          >
-            Clear all
-          </button>
+      <div className="flex flex-col gap-0.5">
+        <div className="flex items-center justify-between">
+          <h2 className="font-heading text-lg text-primary">
+            Filters
+          </h2>
+          {hasActiveFilters && (
+            <button
+              onClick={clearAll}
+              className="text-xs font-medium cursor-pointer hover:opacity-70 text-secondary rounded-full px-3 py-1 bg-secondary/10 transition-colors"
+            >
+              Clear all
+            </button>
+          )}
+        </div>
+        {resultCount != null && (
+          <p className="hidden lg:block text-xs font-semibold uppercase tracking-widest text-text-muted">
+            {resultCount.toLocaleString()} found
+          </p>
         )}
       </div>
 
@@ -173,22 +181,29 @@ export function JobFilters({ filters, onChange, className }: JobFiltersProps) {
     <>
       {/* Mobile toggle */}
       <div className={cn('lg:hidden', className)}>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setMobileOpen(!mobileOpen)}
-          className="w-full justify-between rounded-full"
-        >
-          <span>Filters {hasActiveFilters && `(active)`}</span>
-          <svg
-            className={cn('h-4 w-4 transition-transform', mobileOpen && 'rotate-180')}
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            aria-hidden="true"
+        <div className="flex items-center gap-3">
+          {resultCount != null && (
+            <span className="text-xs font-semibold uppercase tracking-widest text-text-muted whitespace-nowrap">
+              {resultCount.toLocaleString()} found
+            </span>
+          )}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="flex-1 justify-between rounded-full"
           >
-            <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
-          </svg>
-        </Button>
+            <span>Filters {hasActiveFilters && `(active)`}</span>
+            <svg
+              className={cn('h-4 w-4 transition-transform', mobileOpen && 'rotate-180')}
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+            </svg>
+          </Button>
+        </div>
         {mobileOpen && (
           <div className="mt-3 bg-surface-lowest shadow-ambient rounded-2xl p-5">
             {filterContent}
