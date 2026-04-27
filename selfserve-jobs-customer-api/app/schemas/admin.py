@@ -28,6 +28,11 @@ class FlagEntityRequest(BaseModel):
     reason: str
 
 
+class AdminProfileActionResponse(BaseModel):
+    profile_code: str
+    status: str
+
+
 class AdminUserItem(BaseModel):
     profile_code: str
     person_name: str

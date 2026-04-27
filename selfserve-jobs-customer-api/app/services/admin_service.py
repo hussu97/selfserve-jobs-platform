@@ -2,7 +2,7 @@ import math
 from datetime import UTC, datetime
 
 from fastapi import HTTPException, status
-from sqlalchemy import delete, func, or_, select
+from sqlalchemy import delete, func, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.admin_audit_log import AdminAuditLog
@@ -223,6 +223,49 @@ async def flag_entity(
         entity_code=entity_code,
         details={"reason": reason},
     )
+
+
+async def deactivate_reported_profile(
+    db: AsyncSession,
+    admin_email: str,
+    profile_code: str,
+) -> Profile:
+    """Deactivate a reported profile from the admin panel and resolve pending reports."""
+    result = await db.execute(select(Profile).where(Profile.profile_code == profile_code))
+    profile = result.scalar_one_or_none()
+    if not profile:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
+
+    if profile.status not in ("active", "under_review"):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Only active or under-review profiles can be deactivated",
+        )
+
+    now = datetime.now(UTC)
+    profile.status = "inactive"
+    profile.updated_at = now
+
+    await db.execute(
+        update(Report)
+        .where(
+            Report.entity_type == "profile",
+            Report.entity_code == profile_code,
+            Report.status == "pending",
+        )
+        .values(status="resolved", updated_at=now)
+    )
+
+    await db.flush()
+    await write_audit_log(
+        db,
+        admin_email=admin_email,
+        action="deactivate_profile",
+        entity_type="profile",
+        entity_code=profile_code,
+        details={"source": "reports_table"},
+    )
+    return profile
 
 
 async def get_rejection_reasons(db: AsyncSession) -> list[RejectionReasonItem]:

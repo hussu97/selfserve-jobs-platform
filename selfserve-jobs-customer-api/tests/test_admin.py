@@ -3,10 +3,16 @@
 from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock, patch
 
+from sqlalchemy import select
+
 from app.models.auth_session import AuthSession
+from app.models.profile import Profile
 from app.models.recruiter import Recruiter
 from app.models.recruiter_rejection_reason import RecruiterRejectionReason
+from app.models.report import Report
+from app.models.user_sensitive import UserSensitive
 from app.routers.admin import _get_admin_session
+from app.services.code_generator import generate_code
 
 ADMIN_EMAIL = "admin@example.com"
 
@@ -39,6 +45,69 @@ async def _make_recruiter(db_session, *, code: str, email: str, status: str = "p
     db_session.add(recruiter)
     await db_session.flush()
     return recruiter
+
+
+async def _make_profile(
+    db_session,
+    *,
+    code: str,
+    email: str,
+    status: str = "under_review",
+) -> Profile:
+    now = datetime.now(UTC)
+    user = UserSensitive(
+        user_code=generate_code(12),
+        user_email=email,
+        user_phone="+971500000000",
+    )
+    db_session.add(user)
+    await db_session.flush()
+
+    profile = Profile(
+        profile_code=code,
+        user_code=user.user_code,
+        person_name="Reported Candidate",
+        email_verified=True,
+        brief="Experienced operator.",
+        current_city="Dubai",
+        current_country="UAE",
+        years_of_experience=8,
+        current_title="Operations Manager",
+        relocation_preference="open",
+        current_employment_status="full_time",
+        key_skills=["Operations"],
+        status=status,
+        view_count=0,
+        edit_token="edit-token-" + code,
+        expires_at=now + timedelta(days=30),
+        created_at=now,
+        last_renewed_at=now,
+        updated_at=now,
+    )
+    db_session.add(profile)
+    await db_session.flush()
+    return profile
+
+
+async def _make_report(
+    db_session,
+    *,
+    entity_type: str,
+    entity_code: str,
+    status: str = "pending",
+) -> Report:
+    report = Report(
+        report_code=generate_code(12),
+        entity_type=entity_type,
+        entity_code=entity_code,
+        reporter_email="reporter@example.com",
+        reason="spam",
+        details="Suspicious listing",
+        status=status,
+    )
+    db_session.add(report)
+    await db_session.flush()
+    return report
 
 
 async def _make_rejection_reason(
@@ -308,3 +377,58 @@ async def test_get_rejection_reasons(client, db_session):
     assert r.status_code == 200
     codes = [item["code"] for item in r.json()]
     assert "spam_r" in codes
+
+
+# ---------------------------------------------------------------------------
+# POST /api/v1/admin/profiles/{code}/deactivate
+# ---------------------------------------------------------------------------
+
+
+async def test_admin_can_deactivate_reported_profile_and_resolve_pending_reports(client, db_session):
+    profile = await _make_profile(db_session, code="reportprof01", email="reported@example.com", status="under_review")
+    await _make_report(db_session, entity_type="profile", entity_code=profile.profile_code, status="pending")
+    await _make_report(db_session, entity_type="profile", entity_code=profile.profile_code, status="resolved")
+    session = await _make_admin_session(db_session, email="admin9@example.com")
+
+    async def _override():
+        return session
+
+    from app.main import app
+
+    app.dependency_overrides[_get_admin_session] = _override
+    r = await client.post(f"/api/v1/admin/profiles/{profile.profile_code}/deactivate")
+    app.dependency_overrides.pop(_get_admin_session, None)
+
+    assert r.status_code == 200
+    assert r.json()["profile_code"] == profile.profile_code
+    assert r.json()["status"] == "inactive"
+
+    await db_session.refresh(profile)
+    assert profile.status == "inactive"
+
+    pending_reports = (
+        (
+            await db_session.execute(
+                select(Report).where(Report.entity_type == "profile", Report.entity_code == profile.profile_code)
+            )
+        )
+        .scalars()
+        .all()
+    )
+    assert sorted(report.status for report in pending_reports) == ["resolved", "resolved"]
+
+
+async def test_admin_cannot_deactivate_already_inactive_profile(client, db_session):
+    profile = await _make_profile(db_session, code="reportprof02", email="inactive@example.com", status="inactive")
+    session = await _make_admin_session(db_session, email="admin10@example.com")
+
+    async def _override():
+        return session
+
+    from app.main import app
+
+    app.dependency_overrides[_get_admin_session] = _override
+    r = await client.post(f"/api/v1/admin/profiles/{profile.profile_code}/deactivate")
+    app.dependency_overrides.pop(_get_admin_session, None)
+
+    assert r.status_code == 409

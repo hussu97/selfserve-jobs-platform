@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { getJob, getJobs, deleteJob, updateJob, verifyEmail, ApiError } from '../api';
+import { adminDeactivateProfile, getJob, getJobs, deleteJob, updateJob, verifyEmail, ApiError } from '../api';
 
 const mockFetch = vi.fn();
 
@@ -140,6 +140,20 @@ describe('verifyEmail', () => {
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ code: 'verification-code-here' }),
+      })
+    );
+  });
+});
+
+describe('adminDeactivateProfile', () => {
+  it('sends POST request with bearer token', async () => {
+    mockOkResponse({ profile_code: 'prof123', status: 'inactive' });
+    await adminDeactivateProfile('prof123', 'admin-session-token');
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/api/v1/admin/profiles/prof123/deactivate'),
+      expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({ Authorization: 'Bearer admin-session-token' }),
       })
     );
   });

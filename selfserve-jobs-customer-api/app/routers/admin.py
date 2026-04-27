@@ -6,6 +6,7 @@ from app.dependencies import get_session
 from app.models.auth_session import AuthSession
 from app.schemas.admin import (
     AdminLoginRequest,
+    AdminProfileActionResponse,
     AdminRecruiterListResponse,
     AdminReportListResponse,
     AdminUserListResponse,
@@ -224,3 +225,18 @@ async def flag_entity(
         reason=body.reason,
     )
     return {"message": f"{entity_type} {entity_code} flagged for review"}
+
+
+@router.post("/profiles/{code}/deactivate", response_model=AdminProfileActionResponse)
+async def deactivate_profile(
+    code: str,
+    session: AuthSession = Depends(_get_admin_session),
+    db: AsyncSession = Depends(get_session),
+) -> AdminProfileActionResponse:
+    """Deactivate a reported profile from the admin panel."""
+    profile = await admin_service.deactivate_reported_profile(
+        db,
+        admin_email=session.email,
+        profile_code=code,
+    )
+    return AdminProfileActionResponse(profile_code=profile.profile_code, status=profile.status)

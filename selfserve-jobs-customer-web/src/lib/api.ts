@@ -487,4 +487,14 @@ export async function adminGetRejectionReasons(sessionToken: string): Promise<Re
   });
 }
 
+export async function adminDeactivateProfile(
+  code: string,
+  sessionToken: string
+): Promise<{ profile_code: string; status: string }> {
+  return request(`/admin/profiles/${code}/deactivate`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${sessionToken}` },
+  });
+}
+
 export { ApiError };

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { adminGetReports } from '@/lib/api';
+import { adminDeactivateProfile, adminGetReports } from '@/lib/api';
 import type { AdminReportItem } from '@/lib/types';
 
 const ENTITY_TYPE_OPTIONS = ['', 'job', 'profile'];
@@ -36,6 +36,8 @@ export function ReportsTable({ sessionToken }: { sessionToken: string }) {
   const [statusFilter, setStatusFilter] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [feedback, setFeedback] = useState('');
+  const [actioningProfileCode, setActioningProfileCode] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -61,6 +63,23 @@ export function ReportsTable({ sessionToken }: { sessionToken: string }) {
     const t = setTimeout(() => { setSearch(searchInput); setPage(1); }, 400);
     return () => clearTimeout(t);
   }, [searchInput]);
+
+  async function handleDeactivateProfile(report: AdminReportItem) {
+    if (report.entity_type !== 'profile') return;
+    setActioningProfileCode(report.entity_code);
+    setError('');
+    setFeedback('');
+
+    try {
+      await adminDeactivateProfile(report.entity_code, sessionToken);
+      setFeedback(`Profile ${report.entity_code} has been deactivated and its pending reports were resolved.`);
+      await load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to deactivate profile.');
+    } finally {
+      setActioningProfileCode(null);
+    }
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -97,6 +116,7 @@ export function ReportsTable({ sessionToken }: { sessionToken: string }) {
       </div>
 
       {error && <div className="text-sm text-red-700 bg-red-50 rounded-xl px-4 py-3">{error}</div>}
+      {feedback && <div className="text-sm text-green-800 bg-green-50 rounded-xl px-4 py-3">{feedback}</div>}
 
       {/* Table */}
       <div className="rounded-2xl overflow-hidden shadow-ambient" style={{ backgroundColor: 'var(--color-surface-lowest)' }}>
@@ -104,7 +124,7 @@ export function ReportsTable({ sessionToken }: { sessionToken: string }) {
           <table className="w-full text-sm">
             <thead>
               <tr style={{ borderBottom: '1px solid var(--color-surface)' }}>
-                {['Type', 'Post', 'Reporter', 'Reason', 'Details', 'Status', 'Date'].map((h) => (
+                {['Type', 'Post', 'Reporter', 'Reason', 'Details', 'Status', 'Date', 'Actions'].map((h) => (
                   <th key={h} className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>
                     {h}
                   </th>
@@ -113,9 +133,9 @@ export function ReportsTable({ sessionToken }: { sessionToken: string }) {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={7} className="px-5 py-10 text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>Loading…</td></tr>
+                <tr><td colSpan={8} className="px-5 py-10 text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>Loading…</td></tr>
               ) : items.length === 0 ? (
-                <tr><td colSpan={7} className="px-5 py-10 text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>No reports found.</td></tr>
+                <tr><td colSpan={8} className="px-5 py-10 text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>No reports found.</td></tr>
               ) : (
                 items.map((r) => (
                   <tr key={r.report_code} className="transition-colors hover:bg-surface/40" style={{ borderBottom: '1px solid var(--color-surface)' }}>
@@ -148,6 +168,24 @@ export function ReportsTable({ sessionToken }: { sessionToken: string }) {
                     </td>
                     <td className="px-5 py-4 text-xs" style={{ color: 'var(--color-text-muted)' }}>
                       {new Date(r.created_at).toLocaleDateString()}
+                    </td>
+                    <td className="px-5 py-4">
+                      {r.entity_type === 'profile' ? (
+                        <button
+                          type="button"
+                          onClick={() => handleDeactivateProfile(r)}
+                          disabled={actioningProfileCode === r.entity_code}
+                          className="inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                          style={{
+                            backgroundColor: 'var(--color-surface)',
+                            color: 'var(--color-secondary)',
+                          }}
+                        >
+                          {actioningProfileCode === r.entity_code ? 'Deactivating…' : 'Deactivate profile'}
+                        </button>
+                      ) : (
+                        <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>—</span>
+                      )}
                     </td>
                   </tr>
                 ))

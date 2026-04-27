@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
 import { GlobalWorkerOptions, getDocument } from 'pdfjs-dist/build/pdf.mjs';
 
 GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
@@ -17,14 +16,31 @@ interface RenderedPage {
 }
 
 const MAX_RENDER_WIDTH = 1200;
+const FALLBACK_RENDER_WIDTH = 860;
 
 export function ResumeCarousel({ url }: ResumeCarouselProps) {
   const [pageImages, setPageImages] = useState<RenderedPage[]>([]);
   const [activePage, setActivePage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
+  const [renderWidth, setRenderWidth] = useState(FALLBACK_RENDER_WIDTH);
   const trackRef = useRef<HTMLDivElement | null>(null);
   const pageRefs = useRef<Array<HTMLDivElement | null>>([]);
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track || typeof ResizeObserver === 'undefined') return;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (!entry) return;
+      const nextWidth = Math.max(320, Math.min(Math.floor(entry.contentRect.width - 32), FALLBACK_RENDER_WIDTH));
+      setRenderWidth((prev) => (prev === nextWidth ? prev : nextWidth));
+    });
+
+    resizeObserver.observe(track);
+    return () => resizeObserver.disconnect();
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -46,9 +62,8 @@ export function ResumeCarousel({ url }: ResumeCarouselProps) {
         for (let pageNumber = 1; pageNumber <= loadedDocument.numPages; pageNumber += 1) {
           const page = await loadedDocument.getPage(pageNumber);
           const baseViewport = page.getViewport({ scale: 1 });
-          const widthScale = MAX_RENDER_WIDTH / baseViewport.width;
-          const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
-          const viewport = page.getViewport({ scale: widthScale * pixelRatio });
+          const widthScale = Math.min(renderWidth, MAX_RENDER_WIDTH) / baseViewport.width;
+          const viewport = page.getViewport({ scale: widthScale });
           const canvas = document.createElement('canvas');
           const context = canvas.getContext('2d');
 
@@ -98,7 +113,7 @@ export function ResumeCarousel({ url }: ResumeCarouselProps) {
       pdfDocument?.cleanup?.();
       void pdfDocument?.destroy?.();
     };
-  }, [url]);
+  }, [renderWidth, url]);
 
   function updateActivePage() {
     const track = trackRef.current;
@@ -183,7 +198,7 @@ export function ResumeCarousel({ url }: ResumeCarouselProps) {
       <div
         ref={trackRef}
         onScroll={updateActivePage}
-        className="resume-strip flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2"
+        className="resume-strip flex snap-x snap-mandatory overflow-x-auto pb-2"
       >
         {pageImages.map((pageImage, index) => (
           <div
@@ -191,16 +206,16 @@ export function ResumeCarousel({ url }: ResumeCarouselProps) {
             ref={(node) => {
               pageRefs.current[index] = node;
             }}
-            className="min-w-[88%] shrink-0 snap-center sm:min-w-[72%] lg:min-w-[64%]"
+            className="min-w-full shrink-0 snap-center px-1 sm:px-3"
           >
-            <div className="overflow-hidden rounded-[1.5rem] bg-white shadow-ambient">
-              <Image
+            <div className="mx-auto w-full max-w-[860px] overflow-hidden rounded-[1.5rem] bg-white shadow-ambient">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={pageImage.src}
                 alt={`Resume page ${index + 1}`}
+                className="block h-auto w-full"
                 width={pageImage.width}
                 height={pageImage.height}
-                className="block h-auto w-full"
-                unoptimized
               />
             </div>
           </div>
