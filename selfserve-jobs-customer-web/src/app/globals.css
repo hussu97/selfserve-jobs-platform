@@ -106,6 +106,12 @@
   display: none;
 }
 
+.resume-page canvas {
+  display: block;
+  max-width: 100%;
+  height: auto !important;
+}
+
 .hero-gradient {
   background: radial-gradient(circle at center, #fcf9f5 0%, #f6f3ef 100%);
 }

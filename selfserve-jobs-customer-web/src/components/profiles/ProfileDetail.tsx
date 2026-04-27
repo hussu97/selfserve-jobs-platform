@@ -187,7 +187,7 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
               </div>
 
               {canSeeContact && visibleResumeUrl ? (
-                <ResumeCarousel url={visibleResumeUrl} />
+                <ResumeCarousel key={visibleResumeUrl} url={visibleResumeUrl} />
               ) : (
                 /* Blurred/locked resume for non-recruiters */
                 <div className="relative rounded-xl overflow-hidden" style={{ height: '300px' }}>

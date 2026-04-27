@@ -1,29 +1,22 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { GlobalWorkerOptions, getDocument } from 'pdfjs-dist/build/pdf.mjs';
+import { Document, Page, pdfjs } from 'react-pdf';
 
-GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
+pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
 
 interface ResumeCarouselProps {
   url: string;
 }
 
-interface RenderedPage {
-  src: string;
-  width: number;
-  height: number;
-}
-
-const MAX_RENDER_WIDTH = 1200;
-const FALLBACK_RENDER_WIDTH = 860;
+const FALLBACK_PAGE_WIDTH = 860;
 
 export function ResumeCarousel({ url }: ResumeCarouselProps) {
-  const [pageImages, setPageImages] = useState<RenderedPage[]>([]);
+  const [numPages, setNumPages] = useState(0);
   const [activePage, setActivePage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
-  const [renderWidth, setRenderWidth] = useState(FALLBACK_RENDER_WIDTH);
+  const [pageWidth, setPageWidth] = useState(FALLBACK_PAGE_WIDTH);
   const trackRef = useRef<HTMLDivElement | null>(null);
   const pageRefs = useRef<Array<HTMLDivElement | null>>([]);
 
@@ -34,86 +27,13 @@ export function ResumeCarousel({ url }: ResumeCarouselProps) {
     const resizeObserver = new ResizeObserver((entries) => {
       const entry = entries[0];
       if (!entry) return;
-      const nextWidth = Math.max(320, Math.min(Math.floor(entry.contentRect.width - 32), FALLBACK_RENDER_WIDTH));
-      setRenderWidth((prev) => (prev === nextWidth ? prev : nextWidth));
+      const nextWidth = Math.max(280, Math.min(Math.floor(entry.contentRect.width - 32), FALLBACK_PAGE_WIDTH));
+      setPageWidth((prev) => (prev === nextWidth ? prev : nextWidth));
     });
 
     resizeObserver.observe(track);
     return () => resizeObserver.disconnect();
   }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    let loadingTask: ReturnType<typeof getDocument> | null = null;
-    let pdfDocument: { cleanup?: () => void; destroy?: () => Promise<void> } | null = null;
-
-    async function renderPages() {
-      setIsLoading(true);
-      setHasError(false);
-      setPageImages([]);
-      setActivePage(1);
-
-      try {
-        loadingTask = getDocument(url);
-        const loadedDocument = await loadingTask.promise;
-        pdfDocument = loadedDocument;
-        const renderedPages: RenderedPage[] = [];
-
-        for (let pageNumber = 1; pageNumber <= loadedDocument.numPages; pageNumber += 1) {
-          const page = await loadedDocument.getPage(pageNumber);
-          const baseViewport = page.getViewport({ scale: 1 });
-          const widthScale = Math.min(renderWidth, MAX_RENDER_WIDTH) / baseViewport.width;
-          const viewport = page.getViewport({ scale: widthScale });
-          const canvas = document.createElement('canvas');
-          const context = canvas.getContext('2d');
-
-          if (!context) {
-            throw new Error('Canvas context unavailable');
-          }
-
-          canvas.width = Math.floor(viewport.width);
-          canvas.height = Math.floor(viewport.height);
-
-          await page.render({
-            canvasContext: context,
-            viewport,
-          }).promise;
-
-          if (cancelled) {
-            return;
-          }
-
-          renderedPages.push({
-            src: canvas.toDataURL('image/png'),
-            width: canvas.width,
-            height: canvas.height,
-          });
-        }
-
-        if (!cancelled) {
-          setPageImages(renderedPages);
-          setHasError(renderedPages.length === 0);
-        }
-      } catch {
-        if (!cancelled) {
-          setHasError(true);
-        }
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    renderPages();
-
-    return () => {
-      cancelled = true;
-      loadingTask?.destroy();
-      pdfDocument?.cleanup?.();
-      void pdfDocument?.destroy?.();
-    };
-  }, [renderWidth, url]);
 
   function updateActivePage() {
     const track = trackRef.current;
@@ -137,7 +57,7 @@ export function ResumeCarousel({ url }: ResumeCarouselProps) {
   }
 
   function scrollToPage(index: number) {
-    const clampedIndex = Math.max(0, Math.min(index, pageImages.length - 1));
+    const clampedIndex = Math.max(0, Math.min(index, numPages - 1));
     pageRefs.current[clampedIndex]?.scrollIntoView({
       behavior: 'smooth',
       inline: 'center',
@@ -145,29 +65,13 @@ export function ResumeCarousel({ url }: ResumeCarouselProps) {
     });
   }
 
-  if (isLoading) {
-    return (
-      <div className="rounded-[1.5rem] bg-surface px-5 py-12 text-center text-sm text-text-muted">
-        Loading resume pages...
-      </div>
-    );
-  }
-
-  if (hasError || pageImages.length === 0) {
-    return (
-      <div className="rounded-[1.5rem] bg-surface px-5 py-12 text-center text-sm text-text-muted">
-        Unable to render the resume preview right now.
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-text-muted">
-          Page {activePage} of {pageImages.length}
+          {numPages > 0 ? `Page ${activePage} of ${numPages}` : 'Loading pages'}
         </p>
-        {pageImages.length > 1 && (
+        {numPages > 1 && (
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -183,7 +87,7 @@ export function ResumeCarousel({ url }: ResumeCarouselProps) {
             <button
               type="button"
               onClick={() => scrollToPage(activePage)}
-              disabled={activePage === pageImages.length}
+              disabled={activePage === numPages}
               className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-surface text-text-muted transition-colors hover:text-primary disabled:cursor-not-allowed disabled:opacity-35"
               aria-label="Next resume page"
             >
@@ -195,32 +99,68 @@ export function ResumeCarousel({ url }: ResumeCarouselProps) {
         )}
       </div>
 
-      <div
-        ref={trackRef}
-        onScroll={updateActivePage}
-        className="resume-strip flex snap-x snap-mandatory overflow-x-auto pb-2"
-      >
-        {pageImages.map((pageImage, index) => (
-          <div
-            key={`${url}-page-${index + 1}`}
-            ref={(node) => {
-              pageRefs.current[index] = node;
-            }}
-            className="min-w-full shrink-0 snap-center px-1 sm:px-3"
-          >
-            <div className="mx-auto w-full max-w-[860px] overflow-hidden rounded-[1.5rem] bg-white shadow-ambient">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={pageImage.src}
-                alt={`Resume page ${index + 1}`}
-                className="block h-auto w-full"
-                width={pageImage.width}
-                height={pageImage.height}
-              />
-            </div>
+      <Document
+        file={url}
+        loading={
+          <div className="rounded-[1.5rem] bg-surface px-5 py-12 text-center text-sm text-text-muted">
+            Loading resume pages...
           </div>
-        ))}
-      </div>
+        }
+        error={
+          <div className="rounded-[1.5rem] bg-surface px-5 py-12 text-center text-sm text-text-muted">
+            Unable to render the resume preview right now.
+          </div>
+        }
+        onLoadSuccess={({ numPages: nextNumPages }) => {
+          setNumPages(nextNumPages);
+          setActivePage(1);
+          setIsLoading(false);
+          setHasError(nextNumPages === 0);
+        }}
+        onLoadError={() => {
+          setHasError(true);
+          setIsLoading(false);
+        }}
+      >
+        {!hasError && (
+          <div
+            ref={trackRef}
+            onScroll={updateActivePage}
+            className="resume-strip flex snap-x snap-mandatory overflow-x-auto pb-2"
+          >
+            {Array.from({ length: numPages }, (_, index) => (
+              <div
+                key={`${url}-page-${index + 1}`}
+                ref={(node) => {
+                  pageRefs.current[index] = node;
+                }}
+                className="min-w-full shrink-0 snap-center px-1 sm:px-3"
+              >
+                <div className="mx-auto flex w-full max-w-[860px] justify-center overflow-hidden rounded-[1.5rem] bg-white shadow-ambient">
+                  <Page
+                    pageNumber={index + 1}
+                    width={pageWidth}
+                    loading={
+                      <div className="flex min-h-[420px] w-full items-center justify-center bg-surface text-sm text-text-muted">
+                        Loading page {index + 1}...
+                      </div>
+                    }
+                    renderAnnotationLayer={false}
+                    renderTextLayer={false}
+                    className="resume-page"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </Document>
+
+      {isLoading && !hasError && numPages === 0 && (
+        <div className="rounded-[1.5rem] bg-surface px-5 py-12 text-center text-sm text-text-muted">
+          Preparing resume preview...
+        </div>
+      )}
     </div>
   );
 }
