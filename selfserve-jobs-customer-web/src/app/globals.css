@@ -106,8 +106,13 @@
   display: none;
 }
 
+.resume-page {
+  width: 100% !important;
+}
+
 .resume-page canvas {
   display: block;
+  width: 100% !important;
   max-width: 100%;
   height: auto !important;
 }

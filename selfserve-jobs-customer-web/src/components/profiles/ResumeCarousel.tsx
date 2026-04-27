@@ -18,20 +18,21 @@ export function ResumeCarousel({ url }: ResumeCarouselProps) {
   const [hasError, setHasError] = useState(false);
   const [pageWidth, setPageWidth] = useState(FALLBACK_PAGE_WIDTH);
   const trackRef = useRef<HTMLDivElement | null>(null);
+  const frameRef = useRef<HTMLDivElement | null>(null);
   const pageRefs = useRef<Array<HTMLDivElement | null>>([]);
 
   useEffect(() => {
-    const track = trackRef.current;
-    if (!track || typeof ResizeObserver === 'undefined') return;
+    const frame = frameRef.current;
+    if (!frame || typeof ResizeObserver === 'undefined') return;
 
     const resizeObserver = new ResizeObserver((entries) => {
       const entry = entries[0];
       if (!entry) return;
-      const nextWidth = Math.max(280, Math.min(Math.floor(entry.contentRect.width - 32), FALLBACK_PAGE_WIDTH));
+      const nextWidth = Math.max(280, Math.floor(entry.contentRect.width));
       setPageWidth((prev) => (prev === nextWidth ? prev : nextWidth));
     });
 
-    resizeObserver.observe(track);
+    resizeObserver.observe(frame);
     return () => resizeObserver.disconnect();
   }, []);
 
@@ -136,7 +137,10 @@ export function ResumeCarousel({ url }: ResumeCarouselProps) {
                 }}
                 className="min-w-full shrink-0 snap-center px-1 sm:px-3"
               >
-                <div className="mx-auto flex w-full max-w-[860px] justify-center overflow-hidden rounded-[1.5rem] bg-white shadow-ambient">
+                <div
+                  ref={index === 0 ? frameRef : undefined}
+                  className="mx-auto w-full max-w-[860px] rounded-[1.5rem] bg-white shadow-ambient"
+                >
                   <Page
                     pageNumber={index + 1}
                     width={pageWidth}
