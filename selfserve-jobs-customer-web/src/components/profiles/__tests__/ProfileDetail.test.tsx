@@ -135,8 +135,14 @@ describe('ProfileDetail', () => {
     });
 
     expect(screen.getByText('+971507778889')).toBeInTheDocument();
-    expect(screen.getByText('Rendered resume: https://example.com/owner-resume.pdf')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Your view' })).toBeInTheDocument();
+
+    // getResumeUrl fires only after getProfile resolves and is_owner becomes true
+    // (two sequential async hops), so it needs its own waitFor.
+    await waitFor(() => {
+      expect(screen.getByText('Rendered resume: https://example.com/owner-resume.pdf')).toBeInTheDocument();
+    });
+
     expect(getResumeUrlMock).toHaveBeenCalledWith(baseProfile.code, 'owner-token');
   });
 });
