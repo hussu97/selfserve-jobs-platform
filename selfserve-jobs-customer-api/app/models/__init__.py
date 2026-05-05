@@ -1,4 +1,5 @@
 from app.models.auth_session import AuthSession
+from app.models.email_pending import EmailPending
 from app.models.email_verification import EmailVerification
 from app.models.job import Job
 from app.models.login_token import LoginToken
@@ -11,6 +12,7 @@ from app.models.user_sensitive import UserSensitive
 __all__ = [
     "Job",
     "Profile",
+    "EmailPending",
     "EmailVerification",
     "Report",
     "LoginToken",

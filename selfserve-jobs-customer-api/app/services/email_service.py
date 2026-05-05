@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import time
+from datetime import UTC
 from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -70,6 +71,133 @@ def _cb_record_failure() -> None:
 # ---------------------------------------------------------------------------
 
 
+async def _save_pending_email(
+    db: AsyncSession,
+    email_type: str,
+    recipient_email: str,
+    subject: str,
+    html_body: str,
+    text_body: str,
+    entity_type: str | None,
+    entity_code: str | None,
+) -> None:
+    """Persist a failed email to email_pending so it can be retried on the next send."""
+    try:
+        from app.models.email_pending import EmailPending
+
+        pending = EmailPending(
+            email_type=email_type,
+            recipient_email=recipient_email,
+            entity_type=entity_type,
+            entity_code=entity_code,
+            subject=subject,
+            html_body=html_body,
+            text_body=text_body,
+        )
+        db.add(pending)
+        await db.flush()
+        logger.info(
+            "[email-pending] queued failed %s email to %s for later retry",
+            email_type,
+            recipient_email,
+        )
+    except Exception as exc:
+        logger.error("[email-pending] failed to save pending email: %s", exc)
+
+
+async def _flush_pending_emails(db: AsyncSession) -> None:
+    """
+    Attempt a single delivery pass for every email queued in the last 24 hours.
+    Uses one attempt per record (no retry loop) to keep the calling request's
+    latency bounded. Successful records are removed; failed records have their
+    attempt_count incremented so callers can observe escalation.
+    """
+    from datetime import datetime, timedelta
+
+    from sqlalchemy import select
+
+    from app.models.email_pending import EmailPending
+
+    cutoff = datetime.now(UTC) - timedelta(hours=24)
+    result = await db.execute(select(EmailPending).where(EmailPending.created_at >= cutoff))
+    pending_emails = result.scalars().all()
+
+    if not pending_emails:
+        return
+
+    logger.info("[email-pending] flushing %d queued email(s)", len(pending_emails))
+
+    import resend as resend_lib
+
+    resend_lib.api_key = settings.resend_api_key
+
+    for record in pending_emails:
+        if _cb_is_open():
+            logger.warning(
+                "[email-pending] circuit open — aborting flush with %d email(s) remaining",
+                len(pending_emails),
+            )
+            break
+
+        params: dict[str, Any] = {
+            "from": settings.resend_from_email,
+            "to": [record.recipient_email],
+            "subject": record.subject,
+            "html": record.html_body,
+            "text": record.text_body,
+            "headers": {
+                "List-Unsubscribe": _build_list_unsubscribe_header(settings.frontend_url),
+                "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+            },
+        }
+
+        try:
+            send_result = await asyncio.to_thread(resend_lib.Emails.send, params)
+            resend_id = send_result.get("id") if isinstance(send_result, dict) else getattr(send_result, "id", None)
+            _cb_record_success()
+            await _log_email(
+                db,
+                record.email_type,
+                record.recipient_email,
+                True,
+                entity_type=record.entity_type,
+                entity_code=record.entity_code,
+                resend_id=resend_id,
+                error_message="retry_success",
+            )
+            await db.delete(record)
+            logger.info(
+                "[email-pending] retry succeeded for %s to %s",
+                record.email_type,
+                record.recipient_email,
+            )
+        except Exception as exc:
+            _cb_record_failure()
+            record.attempt_count += 1
+            record.last_attempted_at = datetime.now(UTC)
+            await _log_email(
+                db,
+                record.email_type,
+                record.recipient_email,
+                False,
+                entity_type=record.entity_type,
+                entity_code=record.entity_code,
+                error_message=f"retry_attempt_{record.attempt_count}: {exc}",
+            )
+            logger.warning(
+                "[email-pending] retry attempt %d failed for %s to %s: %s",
+                record.attempt_count,
+                record.email_type,
+                record.recipient_email,
+                exc,
+            )
+
+    try:
+        await db.flush()
+    except Exception as exc:
+        logger.error("[email-pending] failed to persist flush changes: %s", exc)
+
+
 async def _log_email(
     db: AsyncSession,
     email_type: str,
@@ -116,7 +244,12 @@ async def _send(
     entity_type: str | None = None,
     entity_code: str | None = None,
 ) -> bool:
-    """Send an email via Resend with retry/backoff and circuit-breaker protection."""
+    """Send an email via Resend with retry/backoff and circuit-breaker protection.
+
+    Before each send, any emails that previously failed (within the last 24 hours)
+    are retried once. If this send ultimately fails after all retries it is saved
+    to email_pending so the next send will pick it up.
+    """
     if not settings.resend_api_key:
         logger.info(
             "DEV MODE - %s email (would send to %s): %s",
@@ -135,6 +268,8 @@ async def _send(
         )
         return True
 
+    await _flush_pending_emails(db)
+
     if _cb_is_open():
         logger.warning(
             "[email-circuit] OPEN — skipping %s email to %s",
@@ -149,6 +284,9 @@ async def _send(
             entity_type=entity_type,
             entity_code=entity_code,
             error_message="circuit_open",
+        )
+        await _save_pending_email(
+            db, email_type, recipient_email, subject, html_body, text_body, entity_type, entity_code
         )
         return False
 
@@ -204,6 +342,9 @@ async def _send(
         error_message = str(last_exc)
         logger.error("All attempts failed for %s email to %s: %s", email_type, recipient_email, last_exc)
         _cb_record_failure()
+        await _save_pending_email(
+            db, email_type, recipient_email, subject, html_body, text_body, entity_type, entity_code
+        )
 
     await _log_email(
         db,
