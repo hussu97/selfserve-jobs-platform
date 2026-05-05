@@ -5,7 +5,9 @@ from unittest.mock import AsyncMock, patch
 
 from sqlalchemy import select
 
+from app.models.admin_audit_log import AdminAuditLog
 from app.models.auth_session import AuthSession
+from app.models.email_verification import EmailVerification
 from app.models.profile import Profile
 from app.models.recruiter import Recruiter
 from app.models.recruiter_rejection_reason import RecruiterRejectionReason
@@ -53,6 +55,7 @@ async def _make_profile(
     code: str,
     email: str,
     status: str = "under_review",
+    email_verified: bool = True,
 ) -> Profile:
     now = datetime.now(UTC)
     user = UserSensitive(
@@ -67,7 +70,7 @@ async def _make_profile(
         profile_code=code,
         user_code=user.user_code,
         person_name="Reported Candidate",
-        email_verified=True,
+        email_verified=email_verified,
         brief="Experienced operator.",
         current_city="Dubai",
         current_country="UAE",
@@ -179,6 +182,112 @@ async def test_admin_login_dev_mode_returns_url(client, db_session):
     data = r.json()
     assert "url" in data
     assert "/admin/verify" in data["url"]
+
+
+# ---------------------------------------------------------------------------
+# POST /api/v1/admin/users/{profile_code}/resend-verification
+# ---------------------------------------------------------------------------
+
+
+async def test_admin_resend_user_verification_success(client, db_session):
+    profile = await _make_profile(
+        db_session,
+        code="resendprof1",
+        email="pending-user@example.com",
+        status="pending_verification",
+        email_verified=False,
+    )
+    session = await _make_admin_session(db_session, email="admin-resend@example.com")
+
+    async def _override():
+        return session
+
+    from app.main import app
+
+    app.dependency_overrides[_get_admin_session] = _override
+    with patch("app.routers.admin.email_service.send_verification_email", new_callable=AsyncMock) as mock_send:
+        r = await client.post(f"/api/v1/admin/users/{profile.profile_code}/resend-verification")
+    app.dependency_overrides.pop(_get_admin_session, None)
+
+    assert r.status_code == 200
+    assert "Verification email sent" in r.json()["message"]
+
+    verification_result = await db_session.execute(
+        select(EmailVerification).where(
+            EmailVerification.entity_type == "profile",
+            EmailVerification.entity_code == profile.profile_code,
+        )
+    )
+    verification = verification_result.scalar_one()
+    assert verification.user_code == profile.user_code
+
+    audit_result = await db_session.execute(
+        select(AdminAuditLog).where(
+            AdminAuditLog.action == "resend_user_verification",
+            AdminAuditLog.entity_code == profile.profile_code,
+        )
+    )
+    assert audit_result.scalar_one().admin_email == "admin-resend@example.com"
+    mock_send.assert_awaited_once()
+
+
+async def test_admin_resend_user_verification_enforces_one_hour_cooldown(client, db_session):
+    now = datetime.now(UTC)
+    profile = await _make_profile(
+        db_session,
+        code="resendprof2",
+        email="cooldown-user@example.com",
+        status="pending_verification",
+        email_verified=False,
+    )
+    db_session.add(
+        EmailVerification(
+            verification_code="c" * 64,
+            user_code=profile.user_code,
+            entity_type="profile",
+            entity_code=profile.profile_code,
+            expires_at=now + timedelta(hours=24),
+            created_at=now,
+        )
+    )
+    await db_session.flush()
+    session = await _make_admin_session(db_session, email="admin-cooldown@example.com")
+
+    async def _override():
+        return session
+
+    from app.main import app
+
+    app.dependency_overrides[_get_admin_session] = _override
+    with patch("app.routers.admin.email_service.send_verification_email", new_callable=AsyncMock) as mock_send:
+        r = await client.post(f"/api/v1/admin/users/{profile.profile_code}/resend-verification")
+    app.dependency_overrides.pop(_get_admin_session, None)
+
+    assert r.status_code == 429
+    assert "Try again after" in r.json()["detail"]
+    mock_send.assert_not_awaited()
+
+
+async def test_admin_resend_user_verification_rejects_verified_profile(client, db_session):
+    profile = await _make_profile(
+        db_session,
+        code="resendprof3",
+        email="verified-user@example.com",
+        status="active",
+        email_verified=True,
+    )
+    session = await _make_admin_session(db_session, email="admin-verified@example.com")
+
+    async def _override():
+        return session
+
+    from app.main import app
+
+    app.dependency_overrides[_get_admin_session] = _override
+    r = await client.post(f"/api/v1/admin/users/{profile.profile_code}/resend-verification")
+    app.dependency_overrides.pop(_get_admin_session, None)
+
+    assert r.status_code == 409
 
 
 # ---------------------------------------------------------------------------

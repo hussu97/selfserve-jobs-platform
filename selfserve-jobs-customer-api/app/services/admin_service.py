@@ -5,8 +5,10 @@ from fastapi import HTTPException, status
 from sqlalchemy import delete, func, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.constants import ADMIN_VERIFICATION_RESEND_COOLDOWN_HOURS
 from app.models.admin_audit_log import AdminAuditLog
 from app.models.auth_session import AuthSession
+from app.models.email_verification import EmailVerification
 from app.models.job import Job
 from app.models.profile import Profile
 from app.models.recruiter import Recruiter
@@ -22,6 +24,7 @@ from app.schemas.admin import (
     AdminUserListResponse,
     RejectionReasonItem,
 )
+from app.services import verification_service
 
 
 async def list_users(
@@ -68,6 +71,52 @@ async def list_users(
         per_page=per_page,
         total_pages=math.ceil(total / per_page) if total else 1,
     )
+
+
+async def prepare_user_verification_resend(
+    db: AsyncSession,
+    *,
+    admin_email: str,
+    profile_code: str,
+) -> tuple[Profile, UserSensitive, EmailVerification]:
+    """Create a new verification code for a pending profile, enforcing a per-user cooldown."""
+    result = await db.execute(
+        select(Profile, UserSensitive)
+        .join(UserSensitive, Profile.user_code == UserSensitive.user_code)
+        .where(Profile.profile_code == profile_code)
+        .with_for_update()
+    )
+    row = result.one_or_none()
+    if row is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
+
+    profile, user = row
+    if profile.email_verified or profile.status != "pending_verification":
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Only pending, unverified profiles can receive a verification resend",
+        )
+
+    await verification_service.check_user_resend_cooldown(
+        db,
+        user_code=profile.user_code,
+        cooldown_hours=ADMIN_VERIFICATION_RESEND_COOLDOWN_HOURS,
+    )
+    verification = await verification_service.create_verification(
+        db,
+        entity_type="profile",
+        entity_code=profile.profile_code,
+        user_code=profile.user_code,
+    )
+    await write_audit_log(
+        db,
+        admin_email=admin_email,
+        action="resend_user_verification",
+        entity_type="profile",
+        entity_code=profile.profile_code,
+        details={"email": user.user_email},
+    )
+    return profile, user, verification
 
 
 async def list_recruiters(

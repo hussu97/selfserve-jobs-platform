@@ -27,6 +27,7 @@ MAX_PAGE: int = 200  # Cap OFFSET-based pagination to prevent expensive full-tab
 # Verification
 VERIFICATION_EXPIRY_HOURS: int = 24
 RESEND_LIMIT_PER_ENTITY: int = 3
+ADMIN_VERIFICATION_RESEND_COOLDOWN_HOURS: int = 1
 
 # Reporting
 REPORT_THRESHOLD: int = 3  # auto-flag entity for review after this many reports

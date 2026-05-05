@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- **Admin verification resend** — added an admin Users-table action to resend talent profile verification emails for pending users, backed by a new admin API endpoint with a one-hour per-user cooldown and audit logging.
 - **noon careers blog post** — added a new published blog article about using noon's careers site and hirebridge together for UAE job search; includes Alembic migration 0015 to seed the database row.
 - **Cloud Run deploy failure logs** — the API deploy workflow now prints recent Cloud Run revisions, latest revision status conditions, and service logs when `gcloud run deploy` fails, so startup exceptions are easier to diagnose directly in GitHub Actions.
 - **Playwright CLI artifact ignore rule** — `.playwright-cli/` is now ignored so local browser automation logs and screenshots do not appear as untracked repo files.

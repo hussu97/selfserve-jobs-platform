@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { adminGetUsers } from '@/lib/api';
+import { adminGetUsers, adminResendUserVerification } from '@/lib/api';
 import type { AdminUserItem } from '@/lib/types';
 
 const STATUS_OPTIONS = ['', 'active', 'pending_verification', 'expired', 'under_review', 'removed'];
@@ -32,6 +32,8 @@ export function UsersTable({ sessionToken }: { sessionToken: string }) {
   const [statusFilter, setStatusFilter] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
+  const [resendingCode, setResendingCode] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -55,6 +57,20 @@ export function UsersTable({ sessionToken }: { sessionToken: string }) {
     const t = setTimeout(() => { setSearch(searchInput); setPage(1); }, 400);
     return () => clearTimeout(t);
   }, [searchInput]);
+
+  async function handleResendVerification(user: AdminUserItem) {
+    setError('');
+    setNotice('');
+    setResendingCode(user.profile_code);
+    try {
+      const res = await adminResendUserVerification(user.profile_code, sessionToken);
+      setNotice(`${user.email}: ${res.message}`);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to resend verification email.');
+    } finally {
+      setResendingCode(null);
+    }
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -85,11 +101,14 @@ export function UsersTable({ sessionToken }: { sessionToken: string }) {
         {error && (
           <div className="px-6 py-4 text-sm text-red-700 bg-red-50">{error}</div>
         )}
+        {notice && (
+          <div className="px-6 py-4 text-sm text-green-700 bg-green-50">{notice}</div>
+        )}
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr style={{ borderBottom: '1px solid var(--color-surface)' }}>
-                {['Name', 'Email', 'Status', 'Title', 'Verified', 'Views', 'Joined'].map((h) => (
+                {['Name', 'Email', 'Status', 'Title', 'Verified', 'Views', 'Joined', 'Actions'].map((h) => (
                   <th key={h} className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>
                     {h}
                   </th>
@@ -99,13 +118,13 @@ export function UsersTable({ sessionToken }: { sessionToken: string }) {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="px-5 py-10 text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                  <td colSpan={8} className="px-5 py-10 text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>
                     Loading…
                   </td>
                 </tr>
               ) : items.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-5 py-10 text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                  <td colSpan={8} className="px-5 py-10 text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>
                     No profiles found.
                   </td>
                 </tr>
@@ -124,6 +143,21 @@ export function UsersTable({ sessionToken }: { sessionToken: string }) {
                     <td className="px-5 py-4" style={{ color: 'var(--color-text-muted)' }}>{u.view_count}</td>
                     <td className="px-5 py-4 text-xs" style={{ color: 'var(--color-text-muted)' }}>
                       {new Date(u.created_at).toLocaleDateString()}
+                    </td>
+                    <td className="px-5 py-4">
+                      {u.status === 'pending_verification' && !u.email_verified ? (
+                        <button
+                          type="button"
+                          onClick={() => handleResendVerification(u)}
+                          disabled={resendingCode === u.profile_code}
+                          className="rounded-full px-3 py-1.5 text-xs font-semibold transition-colors disabled:opacity-50"
+                          style={{ backgroundColor: 'var(--color-primary)', color: 'white' }}
+                        >
+                          {resendingCode === u.profile_code ? 'Sending…' : 'Resend'}
+                        </button>
+                      ) : (
+                        <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>—</span>
+                      )}
                     </td>
                   </tr>
                 ))

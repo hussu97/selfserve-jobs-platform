@@ -14,6 +14,7 @@ from app.schemas.admin import (
     RejectionReasonItem,
     RejectRecruiterRequest,
 )
+from app.schemas.common import MessageResponse
 from app.schemas.recruiter import RecruiterResponse
 from app.services import admin_service, auth_service, email_service, recruiter_service
 
@@ -87,6 +88,34 @@ async def list_users(
 ) -> AdminUserListResponse:
     """List talent profiles."""
     return await admin_service.list_users(db, search=search, status=filter_status, page=page, per_page=per_page)
+
+
+@router.post("/users/{profile_code}/resend-verification", response_model=MessageResponse)
+async def resend_user_verification(
+    profile_code: str,
+    background_tasks: BackgroundTasks,
+    session: AuthSession = Depends(_get_admin_session),
+    db: AsyncSession = Depends(get_session),
+) -> MessageResponse:
+    """Resend a verification email for a pending talent profile."""
+    profile, user, verification = await admin_service.prepare_user_verification_resend(
+        db,
+        admin_email=session.email,
+        profile_code=profile_code,
+    )
+
+    background_tasks.add_task(
+        email_service.send_verification_email,
+        db=db,
+        email=user.user_email,
+        entity_type="profile",
+        entity_code=profile.profile_code,
+        verification_code=verification.verification_code,
+        edit_token=profile.edit_token,
+        frontend_url=settings.frontend_url,
+    )
+
+    return MessageResponse(message="Verification email sent. This user can be resent again after 1 hour.")
 
 
 # ---------------------------------------------------------------------------

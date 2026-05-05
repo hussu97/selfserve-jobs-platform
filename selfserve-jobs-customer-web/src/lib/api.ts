@@ -435,6 +435,16 @@ export async function adminGetUsers(
   });
 }
 
+export async function adminResendUserVerification(
+  profileCode: string,
+  sessionToken: string
+): Promise<{ message: string }> {
+  return request<{ message: string }>(`/admin/users/${profileCode}/resend-verification`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${sessionToken}` },
+  });
+}
+
 export async function adminGetRecruiters(
   filters: AdminListFilters,
   sessionToken: string
