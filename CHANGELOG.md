@@ -43,6 +43,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Admin session lifetime** — admin sessions now match regular and recruiter sessions: 30 days with no one-hour inactivity timeout, while still invalidating if the email is removed from the admin allow-list.
 
 ### Fixed
+- **Admin blog edit form hydration** — admin blog list/create/update responses now include full post content so reopening a saved post hydrates the Markdown editor correctly; update handling now also persists explicit clearing of nullable featured-image and link-preview fields.
 - **Blog seed public codes fit schema** — migration 0014 seed `post_code` values are now 12 characters to match the `blog_post.post_code VARCHAR(12)` schema and project public-code convention.
 - **Blog seed migration bind typing hardened** — migration 0014 now uses a typed SQLAlchemy table insert with parsed JSON tag arrays and Python datetimes, avoiding raw `CAST(:param AS jsonb/timestamptz)` binds under asyncpg.
 - **Blog seed migration startup crash** — Alembic migration 0014 now binds timezone-aware `datetime` objects for `created_at`/`updated_at` instead of ISO strings, fixing the asyncpg `expected a datetime.date or datetime.datetime instance` failure during Cloud Run startup.

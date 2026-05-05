@@ -86,19 +86,21 @@ async def update_blog_post(db: AsyncSession, post_code: str, data: BlogPostUpdat
         post.tags = data.tags
     if data.status is not None:
         post.status = data.status
-    if data.featured_image_url is not None:
+    fields_set = data.model_fields_set
+
+    if "featured_image_url" in fields_set:
         post.featured_image_url = data.featured_image_url
     if data.reading_minutes is not None:
         post.reading_minutes = max(1, data.reading_minutes)
 
-    if data.link_preview_url is not None:
-        if data.link_preview_url == "":
+    if "link_preview_url" in fields_set:
+        if not data.link_preview_url:
             post.link_preview = None
         else:
             preview = await fetch_link_preview(data.link_preview_url)
             post.link_preview = preview.model_dump() if preview else None
-    elif data.link_preview is not None:
-        post.link_preview = data.link_preview.model_dump()
+    elif "link_preview" in fields_set:
+        post.link_preview = data.link_preview.model_dump() if data.link_preview else None
 
     post.updated_at = datetime.now(UTC)
     await db.flush()

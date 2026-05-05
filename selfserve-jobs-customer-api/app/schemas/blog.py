@@ -113,6 +113,7 @@ class AdminBlogPostItem(BaseModel):
     title: str
     slug: str
     excerpt: str
+    content: str
     author: str
     tags: list[str]
     status: str

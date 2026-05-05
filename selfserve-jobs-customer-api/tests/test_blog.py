@@ -196,6 +196,7 @@ async def test_admin_create_blog_post(client, db_session):
     data = resp.json()
     assert data["title"] == "New Admin Blog Post"
     assert data["slug"] == "new-admin-blog-post"
+    assert data["content"] == payload["content"]
     assert data["status"] == "draft"
     assert "post_code" in data
     assert "view_count" in data
@@ -241,6 +242,89 @@ async def test_admin_update_blog_post(client, db_session):
     data = resp.json()
     assert data["title"] == "Updated Title"
     assert data["status"] == "published"
+
+
+@pytest.mark.asyncio
+async def test_admin_blog_form_lifecycle_saves_and_retrieves_all_fields(client, db_session):
+    await _make_admin_session(db_session)
+    await db_session.commit()
+
+    create_payload = {
+        "title": "Lifecycle Post",
+        "slug": "lifecycle-post",
+        "excerpt": "Initial excerpt.",
+        "content": "## Initial\n\nThis content should reopen in the editor.",
+        "author": "Lifecycle Author",
+        "tags": ["admin", "lifecycle"],
+        "status": "draft",
+        "featured_image_url": "https://example.com/image.jpg",
+        "reading_minutes": 4,
+    }
+    create_resp = await client.post(
+        "/api/v1/admin/blog/posts",
+        json=create_payload,
+        headers={"Authorization": f"Bearer {ADMIN_TOKEN}"},
+    )
+    assert create_resp.status_code == 201
+    created = create_resp.json()
+    assert created["content"] == create_payload["content"]
+    assert created["featured_image_url"] == create_payload["featured_image_url"]
+    assert created["tags"] == create_payload["tags"]
+
+    list_resp = await client.get(
+        "/api/v1/admin/blog/posts?search=Lifecycle",
+        headers={"Authorization": f"Bearer {ADMIN_TOKEN}"},
+    )
+    assert list_resp.status_code == 200
+    listed = list_resp.json()["items"][0]
+    assert listed["post_code"] == created["post_code"]
+    assert listed["content"] == create_payload["content"]
+
+    update_payload = {
+        "title": "Lifecycle Post Updated",
+        "slug": "lifecycle-post-updated",
+        "excerpt": "Updated excerpt.",
+        "content": "## Updated\n\nThis edited content should be saved and retrieved.",
+        "author": "Updated Author",
+        "tags": ["updated", "blog"],
+        "status": "published",
+        "featured_image_url": None,
+        "reading_minutes": 7,
+        "link_preview": {
+            "url": "https://example.com/careers",
+            "title": "Example Careers",
+            "description": "Example description",
+            "domain": "example.com",
+        },
+    }
+    update_resp = await client.put(
+        f"/api/v1/admin/blog/posts/{created['post_code']}",
+        json=update_payload,
+        headers={"Authorization": f"Bearer {ADMIN_TOKEN}"},
+    )
+    assert update_resp.status_code == 200
+    updated = update_resp.json()
+    assert updated["title"] == update_payload["title"]
+    assert updated["slug"] == update_payload["slug"]
+    assert updated["excerpt"] == update_payload["excerpt"]
+    assert updated["content"] == update_payload["content"]
+    assert updated["author"] == update_payload["author"]
+    assert updated["tags"] == update_payload["tags"]
+    assert updated["status"] == update_payload["status"]
+    assert updated["featured_image_url"] is None
+    assert updated["reading_minutes"] == update_payload["reading_minutes"]
+    assert updated["link_preview"]["url"] == "https://example.com/careers"
+
+    clear_resp = await client.put(
+        f"/api/v1/admin/blog/posts/{created['post_code']}",
+        json={"link_preview": None, "featured_image_url": None},
+        headers={"Authorization": f"Bearer {ADMIN_TOKEN}"},
+    )
+    assert clear_resp.status_code == 200
+    cleared = clear_resp.json()
+    assert cleared["content"] == update_payload["content"]
+    assert cleared["link_preview"] is None
+    assert cleared["featured_image_url"] is None
 
 
 @pytest.mark.asyncio

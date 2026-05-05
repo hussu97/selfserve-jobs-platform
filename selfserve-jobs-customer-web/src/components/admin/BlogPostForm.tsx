@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { adminCreateBlogPost, adminUpdateBlogPost, adminFetchLinkPreview } from '@/lib/api';
 import type { AdminBlogPost, CreateBlogPostRequest, UpdateBlogPostRequest, LinkPreview } from '@/lib/types';
 
@@ -38,9 +38,11 @@ export function BlogPostForm({ sessionToken, editPost, onSaved, onCancel }: Prop
   );
   const [featuredImageUrl, setFeaturedImageUrl] = useState(editPost?.featured_image_url ?? '');
   const [readingMinutes, setReadingMinutes] = useState<number>(editPost?.reading_minutes ?? 1);
-  const [linkPreviewUrl, setLinkPreviewUrl] = useState('');
+  const originalLinkPreviewUrl = editPost?.link_preview?.url ?? '';
+  const [linkPreviewUrl, setLinkPreviewUrl] = useState(originalLinkPreviewUrl);
   const [linkPreview, setLinkPreview] = useState<LinkPreview | null>(editPost?.link_preview ?? null);
   const [fetchingPreview, setFetchingPreview] = useState(false);
+  const didHydrateContent = useRef(false);
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -55,6 +57,10 @@ export function BlogPostForm({ sessionToken, editPost, onSaved, onCancel }: Prop
 
   // Auto-calculate reading minutes when content changes
   useEffect(() => {
+    if (!didHydrateContent.current) {
+      didHydrateContent.current = true;
+      return;
+    }
     if (content) {
       setReadingMinutes(estimateReadingMinutes(content));
     }
@@ -96,7 +102,7 @@ export function BlogPostForm({ sessionToken, editPost, onSaved, onCancel }: Prop
           status: postStatus,
           featured_image_url: featuredImageUrl || null,
           reading_minutes: readingMinutes,
-          ...(linkPreviewUrl
+          ...(linkPreviewUrl && linkPreviewUrl !== originalLinkPreviewUrl
             ? { link_preview_url: linkPreviewUrl }
             : linkPreview !== editPost.link_preview
             ? { link_preview: linkPreview }
