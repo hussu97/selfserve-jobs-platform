@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import time
+from datetime import UTC
 from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -111,13 +112,13 @@ async def _flush_pending_emails(db: AsyncSession) -> None:
     latency bounded. Successful records are removed; failed records have their
     attempt_count incremented so callers can observe escalation.
     """
-    from datetime import datetime, timedelta, timezone
+    from datetime import datetime, timedelta
 
     from sqlalchemy import select
 
     from app.models.email_pending import EmailPending
 
-    cutoff = datetime.now(timezone.utc) - timedelta(hours=24)
+    cutoff = datetime.now(UTC) - timedelta(hours=24)
     result = await db.execute(select(EmailPending).where(EmailPending.created_at >= cutoff))
     pending_emails = result.scalars().all()
 
@@ -152,11 +153,7 @@ async def _flush_pending_emails(db: AsyncSession) -> None:
 
         try:
             send_result = await asyncio.to_thread(resend_lib.Emails.send, params)
-            resend_id = (
-                send_result.get("id")
-                if isinstance(send_result, dict)
-                else getattr(send_result, "id", None)
-            )
+            resend_id = send_result.get("id") if isinstance(send_result, dict) else getattr(send_result, "id", None)
             _cb_record_success()
             await _log_email(
                 db,
@@ -177,7 +174,7 @@ async def _flush_pending_emails(db: AsyncSession) -> None:
         except Exception as exc:
             _cb_record_failure()
             record.attempt_count += 1
-            record.last_attempted_at = datetime.now(timezone.utc)
+            record.last_attempted_at = datetime.now(UTC)
             await _log_email(
                 db,
                 record.email_type,
@@ -288,7 +285,9 @@ async def _send(
             entity_code=entity_code,
             error_message="circuit_open",
         )
-        await _save_pending_email(db, email_type, recipient_email, subject, html_body, text_body, entity_type, entity_code)
+        await _save_pending_email(
+            db, email_type, recipient_email, subject, html_body, text_body, entity_type, entity_code
+        )
         return False
 
     import resend
@@ -343,7 +342,9 @@ async def _send(
         error_message = str(last_exc)
         logger.error("All attempts failed for %s email to %s: %s", email_type, recipient_email, last_exc)
         _cb_record_failure()
-        await _save_pending_email(db, email_type, recipient_email, subject, html_body, text_body, entity_type, entity_code)
+        await _save_pending_email(
+            db, email_type, recipient_email, subject, html_body, text_body, entity_type, entity_code
+        )
 
     await _log_email(
         db,

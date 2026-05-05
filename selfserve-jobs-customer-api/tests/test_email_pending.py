@@ -4,17 +4,15 @@ import time
 from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import pytest
 from sqlalchemy import select
+
+import app.services.email_service as email_svc
 
 # Import at module level so both tables are registered with Base.metadata
 # before the db_engine fixture calls create_all.
 from app.models.email_log import EmailLog  # noqa: F401
 from app.models.email_pending import EmailPending
-
-import app.services.email_service as email_svc
 from app.services.email_service import _flush_pending_emails, _save_pending_email
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -99,9 +97,7 @@ async def test_save_pending_email_no_entity(db_session):
         entity_code=None,
     )
 
-    result = await db_session.execute(
-        select(EmailPending).where(EmailPending.email_type == "login")
-    )
+    result = await db_session.execute(select(EmailPending).where(EmailPending.email_type == "login"))
     row = result.scalar_one()
     assert row.entity_type is None
     assert row.entity_code is None
