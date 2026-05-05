@@ -6,7 +6,8 @@ Create Date: 2026-05-05
 """
 
 import sqlalchemy as sa
-from sqlalchemy.dialects.postgresql import JSONB, TIMESTAMP as _PG_TIMESTAMP
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import TIMESTAMP as _PG_TIMESTAMP
 
 from alembic import op
 

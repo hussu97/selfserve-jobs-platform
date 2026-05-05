@@ -14,7 +14,6 @@ from app.schemas.blog import (
     BlogListResponse,
     BlogPostCreate,
     BlogPostListItem,
-    BlogPostResponse,
     BlogPostUpdate,
     LinkPreview,
 )
@@ -22,6 +21,7 @@ from app.schemas.blog import (
 
 def _generate_code() -> str:
     from nanoid import generate
+
     return generate(size=12)
 
 
@@ -67,9 +67,7 @@ async def update_blog_post(db: AsyncSession, post_code: str, data: BlogPostUpdat
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Blog post not found")
 
     if data.slug is not None and data.slug != post.slug:
-        conflict = await db.execute(
-            select(BlogPost).where(BlogPost.slug == data.slug, BlogPost.post_code != post_code)
-        )
+        conflict = await db.execute(select(BlogPost).where(BlogPost.slug == data.slug, BlogPost.post_code != post_code))
         if conflict.scalar_one_or_none():
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="A post with this slug already exists")
         post.slug = data.slug
@@ -221,19 +219,13 @@ async def list_admin_blog_posts(
 
 
 async def increment_view_count(db: AsyncSession, post_code: str) -> None:
-    await db.execute(
-        update(BlogPost)
-        .where(BlogPost.post_code == post_code)
-        .values(view_count=BlogPost.view_count + 1)
-    )
+    await db.execute(update(BlogPost).where(BlogPost.post_code == post_code).values(view_count=BlogPost.view_count + 1))
     await db.flush()
 
 
 async def increment_link_click_count(db: AsyncSession, post_code: str) -> None:
     await db.execute(
-        update(BlogPost)
-        .where(BlogPost.post_code == post_code)
-        .values(link_click_count=BlogPost.link_click_count + 1)
+        update(BlogPost).where(BlogPost.post_code == post_code).values(link_click_count=BlogPost.link_click_count + 1)
     )
     await db.flush()
 

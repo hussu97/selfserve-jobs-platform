@@ -43,6 +43,4 @@ class BlogPost(Base):
         TIMESTAMPTZ, nullable=False, server_default=func.now(), onupdate=func.now()
     )
 
-    __table_args__ = (
-        Index("ix_blog_post_status_created_at", "status", "created_at"),
-    )
+    __table_args__ = (Index("ix_blog_post_status_created_at", "status", "created_at"),)

@@ -5,7 +5,6 @@ import os
 os.environ.setdefault("ADMIN_EMAILS", "admin@example.com")
 
 from datetime import UTC, datetime, timedelta
-from unittest.mock import AsyncMock, patch
 
 import pytest
 from sqlalchemy import select
@@ -13,7 +12,6 @@ from sqlalchemy import select
 from app.models.auth_session import AuthSession
 from app.models.blog_post import BlogPost
 from app.services.code_generator import generate_code
-
 
 ADMIN_TOKEN = "admin-blog-test-token"
 ADMIN_EMAIL = "admin@example.com"
@@ -36,7 +34,9 @@ async def _make_admin_session(db_session) -> AuthSession:
     return session
 
 
-async def _make_blog_post(db_session, *, title: str = "Test Post", status: str = "published", slug: str | None = None) -> BlogPost:
+async def _make_blog_post(
+    db_session, *, title: str = "Test Post", status: str = "published", slug: str | None = None
+) -> BlogPost:
     post = BlogPost(
         post_code=generate_code(12),
         title=title,
@@ -98,7 +98,7 @@ async def test_list_blog_posts_search(client, db_session):
 
 @pytest.mark.asyncio
 async def test_get_blog_post_by_slug(client, db_session):
-    post = await _make_blog_post(db_session, title="UAE Visa Tips", status="published", slug="uae-visa-tips")
+    await _make_blog_post(db_session, title="UAE Visa Tips", status="published", slug="uae-visa-tips")
     await db_session.commit()
 
     resp = await client.get("/api/v1/blog/posts/uae-visa-tips")
