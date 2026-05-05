@@ -253,11 +253,12 @@ async def check_resend_rate_limit(
 async def check_user_resend_cooldown(
     db: AsyncSession,
     user_code: str,
-    cooldown_hours: int,
+    cooldown_minutes: int,
 ) -> None:
     """Raise if any verification email was created for this user inside the cooldown window."""
     now = datetime.now(UTC)
-    window_start = now - timedelta(hours=cooldown_hours)
+    cooldown = timedelta(minutes=cooldown_minutes)
+    window_start = now - cooldown
     result = await db.execute(
         select(EmailVerification)
         .where(
@@ -273,7 +274,7 @@ async def check_user_resend_cooldown(
     if latest is None:
         return
 
-    retry_at = latest.created_at + timedelta(hours=cooldown_hours)
+    retry_at = latest.created_at + cooldown
     raise HTTPException(
         status_code=status.HTTP_429_TOO_MANY_REQUESTS,
         detail=f"Verification email already sent recently. Try again after {retry_at.isoformat()}.",

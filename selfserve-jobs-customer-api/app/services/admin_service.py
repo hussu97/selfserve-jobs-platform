@@ -5,7 +5,7 @@ from fastapi import HTTPException, status
 from sqlalchemy import delete, func, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.constants import ADMIN_VERIFICATION_RESEND_COOLDOWN_HOURS
+from app.constants import ADMIN_VERIFICATION_RESEND_COOLDOWN_MINUTES
 from app.models.admin_audit_log import AdminAuditLog
 from app.models.auth_session import AuthSession
 from app.models.email_verification import EmailVerification
@@ -100,7 +100,7 @@ async def prepare_user_verification_resend(
     await verification_service.check_user_resend_cooldown(
         db,
         user_code=profile.user_code,
-        cooldown_hours=ADMIN_VERIFICATION_RESEND_COOLDOWN_HOURS,
+        cooldown_minutes=ADMIN_VERIFICATION_RESEND_COOLDOWN_MINUTES,
     )
     verification = await verification_service.create_verification(
         db,

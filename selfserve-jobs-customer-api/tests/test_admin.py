@@ -231,7 +231,7 @@ async def test_admin_resend_user_verification_success(client, db_session):
     mock_send.assert_awaited_once()
 
 
-async def test_admin_resend_user_verification_enforces_one_hour_cooldown(client, db_session):
+async def test_admin_resend_user_verification_enforces_five_minute_cooldown(client, db_session):
     now = datetime.now(UTC)
     profile = await _make_profile(
         db_session,

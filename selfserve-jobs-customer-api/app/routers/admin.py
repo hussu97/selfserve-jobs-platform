@@ -115,7 +115,7 @@ async def resend_user_verification(
         frontend_url=settings.frontend_url,
     )
 
-    return MessageResponse(message="Verification email sent. This user can be resent again after 1 hour.")
+    return MessageResponse(message="Verification email sent. This user can be resent again after 5 minutes.")
 
 
 # ---------------------------------------------------------------------------
