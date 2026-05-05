@@ -5,9 +5,13 @@ Revises: 0013
 Create Date: 2026-05-05
 """
 
+import json
 from datetime import UTC, datetime
 
+import sqlalchemy as sa
 from sqlalchemy import text
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import TIMESTAMP as _PG_TIMESTAMP
 
 from alembic import op
 
@@ -15,6 +19,24 @@ revision = "0014"
 down_revision = "0013"
 branch_labels = None
 depends_on = None
+
+TIMESTAMPTZ = _PG_TIMESTAMP(timezone=True)
+BLOG_POST_TABLE = sa.table(
+    "blog_post",
+    sa.column("post_code", sa.VARCHAR(12)),
+    sa.column("title", sa.VARCHAR(500)),
+    sa.column("slug", sa.VARCHAR(500)),
+    sa.column("excerpt", sa.Text()),
+    sa.column("content", sa.Text()),
+    sa.column("author", sa.VARCHAR(200)),
+    sa.column("tags", JSONB()),
+    sa.column("status", sa.VARCHAR(20)),
+    sa.column("reading_minutes", sa.Integer()),
+    sa.column("view_count", sa.Integer()),
+    sa.column("link_click_count", sa.Integer()),
+    sa.column("created_at", TIMESTAMPTZ),
+    sa.column("updated_at", TIMESTAMPTZ),
+)
 
 _POSTS = [
     {
@@ -506,35 +528,25 @@ def upgrade() -> None:
         return
 
     now = datetime.now(UTC)
-    for post in _POSTS:
-        conn.execute(
-            text(
-                """
-                INSERT INTO blog_post
-                    (post_code, title, slug, excerpt, content, author, tags, status,
-                     reading_minutes, view_count, link_click_count,
-                     created_at, updated_at)
-                VALUES
-                    (:post_code, :title, :slug, :excerpt, :content, :author,
-                     CAST(:tags AS jsonb), :status, :reading_minutes, 0, 0,
-                     CAST(:created_at AS timestamptz),
-                     CAST(:updated_at AS timestamptz))
-                """
-            ),
-            {
-                "post_code": post["post_code"],
-                "title": post["title"],
-                "slug": post["slug"],
-                "excerpt": post["excerpt"],
-                "content": post["content"],
-                "author": post["author"],
-                "tags": post["tags"],
-                "status": post["status"],
-                "reading_minutes": post["reading_minutes"],
-                "created_at": datetime.fromisoformat(post["created_at"]),
-                "updated_at": now,
-            },
-        )
+    rows = [
+        {
+            "post_code": post["post_code"],
+            "title": post["title"],
+            "slug": post["slug"],
+            "excerpt": post["excerpt"],
+            "content": post["content"],
+            "author": post["author"],
+            "tags": json.loads(post["tags"]),
+            "status": post["status"],
+            "reading_minutes": post["reading_minutes"],
+            "view_count": 0,
+            "link_click_count": 0,
+            "created_at": datetime.fromisoformat(post["created_at"]),
+            "updated_at": now,
+        }
+        for post in _POSTS
+    ]
+    conn.execute(BLOG_POST_TABLE.insert(), rows)
 
 
 def downgrade() -> None:
