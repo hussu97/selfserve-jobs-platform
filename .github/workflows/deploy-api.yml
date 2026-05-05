@@ -136,6 +136,19 @@ jobs:
               --limit 5 || true
             echo "::endgroup::"
 
+            latest_revision="$(gcloud run revisions list \
+              --service selfserve-jobs-customer-api \
+              --region "${{ secrets.GCP_REGION }}" \
+              --limit 1 \
+              --format 'value(metadata.name)' || true)"
+            if [[ -n "$latest_revision" ]]; then
+              echo "::group::Latest Cloud Run revision status"
+              gcloud run revisions describe "$latest_revision" \
+                --region "${{ secrets.GCP_REGION }}" \
+                --format 'yaml(status.conditions,status.containerStatuses,status.logUrl)' || true
+              echo "::endgroup::"
+            fi
+
             echo "::group::Recent Cloud Run service logs"
             gcloud run services logs read selfserve-jobs-customer-api \
               --region "${{ secrets.GCP_REGION }}" \
