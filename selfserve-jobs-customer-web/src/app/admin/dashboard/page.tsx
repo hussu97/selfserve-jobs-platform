@@ -9,14 +9,16 @@ import { UsersTable } from '@/components/admin/UsersTable';
 import { RecruitersTable } from '@/components/admin/RecruitersTable';
 import { ReportsTable } from '@/components/admin/ReportsTable';
 import { BlogsTable } from '@/components/admin/BlogsTable';
+import { EmailLogsTable } from '@/components/admin/EmailLogsTable';
 
-type Tab = 'users' | 'recruiters' | 'reports' | 'blog';
+type Tab = 'users' | 'recruiters' | 'reports' | 'blog' | 'email-logs';
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'users', label: 'Users' },
   { id: 'recruiters', label: 'Recruiters' },
   { id: 'reports', label: 'Reported Posts' },
   { id: 'blog', label: 'Blog' },
+  { id: 'email-logs', label: 'Email Logs' },
 ];
 
 function DashboardContent() {
@@ -118,6 +120,7 @@ function DashboardContent() {
         {tab === 'recruiters' && <RecruitersTable sessionToken={sessionToken} />}
         {tab === 'reports' && <ReportsTable sessionToken={sessionToken} />}
         {tab === 'blog' && <BlogsTable sessionToken={sessionToken} />}
+        {tab === 'email-logs' && <EmailLogsTable sessionToken={sessionToken} />}
       </div>
     </div>
   );

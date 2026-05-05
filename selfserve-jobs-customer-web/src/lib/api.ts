@@ -36,6 +36,8 @@ import type {
   CreateBlogPostRequest,
   UpdateBlogPostRequest,
   LinkPreview,
+  AdminEmailLogItem,
+  AdminEmailLogFilters,
 } from './types';
 import { buildQueryString } from './utils';
 
@@ -610,6 +612,22 @@ export async function adminFetchLinkPreview(url: string, sessionToken: string): 
     method: 'POST',
     headers: { Authorization: `Bearer ${sessionToken}` },
     body: JSON.stringify({ url }),
+  });
+}
+
+export async function adminGetEmailLogs(
+  filters: AdminEmailLogFilters,
+  sessionToken: string
+): Promise<AdminListResponse<AdminEmailLogItem>> {
+  const params: Record<string, string | number | boolean | undefined> = {
+    page: filters.page ?? 1,
+    per_page: filters.per_page ?? 50,
+  };
+  if (filters.search) params.search = filters.search;
+  if (filters.email_type) params.email_type = filters.email_type;
+  if (filters.success !== undefined) params.success = filters.success;
+  return request<AdminListResponse<AdminEmailLogItem>>(`/admin/email-logs${buildQueryString(params)}`, {
+    headers: { Authorization: `Bearer ${sessionToken}` },
   });
 }
 

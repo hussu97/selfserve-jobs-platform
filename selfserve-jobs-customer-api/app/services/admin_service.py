@@ -9,6 +9,7 @@ from app.config import get_settings
 from app.constants import ADMIN_VERIFICATION_RESEND_COOLDOWN_MINUTES
 from app.models.admin_audit_log import AdminAuditLog
 from app.models.auth_session import AuthSession
+from app.models.email_log import EmailLog
 from app.models.email_verification import EmailVerification
 from app.models.job import Job
 from app.models.profile import Profile
@@ -17,6 +18,8 @@ from app.models.recruiter_rejection_reason import RecruiterRejectionReason
 from app.models.report import Report
 from app.models.user_sensitive import UserSensitive
 from app.schemas.admin import (
+    AdminEmailLogItem,
+    AdminEmailLogListResponse,
     AdminRecruiterItem,
     AdminRecruiterListResponse,
     AdminReportItem,
@@ -454,3 +457,36 @@ async def reject_recruiter_with_reason(
     )
 
     return recruiter, reason.name
+
+
+async def list_email_logs(
+    db: AsyncSession,
+    search: str | None = None,
+    email_type: str | None = None,
+    success: bool | None = None,
+    page: int = 1,
+    per_page: int = 50,
+) -> AdminEmailLogListResponse:
+    query = select(EmailLog)
+    if search:
+        term = f"%{search.strip()}%"
+        query = query.where(EmailLog.recipient_email.ilike(term))
+    if email_type:
+        query = query.where(EmailLog.email_type == email_type)
+    if success is not None:
+        query = query.where(EmailLog.success == success)
+
+    count_result = await db.execute(select(func.count()).select_from(query.subquery()))
+    total = count_result.scalar_one()
+
+    offset = (page - 1) * per_page
+    result = await db.execute(query.order_by(EmailLog.created_at.desc()).offset(offset).limit(per_page))
+    logs = result.scalars().all()
+
+    return AdminEmailLogListResponse(
+        items=[AdminEmailLogItem.model_validate(log) for log in logs],
+        total=total,
+        page=page,
+        per_page=per_page,
+        total_pages=math.ceil(total / per_page) if total else 1,
+    )

@@ -457,3 +457,22 @@ export interface UpdateBlogPostRequest {
   link_preview_url?: string;
   link_preview?: LinkPreview | null;
 }
+
+export interface AdminEmailLogItem {
+  email_type: string;
+  recipient_email: string;
+  entity_type: string | null;
+  entity_code: string | null;
+  success: boolean;
+  resend_id: string | null;
+  error_message: string | null;
+  created_at: string;
+}
+
+export interface AdminEmailLogFilters {
+  search?: string;
+  email_type?: string;
+  success?: boolean;
+  page?: number;
+  per_page?: number;
+}

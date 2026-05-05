@@ -5,6 +5,7 @@ from app.config import get_settings
 from app.dependencies import get_session
 from app.models.auth_session import AuthSession
 from app.schemas.admin import (
+    AdminEmailLogListResponse,
     AdminLoginRequest,
     AdminProfileActionResponse,
     AdminRecruiterListResponse,
@@ -287,3 +288,24 @@ async def deactivate_profile(
         profile_code=code,
     )
     return AdminProfileActionResponse(profile_code=profile.profile_code, status=profile.status)
+
+
+@router.get("/email-logs", response_model=AdminEmailLogListResponse)
+async def list_email_logs(
+    search: str | None = Query(None),
+    email_type: str | None = Query(None),
+    success: bool | None = Query(None),
+    page: int = Query(1, ge=1),
+    per_page: int = Query(50, ge=1, le=200),
+    session: AuthSession = Depends(_get_admin_session),
+    db: AsyncSession = Depends(get_session),
+) -> AdminEmailLogListResponse:
+    """List email send attempts with optional filtering by recipient, type, and outcome."""
+    return await admin_service.list_email_logs(
+        db,
+        search=search,
+        email_type=email_type,
+        success=success,
+        page=page,
+        per_page=per_page,
+    )
