@@ -61,6 +61,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Profile/job update 422 — missing `Content-Type: application/json`** — `request()` in `src/lib/api.ts` spread `...fetchOptions` after the merged `headers` object, causing the `headers` key to be overridden by the caller-supplied headers (e.g. `{ 'X-Edit-Token': token }`). PUT requests with custom headers silently lost `Content-Type: application/json`, so FastAPI received the body as a raw string and rejected it with "Input should be a valid dictionary". Fixed by destructuring `headers` out of options before spreading the remainder.
 
 ### Added
+- **Mal careers blog seed** — added Alembic migration `0016_seed_mal_careers_blog_post.py` to publish a new DB-backed article about Mal's UAE fintech careers signal, its public roles page, and how candidates can stay discoverable through hirebridge.
 - **Request validation error logging** — added a `RequestValidationError` exception handler in `app/main.py` that logs 422 errors with the full field-level detail to Cloud Logging, making it possible to diagnose future validation failures without needing DevTools access; handler uses recursive `_make_json_safe` to avoid `TypeError` on non-serialisable Pydantic error fields (bytes, exceptions)
 
 ### Fixed
