@@ -7,6 +7,8 @@ Create Date: 2026-05-05
 
 from datetime import UTC, datetime
 
+from sqlalchemy import text
+
 from alembic import op
 
 revision = "0014"
@@ -499,14 +501,14 @@ Don't feel locked in. Many UAE residents change emirate every 2–3 years as the
 def upgrade() -> None:
     conn = op.get_bind()
 
-    count = conn.execute(__import__("sqlalchemy").text("SELECT COUNT(*) FROM blog_post")).scalar()
+    count = conn.execute(text("SELECT COUNT(*) FROM blog_post")).scalar()
     if count and count > 0:
         return
 
-    now = datetime.now(UTC).isoformat()
+    now = datetime.now(UTC)
     for post in _POSTS:
         conn.execute(
-            __import__("sqlalchemy").text(
+            text(
                 """
                 INSERT INTO blog_post
                     (post_code, title, slug, excerpt, content, author, tags, status,
@@ -529,7 +531,7 @@ def upgrade() -> None:
                 "tags": post["tags"],
                 "status": post["status"],
                 "reading_minutes": post["reading_minutes"],
-                "created_at": post["created_at"],
+                "created_at": datetime.fromisoformat(post["created_at"]),
                 "updated_at": now,
             },
         )
@@ -539,6 +541,6 @@ def downgrade() -> None:
     conn = op.get_bind()
     codes = [p["post_code"] for p in _POSTS]
     conn.execute(
-        __import__("sqlalchemy").text("DELETE FROM blog_post WHERE post_code = ANY(:codes)"),
+        text("DELETE FROM blog_post WHERE post_code = ANY(:codes)"),
         {"codes": codes},
     )
