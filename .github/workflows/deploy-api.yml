@@ -109,6 +109,7 @@ jobs:
             emit_yaml_scalar "ADMIN_NOTIFICATION_EMAIL" "$ADMIN_NOTIFICATION_EMAIL"
           } > "$ENV_FILE"
 
+          set +e
           gcloud run deploy selfserve-jobs-customer-api \
             --image "$IMAGE" \
             --region "${{ secrets.GCP_REGION }}" \
@@ -124,6 +125,25 @@ jobs:
             --max-instances 10 \
             --timeout 300 \
             --cpu-boost
+          deploy_status=$?
+          set -e
+
+          if [[ "$deploy_status" -ne 0 ]]; then
+            echo "::group::Recent Cloud Run revisions"
+            gcloud run revisions list \
+              --service selfserve-jobs-customer-api \
+              --region "${{ secrets.GCP_REGION }}" \
+              --limit 5 || true
+            echo "::endgroup::"
+
+            echo "::group::Recent Cloud Run service logs"
+            gcloud run services logs read selfserve-jobs-customer-api \
+              --region "${{ secrets.GCP_REGION }}" \
+              --limit 120 || true
+            echo "::endgroup::"
+
+            exit "$deploy_status"
+          fi
 
           rm -f "$ENV_FILE"
 

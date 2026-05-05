@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- **Cloud Run deploy failure logs** — the API deploy workflow now prints recent Cloud Run revisions and service logs when `gcloud run deploy` fails, so startup exceptions are visible directly in GitHub Actions.
 - **Playwright CLI artifact ignore rule** — `.playwright-cli/` is now ignored so local browser automation logs and screenshots do not appear as untracked repo files.
 - **Seed 6 initial blog posts** — Alembic data migration 0014 inserts the 6 static blog posts (previously served from `blog-content.ts` only) as published `blog_post` rows on first deployment; uses a count-guard so seeding is skipped if any posts already exist; posts retain their original authored dates and reading times; the 6 posts are now manageable through the admin blog portal and have view/click metrics tracked from the moment of deployment; added `per-file-ignores` ruff exception for the migration file to allow long-form blog content strings
 - **Admin blog management** — new "Blog" tab in the admin dashboard; admins can create, edit, delete, and change the status (draft/published/archived) of blog posts through a full-featured inline form (title, slug auto-generated from title, excerpt, markdown content, author, tags, reading minutes, featured image URL); blog tab shows a metrics bar with total posts, published count, total views, and total link clicks across the loaded page
