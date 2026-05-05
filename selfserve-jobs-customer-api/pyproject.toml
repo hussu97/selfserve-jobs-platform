@@ -52,3 +52,6 @@ ignore = [
     "B008",   # FastAPI uses Depends()/File() in function defaults — this is intentional
     "E402",   # Module-level import not at top — needed for SQLite/Postgres compat shims in models
 ]
+
+[tool.ruff.lint.per-file-ignores]
+"alembic/versions/0014_seed_blog_posts.py" = ["E501"]
