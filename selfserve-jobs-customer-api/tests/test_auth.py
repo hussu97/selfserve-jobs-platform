@@ -1,11 +1,13 @@
 """Tests for auth endpoints: login, verify, logout, me, entities, activate/deactivate."""
 
 from datetime import UTC, datetime, timedelta
+from unittest.mock import patch
 
 from app.models.auth_session import AuthSession
 from app.models.job import Job
 from app.models.login_token import LoginToken
 from app.models.user_sensitive import UserSensitive
+from app.services import auth_service
 from app.services.code_generator import generate_code, generate_token
 
 
@@ -167,6 +169,40 @@ async def test_me_expired_session_unauthorized(client, db_session):
         headers={"Authorization": f"Bearer {session.session_token}"},
     )
     assert response.status_code == 401
+
+
+async def test_admin_session_uses_standard_30_day_expiry(db_session):
+    with patch("app.config.get_settings") as mock_get_settings:
+        mock_get_settings.return_value.admin_email_list = ["admin@example.com"]
+
+        session = await auth_service.create_session(db_session, "admin@example.com")
+
+    assert session.user_type == "admin"
+    remaining = session.expires_at - datetime.now(UTC)
+    assert timedelta(days=29) < remaining <= timedelta(days=30)
+
+
+async def test_admin_session_does_not_expire_from_inactivity(db_session):
+    now = datetime.now(UTC)
+    session = AuthSession(
+        session_token=generate_token(64),
+        email="idle-admin@example.com",
+        user_type="admin",
+        expires_at=now + timedelta(days=30),
+        last_active_at=now - timedelta(hours=2),
+    )
+    db_session.add(session)
+    await db_session.flush()
+
+    with patch("app.config.get_settings") as mock_get_settings:
+        mock_get_settings.return_value.admin_email_list = ["idle-admin@example.com"]
+
+        validated = await auth_service.validate_session(db_session, session.session_token)
+
+    assert validated is not None
+    assert validated.session_token == session.session_token
+    assert validated.last_active_at is not None
+    assert validated.last_active_at > now
 
 
 # ---------------------------------------------------------------------------

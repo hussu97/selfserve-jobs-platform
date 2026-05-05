@@ -26,7 +26,7 @@ def upgrade() -> None:
         ["entity_type", "entity_code", "reporter_email"],
     )
 
-    # --- auth_session: add last_active_at for admin inactivity timeout ---
+    # --- auth_session: add last_active_at for activity tracking ---
     op.add_column("auth_session", sa.Column("last_active_at", sa.TIMESTAMP(timezone=True), nullable=True))
 
     # --- Phase 3 DB indexes for performance ---

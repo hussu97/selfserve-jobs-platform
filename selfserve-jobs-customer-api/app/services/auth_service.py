@@ -6,8 +6,6 @@ from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.constants import (
-    ADMIN_SESSION_EXPIRY_DAYS,
-    ADMIN_SESSION_INACTIVITY_HOURS,
     LOGIN_RATE_LIMIT_PER_HOUR,
     LOGIN_TOKEN_EXPIRY_MINUTES,
     SESSION_EXPIRY_DAYS,
@@ -90,7 +88,7 @@ async def create_session(db: AsyncSession, email: str) -> AuthSession:
     if email in settings.admin_email_list:
         user_type = "admin"
         recruiter_code = None
-        expiry = timedelta(days=ADMIN_SESSION_EXPIRY_DAYS)
+        expiry = timedelta(days=SESSION_EXPIRY_DAYS)
     elif recruiter:
         user_type = "recruiter"
         recruiter_code = recruiter.recruiter_code
@@ -114,7 +112,7 @@ async def create_session(db: AsyncSession, email: str) -> AuthSession:
 
 
 async def validate_session(db: AsyncSession, session_token: str) -> AuthSession | None:
-    """Check token exists and hasn't expired. Enforces 1-hour inactivity timeout for admin sessions."""
+    """Check token exists and hasn't expired."""
     now = datetime.now(UTC)
     result = await db.execute(
         select(AuthSession).where(
@@ -134,14 +132,6 @@ async def validate_session(db: AsyncSession, session_token: str) -> AuthSession 
 
         _settings = _get_settings()
         if session.email not in _settings.admin_email_list:
-            await db.delete(session)
-            await db.flush()
-            return None
-
-    # Admin sessions expire after 1 hour of inactivity
-    if session.user_type == "admin" and session.last_active_at is not None:
-        idle_limit = timedelta(hours=ADMIN_SESSION_INACTIVITY_HOURS)
-        if now - session.last_active_at > idle_limit:
             await db.delete(session)
             await db.flush()
             return None

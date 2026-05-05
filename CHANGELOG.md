@@ -39,6 +39,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - **Pre-push hook** — new `.husky/pre-push` mirrors the GitHub CI test workflows: detects which apps have commits in the push, runs ruff lint + format check + bandit security scan + pytest (verbose) for the API, and eslint + typecheck + vitest + npm audit (high severity) for the web; bandit and npm audit are non-blocking (same as CI)
 
+### Changed
+- **Admin session lifetime** — admin sessions now match regular and recruiter sessions: 30 days with no one-hour inactivity timeout, while still invalidating if the email is removed from the admin allow-list.
+
 ### Fixed
 - **Blog seed public codes fit schema** — migration 0014 seed `post_code` values are now 12 characters to match the `blog_post.post_code VARCHAR(12)` schema and project public-code convention.
 - **Blog seed migration bind typing hardened** — migration 0014 now uses a typed SQLAlchemy table insert with parsed JSON tag arrays and Python datetimes, avoiding raw `CAST(:param AS jsonb/timestamptz)` binds under asyncpg.
