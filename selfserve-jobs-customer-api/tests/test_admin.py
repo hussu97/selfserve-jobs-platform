@@ -755,3 +755,98 @@ async def test_admin_cannot_deactivate_already_inactive_profile(client, db_sessi
     app.dependency_overrides.pop(_get_admin_session, None)
 
     assert r.status_code == 409
+
+
+# ---------------------------------------------------------------------------
+# Email logs
+# ---------------------------------------------------------------------------
+
+
+async def _make_email_log(
+    db_session,
+    *,
+    email_type="verification",
+    recipient_email="user@example.com",
+    success=True,
+    entity_type="job",
+    entity_code="testjob0001",
+    error_message=None,
+    resend_id=None,
+):
+    from app.models.email_log import EmailLog
+
+    log = EmailLog(
+        email_type=email_type,
+        recipient_email=recipient_email,
+        entity_type=entity_type,
+        entity_code=entity_code,
+        success=success,
+        resend_id=resend_id,
+        error_message=error_message,
+    )
+    db_session.add(log)
+    await db_session.flush()
+    return log
+
+
+async def test_admin_email_logs_returns_paginated_list(client, db_session):
+    await _make_email_log(db_session, recipient_email="a@test.com", success=True, resend_id="rid-001")
+    await _make_email_log(db_session, recipient_email="b@test.com", success=False, error_message="timeout")
+    session = await _make_admin_session(db_session, email="admin-el1@example.com")
+
+    async def _override():
+        return session
+
+    from app.main import app
+
+    app.dependency_overrides[_get_admin_session] = _override
+    r = await client.get("/api/v1/admin/email-logs")
+    app.dependency_overrides.pop(_get_admin_session, None)
+
+    assert r.status_code == 200
+    data = r.json()
+    assert "items" in data and "total" in data
+    assert data["total"] >= 2
+    assert all("email_type" in item and "success" in item for item in data["items"])
+
+
+async def test_admin_email_logs_filter_by_success(client, db_session):
+    await _make_email_log(db_session, email_type="login", recipient_email="c@test.com", success=True)
+    await _make_email_log(db_session, email_type="login", recipient_email="d@test.com", success=False)
+    session = await _make_admin_session(db_session, email="admin-el2@example.com")
+
+    async def _override():
+        return session
+
+    from app.main import app
+
+    app.dependency_overrides[_get_admin_session] = _override
+    r = await client.get("/api/v1/admin/email-logs?success=false&email_type=login")
+    app.dependency_overrides.pop(_get_admin_session, None)
+
+    assert r.status_code == 200
+    data = r.json()
+    assert all(not item["success"] for item in data["items"])
+
+
+async def test_admin_email_logs_search_by_recipient(client, db_session):
+    await _make_email_log(db_session, recipient_email="unique_recipient@test.com", success=True)
+    session = await _make_admin_session(db_session, email="admin-el3@example.com")
+
+    async def _override():
+        return session
+
+    from app.main import app
+
+    app.dependency_overrides[_get_admin_session] = _override
+    r = await client.get("/api/v1/admin/email-logs?search=unique_recipient")
+    app.dependency_overrides.pop(_get_admin_session, None)
+
+    assert r.status_code == 200
+    data = r.json()
+    assert all("unique_recipient" in item["recipient_email"] for item in data["items"])
+
+
+async def test_admin_email_logs_requires_auth(client, db_session):
+    r = await client.get("/api/v1/admin/email-logs")
+    assert r.status_code == 401

@@ -112,3 +112,24 @@ class AdminReportListResponse(BaseModel):
     page: int
     per_page: int
     total_pages: int
+
+
+class AdminEmailLogItem(BaseModel):
+    email_type: str
+    recipient_email: str
+    entity_type: str | None
+    entity_code: str | None
+    success: bool
+    resend_id: str | None
+    error_message: str | None
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class AdminEmailLogListResponse(BaseModel):
+    items: list[AdminEmailLogItem]
+    total: int
+    page: int
+    per_page: int
+    total_pages: int
