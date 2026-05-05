@@ -6,9 +6,72 @@ import { Breadcrumbs } from '@/components/seo/Breadcrumbs';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { articleSchema } from '@/lib/schema';
 import { BLOG_POSTS } from '@/lib/blog-content';
+import type { BlogPost, BlogPostListItem, LinkPreview } from '@/lib/types';
+import BlogPostTracker from './BlogPostTracker';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
+}
+
+async function fetchPostFromApi(slug: string): Promise<BlogPost | null> {
+  try {
+    const res = await fetch(`${API_URL}/api/v1/blog/posts/${encodeURIComponent(slug)}`, {
+      next: { revalidate: 300 },
+    });
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+async function fetchRecentPostsFromApi(): Promise<BlogPostListItem[]> {
+  try {
+    const res = await fetch(`${API_URL}/api/v1/blog/posts?per_page=4`, { next: { revalidate: 120 } });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.items ?? [];
+  } catch {
+    return [];
+  }
+}
+
+// Fallback: build a BlogPost-shaped object from static content
+function staticPostToApiShape(p: typeof BLOG_POSTS[0]): BlogPost {
+  return {
+    post_code: p.slug,
+    title: p.title,
+    slug: p.slug,
+    excerpt: p.excerpt,
+    content: p.content,
+    author: p.author,
+    tags: p.tags,
+    status: 'published',
+    featured_image_url: null,
+    reading_minutes: p.readingMinutes,
+    view_count: 0,
+    link_preview: null,
+    created_at: p.datePublished + 'T00:00:00Z',
+    updated_at: (p.dateModified ?? p.datePublished) + 'T00:00:00Z',
+  };
+}
+
+function staticListToApiShape(p: typeof BLOG_POSTS[0]): BlogPostListItem {
+  return {
+    post_code: p.slug,
+    title: p.title,
+    slug: p.slug,
+    excerpt: p.excerpt,
+    author: p.author,
+    tags: p.tags,
+    status: 'published',
+    featured_image_url: null,
+    reading_minutes: p.readingMinutes,
+    created_at: p.datePublished + 'T00:00:00Z',
+    updated_at: (p.dateModified ?? p.datePublished) + 'T00:00:00Z',
+  };
 }
 
 export async function generateStaticParams() {
@@ -17,19 +80,38 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = BLOG_POSTS.find((p) => p.slug === slug);
-  if (!post) return { title: 'Not Found' };
+
+  const apiPost = await fetchPostFromApi(slug);
+  if (apiPost) {
+    return {
+      title: apiPost.title,
+      description: apiPost.excerpt,
+      openGraph: {
+        title: apiPost.title,
+        description: apiPost.excerpt,
+        type: 'article',
+        publishedTime: apiPost.created_at,
+        modifiedTime: apiPost.updated_at,
+        authors: [apiPost.author],
+        images: apiPost.featured_image_url ? [{ url: apiPost.featured_image_url }] : undefined,
+      },
+      alternates: { canonical: `/blog/${slug}` },
+    };
+  }
+
+  const staticPost = BLOG_POSTS.find((p) => p.slug === slug);
+  if (!staticPost) return { title: 'Not Found' };
 
   return {
-    title: post.title,
-    description: post.excerpt,
+    title: staticPost.title,
+    description: staticPost.excerpt,
     openGraph: {
-      title: post.title,
-      description: post.excerpt,
+      title: staticPost.title,
+      description: staticPost.excerpt,
       type: 'article',
-      publishedTime: post.datePublished,
-      modifiedTime: post.dateModified,
-      authors: [post.author],
+      publishedTime: staticPost.datePublished,
+      modifiedTime: staticPost.dateModified,
+      authors: [staticPost.author],
     },
     alternates: { canonical: `/blog/${slug}` },
   };
@@ -43,12 +125,76 @@ function formatDate(dateStr: string): string {
   });
 }
 
+function LinkPreviewCard({ preview, postCode }: { preview: LinkPreview; postCode: string }) {
+  return (
+    <div className="my-8">
+      <p className="text-xs uppercase tracking-widest text-text-muted mb-3 font-semibold">
+        Referenced Link
+      </p>
+      <BlogPostTracker postCode={postCode} type="link">
+        <a
+          href={preview.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group flex gap-4 rounded-2xl bg-surface-lowest shadow-ambient hover:-translate-y-0.5 hover:shadow-ambient-hover transition-all p-4 no-underline"
+        >
+          {preview.image && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={preview.image}
+              alt=""
+              aria-hidden="true"
+              className="w-20 h-20 object-cover rounded-xl shrink-0"
+            />
+          )}
+          <div className="min-w-0 flex-1">
+            <p className="text-xs text-text-muted uppercase tracking-wider mb-1">
+              {preview.domain ?? new URL(preview.url).hostname}
+            </p>
+            {preview.title && (
+              <p className="font-heading text-base text-primary leading-snug mb-1 group-hover:text-primary-hover transition-colors line-clamp-2">
+                {preview.title}
+              </p>
+            )}
+            {preview.description && (
+              <p className="text-xs text-text-muted leading-relaxed line-clamp-2">
+                {preview.description}
+              </p>
+            )}
+          </div>
+          <svg className="h-4 w-4 text-text-muted shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fillRule="evenodd" d="M5.22 14.78a.75.75 0 001.06 0l7.25-7.25a.75.75 0 00-1.06-1.06L5.22 13.72a.75.75 0 000 1.06z" clipRule="evenodd" />
+            <path fillRule="evenodd" d="M7.25 6.5a.75.75 0 01.75-.75h5.5a.75.75 0 01.75.75v5.5a.75.75 0 01-1.5 0V7.25H8a.75.75 0 01-.75-.75z" clipRule="evenodd" />
+          </svg>
+        </a>
+      </BlogPostTracker>
+    </div>
+  );
+}
+
 export default async function BlogPostPage({ params }: PageProps) {
   const { slug } = await params;
-  const post = BLOG_POSTS.find((p) => p.slug === slug);
-  if (!post) notFound();
 
-  const otherPosts = BLOG_POSTS.filter((p) => p.slug !== slug).slice(0, 3);
+  // Try API first, fall back to static
+  let post: BlogPost | null = await fetchPostFromApi(slug);
+  const isFromApi = post !== null;
+
+  if (!post) {
+    const staticPost = BLOG_POSTS.find((p) => p.slug === slug);
+    if (!staticPost) notFound();
+    post = staticPostToApiShape(staticPost);
+  }
+
+  // Get related posts
+  let otherPosts: BlogPostListItem[] = [];
+  if (isFromApi) {
+    const apiPosts = await fetchRecentPostsFromApi();
+    otherPosts = apiPosts.filter((p) => p.slug !== slug).slice(0, 3);
+  } else {
+    otherPosts = BLOG_POSTS.filter((p) => p.slug !== slug)
+      .slice(0, 3)
+      .map(staticListToApiShape);
+  }
 
   const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://hirebridgeuae.com';
 
@@ -59,11 +205,14 @@ export default async function BlogPostPage({ params }: PageProps) {
           title: post.title,
           description: post.excerpt,
           url: `/blog/${slug}`,
-          datePublished: post.datePublished,
-          dateModified: post.dateModified,
+          datePublished: post.created_at,
+          dateModified: post.updated_at,
           authorName: post.author,
         })}
       />
+
+      {/* Track view client-side */}
+      {isFromApi && <BlogPostTracker postCode={post.post_code} type="view" />}
 
       <div className="hero-gradient">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-4">
@@ -73,15 +222,24 @@ export default async function BlogPostPage({ params }: PageProps) {
               { label: post.title },
             ]}
           />
+          {post.featured_image_url && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={post.featured_image_url}
+              alt={post.title}
+              className="w-full h-56 sm:h-72 object-cover rounded-2xl mb-6"
+            />
+          )}
           <div className="mb-8">
             <div className="flex flex-wrap gap-1.5 mb-4">
               {post.tags.map((tag) => (
-                <span
+                <Link
                   key={tag}
-                  className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-surface text-text-muted"
+                  href={`/blog?tag=${encodeURIComponent(tag)}`}
+                  className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-surface text-text-muted hover:bg-surface-lowest transition-colors"
                 >
                   {tag}
-                </span>
+                </Link>
               ))}
             </div>
             <h1 className="font-heading text-3xl sm:text-4xl text-primary mb-4 leading-tight">
@@ -90,9 +248,9 @@ export default async function BlogPostPage({ params }: PageProps) {
             <div className="flex items-center gap-4 text-xs text-text-muted">
               <span>By <strong className="text-text-main">{post.author}</strong></span>
               <span>·</span>
-              <time dateTime={post.datePublished}>{formatDate(post.datePublished)}</time>
+              <time dateTime={post.created_at}>{formatDate(post.created_at)}</time>
               <span>·</span>
-              <span>{post.readingMinutes} min read</span>
+              <span>{post.reading_minutes} min read</span>
             </div>
           </div>
         </div>
@@ -100,12 +258,17 @@ export default async function BlogPostPage({ params }: PageProps) {
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         {/* Article body */}
-        <article className="prose max-w-none mb-16">
+        <article className="prose max-w-none mb-8">
           <ReactMarkdown>{post.content}</ReactMarkdown>
         </article>
 
+        {/* Link preview */}
+        {post.link_preview && (
+          <LinkPreviewCard preview={post.link_preview} postCode={post.post_code} />
+        )}
+
         {/* CTA */}
-        <div className="rounded-2xl bg-primary p-6 sm:p-8 text-white mb-16">
+        <div className="rounded-2xl bg-primary p-6 sm:p-8 text-white mb-16 mt-8">
           <h2 className="font-heading text-xl mb-2">
             Ready to find your next UAE tech role?
           </h2>
@@ -141,14 +304,14 @@ export default async function BlogPostPage({ params }: PageProps) {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
               {otherPosts.map((p) => (
                 <Link
-                  key={p.slug}
+                  key={p.post_code}
                   href={`/blog/${p.slug}`}
                   className="group block rounded-2xl bg-surface-lowest shadow-ambient hover:-translate-y-0.5 transition-transform p-5"
                 >
                   <h3 className="font-heading text-sm text-primary mb-1 group-hover:text-primary-hover transition-colors leading-snug">
                     {p.title}
                   </h3>
-                  <p className="text-xs text-text-muted">{p.readingMinutes} min read</p>
+                  <p className="text-xs text-text-muted">{p.reading_minutes} min read</p>
                 </Link>
               ))}
             </div>

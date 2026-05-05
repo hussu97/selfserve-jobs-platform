@@ -359,3 +359,91 @@ export interface AdminListFilters {
 export interface AdminReportFilters extends AdminListFilters {
   entity_type?: string;
 }
+
+// Blog types
+export interface LinkPreview {
+  url: string;
+  title?: string | null;
+  description?: string | null;
+  image?: string | null;
+  domain?: string | null;
+}
+
+export interface BlogPostListItem {
+  post_code: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  author: string;
+  tags: string[];
+  status: string;
+  featured_image_url?: string | null;
+  reading_minutes: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BlogPost {
+  post_code: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  author: string;
+  tags: string[];
+  status: string;
+  featured_image_url?: string | null;
+  reading_minutes: number;
+  view_count: number;
+  link_preview?: LinkPreview | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AdminBlogPost extends BlogPostListItem {
+  content: string;
+  view_count: number;
+  link_click_count: number;
+  link_preview?: LinkPreview | null;
+}
+
+export interface BlogListFilters {
+  search?: string;
+  tag?: string;
+  page?: number;
+  per_page?: number;
+}
+
+export interface AdminBlogListFilters {
+  search?: string;
+  status?: string;
+  page?: number;
+  per_page?: number;
+}
+
+export interface CreateBlogPostRequest {
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  author: string;
+  tags: string[];
+  status: 'draft' | 'published' | 'archived';
+  featured_image_url?: string | null;
+  reading_minutes?: number;
+  link_preview_url?: string | null;
+}
+
+export interface UpdateBlogPostRequest {
+  title?: string;
+  slug?: string;
+  excerpt?: string;
+  content?: string;
+  author?: string;
+  tags?: string[];
+  status?: 'draft' | 'published' | 'archived';
+  featured_image_url?: string | null;
+  reading_minutes?: number;
+  link_preview_url?: string;
+  link_preview?: LinkPreview | null;
+}
