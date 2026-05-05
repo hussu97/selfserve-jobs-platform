@@ -22,6 +22,7 @@ import type {
   RecruiterRegisterRequest,
   AdminListResponse,
   AdminUserItem,
+  AdminUserEmailUpdateResponse,
   AdminRecruiterItem,
   AdminReportItem,
   RejectionReason,
@@ -442,6 +443,18 @@ export async function adminResendUserVerification(
   return request<{ message: string }>(`/admin/users/${profileCode}/resend-verification`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${sessionToken}` },
+  });
+}
+
+export async function adminUpdateUserEmail(
+  profileCode: string,
+  email: string,
+  sessionToken: string
+): Promise<AdminUserEmailUpdateResponse> {
+  return request<AdminUserEmailUpdateResponse>(`/admin/users/${profileCode}/email`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${sessionToken}` },
+    body: JSON.stringify({ email }),
   });
 }
 

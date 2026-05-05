@@ -33,6 +33,25 @@ class AdminProfileActionResponse(BaseModel):
     status: str
 
 
+class AdminUserEmailUpdateRequest(BaseModel):
+    email: EmailStr
+
+    @field_validator("email", mode="before")
+    @classmethod
+    def normalize_email(cls, v: str) -> str:
+        return v.strip().lower()
+
+
+class AdminUserEmailUpdateResponse(BaseModel):
+    profile_code: str
+    user_code: str
+    old_email: str
+    email: str
+    profiles_updated: int
+    jobs_updated: int
+    contact_email_updates: int
+
+
 class AdminUserItem(BaseModel):
     profile_code: str
     person_name: str

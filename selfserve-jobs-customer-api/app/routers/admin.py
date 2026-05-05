@@ -9,6 +9,8 @@ from app.schemas.admin import (
     AdminProfileActionResponse,
     AdminRecruiterListResponse,
     AdminReportListResponse,
+    AdminUserEmailUpdateRequest,
+    AdminUserEmailUpdateResponse,
     AdminUserListResponse,
     FlagEntityRequest,
     RejectionReasonItem,
@@ -116,6 +118,22 @@ async def resend_user_verification(
     )
 
     return MessageResponse(message="Verification email sent. This user can be resent again after 5 minutes.")
+
+
+@router.patch("/users/{profile_code}/email", response_model=AdminUserEmailUpdateResponse)
+async def update_user_email(
+    profile_code: str,
+    body: AdminUserEmailUpdateRequest,
+    session: AuthSession = Depends(_get_admin_session),
+    db: AsyncSession = Depends(get_session),
+) -> AdminUserEmailUpdateResponse:
+    """Update the login email for the user attached to a talent profile."""
+    return await admin_service.update_user_email(
+        db,
+        admin_email=session.email,
+        profile_code=profile_code,
+        new_email=body.email,
+    )
 
 
 # ---------------------------------------------------------------------------

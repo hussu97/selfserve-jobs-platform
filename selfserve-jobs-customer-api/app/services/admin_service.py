@@ -5,6 +5,7 @@ from fastapi import HTTPException, status
 from sqlalchemy import delete, func, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config import get_settings
 from app.constants import ADMIN_VERIFICATION_RESEND_COOLDOWN_MINUTES
 from app.models.admin_audit_log import AdminAuditLog
 from app.models.auth_session import AuthSession
@@ -20,6 +21,7 @@ from app.schemas.admin import (
     AdminRecruiterListResponse,
     AdminReportItem,
     AdminReportListResponse,
+    AdminUserEmailUpdateResponse,
     AdminUserItem,
     AdminUserListResponse,
     RejectionReasonItem,
@@ -70,6 +72,92 @@ async def list_users(
         page=page,
         per_page=per_page,
         total_pages=math.ceil(total / per_page) if total else 1,
+    )
+
+
+async def update_user_email(
+    db: AsyncSession,
+    *,
+    admin_email: str,
+    profile_code: str,
+    new_email: str,
+) -> AdminUserEmailUpdateResponse:
+    """Update a talent user's login email while preserving their user_code ownership."""
+    result = await db.execute(
+        select(Profile, UserSensitive)
+        .join(UserSensitive, Profile.user_code == UserSensitive.user_code)
+        .where(Profile.profile_code == profile_code)
+        .with_for_update()
+    )
+    row = result.one_or_none()
+    if row is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
+
+    profile, user = row
+    old_email = user.user_email
+    if new_email == old_email:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="New email must be different")
+
+    settings = get_settings()
+    if new_email in settings.admin_email_list:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="This email is reserved for admin access")
+
+    existing_user_result = await db.execute(
+        select(UserSensitive).where(func.lower(UserSensitive.user_email) == new_email)
+    )
+    existing_user = existing_user_result.scalar_one_or_none()
+    if existing_user and existing_user.user_code != user.user_code:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="This email already belongs to another user")
+
+    existing_recruiter_result = await db.execute(select(Recruiter).where(func.lower(Recruiter.email) == new_email))
+    if existing_recruiter_result.scalar_one_or_none():
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="This email already belongs to a recruiter account",
+        )
+
+    profiles_count_result = await db.execute(select(func.count(Profile.id)).where(Profile.user_code == user.user_code))
+    profiles_updated = profiles_count_result.scalar_one()
+    jobs_count_result = await db.execute(select(func.count(Job.id)).where(Job.user_code == user.user_code))
+    jobs_updated = jobs_count_result.scalar_one()
+
+    now = datetime.now(UTC)
+    user.user_email = new_email
+    user.updated_at = now
+
+    contact_email_result = await db.execute(
+        update(Job)
+        .where(Job.user_code == user.user_code, func.lower(Job.contact_email) == old_email)
+        .values(contact_email=new_email, updated_at=now)
+    )
+    contact_email_updates = contact_email_result.rowcount or 0
+
+    await db.execute(delete(AuthSession).where(AuthSession.email.in_([old_email, new_email])))
+    await db.flush()
+    await write_audit_log(
+        db,
+        admin_email=admin_email,
+        action="update_user_email",
+        entity_type="profile",
+        entity_code=profile.profile_code,
+        details={
+            "user_code": user.user_code,
+            "old_email": old_email,
+            "new_email": new_email,
+            "profiles_updated": profiles_updated,
+            "jobs_updated": jobs_updated,
+            "contact_email_updates": contact_email_updates,
+        },
+    )
+
+    return AdminUserEmailUpdateResponse(
+        profile_code=profile.profile_code,
+        user_code=user.user_code,
+        old_email=old_email,
+        email=new_email,
+        profiles_updated=profiles_updated,
+        jobs_updated=jobs_updated,
+        contact_email_updates=contact_email_updates,
     )
 
 

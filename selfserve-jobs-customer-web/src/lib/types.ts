@@ -321,6 +321,16 @@ export interface AdminUserItem {
   view_count: number;
 }
 
+export interface AdminUserEmailUpdateResponse {
+  profile_code: string;
+  user_code: string;
+  old_email: string;
+  email: string;
+  profiles_updated: number;
+  jobs_updated: number;
+  contact_email_updates: number;
+}
+
 export interface AdminRecruiterItem {
   recruiter_code: string;
   name: string;

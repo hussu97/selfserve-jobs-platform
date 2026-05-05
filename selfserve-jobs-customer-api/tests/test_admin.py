@@ -8,12 +8,14 @@ from sqlalchemy import select
 from app.models.admin_audit_log import AdminAuditLog
 from app.models.auth_session import AuthSession
 from app.models.email_verification import EmailVerification
+from app.models.job import Job
 from app.models.profile import Profile
 from app.models.recruiter import Recruiter
 from app.models.recruiter_rejection_reason import RecruiterRejectionReason
 from app.models.report import Report
 from app.models.user_sensitive import UserSensitive
 from app.routers.admin import _get_admin_session
+from app.services import auth_service
 from app.services.code_generator import generate_code
 
 ADMIN_EMAIL = "admin@example.com"
@@ -90,6 +92,42 @@ async def _make_profile(
     db_session.add(profile)
     await db_session.flush()
     return profile
+
+
+async def _make_job(
+    db_session,
+    *,
+    code: str,
+    user_code: str,
+    contact_email: str | None,
+    status: str = "active",
+) -> Job:
+    now = datetime.now(UTC)
+    job = Job(
+        job_code=code,
+        user_code=user_code,
+        email_verified=True,
+        job_title="Product Manager",
+        company_name="Example Co",
+        company_city="Dubai",
+        company_country="UAE",
+        employment_type="full_time",
+        description="Build useful products.",
+        key_skills=["Product"],
+        contact_method="email" if contact_email else "url",
+        contact_email=contact_email,
+        contact_url=None if contact_email else "https://example.com/jobs",
+        status=status,
+        view_count=0,
+        edit_token="edit-token-" + code,
+        expires_at=now + timedelta(days=30),
+        created_at=now,
+        last_renewed_at=now,
+        updated_at=now,
+    )
+    db_session.add(job)
+    await db_session.flush()
+    return job
 
 
 async def _make_report(
@@ -288,6 +326,182 @@ async def test_admin_resend_user_verification_rejects_verified_profile(client, d
     app.dependency_overrides.pop(_get_admin_session, None)
 
     assert r.status_code == 409
+
+
+async def test_admin_update_user_email_moves_profile_and_jobs_to_new_login(client, db_session):
+    primary_profile = await _make_profile(
+        db_session,
+        code="emailprof001",
+        email="old-user@example.com",
+        status="active",
+        email_verified=True,
+    )
+    user = (
+        await db_session.execute(select(UserSensitive).where(UserSensitive.user_code == primary_profile.user_code))
+    ).scalar_one()
+    now = datetime.now(UTC)
+    second_profile = Profile(
+        profile_code="emailprof002",
+        user_code=user.user_code,
+        person_name="Second Candidate",
+        email_verified=True,
+        brief="Another profile.",
+        current_city="Dubai",
+        current_country="UAE",
+        years_of_experience=5,
+        current_title="Designer",
+        relocation_preference="open",
+        current_employment_status="full_time",
+        key_skills=["Design"],
+        status="active",
+        view_count=0,
+        edit_token="edit-token-emailprof002",
+        expires_at=now + timedelta(days=30),
+        created_at=now,
+        last_renewed_at=now,
+        updated_at=now,
+    )
+    db_session.add(second_profile)
+    matching_contact_job = await _make_job(
+        db_session,
+        code="emailjob001",
+        user_code=user.user_code,
+        contact_email="old-user@example.com",
+    )
+    custom_contact_job = await _make_job(
+        db_session,
+        code="emailjob002",
+        user_code=user.user_code,
+        contact_email="custom@example.com",
+    )
+    admin_session = await _make_admin_session(db_session, email="admin-email-change@example.com")
+    old_user_session = AuthSession(
+        session_token="old-user-session",
+        email="old-user@example.com",
+        user_type=None,
+        expires_at=now + timedelta(days=1),
+    )
+    db_session.add(old_user_session)
+
+    async def _override():
+        return admin_session
+
+    from app.main import app
+
+    app.dependency_overrides[_get_admin_session] = _override
+    r = await client.patch(
+        f"/api/v1/admin/users/{primary_profile.profile_code}/email",
+        json={"email": " New-User@Example.com "},
+    )
+    app.dependency_overrides.pop(_get_admin_session, None)
+
+    assert r.status_code == 200
+    data = r.json()
+    assert data["old_email"] == "old-user@example.com"
+    assert data["email"] == "new-user@example.com"
+    assert data["profiles_updated"] == 2
+    assert data["jobs_updated"] == 2
+    assert data["contact_email_updates"] == 1
+
+    old_user = (
+        await db_session.execute(select(UserSensitive).where(UserSensitive.user_email == "old-user@example.com"))
+    ).scalar_one_or_none()
+    assert old_user is None
+    new_user = (
+        await db_session.execute(select(UserSensitive).where(UserSensitive.user_email == "new-user@example.com"))
+    ).scalar_one()
+    assert new_user.user_code == user.user_code
+
+    await db_session.refresh(primary_profile)
+    await db_session.refresh(second_profile)
+    await db_session.refresh(matching_contact_job)
+    await db_session.refresh(custom_contact_job)
+    assert primary_profile.user_code == user.user_code
+    assert second_profile.user_code == user.user_code
+    assert matching_contact_job.user_code == user.user_code
+    assert matching_contact_job.contact_email == "new-user@example.com"
+    assert custom_contact_job.contact_email == "custom@example.com"
+
+    old_entities = await auth_service.get_entities_for_session(db_session, "old-user@example.com")
+    assert old_entities == {"jobs": [], "profiles": []}
+    new_entities = await auth_service.get_entities_for_session(db_session, "new-user@example.com")
+    assert {p["code"] for p in new_entities["profiles"]} == {"emailprof001", "emailprof002"}
+    assert {j["code"] for j in new_entities["jobs"]} == {"emailjob001", "emailjob002"}
+
+    old_session = (
+        await db_session.execute(select(AuthSession).where(AuthSession.session_token == "old-user-session"))
+    ).scalar_one_or_none()
+    assert old_session is None
+    audit = (
+        await db_session.execute(
+            select(AdminAuditLog).where(
+                AdminAuditLog.action == "update_user_email",
+                AdminAuditLog.entity_code == primary_profile.profile_code,
+            )
+        )
+    ).scalar_one()
+    assert audit.admin_email == "admin-email-change@example.com"
+    assert audit.details_json["new_email"] == "new-user@example.com"
+
+
+async def test_admin_update_user_email_rejects_existing_user_email(client, db_session):
+    profile = await _make_profile(
+        db_session,
+        code="emailconf001",
+        email="original@example.com",
+        status="active",
+        email_verified=True,
+    )
+    await _make_profile(
+        db_session,
+        code="emailconf002",
+        email="taken@example.com",
+        status="active",
+        email_verified=True,
+    )
+    session = await _make_admin_session(db_session, email="admin-email-conflict@example.com")
+
+    async def _override():
+        return session
+
+    from app.main import app
+
+    app.dependency_overrides[_get_admin_session] = _override
+    r = await client.patch(
+        f"/api/v1/admin/users/{profile.profile_code}/email",
+        json={"email": "taken@example.com"},
+    )
+    app.dependency_overrides.pop(_get_admin_session, None)
+
+    assert r.status_code == 409
+    assert "already belongs to another user" in r.json()["detail"]
+
+
+async def test_admin_update_user_email_rejects_existing_recruiter_email(client, db_session):
+    profile = await _make_profile(
+        db_session,
+        code="emailrecr001",
+        email="candidate@example.com",
+        status="active",
+        email_verified=True,
+    )
+    await _make_recruiter(db_session, code="emailrecr002", email="recruiter@example.com", status="active")
+    session = await _make_admin_session(db_session, email="admin-email-recruiter@example.com")
+
+    async def _override():
+        return session
+
+    from app.main import app
+
+    app.dependency_overrides[_get_admin_session] = _override
+    r = await client.patch(
+        f"/api/v1/admin/users/{profile.profile_code}/email",
+        json={"email": "recruiter@example.com"},
+    )
+    app.dependency_overrides.pop(_get_admin_session, None)
+
+    assert r.status_code == 409
+    assert "recruiter account" in r.json()["detail"]
 
 
 # ---------------------------------------------------------------------------

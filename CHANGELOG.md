@@ -40,6 +40,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Pre-push hook** — new `.husky/pre-push` mirrors the GitHub CI test workflows: detects which apps have commits in the push, runs ruff lint + format check + bandit security scan + pytest (verbose) for the API, and eslint + typecheck + vitest + npm audit (high severity) for the web; bandit and npm audit are non-blocking (same as CI)
 
 ### Changed
+- **Admin user email changes** — admins can now change a talent user's login email from the users table; the backend rejects emails already used by another talent user, recruiter, or admin address, keeps the existing `user_code` ownership for all profiles/jobs, updates matching job contact emails, invalidates old sessions, and records an audit log entry.
 - **Admin session lifetime** — admin sessions now match regular and recruiter sessions: 30 days with no one-hour inactivity timeout, while still invalidating if the email is removed from the admin allow-list.
 
 ### Fixed

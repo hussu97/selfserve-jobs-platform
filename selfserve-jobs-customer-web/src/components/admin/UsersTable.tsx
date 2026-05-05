@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { adminGetUsers, adminResendUserVerification } from '@/lib/api';
+import { adminGetUsers, adminResendUserVerification, adminUpdateUserEmail } from '@/lib/api';
 import type { AdminUserItem } from '@/lib/types';
 
 const STATUS_OPTIONS = ['', 'active', 'pending_verification', 'expired', 'under_review', 'removed'];
@@ -34,6 +34,9 @@ export function UsersTable({ sessionToken }: { sessionToken: string }) {
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [resendingCode, setResendingCode] = useState<string | null>(null);
+  const [emailEditUser, setEmailEditUser] = useState<AdminUserItem | null>(null);
+  const [emailInput, setEmailInput] = useState('');
+  const [updatingEmail, setUpdatingEmail] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -69,6 +72,35 @@ export function UsersTable({ sessionToken }: { sessionToken: string }) {
       setError(e instanceof Error ? e.message : 'Failed to resend verification email.');
     } finally {
       setResendingCode(null);
+    }
+  }
+
+  function openEmailEditor(user: AdminUserItem) {
+    setError('');
+    setNotice('');
+    setEmailEditUser(user);
+    setEmailInput(user.email);
+  }
+
+  async function handleUpdateEmail(e: React.FormEvent) {
+    e.preventDefault();
+    if (!emailEditUser) return;
+
+    setError('');
+    setNotice('');
+    setUpdatingEmail(true);
+    try {
+      const res = await adminUpdateUserEmail(emailEditUser.profile_code, emailInput, sessionToken);
+      setNotice(
+        `${res.old_email} changed to ${res.email}. ${res.profiles_updated} profile(s) and ${res.jobs_updated} job(s) stay attached to the updated login.`
+      );
+      setEmailEditUser(null);
+      setEmailInput('');
+      await load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to update user email.');
+    } finally {
+      setUpdatingEmail(false);
     }
   }
 
@@ -145,19 +177,27 @@ export function UsersTable({ sessionToken }: { sessionToken: string }) {
                       {new Date(u.created_at).toLocaleDateString()}
                     </td>
                     <td className="px-5 py-4">
-                      {u.status === 'pending_verification' && !u.email_verified ? (
+                      <div className="flex flex-wrap gap-2">
                         <button
                           type="button"
-                          onClick={() => handleResendVerification(u)}
-                          disabled={resendingCode === u.profile_code}
-                          className="rounded-full px-3 py-1.5 text-xs font-semibold transition-colors disabled:opacity-50"
-                          style={{ backgroundColor: 'var(--color-primary)', color: 'white' }}
+                          onClick={() => openEmailEditor(u)}
+                          className="rounded-full px-3 py-1.5 text-xs font-semibold transition-colors"
+                          style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-primary)' }}
                         >
-                          {resendingCode === u.profile_code ? 'Sending…' : 'Resend'}
+                          Change email
                         </button>
-                      ) : (
-                        <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>—</span>
-                      )}
+                        {u.status === 'pending_verification' && !u.email_verified && (
+                          <button
+                            type="button"
+                            onClick={() => handleResendVerification(u)}
+                            disabled={resendingCode === u.profile_code}
+                            className="rounded-full px-3 py-1.5 text-xs font-semibold transition-colors disabled:opacity-50"
+                            style={{ backgroundColor: 'var(--color-primary)', color: 'white' }}
+                          >
+                            {resendingCode === u.profile_code ? 'Sending…' : 'Resend'}
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -166,6 +206,61 @@ export function UsersTable({ sessionToken }: { sessionToken: string }) {
           </table>
         </div>
       </div>
+
+      {emailEditUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(28,28,26,0.5)' }}>
+          <form
+            onSubmit={handleUpdateEmail}
+            className="w-full max-w-md rounded-2xl p-6 shadow-ambient"
+            style={{ backgroundColor: 'var(--color-bg)' }}
+          >
+            <div className="mb-5">
+              <p className="text-xs uppercase tracking-widest font-semibold mb-2" style={{ color: 'var(--color-text-muted)' }}>
+                Change User Email
+              </p>
+              <h3 className="font-heading text-2xl" style={{ color: 'var(--color-primary)' }}>
+                {emailEditUser.person_name}
+              </h3>
+              <p className="text-sm mt-1" style={{ color: 'var(--color-text-muted)' }}>
+                Current email: {emailEditUser.email}
+              </p>
+            </div>
+
+            <label htmlFor="admin-user-email-input" className="block text-xs uppercase tracking-[0.1em] text-text-muted mb-1.5 font-semibold">
+              New email
+            </label>
+            <input
+              id="admin-user-email-input"
+              type="email"
+              required
+              value={emailInput}
+              onChange={(e) => setEmailInput(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-xl text-sm border-0 bg-surface text-text-main placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/30"
+              placeholder="new@email.com"
+            />
+
+            <div className="mt-6 flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setEmailEditUser(null)}
+                disabled={updatingEmail}
+                className="px-5 py-2.5 rounded-full text-sm font-semibold transition-colors disabled:opacity-50"
+                style={{ color: 'var(--color-text-muted)', backgroundColor: 'var(--color-surface)' }}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={updatingEmail || emailInput.trim().toLowerCase() === emailEditUser.email}
+                className="px-6 py-2.5 rounded-full text-sm font-semibold text-white transition-colors disabled:opacity-50"
+                style={{ backgroundColor: 'var(--color-primary)' }}
+              >
+                {updatingEmail ? 'Saving…' : 'Save email'}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
 
       {/* Pagination */}
       <Pagination page={page} totalPages={totalPages} total={total} onPage={setPage} />

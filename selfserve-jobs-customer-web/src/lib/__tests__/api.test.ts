@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   adminDeactivateProfile,
   adminResendUserVerification,
+  adminUpdateUserEmail,
   getJob,
   getJobs,
   deleteJob,
@@ -177,6 +178,29 @@ describe('adminResendUserVerification', () => {
       expect.objectContaining({
         method: 'POST',
         headers: expect.objectContaining({ Authorization: 'Bearer admin-session-token' }),
+      })
+    );
+  });
+});
+
+describe('adminUpdateUserEmail', () => {
+  it('sends PATCH request with bearer token and new email body', async () => {
+    mockOkResponse({
+      profile_code: 'prof123',
+      user_code: 'user123',
+      old_email: 'old@example.com',
+      email: 'new@example.com',
+      profiles_updated: 1,
+      jobs_updated: 2,
+      contact_email_updates: 1,
+    });
+    await adminUpdateUserEmail('prof123', 'new@example.com', 'admin-session-token');
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/api/v1/admin/users/prof123/email'),
+      expect.objectContaining({
+        method: 'PATCH',
+        headers: expect.objectContaining({ Authorization: 'Bearer admin-session-token' }),
+        body: JSON.stringify({ email: 'new@example.com' }),
       })
     );
   });
