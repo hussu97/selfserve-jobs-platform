@@ -55,3 +55,4 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "alembic/versions/0014_seed_blog_posts.py" = ["E501"]
+"alembic/versions/0015_seed_noon_hirebridge_blog_post.py" = ["E501"]
