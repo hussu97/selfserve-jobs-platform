@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- **Email retry queue** — failed Resend API calls (after all in-process retries) are now persisted to a new `email_pending` table (Alembic migration 0017) containing the full email content (subject, HTML body, text body). Every subsequent `_send()` call first flushes all pending emails created within the last 24 hours with a single delivery attempt each (no delay loop, to keep request latency bounded). Successfully flushed records are deleted; failed ones have their `attempt_count` incremented and `last_attempted_at` updated. When the circuit breaker is open, the flush is aborted early and the new email is also queued. This ensures no email is silently dropped when Resend has a transient outage — it will be retried the next time any email is triggered. 11 new tests in `tests/test_email_pending.py` cover save, flush (success/failure/partial/circuit-open), expiry, and `_send` integration.
+
 - **Admin verification resend** — added an admin Users-table action to resend talent profile verification emails for pending users, backed by a new admin API endpoint with a five-minute per-user cooldown and audit logging.
 - **noon careers blog post** — added a new published blog article about using noon's careers site and hirebridge together for UAE job search; includes Alembic migration 0015 to seed the database row.
 - **Cloud Run deploy failure logs** — the API deploy workflow now prints recent Cloud Run revisions, latest revision status conditions, and service logs when `gcloud run deploy` fails, so startup exceptions are easier to diagnose directly in GitHub Actions.
