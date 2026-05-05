@@ -27,6 +27,14 @@ import type {
   RejectionReason,
   AdminListFilters,
   AdminReportFilters,
+  BlogPostListItem,
+  BlogPost,
+  AdminBlogPost,
+  BlogListFilters,
+  AdminBlogListFilters,
+  CreateBlogPostRequest,
+  UpdateBlogPostRequest,
+  LinkPreview,
 } from './types';
 import { buildQueryString } from './utils';
 
@@ -494,6 +502,91 @@ export async function adminDeactivateProfile(
   return request(`/admin/profiles/${code}/deactivate`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${sessionToken}` },
+  });
+}
+
+// Blog — public
+export async function getBlogPosts(
+  filters: BlogListFilters = {}
+): Promise<AdminListResponse<BlogPostListItem>> {
+  const params: Record<string, string | number | undefined> = {
+    page: filters.page ?? 1,
+    per_page: filters.per_page ?? 20,
+  };
+  if (filters.search) params.search = filters.search;
+  if (filters.tag) params.tag = filters.tag;
+  return request<AdminListResponse<BlogPostListItem>>(`/blog/posts${buildQueryString(params)}`, {
+    next: { revalidate: 120 },
+  });
+}
+
+export async function getBlogPost(slug: string): Promise<BlogPost> {
+  return request<BlogPost>(`/blog/posts/${encodeURIComponent(slug)}`);
+}
+
+export async function getBlogTags(): Promise<string[]> {
+  return request<string[]>('/blog/tags', { next: { revalidate: 3600 } });
+}
+
+export async function trackBlogView(postCode: string): Promise<void> {
+  return request<void>(`/blog/posts/${postCode}/track-view`, { method: 'POST' });
+}
+
+export async function trackBlogLinkClick(postCode: string): Promise<void> {
+  return request<void>(`/blog/posts/${postCode}/track-link-click`, { method: 'POST' });
+}
+
+// Blog — admin
+export async function adminGetBlogPosts(
+  filters: AdminBlogListFilters,
+  sessionToken: string
+): Promise<AdminListResponse<AdminBlogPost>> {
+  const params: Record<string, string | number | undefined> = {
+    page: filters.page ?? 1,
+    per_page: filters.per_page ?? 20,
+  };
+  if (filters.search) params.search = filters.search;
+  if (filters.status) params.status = filters.status;
+  return request<AdminListResponse<AdminBlogPost>>(`/admin/blog/posts${buildQueryString(params)}`, {
+    headers: { Authorization: `Bearer ${sessionToken}` },
+  });
+}
+
+export async function adminCreateBlogPost(
+  data: CreateBlogPostRequest,
+  sessionToken: string
+): Promise<AdminBlogPost> {
+  return request<AdminBlogPost>('/admin/blog/posts', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${sessionToken}` },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function adminUpdateBlogPost(
+  postCode: string,
+  data: UpdateBlogPostRequest,
+  sessionToken: string
+): Promise<AdminBlogPost> {
+  return request<AdminBlogPost>(`/admin/blog/posts/${postCode}`, {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${sessionToken}` },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function adminDeleteBlogPost(postCode: string, sessionToken: string): Promise<void> {
+  return request<void>(`/admin/blog/posts/${postCode}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${sessionToken}` },
+  });
+}
+
+export async function adminFetchLinkPreview(url: string, sessionToken: string): Promise<LinkPreview> {
+  return request<LinkPreview>('/admin/blog/link-preview', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${sessionToken}` },
+    body: JSON.stringify({ url }),
   });
 }
 

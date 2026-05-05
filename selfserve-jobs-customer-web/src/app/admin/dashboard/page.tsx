@@ -8,13 +8,15 @@ import { logout } from '@/lib/api';
 import { UsersTable } from '@/components/admin/UsersTable';
 import { RecruitersTable } from '@/components/admin/RecruitersTable';
 import { ReportsTable } from '@/components/admin/ReportsTable';
+import { BlogsTable } from '@/components/admin/BlogsTable';
 
-type Tab = 'users' | 'recruiters' | 'reports';
+type Tab = 'users' | 'recruiters' | 'reports' | 'blog';
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'users', label: 'Users' },
   { id: 'recruiters', label: 'Recruiters' },
   { id: 'reports', label: 'Reported Posts' },
+  { id: 'blog', label: 'Blog' },
 ];
 
 function DashboardContent() {
@@ -89,7 +91,7 @@ function DashboardContent() {
             Admin <em>Portal</em>
           </h1>
           <p className="text-sm mt-1" style={{ color: 'var(--color-text-muted)' }}>
-            Manage users, recruiters, and reported content.
+            Manage users, recruiters, reported content, and blog posts.
           </p>
         </div>
 
@@ -115,6 +117,7 @@ function DashboardContent() {
         {tab === 'users' && <UsersTable sessionToken={sessionToken} />}
         {tab === 'recruiters' && <RecruitersTable sessionToken={sessionToken} />}
         {tab === 'reports' && <ReportsTable sessionToken={sessionToken} />}
+        {tab === 'blog' && <BlogsTable sessionToken={sessionToken} />}
       </div>
     </div>
   );

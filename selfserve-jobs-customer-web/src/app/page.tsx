@@ -1,18 +1,42 @@
 import Link from 'next/link';
 import { JobCard } from '@/components/jobs/JobCard';
 import { ProfileCard } from '@/components/profiles/ProfileCard';
-import { getJobs, getProfiles, getStats } from '@/lib/api';
+import { getJobs, getProfiles, getStats, getBlogPosts } from '@/lib/api';
+import { BLOG_POSTS } from '@/lib/blog-content';
+import type { BlogPostListItem } from '@/lib/types';
+
+function staticBlogToListItem(p: typeof BLOG_POSTS[0]): BlogPostListItem {
+  return {
+    post_code: p.slug,
+    title: p.title,
+    slug: p.slug,
+    excerpt: p.excerpt,
+    author: p.author,
+    tags: p.tags,
+    status: 'published',
+    featured_image_url: null,
+    reading_minutes: p.readingMinutes,
+    created_at: p.datePublished + 'T00:00:00Z',
+    updated_at: (p.dateModified ?? p.datePublished) + 'T00:00:00Z',
+  };
+}
 
 export default async function HomePage() {
-  const [statsResult, jobsResult, profilesResult] = await Promise.allSettled([
+  const [statsResult, jobsResult, profilesResult, blogResult] = await Promise.allSettled([
     getStats(),
     getJobs({ per_page: 6 }),
     getProfiles({ per_page: 6 }),
+    getBlogPosts({ per_page: 4 }),
   ]);
 
   const stats = statsResult.status === 'fulfilled' ? statsResult.value : null;
   const jobs = jobsResult.status === 'fulfilled' ? jobsResult.value.items : [];
   const profiles = profilesResult.status === 'fulfilled' ? profilesResult.value.items : [];
+
+  // Use API blog posts, or fallback to static content when DB is empty
+  const apiBlogPosts = blogResult.status === 'fulfilled' ? blogResult.value.items : [];
+  const blogPosts: BlogPostListItem[] =
+    apiBlogPosts.length > 0 ? apiBlogPosts : BLOG_POSTS.slice(0, 4).map(staticBlogToListItem);
 
   return (
     <div>
@@ -372,6 +396,89 @@ export default async function HomePage() {
         </div>
       </section>
 
+
+      {/* ── Blog ─────────────────────────────────────── */}
+      {blogPosts.length > 0 && (
+        <section className="relative overflow-hidden bg-surface py-20 sm:py-28">
+          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Section header */}
+            <div className="flex items-end justify-between mb-10">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-2">
+                  Insights &amp; Guides
+                </p>
+                <h2 className="font-heading text-3xl sm:text-4xl text-primary">
+                  From the <span className="italic">Blog</span>
+                </h2>
+              </div>
+              <Link
+                href="/blog"
+                className="hidden sm:inline-flex items-center gap-1.5 text-primary font-semibold uppercase tracking-wider text-xs hover:opacity-70 transition-opacity"
+              >
+                All articles
+                <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fillRule="evenodd" d="M8.22 5.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 010-1.06z" clipRule="evenodd" />
+                </svg>
+              </Link>
+            </div>
+
+            {/* Carousel — horizontal scroll on mobile, grid on desktop */}
+            <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-5 overflow-x-auto pb-2 sm:pb-0 snap-x snap-mandatory sm:snap-none -mx-4 px-4 sm:mx-0 sm:px-0">
+              {blogPosts.map((post) => (
+                <Link
+                  key={post.post_code}
+                  href={`/blog/${post.slug}`}
+                  className="group flex-none w-72 sm:w-auto snap-start block rounded-2xl bg-surface-lowest shadow-ambient hover:-translate-y-1 transition-all duration-200 overflow-hidden"
+                >
+                  {post.featured_image_url && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={post.featured_image_url}
+                      alt=""
+                      aria-hidden="true"
+                      className="w-full h-32 object-cover"
+                    />
+                  )}
+                  <div className="p-5">
+                    <div className="flex flex-wrap gap-1 mb-2">
+                      {post.tags.slice(0, 2).map((tag) => (
+                        <span
+                          key={tag}
+                          className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-surface text-text-muted"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                    <h3 className="font-heading text-base text-primary mb-2 leading-snug group-hover:text-primary-hover transition-colors line-clamp-2">
+                      {post.title}
+                    </h3>
+                    <p className="text-xs text-text-muted leading-relaxed line-clamp-2 mb-3">
+                      {post.excerpt}
+                    </p>
+                    <p className="text-xs text-text-muted">
+                      {post.reading_minutes} min read
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            {/* Mobile view all */}
+            <div className="mt-8 sm:hidden text-center">
+              <Link
+                href="/blog"
+                className="inline-flex items-center gap-1.5 text-primary font-semibold uppercase tracking-wider text-xs hover:opacity-70 transition-opacity"
+              >
+                All articles
+                <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fillRule="evenodd" d="M8.22 5.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 010-1.06z" clipRule="evenodd" />
+                </svg>
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
 
     </div>
   );
