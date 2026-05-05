@@ -40,7 +40,7 @@ BLOG_POST_TABLE = sa.table(
 
 _POSTS = [
     {
-        "post_code": "blogpost00001",
+        "post_code": "blog00000001",
         "title": "How to Find a Tech Job in Dubai in 2026",
         "slug": "how-to-find-a-tech-job-in-dubai-2026",
         "excerpt": (
@@ -107,7 +107,7 @@ The highest demand in Dubai's tech sector in 2026 is concentrated in:
 The Dubai tech market rewards preparation and directness. Companies here move quickly when they find the right candidate — often from interview to offer in under two weeks.""",
     },
     {
-        "post_code": "blogpost00002",
+        "post_code": "blog00000002",
         "title": "UAE Work Visa Guide for Tech Professionals",
         "slug": "uae-work-visa-guide-tech-professionals",
         "excerpt": (
@@ -187,7 +187,7 @@ Key free zones offering freelance permits:
 The UAE visa system is well-established and employer-friendly. For full-time tech roles, the process is routine and handled by HR — the main thing you need to do is ensure your documents (degree certificates, experience letters) are attested if required.""",
     },
     {
-        "post_code": "blogpost00003",
+        "post_code": "blog00000003",
         "title": "Free Zone vs. Mainland Companies in the UAE: What Job Seekers Need to Know",
         "slug": "free-zone-vs-mainland-uae-jobs",
         "excerpt": (
@@ -254,7 +254,7 @@ Free zone companies are generally not permitted to directly do business with the
 Don't let "free zone" vs. "mainland" be a deciding factor in your job search. Focus on the company quality, role fit, compensation, and culture. Both structures offer legitimate UAE employment with standard visa sponsorship, proper employment contracts, and full legal protections.""",
     },
     {
-        "post_code": "blogpost00004",
+        "post_code": "blog00000004",
         "title": "Remote Work in the UAE: What You Need to Know in 2026",
         "slug": "remote-work-uae-regulations",
         "excerpt": (
@@ -326,7 +326,7 @@ For most European nationals, spending 183+ days per year in the UAE effectively 
 6. Find co-working or set up your home office — fibre internet is readily available across UAE apartments""",
     },
     {
-        "post_code": "blogpost00005",
+        "post_code": "blog00000005",
         "title": "Top In-Demand Tech Skills in the UAE Job Market",
         "slug": "top-tech-skills-uae-job-market",
         "excerpt": (
@@ -404,7 +404,7 @@ The most effective thing you can do beyond having the right skills is demonstrat
 Skills alone get you through the door. Demonstrated regional relevance gets you the offer.""",
     },
     {
-        "post_code": "blogpost00006",
+        "post_code": "blog00000006",
         "title": "A Guide to Working in Each UAE Emirate",
         "slug": "guide-to-working-in-each-uae-emirate",
         "excerpt": (
