@@ -5,8 +5,10 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Input } from '@/components/ui/Input';
 import { StatusBanner } from '@/components/shared/StatusBanner';
+import { PasskeyButton } from '@/components/passkey/PasskeyButton';
 import { loginRequest } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
+import type { PasskeyAuthCompleteResponse } from '@/lib/types';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -20,6 +22,15 @@ export default function LoginPage() {
   useEffect(() => {
     if (isLoggedIn) router.replace('/account');
   }, [isLoggedIn, router]);
+
+  const handlePasskeySuccess = (res: PasskeyAuthCompleteResponse) => {
+    login(res.session_token, res.email, res.user_type, res.recruiter_code, res.recruiter_status);
+    if (res.user_type === 'recruiter') {
+      router.replace(res.recruiter_status === 'active' ? '/account' : '/recruiter/pending');
+    } else {
+      router.replace('/account');
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,6 +101,18 @@ export default function LoginPage() {
               >
                 {loading ? 'Sending…' : 'Send Magic Link'}
               </button>
+
+              <div className="flex items-center gap-3 my-1">
+                <div className="flex-1 h-px" style={{ backgroundColor: 'var(--color-surface)' }} />
+                <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>or</span>
+                <div className="flex-1 h-px" style={{ backgroundColor: 'var(--color-surface)' }} />
+              </div>
+
+              <PasskeyButton
+                email={email}
+                onSuccess={handlePasskeySuccess}
+                onError={setError}
+              />
             </form>
           )}
         </div>

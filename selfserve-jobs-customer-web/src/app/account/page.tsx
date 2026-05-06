@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { getMyEntities, deleteJob, deleteProfile, deactivateJob, activateJob, deactivateProfile, activateProfile, logout as apiLogout } from '@/lib/api';
+import { PasskeyManager } from '@/components/passkey/PasskeyManager';
 import type { AuthEntity } from '@/lib/types';
 import { Spinner } from '@/components/ui/Spinner';
 import { StatusBanner } from '@/components/shared/StatusBanner';
@@ -258,6 +259,9 @@ export default function AccountPage() {
                 </div>
               )}
             </section>
+
+            {/* Security — passkey management */}
+            <PasskeyManager sessionToken={sessionToken!} />
           </div>
         )}
       </div>

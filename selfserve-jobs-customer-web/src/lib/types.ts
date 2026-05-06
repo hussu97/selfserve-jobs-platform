@@ -476,3 +476,27 @@ export interface AdminEmailLogFilters {
   page?: number;
   per_page?: number;
 }
+
+// Passkey types
+export interface PasskeyBeginResponse {
+  session_key: string;
+  options: Record<string, unknown>;
+}
+
+export interface PasskeyAuthCompleteResponse {
+  session_token: string;
+  email: string;
+  user_type: string | null;
+  recruiter_code: string | null;
+  recruiter_status: string | null;
+}
+
+export interface PasskeyItem {
+  credential_id_b64: string;
+  label: string | null;
+  created_at: string;
+}
+
+export interface PasskeyListResponse {
+  items: PasskeyItem[];
+}

@@ -38,6 +38,9 @@ import type {
   LinkPreview,
   AdminEmailLogItem,
   AdminEmailLogFilters,
+  PasskeyBeginResponse,
+  PasskeyAuthCompleteResponse,
+  PasskeyListResponse,
 } from './types';
 import { buildQueryString } from './utils';
 
@@ -627,6 +630,59 @@ export async function adminGetEmailLogs(
   if (filters.email_type) params.email_type = filters.email_type;
   if (filters.success !== undefined) params.success = filters.success;
   return request<AdminListResponse<AdminEmailLogItem>>(`/admin/email-logs${buildQueryString(params)}`, {
+    headers: { Authorization: `Bearer ${sessionToken}` },
+  });
+}
+
+// Passkey API
+export async function passkeyRegisterBegin(sessionToken: string): Promise<PasskeyBeginResponse> {
+  return request<PasskeyBeginResponse>('/passkey/register/begin', {
+    headers: { Authorization: `Bearer ${sessionToken}` },
+  });
+}
+
+export async function passkeyRegisterComplete(
+  sessionToken: string,
+  sessionKey: string,
+  credential: unknown,
+  label?: string
+): Promise<{ message: string }> {
+  return request<{ message: string }>('/passkey/register/complete', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${sessionToken}` },
+    body: JSON.stringify({ session_key: sessionKey, credential, label: label ?? null }),
+  });
+}
+
+export async function passkeyAuthBegin(email: string, adminOnly = false): Promise<PasskeyBeginResponse> {
+  const path = adminOnly ? '/passkey/auth/begin/admin' : '/passkey/auth/begin';
+  return request<PasskeyBeginResponse>(path, {
+    method: 'POST',
+    body: JSON.stringify({ email }),
+  });
+}
+
+export async function passkeyAuthComplete(
+  sessionKey: string,
+  credential: unknown,
+  adminOnly = false
+): Promise<PasskeyAuthCompleteResponse> {
+  const path = adminOnly ? '/passkey/auth/complete/admin' : '/passkey/auth/complete';
+  return request<PasskeyAuthCompleteResponse>(path, {
+    method: 'POST',
+    body: JSON.stringify({ session_key: sessionKey, credential }),
+  });
+}
+
+export async function passkeyList(sessionToken: string): Promise<PasskeyListResponse> {
+  return request<PasskeyListResponse>('/passkey/', {
+    headers: { Authorization: `Bearer ${sessionToken}` },
+  });
+}
+
+export async function passkeyDelete(sessionToken: string, credentialIdB64: string): Promise<{ message: string }> {
+  return request<{ message: string }>(`/passkey/${encodeURIComponent(credentialIdB64)}`, {
+    method: 'DELETE',
     headers: { Authorization: `Bearer ${sessionToken}` },
   });
 }

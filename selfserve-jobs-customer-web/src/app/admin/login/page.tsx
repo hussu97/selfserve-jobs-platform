@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { PasskeyButton } from '@/components/passkey/PasskeyButton';
 import { adminLogin } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
+import type { PasskeyAuthCompleteResponse } from '@/lib/types';
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const { isHydrated, isAdmin } = useAuth();
+  const { isHydrated, isAdmin, login } = useAuth();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -17,6 +19,15 @@ export default function AdminLoginPage() {
   useEffect(() => {
     if (isHydrated && isAdmin) router.replace('/admin/dashboard');
   }, [isHydrated, isAdmin, router]);
+
+  const handlePasskeySuccess = (res: PasskeyAuthCompleteResponse) => {
+    if (res.user_type !== 'admin') {
+      setError('This email is not authorised for admin access.');
+      return;
+    }
+    login(res.session_token, res.email, res.user_type, null, null);
+    router.replace('/admin/dashboard');
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -126,6 +137,19 @@ export default function AdminLoginPage() {
               >
                 {loading ? 'Sending…' : 'Send Magic Link'}
               </button>
+
+              <div className="flex items-center gap-3 my-1">
+                <div className="flex-1 h-px" style={{ backgroundColor: 'var(--color-surface)' }} />
+                <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>or</span>
+                <div className="flex-1 h-px" style={{ backgroundColor: 'var(--color-surface)' }} />
+              </div>
+
+              <PasskeyButton
+                email={email}
+                adminOnly
+                onSuccess={handlePasskeySuccess}
+                onError={setError}
+              />
             </form>
           )}
         </div>

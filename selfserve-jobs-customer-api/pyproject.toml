@@ -20,6 +20,7 @@ dependencies = [
     "slowapi>=0.1.9",
     "python-json-logger>=2.0",
     "sentry-sdk[fastapi]>=2.0",
+    "webauthn>=2.0",
 ]
 
 [project.optional-dependencies]
