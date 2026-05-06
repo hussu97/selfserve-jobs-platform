@@ -20,6 +20,7 @@ from app.routers import (
     jobs,
     management,
     meta,
+    passkey,
     profiles,
     recruiters,
     reports,
@@ -303,6 +304,7 @@ async def cache_control_middleware(request: Request, call_next) -> Response:
 # Include all routers
 app.include_router(auth.router)
 app.include_router(blog.router)
+app.include_router(passkey.router)
 app.include_router(internal.router)
 app.include_router(recruiters.router)
 app.include_router(admin.router)

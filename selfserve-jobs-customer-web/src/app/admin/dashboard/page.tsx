@@ -10,8 +10,9 @@ import { RecruitersTable } from '@/components/admin/RecruitersTable';
 import { ReportsTable } from '@/components/admin/ReportsTable';
 import { BlogsTable } from '@/components/admin/BlogsTable';
 import { EmailLogsTable } from '@/components/admin/EmailLogsTable';
+import { PasskeyManager } from '@/components/passkey/PasskeyManager';
 
-type Tab = 'users' | 'recruiters' | 'reports' | 'blog' | 'email-logs';
+type Tab = 'users' | 'recruiters' | 'reports' | 'blog' | 'email-logs' | 'security';
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'users', label: 'Users' },
@@ -19,6 +20,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'reports', label: 'Reported Posts' },
   { id: 'blog', label: 'Blog' },
   { id: 'email-logs', label: 'Email Logs' },
+  { id: 'security', label: 'Security' },
 ];
 
 function DashboardContent() {
@@ -121,6 +123,11 @@ function DashboardContent() {
         {tab === 'reports' && <ReportsTable sessionToken={sessionToken} />}
         {tab === 'blog' && <BlogsTable sessionToken={sessionToken} />}
         {tab === 'email-logs' && <EmailLogsTable sessionToken={sessionToken} />}
+        {tab === 'security' && (
+          <div className="max-w-lg">
+            <PasskeyManager sessionToken={sessionToken} />
+          </div>
+        )}
       </div>
     </div>
   );

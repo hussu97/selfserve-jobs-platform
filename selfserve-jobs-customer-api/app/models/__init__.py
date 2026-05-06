@@ -3,6 +3,7 @@ from app.models.email_pending import EmailPending
 from app.models.email_verification import EmailVerification
 from app.models.job import Job
 from app.models.login_token import LoginToken
+from app.models.passkey import Passkey, WebAuthnChallenge
 from app.models.profile import Profile
 from app.models.recruiter import Recruiter
 from app.models.recruiter_rejection_reason import RecruiterRejectionReason
@@ -20,4 +21,6 @@ __all__ = [
     "Recruiter",
     "RecruiterRejectionReason",
     "UserSensitive",
+    "Passkey",
+    "WebAuthnChallenge",
 ]

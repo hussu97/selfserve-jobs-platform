@@ -36,6 +36,20 @@ class Settings(BaseSettings):
     def admin_email_list(self) -> list[str]:
         return [e.strip().lower() for e in self.admin_emails.split(",") if e.strip()]
 
+    @property
+    def webauthn_rp_id(self) -> str:
+        from urllib.parse import urlparse
+
+        return urlparse(self.frontend_url).hostname or "localhost"
+
+    @property
+    def webauthn_rp_name(self) -> str:
+        return "hirebridge"
+
+    @property
+    def webauthn_origin(self) -> str:
+        return self.frontend_url.rstrip("/")
+
 
 @lru_cache
 def get_settings() -> Settings:
