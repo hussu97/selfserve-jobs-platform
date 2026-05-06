@@ -10,6 +10,7 @@ import type { BlogPost, BlogPostListItem, LinkPreview } from '@/lib/types';
 import BlogPostTracker from './BlogPostTracker';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
+const BLOG_REVALIDATE_SECONDS = 24 * 60 * 60;
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -18,7 +19,7 @@ interface PageProps {
 async function fetchPostFromApi(slug: string): Promise<BlogPost | null> {
   try {
     const res = await fetch(`${API_URL}/api/v1/blog/posts/${encodeURIComponent(slug)}`, {
-      next: { revalidate: 300 },
+      next: { revalidate: BLOG_REVALIDATE_SECONDS },
     });
     if (!res.ok) return null;
     return res.json();
@@ -29,7 +30,9 @@ async function fetchPostFromApi(slug: string): Promise<BlogPost | null> {
 
 async function fetchRecentPostsFromApi(): Promise<BlogPostListItem[]> {
   try {
-    const res = await fetch(`${API_URL}/api/v1/blog/posts?per_page=4`, { next: { revalidate: 120 } });
+    const res = await fetch(`${API_URL}/api/v1/blog/posts?per_page=4`, {
+      next: { revalidate: BLOG_REVALIDATE_SECONDS },
+    });
     if (!res.ok) return [];
     const data = await res.json();
     return data.items ?? [];

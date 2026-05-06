@@ -135,9 +135,12 @@ async function request<T>(
   return data;
 }
 
+const SERVER_STATS_REVALIDATE_SECONDS = 24 * 60 * 60;
+const SERVER_LIST_REVALIDATE_SECONDS = 24 * 60 * 60;
+
 // Stats
 export async function getStats(): Promise<StatsResponse> {
-  return request<StatsResponse>('/stats', { next: { revalidate: 60 } });
+  return request<StatsResponse>('/stats', { next: { revalidate: SERVER_STATS_REVALIDATE_SECONDS } });
 }
 
 // Jobs
@@ -154,7 +157,7 @@ export async function getJobs(filters: JobFilters = {}): Promise<PaginatedRespon
   if (filters.sort) params.sort = filters.sort;
 
   return request<PaginatedResponse<JobListItem>>(`/jobs${buildQueryString(params)}`, {
-    next: { revalidate: 120 },
+    next: { revalidate: SERVER_LIST_REVALIDATE_SECONDS },
     clientCache: true,
   });
 }
@@ -211,7 +214,7 @@ export async function getProfiles(filters: ProfileFilters = {}): Promise<Paginat
   if (filters.sort) params.sort = filters.sort;
 
   return request<PaginatedResponse<ProfileListItem>>(`/profiles${buildQueryString(params)}`, {
-    next: { revalidate: 120 },
+    next: { revalidate: SERVER_LIST_REVALIDATE_SECONDS },
     clientCache: true,
   });
 }
@@ -545,7 +548,7 @@ export async function getBlogPosts(
   if (filters.search) params.search = filters.search;
   if (filters.tag) params.tag = filters.tag;
   return request<AdminListResponse<BlogPostListItem>>(`/blog/posts${buildQueryString(params)}`, {
-    next: { revalidate: 120 },
+    next: { revalidate: SERVER_LIST_REVALIDATE_SECONDS },
   });
 }
 

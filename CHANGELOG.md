@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Changed
+- **Vercel ISR write usage** — reduced frontend ISR churn by lengthening server-side list/stat/blog revalidation windows, moving `sitemap.xml` and `llms.txt` regeneration to daily, and making sitemap `lastModified` values stable for static/SEO routes so Vercel does not persist fresh output just because the render timestamp changed.
 - **Passkey setup and login flow** — the account passkey manager no longer asks users to type a device label; the frontend presents passkeys as a single enabled/disabled setting while the backend still supports multiple credentials per email and auto-generates stored labels. Login now follows a two-step flow: enter email first, then show magic-link and passkey options only when that email already has a registered passkey.
 
 ### Fixed

@@ -1,6 +1,6 @@
 import { getStats } from '@/lib/api';
 
-export const revalidate = 3600; // regenerate every hour
+export const revalidate = 86400; // regenerate daily to reduce ISR writes
 
 export async function GET() {
   const stats = await getStats().catch(() => ({ active_jobs: 0, active_profiles: 0 }));
@@ -92,7 +92,7 @@ hirebridge (hirebridgeuae.com) is a talent-first job platform connecting UAE pro
   return new Response(content, {
     headers: {
       'Content-Type': 'text/plain; charset=utf-8',
-      'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
+      'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=172800',
     },
   });
 }

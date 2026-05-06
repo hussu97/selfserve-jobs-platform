@@ -4,44 +4,43 @@ import { UAE_EMIRATES, EMPLOYMENT_TYPES, TOP_SKILLS } from '@/lib/seo-constants'
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://hirebridgeuae.com';
 const PAGE_SIZE = 200;
+const STATIC_LAST_MODIFIED = new Date('2026-01-01T00:00:00.000Z');
 
 // Google's per-sitemap limits: 50,000 URLs and 50 MB uncompressed.
 // Log a warning if we get close so the team knows to split the sitemap.
 const SITEMAP_URL_LIMIT = 50_000;
 const SITEMAP_URL_WARN_THRESHOLD = 45_000;
 
-// Revalidate every hour so new listings appear in the sitemap without a full redeploy
-export const revalidate = 3600;
+// Revalidate daily to avoid burning ISR write units on a large XML route.
+export const revalidate = 86400;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const now = new Date();
-
   // --- Static pages ---
   const staticRoutes: MetadataRoute.Sitemap = [
-    { url: BASE_URL, lastModified: now, changeFrequency: 'daily', priority: 1 },
-    { url: `${BASE_URL}/jobs`, lastModified: now, changeFrequency: 'hourly', priority: 0.9 },
-    { url: `${BASE_URL}/profiles`, lastModified: now, changeFrequency: 'hourly', priority: 0.9 },
-    { url: `${BASE_URL}/jobs/new`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${BASE_URL}/profiles/new`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${BASE_URL}/about`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
-    { url: `${BASE_URL}/faq`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${BASE_URL}/blog`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
-    { url: `${BASE_URL}/contact`, lastModified: now, changeFrequency: 'monthly', priority: 0.4 },
-    { url: `${BASE_URL}/privacy`, lastModified: now, changeFrequency: 'monthly', priority: 0.3 },
-    { url: `${BASE_URL}/terms`, lastModified: now, changeFrequency: 'monthly', priority: 0.3 },
+    { url: BASE_URL, lastModified: STATIC_LAST_MODIFIED, changeFrequency: 'daily', priority: 1 },
+    { url: `${BASE_URL}/jobs`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: 'daily', priority: 0.9 },
+    { url: `${BASE_URL}/profiles`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: 'daily', priority: 0.9 },
+    { url: `${BASE_URL}/jobs/new`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${BASE_URL}/profiles/new`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${BASE_URL}/about`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${BASE_URL}/faq`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${BASE_URL}/blog`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: 'weekly', priority: 0.7 },
+    { url: `${BASE_URL}/contact`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: 'monthly', priority: 0.4 },
+    { url: `${BASE_URL}/privacy`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: 'monthly', priority: 0.3 },
+    { url: `${BASE_URL}/terms`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: 'monthly', priority: 0.3 },
   ];
 
   // --- Programmatic landing pages ---
   const emirateJobRoutes: MetadataRoute.Sitemap = UAE_EMIRATES.map((e) => ({
     url: `${BASE_URL}/jobs/in/${e.slug}`,
-    lastModified: now,
+    lastModified: STATIC_LAST_MODIFIED,
     changeFrequency: 'daily' as const,
     priority: 0.85,
   }));
 
   const typeRoutes: MetadataRoute.Sitemap = EMPLOYMENT_TYPES.map((t) => ({
     url: `${BASE_URL}/jobs/type/${t.slug}`,
-    lastModified: now,
+    lastModified: STATIC_LAST_MODIFIED,
     changeFrequency: 'daily' as const,
     priority: 0.8,
   }));
@@ -49,7 +48,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const emirateSkillRoutes: MetadataRoute.Sitemap = UAE_EMIRATES.flatMap((e) =>
     TOP_SKILLS.slice(0, 10).map((s) => ({
       url: `${BASE_URL}/jobs/in/${e.slug}/${s.slug}`,
-      lastModified: now,
+      lastModified: STATIC_LAST_MODIFIED,
       changeFrequency: 'daily' as const,
       priority: 0.75,
     }))
@@ -57,14 +56,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const emirateProfileRoutes: MetadataRoute.Sitemap = UAE_EMIRATES.map((e) => ({
     url: `${BASE_URL}/profiles/in/${e.slug}`,
-    lastModified: now,
+    lastModified: STATIC_LAST_MODIFIED,
     changeFrequency: 'daily' as const,
     priority: 0.75,
   }));
 
   const skillProfileRoutes: MetadataRoute.Sitemap = TOP_SKILLS.map((s) => ({
     url: `${BASE_URL}/profiles/skill/${s.slug}`,
-    lastModified: now,
+    lastModified: STATIC_LAST_MODIFIED,
     changeFrequency: 'daily' as const,
     priority: 0.75,
   }));
