@@ -87,6 +87,12 @@ async def _consume_challenge(db: AsyncSession, session_key: str) -> bytes:
     return challenge
 
 
+async def _generate_passkey_label(db: AsyncSession, user_email: str) -> str:
+    result = await db.execute(select(Passkey).where(Passkey.user_email == user_email))
+    existing_count = len(result.scalars().all())
+    return f"Passkey {existing_count + 1}"
+
+
 async def register_begin(
     db: AsyncSession,
     user_email: str,
@@ -177,13 +183,14 @@ async def register_complete_for_user(
         logger.warning("Passkey registration verification failed for %s: %s", user_email, exc)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Passkey registration failed") from exc
 
+    resolved_label = label.strip() if label and label.strip() else await _generate_passkey_label(db, user_email)
     passkey = Passkey(
         credential_id=verification.credential_id,
         public_key=verification.credential_public_key,
         sign_count=verification.sign_count,
         aaguid=str(verification.aaguid) if verification.aaguid else None,
         user_email=user_email,
-        label=label,
+        label=resolved_label,
     )
     db.add(passkey)
     await db.flush()
@@ -207,6 +214,11 @@ async def auth_begin(
     )
     session_key = await _save_challenge(db, options.challenge)
     return {"session_key": session_key, "options": json.loads(options_to_json(options))}
+
+
+async def has_passkey(db: AsyncSession, email: str) -> bool:
+    result = await db.execute(select(Passkey.id).where(Passkey.user_email == email).limit(1))
+    return result.scalar_one_or_none() is not None
 
 
 async def auth_complete(

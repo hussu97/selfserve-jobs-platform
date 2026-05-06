@@ -3,16 +3,21 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { PasskeyButton } from '@/components/passkey/PasskeyButton';
-import { adminLogin } from '@/lib/api';
+import { usePasskeySupport } from '@/hooks/usePasskey';
+import { adminLogin, passkeyAvailability } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import type { PasskeyAuthCompleteResponse } from '@/lib/types';
+
+type LoginStep = 'email' | 'methods' | 'sent';
 
 export default function AdminLoginPage() {
   const router = useRouter();
   const { isHydrated, isAdmin, login } = useAuth();
+  const passkeySupported = usePasskeySupport();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  const [sent, setSent] = useState(false);
+  const [step, setStep] = useState<LoginStep>('email');
+  const [hasPasskey, setHasPasskey] = useState(false);
   const [devUrl, setDevUrl] = useState('');
   const [error, setError] = useState('');
 
@@ -29,17 +34,33 @@ export default function AdminLoginPage() {
     router.replace('/admin/dashboard');
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const normalizedEmail = email.trim().toLowerCase();
     setLoading(true);
     setError('');
     try {
-      const res = await adminLogin(email.trim().toLowerCase());
+      const res = await passkeyAvailability(normalizedEmail, true);
+      setEmail(normalizedEmail);
+      setHasPasskey(res.has_passkey);
+      setStep('methods');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleMagicLink = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const res = await adminLogin(email);
       if (res.url) {
         // Dev mode: show the URL directly
         setDevUrl(res.url);
       }
-      setSent(true);
+      setStep('sent');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
     } finally {
@@ -61,7 +82,7 @@ export default function AdminLoginPage() {
         </div>
 
         <div className="rounded-2xl p-8 shadow-ambient" style={{ backgroundColor: 'var(--color-surface-lowest)' }}>
-          {sent ? (
+          {step === 'sent' ? (
             <div className="text-center">
               <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
                 <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -90,15 +111,15 @@ export default function AdminLoginPage() {
                 </p>
               )}
               <button
-                onClick={() => { setSent(false); setDevUrl(''); setEmail(''); }}
+                onClick={() => { setStep('email'); setDevUrl(''); setEmail(''); setHasPasskey(false); }}
                 className="mt-5 text-xs underline transition-colors"
                 style={{ color: 'var(--color-text-muted)' }}
               >
                 Use a different email
               </button>
             </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          ) : step === 'email' ? (
+            <form onSubmit={handleEmailSubmit} className="flex flex-col gap-5">
               <div>
                 <h1 className="font-heading text-2xl mb-1" style={{ color: 'var(--color-primary)' }}>
                   Admin <em>sign in</em>
@@ -135,22 +156,61 @@ export default function AdminLoginPage() {
                 className="w-full py-3 rounded-full text-sm font-semibold uppercase tracking-widest text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ backgroundColor: 'var(--color-primary)' }}
               >
+                {loading ? 'Checking…' : 'Continue'}
+              </button>
+            </form>
+          ) : (
+            <div className="flex flex-col gap-5">
+              <div>
+                <h1 className="font-heading text-2xl mb-1" style={{ color: 'var(--color-primary)' }}>
+                  Admin <em>sign in</em>
+                </h1>
+                <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                  {email}
+                </p>
+              </div>
+
+              {error && (
+                <div className="rounded-xl px-4 py-3 text-sm bg-red-50 text-red-700">
+                  {error}
+                </div>
+              )}
+
+              {hasPasskey && passkeySupported && (
+                <>
+                  <PasskeyButton
+                    email={email}
+                    adminOnly
+                    onSuccess={handlePasskeySuccess}
+                    onError={setError}
+                  />
+                  <div className="flex items-center gap-3 my-1">
+                    <div className="flex-1 h-px" style={{ backgroundColor: 'var(--color-surface)' }} />
+                    <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>or</span>
+                    <div className="flex-1 h-px" style={{ backgroundColor: 'var(--color-surface)' }} />
+                  </div>
+                </>
+              )}
+
+              <button
+                type="button"
+                onClick={handleMagicLink}
+                disabled={loading}
+                className="w-full py-3 rounded-full text-sm font-semibold uppercase tracking-widest text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ backgroundColor: 'var(--color-primary)' }}
+              >
                 {loading ? 'Sending…' : 'Send Magic Link'}
               </button>
 
-              <div className="flex items-center gap-3 my-1">
-                <div className="flex-1 h-px" style={{ backgroundColor: 'var(--color-surface)' }} />
-                <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>or</span>
-                <div className="flex-1 h-px" style={{ backgroundColor: 'var(--color-surface)' }} />
-              </div>
-
-              <PasskeyButton
-                email={email}
-                adminOnly
-                onSuccess={handlePasskeySuccess}
-                onError={setError}
-              />
-            </form>
+              <button
+                type="button"
+                onClick={() => { setStep('email'); setHasPasskey(false); }}
+                className="text-xs underline transition-colors"
+                style={{ color: 'var(--color-text-muted)' }}
+              >
+                Use a different email
+              </button>
+            </div>
           )}
         </div>
       </div>

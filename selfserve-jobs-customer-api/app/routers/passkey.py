@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
@@ -10,6 +10,7 @@ from app.schemas.passkey import (
     PasskeyAuthBeginResponse,
     PasskeyAuthCompleteRequest,
     PasskeyAuthCompleteResponse,
+    PasskeyAvailabilityResponse,
     PasskeyListResponse,
     PasskeyRegisterBeginResponse,
     PasskeyRegisterCompleteRequest,
@@ -82,6 +83,19 @@ async def auth_complete(
         rp_id=settings.webauthn_rp_id,
         origin=settings.webauthn_origin,
     )
+
+
+@router.get("/availability", response_model=PasskeyAvailabilityResponse)
+async def passkey_availability(
+    email: str = Query(...),
+    admin_only: bool = Query(False),
+    db: AsyncSession = Depends(get_session),
+) -> PasskeyAvailabilityResponse:
+    """Return whether the normalized email has at least one registered passkey."""
+    normalized_email = email.strip().lower()
+    if admin_only and normalized_email not in settings.admin_email_list:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not an admin email")
+    return PasskeyAvailabilityResponse(has_passkey=await passkey_service.has_passkey(db, normalized_email))
 
 
 @router.get("/", response_model=PasskeyListResponse)

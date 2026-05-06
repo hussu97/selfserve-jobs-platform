@@ -3,6 +3,7 @@ import {
   adminDeactivateProfile,
   adminResendUserVerification,
   adminUpdateUserEmail,
+  passkeyAvailability,
   getJob,
   getJobs,
   deleteJob,
@@ -202,6 +203,26 @@ describe('adminUpdateUserEmail', () => {
         headers: expect.objectContaining({ Authorization: 'Bearer admin-session-token' }),
         body: JSON.stringify({ email: 'new@example.com' }),
       })
+    );
+  });
+});
+
+describe('passkeyAvailability', () => {
+  it('checks passkey availability for an email', async () => {
+    mockOkResponse({ has_passkey: true });
+    await passkeyAvailability('user@example.com');
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/api/v1/passkey/availability?email=user%40example.com&admin_only=false'),
+      expect.any(Object)
+    );
+  });
+
+  it('includes admin_only when checking admin passkey availability', async () => {
+    mockOkResponse({ has_passkey: false });
+    await passkeyAvailability('admin@example.com', true);
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/api/v1/passkey/availability?email=admin%40example.com&admin_only=true'),
+      expect.any(Object)
     );
   });
 });

@@ -6,17 +6,22 @@ import Link from 'next/link';
 import { Input } from '@/components/ui/Input';
 import { StatusBanner } from '@/components/shared/StatusBanner';
 import { PasskeyButton } from '@/components/passkey/PasskeyButton';
-import { loginRequest } from '@/lib/api';
+import { usePasskeySupport } from '@/hooks/usePasskey';
+import { loginRequest, passkeyAvailability } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import type { PasskeyAuthCompleteResponse } from '@/lib/types';
+
+type LoginStep = 'email' | 'methods' | 'sent';
 
 export default function LoginPage() {
   const router = useRouter();
   const { isLoggedIn, login } = useAuth();
+  const passkeySupported = usePasskeySupport();
 
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  const [sent, setSent] = useState(false);
+  const [step, setStep] = useState<LoginStep>('email');
+  const [hasPasskey, setHasPasskey] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -32,18 +37,34 @@ export default function LoginPage() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const normalizedEmail = email.trim().toLowerCase();
     setLoading(true);
     setError('');
     try {
-      const res = await loginRequest(email.trim().toLowerCase());
+      const res = await passkeyAvailability(normalizedEmail);
+      setEmail(normalizedEmail);
+      setHasPasskey(res.has_passkey);
+      setStep('methods');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleMagicLink = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const res = await loginRequest(email);
       if (res.session_token) {
         // Non-production: auto-login
-        login(res.session_token, email.trim().toLowerCase());
+        login(res.session_token, email);
         router.push('/account');
       } else {
-        setSent(true);
+        setStep('sent');
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
@@ -60,12 +81,12 @@ export default function LoginPage() {
             Sign <em>in</em>
           </h1>
           <p className="text-sm text-text-muted">
-            Enter your email and we&apos;ll send you a magic link.
+            Enter your email to choose your sign-in method.
           </p>
         </div>
 
         <div className="bg-surface-lowest rounded-2xl shadow-ambient p-8">
-          {sent ? (
+          {step === 'sent' ? (
             <div className="text-center">
               <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
                 <svg className="h-7 w-7 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -77,14 +98,14 @@ export default function LoginPage() {
                 We sent a sign-in link to <strong>{email}</strong>. It expires in 15 minutes. If you don&apos;t see it, check your spam or junk folder.
               </p>
               <button
-                onClick={() => { setSent(false); setEmail(''); }}
+                onClick={() => { setStep('email'); setEmail(''); setHasPasskey(false); }}
                 className="text-sm text-text-muted hover:text-primary transition-colors underline"
               >
                 Use a different email
               </button>
             </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          ) : step === 'email' ? (
+            <form onSubmit={handleEmailSubmit} className="flex flex-col gap-5">
               {error && <StatusBanner type="error" message={error} />}
               <Input
                 type="email"
@@ -99,21 +120,51 @@ export default function LoginPage() {
                 disabled={loading || !email.trim()}
                 className="w-full py-3.5 rounded-full text-sm font-semibold uppercase tracking-widest text-white bg-primary-btn transition-all hover:bg-primary disabled:opacity-50 disabled:cursor-not-allowed"
               >
+                {loading ? 'Checking…' : 'Continue'}
+              </button>
+            </form>
+          ) : (
+            <div className="flex flex-col gap-5">
+              {error && <StatusBanner type="error" message={error} />}
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: 'var(--color-text-muted)' }}>
+                  Sign in as
+                </p>
+                <p className="text-sm font-medium" style={{ color: 'var(--color-text-main)' }}>{email}</p>
+              </div>
+
+              {hasPasskey && passkeySupported && (
+                <>
+                  <PasskeyButton
+                    email={email}
+                    onSuccess={handlePasskeySuccess}
+                    onError={setError}
+                  />
+                  <div className="flex items-center gap-3 my-1">
+                    <div className="flex-1 h-px" style={{ backgroundColor: 'var(--color-surface)' }} />
+                    <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>or</span>
+                    <div className="flex-1 h-px" style={{ backgroundColor: 'var(--color-surface)' }} />
+                  </div>
+                </>
+              )}
+
+              <button
+                type="button"
+                onClick={handleMagicLink}
+                disabled={loading}
+                className="w-full py-3.5 rounded-full text-sm font-semibold uppercase tracking-widest text-white bg-primary-btn transition-all hover:bg-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 {loading ? 'Sending…' : 'Send Magic Link'}
               </button>
 
-              <div className="flex items-center gap-3 my-1">
-                <div className="flex-1 h-px" style={{ backgroundColor: 'var(--color-surface)' }} />
-                <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>or</span>
-                <div className="flex-1 h-px" style={{ backgroundColor: 'var(--color-surface)' }} />
-              </div>
-
-              <PasskeyButton
-                email={email}
-                onSuccess={handlePasskeySuccess}
-                onError={setError}
-              />
-            </form>
+              <button
+                type="button"
+                onClick={() => { setStep('email'); setHasPasskey(false); }}
+                className="text-sm text-text-muted hover:text-primary transition-colors underline"
+              >
+                Use a different email
+              </button>
+            </div>
           )}
         </div>
 

@@ -491,6 +491,10 @@ export interface PasskeyAuthCompleteResponse {
   recruiter_status: string | null;
 }
 
+export interface PasskeyAvailabilityResponse {
+  has_passkey: boolean;
+}
+
 export interface PasskeyItem {
   credential_id_b64: string;
   label: string | null;

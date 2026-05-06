@@ -40,6 +40,7 @@ import type {
   AdminEmailLogFilters,
   PasskeyBeginResponse,
   PasskeyAuthCompleteResponse,
+  PasskeyAvailabilityResponse,
   PasskeyListResponse,
 } from './types';
 import { buildQueryString } from './utils';
@@ -635,6 +636,12 @@ export async function adminGetEmailLogs(
 }
 
 // Passkey API
+export async function passkeyAvailability(email: string, adminOnly = false): Promise<PasskeyAvailabilityResponse> {
+  return request<PasskeyAvailabilityResponse>(
+    `/passkey/availability${buildQueryString({ email, admin_only: adminOnly })}`
+  );
+}
+
 export async function passkeyRegisterBegin(sessionToken: string): Promise<PasskeyBeginResponse> {
   return request<PasskeyBeginResponse>('/passkey/register/begin', {
     headers: { Authorization: `Bearer ${sessionToken}` },

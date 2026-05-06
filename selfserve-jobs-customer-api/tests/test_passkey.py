@@ -15,6 +15,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from httpx import ASGITransport, AsyncClient
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.database import Base
@@ -148,6 +149,43 @@ async def test_register_complete_saves_passkey(client, db):
         )
     assert r.status_code == 200
     assert r.json()["message"] == "Passkey registered successfully"
+    stored = (await db.execute(select(Passkey).where(Passkey.user_email == "user@test.com"))).scalar_one()
+    assert stored.label == "Test key"
+
+
+async def test_register_complete_auto_generates_label(client, db):
+    token = await _make_session(db, "autolabel@test.com")
+
+    r = await client.get(
+        "/api/v1/passkey/register/begin",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    session_key = r.json()["session_key"]
+
+    fake_verification = MagicMock()
+    fake_verification.credential_id = b"\x12\x34" * 16
+    fake_verification.credential_public_key = b"\x56" * 64
+    fake_verification.sign_count = 0
+    fake_verification.aaguid = "00000000-0000-0000-0000-000000000000"
+
+    with patch("app.services.passkey_service.webauthn.verify_registration_response", return_value=fake_verification):
+        r = await client.post(
+            "/api/v1/passkey/register/complete",
+            json={
+                "session_key": session_key,
+                "credential": {
+                    "id": "abc",
+                    "rawId": "abc",
+                    "response": {"clientDataJSON": "abc", "attestationObject": "abc"},
+                },
+                "label": None,
+            },
+            headers={"Authorization": f"Bearer {token}"},
+        )
+
+    assert r.status_code == 200
+    stored = (await db.execute(select(Passkey).where(Passkey.user_email == "autolabel@test.com"))).scalar_one()
+    assert stored.label == "Passkey 1"
 
 
 async def test_register_complete_bad_session_key(client, db):
@@ -177,6 +215,29 @@ async def test_auth_begin_returns_options(client, db):
 async def test_auth_begin_unknown_email_returns_404(client, db):
     r = await client.post("/api/v1/passkey/auth/begin", json={"email": "nobody@test.com"})
     assert r.status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# availability
+# ---------------------------------------------------------------------------
+
+
+async def test_passkey_availability_returns_false_without_passkey(client):
+    r = await client.get("/api/v1/passkey/availability?email=nobody@test.com")
+    assert r.status_code == 200
+    assert r.json() == {"has_passkey": False}
+
+
+async def test_passkey_availability_returns_true_with_passkey(client, db):
+    await _make_passkey(db, "available@test.com")
+    r = await client.get("/api/v1/passkey/availability?email=AVAILABLE@test.com")
+    assert r.status_code == 200
+    assert r.json() == {"has_passkey": True}
+
+
+async def test_passkey_availability_admin_only_rejects_non_admin(client):
+    r = await client.get("/api/v1/passkey/availability?email=user@test.com&admin_only=true")
+    assert r.status_code == 403
 
 
 # ---------------------------------------------------------------------------

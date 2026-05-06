@@ -36,6 +36,10 @@ class PasskeyAuthCompleteResponse(BaseModel):
     recruiter_status: str | None
 
 
+class PasskeyAvailabilityResponse(BaseModel):
+    has_passkey: bool
+
+
 class PasskeyItem(BaseModel):
     credential_id_b64: str
     label: str | None

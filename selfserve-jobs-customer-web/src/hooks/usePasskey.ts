@@ -19,7 +19,6 @@ export function usePasskeySupport() {
 
 export async function registerPasskey(sessionToken: string, label?: string): Promise<void> {
   const beginRes = await passkeyRegisterBegin(sessionToken);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const credential = await startRegistration({ optionsJSON: beginRes.options as any });
   await passkeyRegisterComplete(sessionToken, beginRes.session_key, credential, label);
 }
@@ -29,7 +28,6 @@ export async function authenticatePasskey(
   adminOnly = false
 ): Promise<PasskeyAuthCompleteResponse> {
   const beginRes = await passkeyAuthBegin(email, adminOnly);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const credential = await startAuthentication({ optionsJSON: beginRes.options as any });
   return passkeyAuthComplete(beginRes.session_key, credential, adminOnly);
 }
