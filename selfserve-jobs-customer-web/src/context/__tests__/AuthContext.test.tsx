@@ -282,7 +282,7 @@ describe('AuthProvider — updateRecruiterStatus()', () => {
 // ---------------------------------------------------------------------------
 
 describe('AuthProvider — session persistence', () => {
-  it('restores session from localStorage on mount', () => {
+  it('restores session from localStorage on mount', async () => {
     localStorageMock.setItem(
       'auth_session',
       JSON.stringify({
@@ -300,9 +300,45 @@ describe('AuthProvider — session persistence', () => {
       </AuthProvider>,
     );
 
+    await waitFor(() => expect(screen.getByTestId('hydrated')).toHaveTextContent('true'));
     expect(screen.getByTestId('email')).toHaveTextContent('restored@test.com');
     expect(screen.getByTestId('is-admin')).toHaveTextContent('true');
     expect(screen.getByTestId('logged-in')).toHaveTextContent('true');
+  });
+
+  it('keeps hydration pending until the stored session is refreshed', async () => {
+    let resolveMe!: (value: Awaited<ReturnType<typeof getMe>>) => void;
+    getMeMock.mockReturnValueOnce(
+      new Promise<Awaited<ReturnType<typeof getMe>>>((resolve) => {
+        resolveMe = resolve;
+      })
+    );
+    localStorageMock.setItem(
+      'auth_session',
+      JSON.stringify({
+        sessionToken: 'restored-token',
+        email: 'recruiter@test.com',
+        userType: 'recruiter',
+        recruiterCode: 'rc002',
+        recruiterStatus: 'pending_approval',
+      }),
+    );
+
+    render(
+      <AuthProvider>
+        <AuthConsumer />
+      </AuthProvider>,
+    );
+
+    expect(screen.getByTestId('hydrated')).toHaveTextContent('false');
+    resolveMe({
+      email: 'recruiter@test.com',
+      user_type: 'recruiter',
+      recruiter_code: 'rc002',
+      recruiter_status: 'active',
+    });
+    await waitFor(() => expect(screen.getByTestId('hydrated')).toHaveTextContent('true'));
+    expect(screen.getByTestId('is-active-recruiter')).toHaveTextContent('true');
   });
 
   it('refreshes stored recruiter status from /auth/me on mount', async () => {

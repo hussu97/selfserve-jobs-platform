@@ -140,7 +140,7 @@ function EntityCard({
 
 export default function AccountPage() {
   const router = useRouter();
-  const { isLoggedIn, email, sessionToken, logout } = useAuth();
+  const { isHydrated, isLoggedIn, email, sessionToken, logout } = useAuth();
 
   const [jobs, setJobs] = useState<AuthEntity[]>([]);
   const [profiles, setProfiles] = useState<AuthEntity[]>([]);
@@ -161,13 +161,14 @@ export default function AccountPage() {
   };
 
   useEffect(() => {
+    if (!isHydrated) return;
     if (!isLoggedIn) {
       router.replace('/login');
       return;
     }
     fetchEntities();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoggedIn]);
+  }, [isHydrated, isLoggedIn, sessionToken]);
 
   const handleLogout = async () => {
     if (sessionToken) apiLogout(sessionToken).catch(() => {});
@@ -175,7 +176,7 @@ export default function AccountPage() {
     router.push('/');
   };
 
-  if (!isLoggedIn) return null;
+  if (!isHydrated || !isLoggedIn) return null;
 
   return (
     <div className="hero-gradient min-h-screen">

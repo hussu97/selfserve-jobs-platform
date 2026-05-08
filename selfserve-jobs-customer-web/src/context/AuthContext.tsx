@@ -39,27 +39,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    let storedState: AuthState | null = null;
+    let cancelled = false;
 
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored) as AuthState;
-        if (parsed.sessionToken && parsed.email) {
-          storedState = parsed;
-          // eslint-disable-next-line react-hooks/set-state-in-effect
-          setAuth(parsed);
+    async function hydrateSession() {
+      let storedState: AuthState | null = null;
+
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          const parsed = JSON.parse(stored) as AuthState;
+          if (parsed.sessionToken && parsed.email) {
+            storedState = parsed;
+            setAuth(parsed);
+          }
         }
+      } catch {
+        // ignore corrupt storage
       }
-    } catch {
-      // ignore corrupt storage
-    }
-    setIsHydrated(true);
 
-    if (!storedState?.sessionToken) return;
+      if (!storedState?.sessionToken) {
+        if (!cancelled) setIsHydrated(true);
+        return;
+      }
 
-    getMe(storedState.sessionToken)
-      .then((me) => {
+      try {
+        const me = await getMe(storedState.sessionToken);
+        if (cancelled) return;
         const refreshed: AuthState = {
           sessionToken: storedState.sessionToken,
           email: me.email,
@@ -69,10 +74,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         };
         setAuth(refreshed);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(refreshed));
-      })
-      .catch(() => {
+      } catch {
         // Keep the stored session if the refresh fails for a transient reason.
-      });
+      } finally {
+        if (!cancelled) setIsHydrated(true);
+      }
+    }
+
+    hydrateSession();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const login = useCallback(
