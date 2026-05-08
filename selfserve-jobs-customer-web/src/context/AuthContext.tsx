@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { getMe } from '@/lib/api';
 
 interface AuthState {
   email: string | null;
@@ -38,17 +39,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
+    let storedState: AuthState | null = null;
+
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored) as AuthState;
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        if (parsed.sessionToken && parsed.email) setAuth(parsed);
+        if (parsed.sessionToken && parsed.email) {
+          storedState = parsed;
+          // eslint-disable-next-line react-hooks/set-state-in-effect
+          setAuth(parsed);
+        }
       }
     } catch {
       // ignore corrupt storage
     }
     setIsHydrated(true);
+
+    if (!storedState?.sessionToken) return;
+
+    getMe(storedState.sessionToken)
+      .then((me) => {
+        const refreshed: AuthState = {
+          sessionToken: storedState.sessionToken,
+          email: me.email,
+          userType: me.user_type ?? null,
+          recruiterCode: me.recruiter_code ?? null,
+          recruiterStatus: me.recruiter_status ?? null,
+        };
+        setAuth(refreshed);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(refreshed));
+      })
+      .catch(() => {
+        // Keep the stored session if the refresh fails for a transient reason.
+      });
   }, []);
 
   const login = useCallback(

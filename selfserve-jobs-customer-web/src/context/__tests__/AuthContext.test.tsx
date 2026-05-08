@@ -1,7 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AuthProvider, useAuth } from '../AuthContext';
+import { getMe } from '@/lib/api';
+
+vi.mock('@/lib/api', () => ({
+  getMe: vi.fn(),
+}));
+
+const getMeMock = vi.mocked(getMe);
 
 // ---------------------------------------------------------------------------
 // localStorage mock
@@ -66,6 +73,8 @@ function AuthConsumer() {
 
 beforeEach(() => {
   localStorageMock.clear();
+  getMeMock.mockReset();
+  getMeMock.mockRejectedValue(new Error('session refresh unavailable'));
 });
 
 // ---------------------------------------------------------------------------
@@ -294,6 +303,38 @@ describe('AuthProvider — session persistence', () => {
     expect(screen.getByTestId('email')).toHaveTextContent('restored@test.com');
     expect(screen.getByTestId('is-admin')).toHaveTextContent('true');
     expect(screen.getByTestId('logged-in')).toHaveTextContent('true');
+  });
+
+  it('refreshes stored recruiter status from /auth/me on mount', async () => {
+    getMeMock.mockResolvedValueOnce({
+      email: 'recruiter@test.com',
+      user_type: 'recruiter',
+      recruiter_code: 'rc002',
+      recruiter_status: 'active',
+    });
+    localStorageMock.setItem(
+      'auth_session',
+      JSON.stringify({
+        sessionToken: 'restored-token',
+        email: 'recruiter@test.com',
+        userType: 'recruiter',
+        recruiterCode: 'rc002',
+        recruiterStatus: 'pending_approval',
+      }),
+    );
+
+    render(
+      <AuthProvider>
+        <AuthConsumer />
+      </AuthProvider>,
+    );
+
+    await waitFor(() => expect(screen.getByTestId('is-active-recruiter')).toHaveTextContent('true'));
+    expect(screen.getByTestId('recruiter-status')).toHaveTextContent('active');
+    expect(getMeMock).toHaveBeenCalledWith('restored-token');
+
+    const stored = JSON.parse(localStorageMock.getItem('auth_session')!);
+    expect(stored.recruiterStatus).toBe('active');
   });
 
   it('ignores corrupt localStorage data without throwing', () => {
