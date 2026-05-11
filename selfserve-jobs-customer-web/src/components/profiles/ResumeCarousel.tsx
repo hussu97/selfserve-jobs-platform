@@ -9,30 +9,42 @@ interface ResumeCarouselProps {
   url: string;
 }
 
-const FALLBACK_PAGE_WIDTH = 860;
-
 export function ResumeCarousel({ url }: ResumeCarouselProps) {
   const [numPages, setNumPages] = useState(0);
   const [activePage, setActivePage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
-  const [pageWidth, setPageWidth] = useState(FALLBACK_PAGE_WIDTH);
+  const [pageWidth, setPageWidth] = useState<number | null>(null);
+  const viewerRef = useRef<HTMLDivElement | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
-  const frameRef = useRef<HTMLDivElement | null>(null);
   const pageRefs = useRef<Array<HTMLDivElement | null>>([]);
 
   useEffect(() => {
-    const frame = frameRef.current;
-    if (!frame || typeof ResizeObserver === 'undefined') return;
+    const viewer = viewerRef.current;
+    if (!viewer) return;
+
+    function measureViewer() {
+      const nextWidth = Math.floor(viewer?.getBoundingClientRect().width ?? 0);
+      if (nextWidth <= 0) return;
+      setPageWidth((prev) => (prev === nextWidth ? prev : nextWidth));
+    }
+
+    measureViewer();
+
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', measureViewer);
+      return () => window.removeEventListener('resize', measureViewer);
+    }
 
     const resizeObserver = new ResizeObserver((entries) => {
       const entry = entries[0];
       if (!entry) return;
-      const nextWidth = Math.max(280, Math.floor(entry.contentRect.width));
+      const nextWidth = Math.floor(entry.contentRect.width);
+      if (nextWidth <= 0) return;
       setPageWidth((prev) => (prev === nextWidth ? prev : nextWidth));
     });
 
-    resizeObserver.observe(frame);
+    resizeObserver.observe(viewer);
     return () => resizeObserver.disconnect();
   }, []);
 
@@ -100,65 +112,70 @@ export function ResumeCarousel({ url }: ResumeCarouselProps) {
         )}
       </div>
 
-      <Document
-        file={url}
-        loading={
-          <div className="rounded-[1.5rem] bg-surface px-5 py-12 text-center text-sm text-text-muted">
-            Loading resume pages...
-          </div>
-        }
-        error={
-          <div className="rounded-[1.5rem] bg-surface px-5 py-12 text-center text-sm text-text-muted">
-            Unable to render the resume preview right now.
-          </div>
-        }
-        onLoadSuccess={({ numPages: nextNumPages }) => {
-          setNumPages(nextNumPages);
-          setActivePage(1);
-          setIsLoading(false);
-          setHasError(nextNumPages === 0);
-        }}
-        onLoadError={() => {
-          setHasError(true);
-          setIsLoading(false);
-        }}
-      >
-        {!hasError && (
-          <div
-            ref={trackRef}
-            onScroll={updateActivePage}
-            className="resume-strip flex snap-x snap-mandatory overflow-x-auto pb-2"
-          >
-            {Array.from({ length: numPages }, (_, index) => (
-              <div
-                key={`${url}-page-${index + 1}`}
-                ref={(node) => {
-                  pageRefs.current[index] = node;
-                }}
-                className="min-w-full shrink-0 snap-center px-1 sm:px-3"
-              >
+      <div ref={viewerRef} className="w-full min-w-0">
+        <Document
+          file={url}
+          loading={
+            <div className="rounded-[1.5rem] bg-surface px-5 py-12 text-center text-sm text-text-muted">
+              Loading resume pages...
+            </div>
+          }
+          error={
+            <div className="rounded-[1.5rem] bg-surface px-5 py-12 text-center text-sm text-text-muted">
+              Unable to render the resume preview right now.
+            </div>
+          }
+          onLoadSuccess={({ numPages: nextNumPages }) => {
+            setNumPages(nextNumPages);
+            setActivePage(1);
+            setIsLoading(false);
+            setHasError(nextNumPages === 0);
+          }}
+          onLoadError={() => {
+            setHasError(true);
+            setIsLoading(false);
+          }}
+        >
+          {!hasError && (
+            <div
+              ref={trackRef}
+              onScroll={updateActivePage}
+              className="resume-strip flex w-full min-w-0 snap-x snap-mandatory overflow-x-auto pb-2"
+            >
+              {Array.from({ length: numPages }, (_, index) => (
                 <div
-                  ref={index === 0 ? frameRef : undefined}
-                  className="mx-auto w-full max-w-[860px] rounded-[1.5rem] bg-white shadow-ambient"
+                  key={`${url}-page-${index + 1}`}
+                  ref={(node) => {
+                    pageRefs.current[index] = node;
+                  }}
+                  className="w-full min-w-0 shrink-0 snap-center"
                 >
-                  <Page
-                    pageNumber={index + 1}
-                    width={pageWidth}
-                    loading={
+                  <div className="w-full overflow-hidden rounded-[1.5rem] bg-white shadow-ambient">
+                    {pageWidth ? (
+                      <Page
+                        pageNumber={index + 1}
+                        width={pageWidth}
+                        loading={
+                          <div className="flex min-h-[420px] w-full items-center justify-center bg-surface text-sm text-text-muted">
+                            Loading page {index + 1}...
+                          </div>
+                        }
+                        renderAnnotationLayer={false}
+                        renderTextLayer={false}
+                        className="resume-page"
+                      />
+                    ) : (
                       <div className="flex min-h-[420px] w-full items-center justify-center bg-surface text-sm text-text-muted">
-                        Loading page {index + 1}...
+                        Measuring resume width...
                       </div>
-                    }
-                    renderAnnotationLayer={false}
-                    renderTextLayer={false}
-                    className="resume-page"
-                  />
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </Document>
+              ))}
+            </div>
+          )}
+        </Document>
+      </div>
 
       {isLoading && !hasError && numPages === 0 && (
         <div className="rounded-[1.5rem] bg-surface px-5 py-12 text-center text-sm text-text-muted">

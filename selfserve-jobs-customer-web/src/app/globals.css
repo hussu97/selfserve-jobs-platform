@@ -107,7 +107,10 @@
 }
 
 .resume-page {
+  box-sizing: border-box;
   width: 100% !important;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .resume-page canvas {
