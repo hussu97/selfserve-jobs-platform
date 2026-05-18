@@ -4,9 +4,9 @@ import { withSentryConfig } from '@sentry/nextjs';
 const nextConfig: NextConfig = {
   async rewrites() {
     return [
-      // Proxy the Umami script through a non-analytics-looking path.
-      // Events are forwarded server-side via src/app/api/send/route.ts
-      // so UAE's deep packet inspection does not intercept them.
+      // Optional compatibility path for older deployments that loaded Umami
+      // from /lib/app.js. Event collection now posts directly to Umami Cloud
+      // so pageviews do not invoke a Vercel Function for every analytics hit.
       {
         source: '/lib/app.js',
         destination: 'https://cloud.umami.is/script.js',
@@ -45,6 +45,9 @@ export default withSentryConfig(nextConfig, {
   // Automatically tree-shake Sentry logger statements in production
   disableLogger: true,
 
-  // Tunnel Sentry requests through /monitoring to bypass ad-blockers
-  tunnelRoute: '/monitoring',
+  // Tunneling Sentry through the app can turn every envelope into Vercel
+  // compute. Keep it opt-in for environments that explicitly need it.
+  ...(process.env.NEXT_PUBLIC_SENTRY_TUNNEL_ENABLED === 'true'
+    ? { tunnelRoute: '/monitoring' }
+    : {}),
 });
