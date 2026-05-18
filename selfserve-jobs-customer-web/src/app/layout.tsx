@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Newsreader, Manrope } from 'next/font/google';
 import Script from 'next/script';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
 import { Header } from '@/components/layout/Header';
 import { AppShell } from '@/components/layout/AppShell';
@@ -25,8 +26,6 @@ const manrope = Manrope({
 });
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://hirebridgeuae.com';
-const UMAMI_SCRIPT_URL = process.env.NEXT_PUBLIC_UMAMI_SCRIPT_URL ?? 'https://cloud.umami.is/script.js';
-const UMAMI_HOST_URL = process.env.NEXT_PUBLIC_UMAMI_HOST_URL ?? 'https://cloud.umami.is';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -101,11 +100,12 @@ export default function RootLayout({
             <AppShell>{children}</AppShell>
           </ToastProvider>
         </AuthProvider>
+        <SpeedInsights />
         {process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID && (
           <Script
-            src={UMAMI_SCRIPT_URL}
+            src="/lib/app.js"
             data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID}
-            data-host-url={UMAMI_HOST_URL}
+            data-host-url={SITE_URL}
             data-do-not-track="false"
             strategy="afterInteractive"
           />

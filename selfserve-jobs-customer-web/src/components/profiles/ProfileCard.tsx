@@ -22,7 +22,7 @@ export const ProfileCard = memo(function ProfileCard({ profile }: ProfileCardPro
   const brief = (profile as unknown as Record<string, unknown>).brief as string | undefined;
 
   return (
-    <Link href={`/profiles/${profile.code}`} prefetch={false} className="block group">
+    <Link href={`/profiles/${profile.code}`} className="block group">
       <article className="h-full flex flex-col bg-surface-lowest rounded-2xl shadow-ambient transition-all duration-300 hover:shadow-ambient-hover hover:-translate-y-1 p-6 gap-4">
 
         {/* Row 1: Employment status badge + relocation badge + time posted */}

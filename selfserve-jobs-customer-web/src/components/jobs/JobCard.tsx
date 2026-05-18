@@ -14,7 +14,7 @@ export const JobCard = memo(function JobCard({ job }: JobCardProps) {
   const extraSkills = job.key_skills.length - displaySkills.length;
 
   return (
-    <Link href={`/jobs/${job.code}`} prefetch={false} className="block group">
+    <Link href={`/jobs/${job.code}`} className="block group">
       <article className="h-full flex flex-col bg-surface-lowest rounded-2xl shadow-ambient transition-all duration-300 hover:shadow-ambient-hover hover:-translate-y-1 p-6 gap-4">
 
         {/* Row 1: Employment type badge + time posted */}
