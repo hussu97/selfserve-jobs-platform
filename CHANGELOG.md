@@ -16,7 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **ProfileDetail owner resume test** — `ProfileDetail.test.tsx` was asserting resume visibility synchronously after waiting for the email to appear, but for owner profiles `getResumeUrl` fires only after `getProfile` resolves and `is_owner` becomes `true` (two sequential async hops vs one for recruiters). The resume assertion now uses its own `waitFor` to properly await the second async operation.
 
 ### Added
-- **Cleanup job deploy workflow** — added a manual GitHub Actions workflow that validates required GCP/internal secrets, enables Cloud Scheduler if needed, and creates or updates the `cleanup-stale-data` Cloud Scheduler job against the deployed `selfserve-jobs-customer-api` service.
+- **Cleanup job workflow** — added a scheduled GitHub Actions cleanup job that validates required GCP/internal secrets, resolves the deployed `selfserve-jobs-customer-api` URL, and calls `POST /api/v1/internal/cleanup` daily with the protected internal secret header.
 
 - **Substack-powered Field Notes integration** — added configurable Substack RSS ingestion (`SUBSTACK_FEED_URL`, `SUBSTACK_PUBLICATION_URL`, `SUBSTACK_PUBLICATION_NAME`) through a protected `POST /api/v1/internal/sync-substack` endpoint, source metadata on `blog_post`, and synced-post public API fields. `/blog` remains the canonical article archive while homepage, blog detail, profile creation, and talent listing pages now surface integrated career-market article modules and optional Substack subscribe/read CTAs. Sitemap, `llms.txt`, production docs, env examples, and deploy env propagation were updated for the new content flow.
 

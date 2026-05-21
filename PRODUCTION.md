@@ -369,6 +369,8 @@ gcloud iam workload-identity-pools providers describe "github-provider" \
 
 Three scheduled jobs keep the platform healthy and content fresh. All call internal API endpoints protected by `X-Internal-Secret`.
 
+The repository also includes `.github/workflows/deploy-cleanup-job.yml`, which runs the cleanup endpoint daily from GitHub Actions using the same `GCP_*` and `INTERNAL_API_SECRET` secrets. Use that workflow when Cloud Scheduler API is unavailable or not enabled for the project.
+
 ### Prerequisites
 
 Enable the Cloud Scheduler API if not already enabled:
