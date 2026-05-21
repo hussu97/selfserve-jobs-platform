@@ -45,10 +45,12 @@ jobs:
           GCP_REGION: ${{ secrets.GCP_REGION }}
           INTERNAL_API_SECRET: ${{ secrets.INTERNAL_API_SECRET }}
           SCHEDULE: ${{ inputs.schedule || '0 3 * * *' }}
+          CLOUDSDK_CORE_DISABLE_PROMPTS: "1"
         run: |
           set -euo pipefail
 
           gcloud config set project "$GCP_PROJECT_ID"
+          gcloud services enable cloudscheduler.googleapis.com --project "$GCP_PROJECT_ID" --quiet
 
           SERVICE_URL="$(gcloud run services describe selfserve-jobs-customer-api \
             --region "$GCP_REGION" \
