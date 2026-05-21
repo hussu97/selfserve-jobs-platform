@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Changed
+- **Profile listing article placement** — moved Job Market Notes out of the desktop filter sidebar and into the main listing flow below search, making the module visible before the talent results on all viewport sizes.
+
 - **Profile creation article placement** — moved the Job Market Notes module below the profile creation form so candidates focus on completing their profile first, then continue into related guidance.
 
 - **Vercel ISR write usage** — reduced frontend ISR churn by lengthening server-side list/stat/blog revalidation windows, moving `sitemap.xml` and `llms.txt` regeneration to daily, and making sitemap `lastModified` values stable for static/SEO routes so Vercel does not persist fresh output just because the render timestamp changed.

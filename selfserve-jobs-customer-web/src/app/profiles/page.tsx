@@ -246,12 +246,13 @@ function ProfilesContent() {
           />
         </div>
 
+        <div className="mb-8">
+          <JobMarketNotes />
+        </div>
+
         <div className="flex flex-col lg:flex-row gap-8">
           <aside className="w-full lg:w-64 lg:flex-shrink-0">
             <ProfileFilters filters={filters} onChange={handleFiltersChange} resultCount={loading ? null : total} />
-            <div className="mt-6">
-              <JobMarketNotes />
-            </div>
           </aside>
 
           <div className="flex-1 min-w-0" aria-busy={loading} aria-live="polite">
