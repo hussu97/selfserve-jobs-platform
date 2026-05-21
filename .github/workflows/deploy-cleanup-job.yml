@@ -1,0 +1,90 @@
+name: Deploy Cleanup Job
+
+on:
+  workflow_dispatch:
+    inputs:
+      schedule:
+        description: "Cloud Scheduler cron expression"
+        required: false
+        default: "0 3 * * *"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Validate required secrets
+        run: |
+          missing=()
+          [[ -z "${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}" ]] && missing+=("GCP_WORKLOAD_IDENTITY_PROVIDER")
+          [[ -z "${{ secrets.GCP_SERVICE_ACCOUNT }}" ]] && missing+=("GCP_SERVICE_ACCOUNT")
+          [[ -z "${{ secrets.GCP_PROJECT_ID }}" ]] && missing+=("GCP_PROJECT_ID")
+          [[ -z "${{ secrets.GCP_REGION }}" ]] && missing+=("GCP_REGION")
+          [[ -z "${{ secrets.INTERNAL_API_SECRET }}" ]] && missing+=("INTERNAL_API_SECRET")
+          if [[ ${#missing[@]} -gt 0 ]]; then
+            echo "Missing required secrets: ${missing[*]}"
+            exit 1
+          fi
+          echo "All required secrets present"
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Create or update cleanup scheduler job
+        env:
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          GCP_REGION: ${{ secrets.GCP_REGION }}
+          INTERNAL_API_SECRET: ${{ secrets.INTERNAL_API_SECRET }}
+          SCHEDULE: ${{ inputs.schedule || '0 3 * * *' }}
+        run: |
+          set -euo pipefail
+
+          gcloud config set project "$GCP_PROJECT_ID"
+
+          SERVICE_URL="$(gcloud run services describe selfserve-jobs-customer-api \
+            --region "$GCP_REGION" \
+            --format 'value(status.url)')"
+
+          if [[ -z "$SERVICE_URL" ]]; then
+            echo "Could not resolve Cloud Run service URL for selfserve-jobs-customer-api"
+            exit 1
+          fi
+
+          JOB_NAME="cleanup-stale-data"
+          JOB_URI="${SERVICE_URL}/api/v1/internal/cleanup"
+          HEADERS="X-Internal-Secret=${INTERNAL_API_SECRET},Content-Type=application/json"
+
+          if gcloud scheduler jobs describe "$JOB_NAME" --location "$GCP_REGION" >/dev/null 2>&1; then
+            gcloud scheduler jobs update http "$JOB_NAME" \
+              --location "$GCP_REGION" \
+              --schedule "$SCHEDULE" \
+              --uri "$JOB_URI" \
+              --http-method POST \
+              --headers "$HEADERS" \
+              --time-zone "UTC" \
+              --attempt-deadline 60s \
+              --description "Delete expired sessions, tokens, and old email logs"
+          else
+            gcloud scheduler jobs create http "$JOB_NAME" \
+              --location "$GCP_REGION" \
+              --schedule "$SCHEDULE" \
+              --uri "$JOB_URI" \
+              --http-method POST \
+              --headers "$HEADERS" \
+              --time-zone "UTC" \
+              --attempt-deadline 60s \
+              --description "Delete expired sessions, tokens, and old email logs"
+          fi
+
+          gcloud scheduler jobs describe "$JOB_NAME" \
+            --location "$GCP_REGION" \
+            --format 'yaml(name,schedule,state,httpTarget.uri,httpTarget.httpMethod,timeZone,attemptDeadline)'
