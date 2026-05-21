@@ -23,12 +23,12 @@ export default function NewProfilePage() {
           </p>
         </div>
 
-        <div className="mb-8">
-          <JobMarketNotes variant="profile-form" />
-        </div>
-
         <div className="bg-surface-lowest shadow-ambient rounded-2xl p-8">
           <ProfileForm />
+        </div>
+
+        <div className="mt-8">
+          <JobMarketNotes variant="profile-form" />
         </div>
       </div>
     </div>
