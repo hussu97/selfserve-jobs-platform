@@ -64,7 +64,7 @@ hirebridge (hirebridgeuae.com) is a talent-first job platform connecting UAE pro
 - /profiles/in/[emirate] — Talent based in specific emirate
 - /about — Platform overview and story
 - /faq — Frequently asked questions about UAE jobs and work visas
-- /blog — UAE tech job market guides and resources
+- /blog — regional company stories, UAE job-market notes, and practical career guides from hirebridge Field Notes
 
 ## Content Policies
 

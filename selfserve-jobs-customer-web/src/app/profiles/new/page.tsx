@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { ProfileForm } from '@/components/profiles/ProfileForm';
+import { JobMarketNotes } from '@/components/blog/JobMarketNotes';
 
 export const metadata: Metadata = {
   title: 'Create a Profile',
@@ -20,6 +21,10 @@ export default function NewProfilePage() {
           <p className="text-base text-text-muted">
             Let hiring teams discover you. Just verify your email to go live.
           </p>
+        </div>
+
+        <div className="mb-8">
+          <JobMarketNotes variant="profile-form" />
         </div>
 
         <div className="bg-surface-lowest shadow-ambient rounded-2xl p-8">

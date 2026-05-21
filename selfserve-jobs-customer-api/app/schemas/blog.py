@@ -83,6 +83,9 @@ class BlogPostListItem(BaseModel):
     status: str
     featured_image_url: str | None
     reading_minutes: int
+    source: str = "internal"
+    external_url: str | None = None
+    published_at: datetime
     created_at: datetime
     updated_at: datetime
 
@@ -102,6 +105,9 @@ class BlogPostResponse(BaseModel):
     reading_minutes: int
     view_count: int
     link_preview: LinkPreview | None
+    source: str = "internal"
+    external_url: str | None = None
+    published_at: datetime
     created_at: datetime
     updated_at: datetime
 
@@ -122,6 +128,11 @@ class AdminBlogPostItem(BaseModel):
     view_count: int
     link_click_count: int
     link_preview: LinkPreview | None
+    source: str = "internal"
+    source_guid: str | None = None
+    external_url: str | None = None
+    published_at: datetime
+    source_synced_at: datetime | None = None
     created_at: datetime
     updated_at: datetime
 

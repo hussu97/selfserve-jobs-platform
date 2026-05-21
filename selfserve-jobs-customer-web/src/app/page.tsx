@@ -16,9 +16,19 @@ function staticBlogToListItem(p: typeof BLOG_POSTS[0]): BlogPostListItem {
     status: 'published',
     featured_image_url: null,
     reading_minutes: p.readingMinutes,
+    source: 'internal',
+    external_url: null,
+    published_at: p.datePublished + 'T00:00:00Z',
     created_at: p.datePublished + 'T00:00:00Z',
     updated_at: (p.dateModified ?? p.datePublished) + 'T00:00:00Z',
   };
+}
+
+function formatArticleDate(dateStr: string | undefined): string {
+  return new Date(dateStr ?? Date.now()).toLocaleDateString('en-AE', {
+    month: 'short',
+    day: 'numeric',
+  });
 }
 
 export default async function HomePage() {
@@ -397,19 +407,21 @@ export default async function HomePage() {
       </section>
 
 
-      {/* ── Blog ─────────────────────────────────────── */}
+      {/* ── Career Field Notes ───────────────────────── */}
       {blogPosts.length > 0 && (
         <section className="relative overflow-hidden bg-surface py-20 sm:py-28">
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            {/* Section header */}
             <div className="flex items-end justify-between mb-10">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-2">
-                  Insights &amp; Guides
+                  Career field notes
                 </p>
                 <h2 className="font-heading text-3xl sm:text-4xl text-primary">
-                  From the <span className="italic">Blog</span>
+                  Read the <span className="italic">Market</span>
                 </h2>
+                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-text-muted">
+                  Company stories, regional hiring signals, and practical guidance for moving through the UAE job market.
+                </p>
               </div>
               <Link
                 href="/blog"
@@ -422,25 +434,55 @@ export default async function HomePage() {
               </Link>
             </div>
 
-            {/* Carousel — horizontal scroll on mobile, grid on desktop */}
-            <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-5 overflow-x-auto pb-2 sm:pb-0 snap-x snap-mandatory sm:snap-none -mx-4 px-4 sm:mx-0 sm:px-0">
-              {blogPosts.map((post) => (
-                <Link
-                  key={post.post_code}
-                  href={`/blog/${post.slug}`}
-                  className="group flex-none w-72 sm:w-auto snap-start block rounded-2xl bg-surface-lowest shadow-ambient hover:-translate-y-1 transition-all duration-200 overflow-hidden"
-                >
-                  {post.featured_image_url && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={post.featured_image_url}
-                      alt=""
-                      aria-hidden="true"
-                      className="w-full h-32 object-cover"
-                    />
-                  )}
-                  <div className="p-5">
-                    <div className="flex flex-wrap gap-1 mb-2">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              <Link
+                href={`/blog/${blogPosts[0].slug}`}
+                className="group lg:col-span-7 rounded-2xl bg-surface-lowest shadow-ambient hover:-translate-y-1 hover:shadow-ambient-hover transition-all duration-200 overflow-hidden"
+              >
+                {blogPosts[0].featured_image_url && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={blogPosts[0].featured_image_url}
+                    alt=""
+                    aria-hidden="true"
+                    className="w-full h-56 sm:h-72 object-cover"
+                  />
+                )}
+                <div className="p-7 sm:p-9">
+                  <div className="flex flex-wrap items-center gap-2 mb-4">
+                    <span className="text-[10px] uppercase tracking-widest px-2.5 py-1 rounded-full bg-accent/20 text-accent-dark">
+                      Latest
+                    </span>
+                    {blogPosts[0].source === 'substack' && (
+                      <span className="text-[10px] uppercase tracking-widest text-text-muted">Substack</span>
+                    )}
+                    <span className="text-[10px] uppercase tracking-widest text-text-muted">
+                      {formatArticleDate(blogPosts[0].published_at ?? blogPosts[0].created_at)}
+                    </span>
+                  </div>
+                  <h3 className="font-heading text-3xl sm:text-4xl text-primary mb-3 leading-tight group-hover:text-primary-hover transition-colors">
+                    {blogPosts[0].title}
+                  </h3>
+                  <p className="text-sm text-text-muted leading-relaxed mb-5">
+                    {blogPosts[0].excerpt}
+                  </p>
+                  <span className="inline-flex items-center gap-1.5 text-primary font-semibold uppercase tracking-wider text-xs">
+                    Read article
+                    <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fillRule="evenodd" d="M8.22 5.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 010-1.06z" clipRule="evenodd" />
+                    </svg>
+                  </span>
+                </div>
+              </Link>
+
+              <div className="lg:col-span-5 grid grid-cols-1 gap-4">
+                {blogPosts.slice(1, 4).map((post) => (
+                  <Link
+                    key={post.post_code}
+                    href={`/blog/${post.slug}`}
+                    className="group block rounded-2xl bg-surface-lowest shadow-ambient hover:-translate-y-1 hover:shadow-ambient-hover transition-all duration-200 p-5"
+                  >
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
                       {post.tags.slice(0, 2).map((tag) => (
                         <span
                           key={tag}
@@ -449,8 +491,11 @@ export default async function HomePage() {
                           {tag}
                         </span>
                       ))}
+                      <span className="text-[10px] uppercase tracking-widest text-text-muted">
+                        {formatArticleDate(post.published_at ?? post.created_at)}
+                      </span>
                     </div>
-                    <h3 className="font-heading text-base text-primary mb-2 leading-snug group-hover:text-primary-hover transition-colors line-clamp-2">
+                    <h3 className="font-heading text-xl text-primary mb-2 leading-snug group-hover:text-primary-hover transition-colors">
                       {post.title}
                     </h3>
                     <p className="text-xs text-text-muted leading-relaxed line-clamp-2 mb-3">
@@ -459,9 +504,9 @@ export default async function HomePage() {
                     <p className="text-xs text-text-muted">
                       {post.reading_minutes} min read
                     </p>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                ))}
+              </div>
             </div>
 
             {/* Mobile view all */}

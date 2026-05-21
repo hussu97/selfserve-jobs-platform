@@ -56,6 +56,9 @@ function staticPostToApiShape(p: typeof BLOG_POSTS[0]): BlogPost {
     reading_minutes: p.readingMinutes,
     view_count: 0,
     link_preview: null,
+    source: 'internal',
+    external_url: null,
+    published_at: p.datePublished + 'T00:00:00Z',
     created_at: p.datePublished + 'T00:00:00Z',
     updated_at: (p.dateModified ?? p.datePublished) + 'T00:00:00Z',
   };
@@ -72,6 +75,9 @@ function staticListToApiShape(p: typeof BLOG_POSTS[0]): BlogPostListItem {
     status: 'published',
     featured_image_url: null,
     reading_minutes: p.readingMinutes,
+    source: 'internal',
+    external_url: null,
+    published_at: p.datePublished + 'T00:00:00Z',
     created_at: p.datePublished + 'T00:00:00Z',
     updated_at: (p.dateModified ?? p.datePublished) + 'T00:00:00Z',
   };
@@ -200,6 +206,8 @@ export default async function BlogPostPage({ params }: PageProps) {
   }
 
   const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://hirebridgeuae.com';
+  const substackUrl = process.env.NEXT_PUBLIC_SUBSTACK_PUBLICATION_URL;
+  const publishedAt = post.published_at ?? post.created_at;
 
   return (
     <>
@@ -208,7 +216,7 @@ export default async function BlogPostPage({ params }: PageProps) {
           title: post.title,
           description: post.excerpt,
           url: `/blog/${slug}`,
-          datePublished: post.created_at,
+          datePublished: publishedAt,
           dateModified: post.updated_at,
           authorName: post.author,
         })}
@@ -251,9 +259,15 @@ export default async function BlogPostPage({ params }: PageProps) {
             <div className="flex items-center gap-4 text-xs text-text-muted">
               <span>By <strong className="text-text-main">{post.author}</strong></span>
               <span>·</span>
-              <time dateTime={post.created_at}>{formatDate(post.created_at)}</time>
+              <time dateTime={publishedAt}>{formatDate(publishedAt)}</time>
               <span>·</span>
               <span>{post.reading_minutes} min read</span>
+              {post.source === 'substack' && (
+                <>
+                  <span>·</span>
+                  <span>Substack</span>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -268,6 +282,42 @@ export default async function BlogPostPage({ params }: PageProps) {
         {/* Link preview */}
         {post.link_preview && (
           <LinkPreviewCard preview={post.link_preview} postCode={post.post_code} />
+        )}
+
+        {(post.external_url || substackUrl) && (
+          <div className="rounded-2xl bg-surface-lowest p-6 sm:p-8 shadow-ambient mb-8">
+            <p className="text-xs font-semibold uppercase tracking-widest text-secondary mb-2">
+              Field notes
+            </p>
+            <h2 className="font-heading text-xl text-primary mb-2">
+              Keep reading with hirebridge on Substack
+            </h2>
+            <p className="text-sm text-text-muted leading-relaxed mb-5">
+              Company stories, market notes, and practical job-search guidance for professionals across the region.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              {post.external_url && (
+                <a
+                  href={post.external_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-5 py-2.5 rounded-full bg-primary text-white font-semibold text-sm hover:bg-primary-hover transition-colors"
+                >
+                  Read on Substack
+                </a>
+              )}
+              {substackUrl && (
+                <a
+                  href={substackUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-5 py-2.5 rounded-full bg-surface text-primary font-semibold text-sm hover:bg-accent/15 transition-colors"
+                >
+                  Subscribe
+                </a>
+              )}
+            </div>
+          </div>
         )}
 
         {/* CTA */}

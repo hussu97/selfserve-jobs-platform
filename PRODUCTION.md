@@ -21,6 +21,9 @@ export RESEND_FROM_EMAIL="hirebridge <noreply@hirebridgeuae.com>"
 export REPO_NAME="selfserve-jobs-platform"
 export REGISTRY_LOCATION="${REGION}-docker.pkg.dev"
 export DB_CONNECTION_NAME="${PROJECT_ID}:${REGION}:${DB_INSTANCE}"
+export SUBSTACK_FEED_URL="https://your-publication.substack.com/feed"
+export SUBSTACK_PUBLICATION_URL="https://your-publication.substack.com"
+export SUBSTACK_PUBLICATION_NAME="hirebridge Field Notes"
 ```
 
 ## 1. GCP Project Setup
@@ -209,6 +212,9 @@ gcloud run deploy $API_SERVICE_NAME \
   --set-env-vars "ENVIRONMENT=production" \
   --set-env-vars "ADMIN_EMAILS=${ADMIN_EMAILS}" \
   --set-env-vars "ADMIN_NOTIFICATION_EMAIL=${ADMIN_NOTIFICATION_EMAIL}" \
+  --set-env-vars "SUBSTACK_FEED_URL=${SUBSTACK_FEED_URL}" \
+  --set-env-vars "SUBSTACK_PUBLICATION_URL=${SUBSTACK_PUBLICATION_URL}" \
+  --set-env-vars "SUBSTACK_PUBLICATION_NAME=${SUBSTACK_PUBLICATION_NAME}" \
   --min-instances=0 \
   --max-instances=10 \
   --memory=512Mi \
@@ -248,6 +254,7 @@ gcloud run services update $API_SERVICE_NAME \
    - Leave build/output settings as defaults
 4. Under **Environment Variables**, add:
    - `NEXT_PUBLIC_API_URL` = the Cloud Run URL from step 6 (e.g. `https://selfserve-jobs-customer-api-xxxx-uc.a.run.app`)
+   - `NEXT_PUBLIC_SUBSTACK_PUBLICATION_URL` = the public Substack publication URL used for subscribe/read CTAs
    - `NEXT_PUBLIC_SENTRY_DSN` = your Sentry DSN (Sentry → Project Settings → Client Keys)
    - `SENTRY_ORG` = your Sentry org slug
    - `SENTRY_PROJECT` = your Sentry project slug
@@ -313,6 +320,9 @@ Configure these secrets in your GitHub repo (**Settings → Secrets and variable
 | `ADMIN_EMAILS` | (optional) comma-separated list e.g. `admin@example.com,ops@example.com` | Comma-separated list of admin email addresses used for access control |
 | `ADMIN_NOTIFICATION_EMAIL` | (optional) e.g. `admin@example.com` | Destination address for report/flag notification emails |
 | `GOOGLE_INDEXING_CREDENTIALS` | (optional) Full JSON string of GCP service-account key | Enables Google Indexing API notifications — see step 11a |
+| `SUBSTACK_FEED_URL` | (optional) e.g. `https://publication.substack.com/feed` | RSS feed imported by `POST /api/v1/internal/sync-substack` |
+| `SUBSTACK_PUBLICATION_URL` | (optional) e.g. `https://publication.substack.com` | Source URL stored on synced posts |
+| `SUBSTACK_PUBLICATION_NAME` | (optional) e.g. `hirebridge Field Notes` | Fallback author/publication label for synced posts |
 
 > **Note:** The workflow also hard-codes `ENVIRONMENT=production` and `LOG_FORMAT=json` on every deploy. `ENVIRONMENT` controls dev/prod behaviour in `config.py`; `LOG_FORMAT=json` switches to structured JSON logging for Cloud Logging.
 
@@ -357,7 +367,7 @@ gcloud iam workload-identity-pools providers describe "github-provider" \
 
 ## 11. Cloud Scheduler (Cron Jobs)
 
-Two scheduled jobs keep the platform healthy. Both call internal API endpoints protected by `X-Internal-Secret`.
+Three scheduled jobs keep the platform healthy and content fresh. All call internal API endpoints protected by `X-Internal-Secret`.
 
 ### Prerequisites
 
@@ -386,7 +396,23 @@ gcloud scheduler jobs create http expire-listings \
   --description="Expire overdue listings and send 7-day warnings"
 ```
 
-### Job 2 — `cleanup` (runs daily at 03:00 UTC)
+### Job 2 — `sync-substack` (runs daily at 02:30 UTC)
+
+Imports the latest Substack RSS posts into `blog_post` so `/blog`, homepage articles, profile guidance panels, and the sitemap stay current. Missing items are not archived.
+
+```bash
+gcloud scheduler jobs create http sync-substack \
+  --location=$REGION \
+  --schedule="30 2 * * *" \
+  --uri="${API_URL}/api/v1/internal/sync-substack" \
+  --http-method=POST \
+  --headers="X-Internal-Secret=${INTERNAL_API_SECRET},Content-Type=application/json" \
+  --time-zone="UTC" \
+  --attempt-deadline=60s \
+  --description="Import latest Substack posts into the hirebridge blog"
+```
+
+### Job 3 — `cleanup` (runs daily at 03:00 UTC)
 
 Purges expired auth sessions, used login tokens, and email log rows older than 90 days.
 
@@ -412,6 +438,7 @@ gcloud scheduler jobs list --location=$REGION
 
 ```bash
 gcloud scheduler jobs run expire-listings --location=$REGION
+gcloud scheduler jobs run sync-substack --location=$REGION
 gcloud scheduler jobs run cleanup-stale-data --location=$REGION
 ```
 

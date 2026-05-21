@@ -16,6 +16,9 @@ class Settings(BaseSettings):
     log_format: str = "json"  # "json" in production, "text" in development
     internal_api_secret: str = ""  # shared secret for /api/v1/internal/* cron endpoints
     google_indexing_credentials: str = ""  # JSON string of GCP service-account key with indexing scope
+    substack_feed_url: str = ""
+    substack_publication_url: str = ""
+    substack_publication_name: str = "hirebridge Field Notes"
 
     model_config = SettingsConfigDict(
         env_file=".env",

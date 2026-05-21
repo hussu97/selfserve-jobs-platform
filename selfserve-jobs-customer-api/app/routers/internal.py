@@ -13,7 +13,7 @@ from app.models.job import Job
 from app.models.login_token import LoginToken
 from app.models.profile import Profile
 from app.models.user_sensitive import UserSensitive
-from app.services import email_service
+from app.services import blog_service, email_service
 
 router = APIRouter(prefix="/api/v1/internal", tags=["internal"])
 logger = logging.getLogger(__name__)
@@ -182,3 +182,21 @@ async def cleanup(db: AsyncSession = Depends(get_db)):
         "deleted_login_tokens": deleted_tokens,
         "deleted_email_logs": deleted_logs,
     }
+
+
+@router.post("/sync-substack", dependencies=[Depends(_require_secret)])
+async def sync_substack(db: AsyncSession = Depends(get_db)):
+    """Fetch configured Substack RSS posts into the public blog table.
+
+    Intended to be called by Cloud Scheduler hourly or daily. If the feed is
+    not configured, this returns a successful no-op so deployments can enable
+    the feature by setting environment variables only.
+    """
+    result = await blog_service.sync_substack_posts(
+        db,
+        feed_url=settings.substack_feed_url,
+        publication_url=settings.substack_publication_url,
+        publication_name=settings.substack_publication_name,
+    )
+    logger.info("sync-substack: %s", result)
+    return result

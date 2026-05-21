@@ -1,9 +1,10 @@
 import type { MetadataRoute } from 'next';
-import { getJobs, getProfiles } from '@/lib/api';
+import { getBlogPosts, getJobs, getProfiles } from '@/lib/api';
 import { UAE_EMIRATES, EMPLOYMENT_TYPES, TOP_SKILLS } from '@/lib/seo-constants';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://hirebridgeuae.com';
 const PAGE_SIZE = 200;
+const BLOG_PAGE_SIZE = 50;
 const STATIC_LAST_MODIFIED = new Date('2026-01-01T00:00:00.000Z');
 
 // Google's per-sitemap limits: 50,000 URLs and 50 MB uncompressed.
@@ -70,12 +71,39 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // --- Blog posts ---
   const { BLOG_POSTS } = await import('@/lib/blog-content').catch(() => ({ BLOG_POSTS: [] }));
-  const blogRoutes: MetadataRoute.Sitemap = BLOG_POSTS.map((post) => ({
+  let blogRoutes: MetadataRoute.Sitemap = BLOG_POSTS.map((post) => ({
     url: `${BASE_URL}/blog/${post.slug}`,
     lastModified: new Date(post.dateModified ?? post.datePublished),
     changeFrequency: 'monthly' as const,
     priority: 0.65,
   }));
+  try {
+    let page = 1;
+    const dynamicBlogRoutes: MetadataRoute.Sitemap = [];
+    while (true) {
+      const result = await getBlogPosts({ page, per_page: BLOG_PAGE_SIZE });
+      dynamicBlogRoutes.push(
+        ...result.items.map((post) => ({
+          url: `${BASE_URL}/blog/${post.slug}`,
+          lastModified: new Date(post.updated_at),
+          changeFrequency: 'weekly' as const,
+          priority: post.source === 'substack' ? 0.75 : 0.65,
+        }))
+      );
+      if (page >= result.total_pages || result.items.length === 0) break;
+      page++;
+    }
+    if (dynamicBlogRoutes.length > 0) {
+      const seen = new Set<string>();
+      blogRoutes = [...dynamicBlogRoutes, ...blogRoutes].filter((route) => {
+        if (seen.has(route.url)) return false;
+        seen.add(route.url);
+        return true;
+      });
+    }
+  } catch {
+    // API unavailable — keep static fallback blog URLs.
+  }
 
   // --- Dynamic listing pages (all pages, API errors silently skipped) ---
   const jobRoutes: MetadataRoute.Sitemap = [];

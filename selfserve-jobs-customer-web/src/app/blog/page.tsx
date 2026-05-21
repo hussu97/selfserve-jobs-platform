@@ -16,6 +16,7 @@ function formatDate(dateStr: string): string {
 }
 
 function BlogPostCard({ post }: { post: BlogPostListItem }) {
+  const publishedAt = post.published_at ?? post.created_at;
   return (
     <Link
       href={`/blog/${post.slug}`}
@@ -32,6 +33,11 @@ function BlogPostCard({ post }: { post: BlogPostListItem }) {
       )}
       <div className="p-6">
         <div className="flex flex-wrap gap-1.5 mb-3">
+          {post.source === 'substack' && (
+            <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-accent/20 text-accent-dark">
+              Substack
+            </span>
+          )}
           {post.tags.map((tag) => (
             <span
               key={tag}
@@ -47,7 +53,7 @@ function BlogPostCard({ post }: { post: BlogPostListItem }) {
         <p className="text-sm text-text-muted leading-relaxed mb-4">{post.excerpt}</p>
         <div className="flex items-center justify-between text-xs text-text-muted">
           <span>{post.author}</span>
-          <span>{post.reading_minutes} min read · {formatDate(post.created_at)}</span>
+          <span>{post.reading_minutes} min read · {formatDate(publishedAt)}</span>
         </div>
       </div>
     </Link>
@@ -66,6 +72,9 @@ function staticToApiShape(p: typeof BLOG_POSTS[0]): BlogPostListItem {
     status: 'published',
     featured_image_url: null,
     reading_minutes: p.readingMinutes,
+    source: 'internal',
+    external_url: null,
+    published_at: p.datePublished + 'T00:00:00Z',
     created_at: p.datePublished + 'T00:00:00Z',
     updated_at: (p.dateModified ?? p.datePublished) + 'T00:00:00Z',
   };
@@ -166,6 +175,7 @@ export default function BlogIndexPage() {
   };
 
   const hasFilters = search || activeTag;
+  const substackUrl = process.env.NEXT_PUBLIC_SUBSTACK_PUBLICATION_URL;
 
   return (
     <>
@@ -177,12 +187,33 @@ export default function BlogIndexPage() {
               Resources
             </span>
             <h1 className="font-heading text-3xl sm:text-4xl text-primary mb-3">
-              UAE Careers <em>Blog</em>
+              Career <em>Field Notes</em>
             </h1>
             <p className="text-text-muted text-base">
-              Practical guides for tech professionals working in or moving to the UAE.
+              Regional job-market signals, company stories, and practical guides for building a career in the UAE.
             </p>
           </div>
+
+          {substackUrl && (
+            <a
+              href={substackUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group mb-7 flex flex-col gap-4 rounded-2xl bg-surface-lowest p-5 shadow-ambient transition-all hover:-translate-y-0.5 hover:shadow-ambient-hover sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-widest text-secondary mb-1">Published on Substack</p>
+                <p className="font-heading text-xl text-primary">Subscribe for the next regional hiring note</p>
+              </div>
+              <span className="inline-flex items-center gap-1.5 text-primary font-semibold uppercase tracking-wider text-xs">
+                Open Substack
+                <svg className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fillRule="evenodd" d="M5.22 14.78a.75.75 0 001.06 0l7.25-7.25a.75.75 0 00-1.06-1.06L5.22 13.72a.75.75 0 000 1.06z" clipRule="evenodd" />
+                  <path fillRule="evenodd" d="M7.25 6.5a.75.75 0 01.75-.75h5.5a.75.75 0 01.75.75v5.5a.75.75 0 01-1.5 0V7.25H8a.75.75 0 01-.75-.75z" clipRule="evenodd" />
+                </svg>
+              </span>
+            </a>
+          )}
 
           {/* Search */}
           <div className="relative mb-5">
@@ -312,11 +343,11 @@ export default function BlogIndexPage() {
             <p className="text-xs text-text-muted">Answers to common UAE job questions</p>
           </Link>
           <Link
-            href="/jobs/in/dubai"
+            href="/profiles/new"
             className="rounded-2xl bg-surface-lowest shadow-ambient p-5 hover:-translate-y-0.5 transition-transform"
           >
-            <p className="font-heading text-base text-primary mb-1">Jobs in Dubai</p>
-            <p className="text-xs text-text-muted">Dubai tech jobs, filtered and live</p>
+            <p className="font-heading text-base text-primary mb-1">Create Your Profile</p>
+            <p className="text-xs text-text-muted">Turn the guidance into a profile hiring teams can find</p>
           </Link>
         </div>
       </div>

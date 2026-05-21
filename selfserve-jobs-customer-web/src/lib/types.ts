@@ -389,6 +389,9 @@ export interface BlogPostListItem {
   status: string;
   featured_image_url?: string | null;
   reading_minutes: number;
+  source?: string;
+  external_url?: string | null;
+  published_at?: string;
   created_at: string;
   updated_at: string;
 }
@@ -406,6 +409,9 @@ export interface BlogPost {
   reading_minutes: number;
   view_count: number;
   link_preview?: LinkPreview | null;
+  source?: string;
+  external_url?: string | null;
+  published_at?: string;
   created_at: string;
   updated_at: string;
 }
@@ -415,6 +421,11 @@ export interface AdminBlogPost extends BlogPostListItem {
   view_count: number;
   link_click_count: number;
   link_preview?: LinkPreview | null;
+  source?: string;
+  source_guid?: string | null;
+  external_url?: string | null;
+  published_at?: string;
+  source_synced_at?: string | null;
 }
 
 export interface BlogListFilters {

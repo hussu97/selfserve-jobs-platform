@@ -1,7 +1,11 @@
 import math
 import re
 import urllib.parse
+import xml.etree.ElementTree as ET
 from datetime import UTC, datetime
+from email.utils import parsedate_to_datetime
+from html import unescape
+from html.parser import HTMLParser
 
 from fastapi import HTTPException, status
 from sqlalchemy import func, or_, select, update
@@ -30,6 +34,23 @@ def _calculate_reading_minutes(content: str) -> int:
     return max(1, round(words / 200))
 
 
+def _slugify(value: str) -> str:
+    slug = re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
+    return slug[:120].strip("-") or _generate_code().lower()
+
+
+async def _unique_slug(db: AsyncSession, preferred_slug: str, source_guid: str | None = None) -> str:
+    slug = preferred_slug
+    suffix = _slugify(source_guid[-24:])[-8:] if source_guid else _generate_code().lower()
+    i = 1
+    while True:
+        result = await db.execute(select(BlogPost).where(BlogPost.slug == slug))
+        if result.scalar_one_or_none() is None:
+            return slug
+        slug = f"{preferred_slug[:110].strip('-')}-{suffix if i == 1 else f'{suffix}-{i}'}"
+        i += 1
+
+
 async def create_blog_post(db: AsyncSession, data: BlogPostCreate) -> BlogPost:
     existing = await db.execute(select(BlogPost).where(BlogPost.slug == data.slug))
     if existing.scalar_one_or_none():
@@ -48,6 +69,7 @@ async def create_blog_post(db: AsyncSession, data: BlogPostCreate) -> BlogPost:
         status=data.status,
         featured_image_url=data.featured_image_url,
         reading_minutes=reading_minutes,
+        published_at=datetime.now(UTC),
     )
 
     if data.link_preview_url:
@@ -149,16 +171,21 @@ async def list_blog_posts(
     count_result = await db.execute(select(func.count()).select_from(query.subquery()))
     all_total = count_result.scalar_one()
 
-    offset = (page - 1) * per_page
-    result = await db.execute(query.order_by(BlogPost.created_at.desc()).offset(offset).limit(per_page))
-    posts = result.scalars().all()
-
-    # Tag filtering is done in Python to stay SQLite-compatible (PostgreSQL uses JSONB @>)
     if tag:
+        result = await db.execute(query.order_by(BlogPost.published_at.desc(), BlogPost.created_at.desc()))
+        all_posts = result.scalars().all()
         tag_lower = tag.lower()
-        posts = [p for p in posts if any(t.lower() == tag_lower for t in (p.tags or []))]
-
-    total = len(posts) if tag else all_total
+        filtered_posts = [p for p in all_posts if any(t.lower() == tag_lower for t in (p.tags or []))]
+        total = len(filtered_posts)
+        offset = (page - 1) * per_page
+        posts = filtered_posts[offset : offset + per_page]
+    else:
+        total = all_total
+        offset = (page - 1) * per_page
+        result = await db.execute(
+            query.order_by(BlogPost.published_at.desc(), BlogPost.created_at.desc()).offset(offset).limit(per_page)
+        )
+        posts = result.scalars().all()
 
     return BlogListResponse(
         items=[BlogPostListItem.model_validate(p) for p in posts],
@@ -208,7 +235,9 @@ async def list_admin_blog_posts(
     total = count_result.scalar_one()
 
     offset = (page - 1) * per_page
-    result = await db.execute(query.order_by(BlogPost.created_at.desc()).offset(offset).limit(per_page))
+    result = await db.execute(
+        query.order_by(BlogPost.published_at.desc(), BlogPost.created_at.desc()).offset(offset).limit(per_page)
+    )
     posts = result.scalars().all()
 
     return AdminBlogListResponse(
@@ -230,6 +259,219 @@ async def increment_link_click_count(db: AsyncSession, post_code: str) -> None:
         update(BlogPost).where(BlogPost.post_code == post_code).values(link_click_count=BlogPost.link_click_count + 1)
     )
     await db.flush()
+
+
+class _MarkdownHTMLParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self.parts: list[str] = []
+        self.link_stack: list[str | None] = []
+        self.skip_depth = 0
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag in {"script", "style"}:
+            self.skip_depth += 1
+            return
+        if self.skip_depth:
+            return
+        attrs_dict = dict(attrs)
+        if tag in {"p", "div", "section", "article"}:
+            self.parts.append("\n\n")
+        elif tag == "br":
+            self.parts.append("\n")
+        elif tag in {"h1", "h2"}:
+            self.parts.append("\n\n## ")
+        elif tag == "h3":
+            self.parts.append("\n\n### ")
+        elif tag == "li":
+            self.parts.append("\n- ")
+        elif tag in {"strong", "b"}:
+            self.parts.append("**")
+        elif tag in {"em", "i"}:
+            self.parts.append("*")
+        elif tag == "a":
+            self.link_stack.append(attrs_dict.get("href"))
+            self.parts.append("[")
+        elif tag == "blockquote":
+            self.parts.append("\n\n> ")
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag in {"script", "style"}:
+            self.skip_depth = max(0, self.skip_depth - 1)
+            return
+        if self.skip_depth:
+            return
+        if tag in {"h1", "h2", "h3", "p", "div", "section", "article", "blockquote", "ul", "ol"}:
+            self.parts.append("\n\n")
+        elif tag in {"strong", "b"}:
+            self.parts.append("**")
+        elif tag in {"em", "i"}:
+            self.parts.append("*")
+        elif tag == "a":
+            href = self.link_stack.pop() if self.link_stack else None
+            self.parts.append(f"]({href})" if href else "]")
+
+    def handle_data(self, data: str) -> None:
+        if self.skip_depth:
+            return
+        text = unescape(data)
+        if text:
+            self.parts.append(text)
+
+    def markdown(self) -> str:
+        value = "".join(self.parts)
+        value = re.sub(r"[ \t]+\n", "\n", value)
+        value = re.sub(r"\n{3,}", "\n\n", value)
+        value = re.sub(r" +", " ", value)
+        return value.strip()
+
+
+def _html_to_markdown(html: str) -> str:
+    parser = _MarkdownHTMLParser()
+    parser.feed(html)
+    return parser.markdown()
+
+
+def _plain_text(value: str) -> str:
+    parser = _MarkdownHTMLParser()
+    parser.feed(value)
+    text = re.sub(r"\[(.*?)\]\([^)]*\)", r"\1", parser.markdown())
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def _excerpt(value: str, max_chars: int = 220) -> str:
+    text = _plain_text(value)
+    if len(text) <= max_chars:
+        return text or "Latest regional job market notes from hirebridge."
+    return text[: max_chars - 1].rsplit(" ", 1)[0].rstrip(".,;:") + "…"
+
+
+def _find_child_text(item: ET.Element, local_name: str) -> str | None:
+    for child in item:
+        if child.tag.split("}")[-1] == local_name and child.text:
+            return child.text.strip()
+    return None
+
+
+def _parse_rss_date(value: str | None) -> datetime:
+    if not value:
+        return datetime.now(UTC)
+    try:
+        parsed = parsedate_to_datetime(value)
+        if parsed.tzinfo is None:
+            return parsed.replace(tzinfo=UTC)
+        return parsed.astimezone(UTC)
+    except Exception:
+        return datetime.now(UTC)
+
+
+def _extract_image(item: ET.Element, html: str) -> str | None:
+    for child in item:
+        tag = child.tag.split("}")[-1]
+        if tag in {"content", "thumbnail"} and child.attrib.get("url"):
+            return child.attrib["url"]
+        if tag == "enclosure" and child.attrib.get("url") and child.attrib.get("type", "").startswith("image/"):
+            return child.attrib["url"]
+    match = re.search(r'<img[^>]+src=["\']([^"\']+)["\']', html, re.IGNORECASE)
+    return match.group(1) if match else None
+
+
+async def sync_substack_posts(
+    db: AsyncSession,
+    *,
+    feed_url: str,
+    publication_url: str,
+    publication_name: str,
+) -> dict[str, int | str | bool]:
+    """Fetch Substack RSS and upsert posts into blog_post.
+
+    Missing feed items are intentionally not archived; Substack remains an
+    ingestion source, not an instruction to delete local article history.
+    """
+    if not feed_url:
+        return {"skipped": True, "created": 0, "updated": 0, "seen": 0, "reason": "substack_feed_url_not_configured"}
+
+    import httpx
+
+    async with httpx.AsyncClient(timeout=12.0, follow_redirects=True) as client:
+        response = await client.get(feed_url, headers={"User-Agent": "Mozilla/5.0 (compatible; hirebridge-bot/1.0)"})
+        response.raise_for_status()
+
+    root = ET.fromstring(response.content)
+    items = root.findall(".//item")
+    now = datetime.now(UTC)
+    created = 0
+    updated = 0
+
+    for item in items:
+        title = _find_child_text(item, "title")
+        link = _find_child_text(item, "link")
+        guid = _find_child_text(item, "guid") or link
+        if not title or not guid:
+            continue
+
+        raw_content = _find_child_text(item, "encoded") or _find_child_text(item, "description") or ""
+        content = _html_to_markdown(raw_content) or _plain_text(raw_content) or title
+        description = _find_child_text(item, "description") or raw_content
+        published_at = _parse_rss_date(_find_child_text(item, "pubDate"))
+        author = _find_child_text(item, "creator") or publication_name or "hirebridge"
+        tags = sorted(
+            {
+                (child.text or "").strip()
+                for child in item
+                if child.tag.split("}")[-1] == "category" and (child.text or "").strip()
+            }
+        )
+        if not tags:
+            tags = ["Job market"]
+
+        existing_result = await db.execute(
+            select(BlogPost).where(BlogPost.source == "substack", BlogPost.source_guid == guid)
+        )
+        post = existing_result.scalar_one_or_none()
+        is_new = post is None
+
+        if post is None:
+            slug = await _unique_slug(db, _slugify(title), guid)
+            post = BlogPost(
+                post_code=_generate_code(),
+                slug=slug,
+                source="substack",
+                source_guid=guid,
+                view_count=0,
+                link_click_count=0,
+            )
+            db.add(post)
+
+        post.title = title
+        post.excerpt = _excerpt(description)
+        post.content = content
+        post.author = author
+        post.tags = tags
+        post.status = "published"
+        post.featured_image_url = _extract_image(item, raw_content)
+        post.reading_minutes = _calculate_reading_minutes(content)
+        post.external_url = link or publication_url or feed_url
+        post.published_at = published_at
+        post.source_synced_at = now
+        post.updated_at = now
+        if post.link_preview is None and post.external_url:
+            parsed = urllib.parse.urlparse(post.external_url)
+            post.link_preview = {
+                "url": post.external_url,
+                "title": title,
+                "description": post.excerpt,
+                "image": post.featured_image_url,
+                "domain": parsed.netloc,
+            }
+
+        if is_new:
+            created += 1
+        else:
+            updated += 1
+
+    await db.flush()
+    return {"skipped": False, "created": created, "updated": updated, "seen": len(items)}
 
 
 async def fetch_link_preview(url: str) -> LinkPreview | None:

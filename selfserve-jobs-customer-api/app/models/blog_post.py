@@ -38,9 +38,18 @@ class BlogPost(Base):
     link_click_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     # Stored OG preview for the primary link in the post (url, title, description, image, domain)
     link_preview: Mapped[dict | None] = mapped_column(JSONB_COMPAT, nullable=True)
+    source: Mapped[str] = mapped_column(VARCHAR(40), default="internal", nullable=False, server_default="internal")
+    source_guid: Mapped[str | None] = mapped_column(VARCHAR(1000), nullable=True)
+    external_url: Mapped[str | None] = mapped_column(VARCHAR(2048), nullable=True)
+    published_at: Mapped[datetime] = mapped_column(TIMESTAMPTZ, nullable=False, server_default=func.now())
+    source_synced_at: Mapped[datetime | None] = mapped_column(TIMESTAMPTZ, nullable=True)
     created_at: Mapped[datetime] = mapped_column(TIMESTAMPTZ, nullable=False, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         TIMESTAMPTZ, nullable=False, server_default=func.now(), onupdate=func.now()
     )
 
-    __table_args__ = (Index("ix_blog_post_status_created_at", "status", "created_at"),)
+    __table_args__ = (
+        Index("ix_blog_post_status_created_at", "status", "created_at"),
+        Index("ix_blog_post_status_published_at", "status", "published_at"),
+        Index("ix_blog_post_source_guid", "source", "source_guid", unique=True),
+    )

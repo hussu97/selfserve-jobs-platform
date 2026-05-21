@@ -11,6 +11,8 @@ from sqlalchemy import select
 
 from app.models.auth_session import AuthSession
 from app.models.blog_post import BlogPost
+from app.routers import internal
+from app.services import blog_service
 from app.services.code_generator import generate_code
 
 ADMIN_TOKEN = "admin-blog-test-token"
@@ -35,7 +37,12 @@ async def _make_admin_session(db_session) -> AuthSession:
 
 
 async def _make_blog_post(
-    db_session, *, title: str = "Test Post", status: str = "published", slug: str | None = None
+    db_session,
+    *,
+    title: str = "Test Post",
+    status: str = "published",
+    slug: str | None = None,
+    published_at: datetime | None = None,
 ) -> BlogPost:
     post = BlogPost(
         post_code=generate_code(12),
@@ -49,6 +56,7 @@ async def _make_blog_post(
         reading_minutes=2,
         view_count=0,
         link_click_count=0,
+        published_at=published_at or datetime.now(UTC),
     )
     db_session.add(post)
     await db_session.flush()
@@ -107,6 +115,9 @@ async def test_get_blog_post_by_slug(client, db_session):
     assert data["slug"] == "uae-visa-tips"
     assert data["title"] == "UAE Visa Tips"
     assert "content" in data
+    assert data["source"] == "internal"
+    assert data["external_url"] is None
+    assert "published_at" in data
 
 
 @pytest.mark.asyncio
@@ -140,6 +151,124 @@ async def test_track_link_click(client, db_session):
 
     await db_session.refresh(post)
     assert post.link_click_count == 1
+
+
+@pytest.mark.asyncio
+async def test_list_blog_posts_orders_by_published_at(client, db_session):
+    await _make_blog_post(
+        db_session,
+        title="Older Published",
+        status="published",
+        slug="older-published",
+        published_at=datetime(2026, 1, 1, tzinfo=UTC),
+    )
+    await _make_blog_post(
+        db_session,
+        title="Newer Published",
+        status="published",
+        slug="newer-published",
+        published_at=datetime(2026, 2, 1, tzinfo=UTC),
+    )
+    await db_session.commit()
+
+    resp = await client.get("/api/v1/blog/posts")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert [item["title"] for item in data["items"]] == ["Newer Published", "Older Published"]
+    assert data["items"][0]["source"] == "internal"
+    assert "published_at" in data["items"][0]
+
+
+@pytest.mark.asyncio
+async def test_sync_substack_endpoint_noops_when_feed_missing(client, db_session, monkeypatch):
+    monkeypatch.setattr(internal.settings, "internal_api_secret", "secret")
+    monkeypatch.setattr(internal.settings, "substack_feed_url", "")
+
+    resp = await client.post("/api/v1/internal/sync-substack", headers={"X-Internal-Secret": "secret"})
+
+    assert resp.status_code == 200
+    assert resp.json()["skipped"] is True
+
+
+class _MockRssResponse:
+    def __init__(self, content: bytes):
+        self.content = content
+
+    def raise_for_status(self) -> None:
+        return None
+
+
+class _MockAsyncClient:
+    def __init__(self, *args, **kwargs):
+        self.args = args
+        self.kwargs = kwargs
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc, tb):
+        return None
+
+    async def get(self, url, headers=None):
+        return _MockRssResponse(
+            b"""<?xml version="1.0" encoding="UTF-8"?>
+            <rss version="2.0"
+              xmlns:content="http://purl.org/rss/1.0/modules/content/"
+              xmlns:dc="http://purl.org/dc/elements/1.1/">
+              <channel>
+                <item>
+                  <title>How to Get Hired in Dubai</title>
+                  <link>https://hirebridge.substack.com/p/get-hired-dubai</link>
+                  <guid>substack-guid-1</guid>
+                  <pubDate>Fri, 01 May 2026 08:00:00 GMT</pubDate>
+                  <dc:creator>hirebridge</dc:creator>
+                  <category>Job Search</category>
+                  <category>Dubai</category>
+                  <description><![CDATA[<p>A practical guide for candidates.</p>]]></description>
+                  <content:encoded><![CDATA[
+                    <h2>Start with the market</h2>
+                    <p>Use your profile to show proof.</p>
+                    <p><a href="https://example.com">Read more</a></p>
+                  ]]></content:encoded>
+                </item>
+              </channel>
+            </rss>"""
+        )
+
+
+@pytest.mark.asyncio
+async def test_sync_substack_imports_and_updates_idempotently(db_session, monkeypatch):
+    import httpx
+
+    monkeypatch.setattr(httpx, "AsyncClient", _MockAsyncClient)
+
+    first = await blog_service.sync_substack_posts(
+        db_session,
+        feed_url="https://hirebridge.substack.com/feed",
+        publication_url="https://hirebridge.substack.com",
+        publication_name="hirebridge Field Notes",
+    )
+    second = await blog_service.sync_substack_posts(
+        db_session,
+        feed_url="https://hirebridge.substack.com/feed",
+        publication_url="https://hirebridge.substack.com",
+        publication_name="hirebridge Field Notes",
+    )
+    await db_session.commit()
+
+    assert first == {"skipped": False, "created": 1, "updated": 0, "seen": 1}
+    assert second == {"skipped": False, "created": 0, "updated": 1, "seen": 1}
+
+    result = await db_session.execute(select(BlogPost).where(BlogPost.source == "substack"))
+    posts = result.scalars().all()
+    assert len(posts) == 1
+    post = posts[0]
+    assert post.source_guid == "substack-guid-1"
+    assert post.external_url == "https://hirebridge.substack.com/p/get-hired-dubai"
+    assert post.slug == "how-to-get-hired-in-dubai"
+    assert post.published_at.replace(tzinfo=UTC) == datetime(2026, 5, 1, 8, 0, tzinfo=UTC)
+    assert "## Start with the market" in post.content
+    assert "<p>" not in post.content
 
 
 # ---------------------------------------------------------------------------

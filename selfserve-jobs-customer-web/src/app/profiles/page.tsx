@@ -8,6 +8,7 @@ import { SearchBar } from '@/components/shared/SearchBar';
 import { Pagination } from '@/components/shared/Pagination';
 import { ProfileCardSkeleton } from '@/components/ui/Skeleton';
 import { StatusBanner } from '@/components/shared/StatusBanner';
+import { JobMarketNotes } from '@/components/blog/JobMarketNotes';
 import { getProfiles } from '@/lib/api';
 import type { ProfileFilters as ProfileFiltersType, ProfileListItem, RelocationPreference, NoticePeriod } from '@/lib/types';
 import { ITEMS_PER_PAGE } from '@/lib/constants';
@@ -248,6 +249,9 @@ function ProfilesContent() {
         <div className="flex flex-col lg:flex-row gap-8">
           <aside className="w-full lg:w-64 lg:flex-shrink-0">
             <ProfileFilters filters={filters} onChange={handleFiltersChange} resultCount={loading ? null : total} />
+            <div className="mt-6">
+              <JobMarketNotes />
+            </div>
           </aside>
 
           <div className="flex-1 min-w-0" aria-busy={loading} aria-live="polite">

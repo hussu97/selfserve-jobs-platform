@@ -77,6 +77,9 @@ jobs:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
           ADMIN_EMAILS: ${{ secrets.ADMIN_EMAILS }}
           ADMIN_NOTIFICATION_EMAIL: ${{ secrets.ADMIN_NOTIFICATION_EMAIL }}
+          SUBSTACK_FEED_URL: ${{ secrets.SUBSTACK_FEED_URL }}
+          SUBSTACK_PUBLICATION_URL: ${{ secrets.SUBSTACK_PUBLICATION_URL }}
+          SUBSTACK_PUBLICATION_NAME: ${{ secrets.SUBSTACK_PUBLICATION_NAME }}
         run: |
           # Build a YAML env-vars file for Cloud Run. Using --env-vars-file rather
           # than --set-env-vars avoids shell-escaping headaches with values that
@@ -107,6 +110,9 @@ jobs:
             emit_yaml_scalar "SENTRY_DSN" "$SENTRY_DSN"
             emit_yaml_scalar "ADMIN_EMAILS" "$ADMIN_EMAILS"
             emit_yaml_scalar "ADMIN_NOTIFICATION_EMAIL" "$ADMIN_NOTIFICATION_EMAIL"
+            emit_yaml_scalar "SUBSTACK_FEED_URL" "$SUBSTACK_FEED_URL"
+            emit_yaml_scalar "SUBSTACK_PUBLICATION_URL" "$SUBSTACK_PUBLICATION_URL"
+            emit_yaml_scalar "SUBSTACK_PUBLICATION_NAME" "$SUBSTACK_PUBLICATION_NAME"
           } > "$ENV_FILE"
 
           set +e

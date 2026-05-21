@@ -4,6 +4,7 @@ import {
   adminResendUserVerification,
   adminUpdateUserEmail,
   passkeyAvailability,
+  getBlogPosts,
   getJob,
   getJobs,
   deleteJob,
@@ -224,6 +225,46 @@ describe('passkeyAvailability', () => {
       expect.stringContaining('/api/v1/passkey/availability?email=admin%40example.com&admin_only=true'),
       expect.any(Object)
     );
+  });
+});
+
+describe('getBlogPosts', () => {
+  it('returns Substack source metadata from the blog API', async () => {
+    const payload = {
+      items: [
+        {
+          post_code: 'blog12345678',
+          title: 'Market note',
+          slug: 'market-note',
+          excerpt: 'A regional hiring note.',
+          author: 'hirebridge',
+          tags: ['Job Search'],
+          status: 'published',
+          featured_image_url: null,
+          reading_minutes: 3,
+          source: 'substack',
+          external_url: 'https://example.substack.com/p/market-note',
+          published_at: '2026-05-01T08:00:00Z',
+          created_at: '2026-05-01T08:00:00Z',
+          updated_at: '2026-05-01T08:00:00Z',
+        },
+      ],
+      total: 1,
+      page: 1,
+      per_page: 3,
+      total_pages: 1,
+    };
+    mockOkResponse(payload);
+
+    const result = await getBlogPosts({ per_page: 3 });
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/api/v1/blog/posts?page=1&per_page=3'),
+      expect.any(Object)
+    );
+    expect(result.items[0].source).toBe('substack');
+    expect(result.items[0].external_url).toContain('substack.com');
+    expect(result.items[0].published_at).toBe('2026-05-01T08:00:00Z');
   });
 });
 
