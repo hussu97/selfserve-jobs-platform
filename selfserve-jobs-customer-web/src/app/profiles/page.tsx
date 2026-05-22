@@ -246,10 +246,6 @@ function ProfilesContent() {
           />
         </div>
 
-        <div className="mb-8">
-          <JobMarketNotes />
-        </div>
-
         <div className="flex flex-col lg:flex-row gap-8">
           <aside className="w-full lg:w-64 lg:flex-shrink-0">
             <ProfileFilters filters={filters} onChange={handleFiltersChange} resultCount={loading ? null : total} />
@@ -327,6 +323,10 @@ function ProfilesContent() {
                 )}
               </>
             )}
+
+            <div className="mt-10">
+              <JobMarketNotes />
+            </div>
           </div>
         </div>
       </div>
