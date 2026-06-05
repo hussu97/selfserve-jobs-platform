@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Changed
+- **API database pool default** — raised the production-friendly SQLAlchemy pool defaults to `DATABASE_POOL_SIZE=3` and `DATABASE_MAX_OVERFLOW=2`, allowing up to 5 database connections per Cloud Run instance while staying well below the previous 30-connection ceiling.
 - **Profile listing article placement** — moved Job Market Notes below the talent results, pagination, and mobile infinite-scroll states so the module follows the profile list on all viewport sizes.
 
 - **Profile creation article placement** — moved the Job Market Notes module below the profile creation form so candidates focus on completing their profile first, then continue into related guidance.

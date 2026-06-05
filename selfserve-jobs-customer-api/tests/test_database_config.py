@@ -9,8 +9,8 @@ def test_postgres_engine_options_use_bounded_pool(monkeypatch):
         "settings",
         SimpleNamespace(
             database_url="postgresql+asyncpg://user:pass@localhost/jobs4u",
-            database_pool_size=1,
-            database_max_overflow=1,
+            database_pool_size=3,
+            database_max_overflow=2,
             database_pool_timeout_seconds=10,
             database_pool_recycle_seconds=1800,
             is_development=False,
@@ -19,8 +19,8 @@ def test_postgres_engine_options_use_bounded_pool(monkeypatch):
 
     options = database._build_engine_options()
 
-    assert options["pool_size"] == 1
-    assert options["max_overflow"] == 1
+    assert options["pool_size"] == 3
+    assert options["max_overflow"] == 2
     assert options["pool_timeout"] == 10
     assert options["pool_recycle"] == 1800
     assert options["pool_pre_ping"] is True
