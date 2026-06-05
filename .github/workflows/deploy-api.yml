@@ -80,6 +80,10 @@ jobs:
           SUBSTACK_FEED_URL: ${{ secrets.SUBSTACK_FEED_URL }}
           SUBSTACK_PUBLICATION_URL: ${{ secrets.SUBSTACK_PUBLICATION_URL }}
           SUBSTACK_PUBLICATION_NAME: ${{ secrets.SUBSTACK_PUBLICATION_NAME }}
+          DATABASE_POOL_SIZE: ${{ secrets.DATABASE_POOL_SIZE }}
+          DATABASE_MAX_OVERFLOW: ${{ secrets.DATABASE_MAX_OVERFLOW }}
+          DATABASE_POOL_TIMEOUT_SECONDS: ${{ secrets.DATABASE_POOL_TIMEOUT_SECONDS }}
+          DATABASE_POOL_RECYCLE_SECONDS: ${{ secrets.DATABASE_POOL_RECYCLE_SECONDS }}
         run: |
           # Build a YAML env-vars file for Cloud Run. Using --env-vars-file rather
           # than --set-env-vars avoids shell-escaping headaches with values that
@@ -113,6 +117,10 @@ jobs:
             emit_yaml_scalar "SUBSTACK_FEED_URL" "$SUBSTACK_FEED_URL"
             emit_yaml_scalar "SUBSTACK_PUBLICATION_URL" "$SUBSTACK_PUBLICATION_URL"
             emit_yaml_scalar "SUBSTACK_PUBLICATION_NAME" "$SUBSTACK_PUBLICATION_NAME"
+            emit_yaml_scalar "DATABASE_POOL_SIZE" "$DATABASE_POOL_SIZE"
+            emit_yaml_scalar "DATABASE_MAX_OVERFLOW" "$DATABASE_MAX_OVERFLOW"
+            emit_yaml_scalar "DATABASE_POOL_TIMEOUT_SECONDS" "$DATABASE_POOL_TIMEOUT_SECONDS"
+            emit_yaml_scalar "DATABASE_POOL_RECYCLE_SECONDS" "$DATABASE_POOL_RECYCLE_SECONDS"
           } > "$ENV_FILE"
 
           set +e

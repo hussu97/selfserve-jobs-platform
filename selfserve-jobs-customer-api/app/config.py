@@ -1,10 +1,15 @@
 from functools import lru_cache
 
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     database_url: str  # required — set via DATABASE_URL env var; no default to avoid credential exposure
+    database_pool_size: int = Field(default=1, ge=1)
+    database_max_overflow: int = Field(default=1, ge=0)
+    database_pool_timeout_seconds: int = Field(default=10, ge=1)
+    database_pool_recycle_seconds: int = Field(default=1800, ge=60)
     frontend_url: str = "http://localhost:3000"
     gcs_bucket_name: str = ""
     resend_api_key: str = ""

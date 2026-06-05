@@ -11,18 +11,38 @@ logger = logging.getLogger(__name__)
 
 settings = get_settings()
 
-# Query timeout: 30 s default for all statements (PostgreSQL only)
-_CONNECT_ARGS: dict = {}
-if "postgresql" in settings.database_url:
-    _CONNECT_ARGS = {"server_settings": {"statement_timeout": "30000"}}
+
+def _is_postgresql_url(database_url: str) -> bool:
+    return database_url.startswith(("postgresql://", "postgresql+", "postgres://"))
+
+
+def _build_connect_args(database_url: str) -> dict:
+    # Query timeout: 30 s default for all statements (PostgreSQL only)
+    if _is_postgresql_url(database_url):
+        return {"server_settings": {"statement_timeout": "30000"}}
+    return {}
+
+
+def _build_engine_options() -> dict:
+    options = {
+        "echo": settings.is_development,
+        "connect_args": _build_connect_args(settings.database_url),
+    }
+    if _is_postgresql_url(settings.database_url):
+        options.update(
+            pool_pre_ping=True,
+            pool_size=settings.database_pool_size,
+            max_overflow=settings.database_max_overflow,
+            pool_timeout=settings.database_pool_timeout_seconds,
+            pool_recycle=settings.database_pool_recycle_seconds,
+            pool_use_lifo=True,
+        )
+    return options
+
 
 engine = create_async_engine(
     settings.database_url,
-    echo=settings.is_development,
-    pool_pre_ping=True,
-    pool_size=10,
-    max_overflow=20,
-    connect_args=_CONNECT_ARGS,
+    **_build_engine_options(),
 )
 
 async_session_factory = async_sessionmaker(

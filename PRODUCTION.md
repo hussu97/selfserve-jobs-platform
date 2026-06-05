@@ -205,6 +205,10 @@ gcloud run deploy $API_SERVICE_NAME \
   --service-account $SA_EMAIL \
   --add-cloudsql-instances=$DB_CONNECTION_NAME \
   --set-env-vars "DATABASE_URL=postgresql+asyncpg://${DB_USER}:${DB_PASSWORD}@/${DB_NAME}?host=/cloudsql/${DB_CONNECTION_NAME}" \
+  --set-env-vars "DATABASE_POOL_SIZE=1" \
+  --set-env-vars "DATABASE_MAX_OVERFLOW=1" \
+  --set-env-vars "DATABASE_POOL_TIMEOUT_SECONDS=10" \
+  --set-env-vars "DATABASE_POOL_RECYCLE_SECONDS=1800" \
   --set-env-vars "GCS_BUCKET_NAME=${BUCKET_NAME}" \
   --set-env-vars "RESEND_API_KEY=${RESEND_API_KEY}" \
   --set-env-vars "RESEND_FROM_EMAIL=${RESEND_FROM_EMAIL}" \
@@ -311,6 +315,10 @@ Configure these secrets in your GitHub repo (**Settings → Secrets and variable
 |--------|-------|-------|
 | `GCP_CLOUDSQL_INSTANCE` | `$DB_CONNECTION_NAME` — `PROJECT_ID:REGION:DB_INSTANCE` | Passed to `--add-cloudsql-instances`; attaches the Unix socket at `/cloudsql/$GCP_CLOUDSQL_INSTANCE` |
 | `GCP_DATABASE_URL` | `postgresql+asyncpg://$DB_USER:$DB_PASSWORD@/$DB_NAME?host=/cloudsql/$DB_CONNECTION_NAME` | Full async DSN; the `host=` query arg routes through the Cloud SQL socket |
+| `DATABASE_POOL_SIZE` | (optional) `1` | SQLAlchemy base pool size per Cloud Run instance; keep low because every instance owns its own pool |
+| `DATABASE_MAX_OVERFLOW` | (optional) `1` | Temporary extra DB connections per instance above `DATABASE_POOL_SIZE` |
+| `DATABASE_POOL_TIMEOUT_SECONDS` | (optional) `10` | Seconds a request waits for a pooled connection before failing fast |
+| `DATABASE_POOL_RECYCLE_SECONDS` | (optional) `1800` | Recycle pooled connections to avoid stale long-lived Cloud SQL sockets |
 | `GCS_BUCKET_NAME` | `$BUCKET_NAME` from step 0 | Bucket for resume uploads |
 | `RESEND_API_KEY` | `re_...` | Resend API key (see step 7) |
 | `RESEND_FROM_EMAIL` | e.g. `hirebridge <noreply@hirebridgeuae.com>` | Must match a verified Resend domain |
@@ -646,8 +654,8 @@ curl -X POST https://your-api-url/api/v1/verify/resend \
 
 | Symptom detail | Fix |
 |---|---|
-| Single Cloud Run instance exceeding pool | Reduce `pool_size` in `database.py` (currently 10) or scale down `max_overflow` (currently 20). |
-| Multiple Cloud Run instances | Each instance has its own pool. With 10 instances × 10 pool_size = 100 connections. `db-f1-micro` supports ~25 connections. Upgrade instance tier or reduce pool. |
+| Single Cloud Run instance exceeding pool | Lower `DATABASE_POOL_SIZE` or `DATABASE_MAX_OVERFLOW`; defaults are `1` and `1`, so each instance can open at most 2 DB connections. |
+| Multiple Cloud Run instances | Each instance has its own pool. With 10 instances × 2 max connections = 20 connections before admin/manual sessions. `db-f1-micro` supports ~25 connections. Upgrade instance tier, reduce pool, or scale down max instances. |
 | `FATAL: password authentication failed` | DB password changed. Update `DATABASE_URL` env var in Cloud Run. |
 
 **Check current connection count:**
