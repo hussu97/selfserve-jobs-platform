@@ -309,5 +309,3 @@ async def validate_token(
     """Check if an edit token is valid for a job."""
     result = await db.execute(select(Job).where(and_(Job.job_code == entity_code, Job.edit_token == token)))
     return result.scalar_one_or_none() is not None
-
-
