@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Removed
+- **Auto-expiry and listing renewal** — job and profile listings no longer automatically deactivate after `expires_at`. Removed the hourly `expire-listings` internal cron endpoint (and its Cloud Scheduler job), the 7-day expiry warning email and template, the `MAX_RENEWALS`/`RENEWAL_EXTENSION_DAYS` constants, the `POST /{code}/renew` job/profile endpoints and service logic, and the "Renew Listing" UI on the manage page. Listings now remain active indefinitely until the user manually deactivates or deletes them; manual deactivate/reactivate is unaffected.
+
 ### Changed
 - **API database pool default** — raised the production-friendly SQLAlchemy pool defaults to `DATABASE_POOL_SIZE=3` and `DATABASE_MAX_OVERFLOW=2`, allowing up to 5 database connections per Cloud Run instance while staying well below the previous 30-connection ceiling.
 - **Profile listing article placement** — moved Job Market Notes below the talent results, pagination, and mobile infinite-scroll states so the module follows the profile list on all viewport sizes.

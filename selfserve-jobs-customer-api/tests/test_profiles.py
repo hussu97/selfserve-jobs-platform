@@ -479,31 +479,6 @@ async def test_list_profiles_default_sort_open_to_work_first(client, db_session)
     assert codes.index("sortopen001") < codes.index("sortfull001")
 
 
-async def test_renew_profile_updates_last_renewed_at(client, db_session):
-    """Renewing a profile sets last_renewed_at to now, bumping recency."""
-    now = datetime.now(UTC)
-    old_time = now - timedelta(days=10)
-    profile = await _make_profile(
-        db_session,
-        profile_code="renewbump01",
-        email="renewbump@example.com",
-        last_renewed_at=old_time,
-        created_at=old_time,
-    )
-    r = await client.post(
-        f"/api/v1/profiles/{profile.profile_code}/renew",
-        headers={"X-Edit-Token": profile.edit_token},
-    )
-    assert r.status_code == 200
-    await db_session.refresh(profile)
-    # Strip tz for SQLite compat — SQLite returns naive datetimes
-    renewed = profile.last_renewed_at
-    if renewed.tzinfo:
-        renewed = renewed.replace(tzinfo=None)
-    threshold = old_time.replace(tzinfo=None) + timedelta(days=5)
-    assert renewed > threshold
-
-
 async def test_create_profile_stores_employment_status(client):
     """Employment status sent at creation is stored and returned."""
     payload = {**VALID_PROFILE_PAYLOAD, "email": "empnew@example.com", "current_employment_status": "open_to_work"}
