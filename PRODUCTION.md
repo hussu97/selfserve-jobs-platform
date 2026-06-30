@@ -375,9 +375,11 @@ gcloud iam workload-identity-pools providers describe "github-provider" \
 
 ## 11. Cloud Scheduler (Cron Jobs)
 
-Three scheduled jobs keep the platform healthy and content fresh. All call internal API endpoints protected by `X-Internal-Secret`.
+Two scheduled jobs keep the platform healthy and content fresh. All call internal API endpoints protected by `X-Internal-Secret`.
 
 The repository also includes `.github/workflows/deploy-cleanup-job.yml`, which runs the cleanup endpoint daily from GitHub Actions using the same `GCP_*` and `INTERNAL_API_SECRET` secrets. Use that workflow when Cloud Scheduler API is unavailable or not enabled for the project.
+
+> **Note:** Automatic listing expiry (the former `expire-listings` job) has been removed. Job and profile listings no longer auto-deactivate or require renewal — they stay active until the user manually deactivates or deletes them. If you previously created an `expire-listings` Cloud Scheduler job in a live environment, delete it: `gcloud scheduler jobs delete expire-listings --location=$REGION`.
 
 ### Prerequisites
 
@@ -387,26 +389,12 @@ Enable the Cloud Scheduler API if not already enabled:
 gcloud services enable cloudscheduler.googleapis.com
 ```
 
-### Job 1 — `expire-listings` (runs every hour)
-
-Transitions listings past their `expires_at` to `expired`, sends 7-day expiry warning emails, and fires `URL_DELETED` to the Google Indexing API for each expired listing.
-
 ```bash
 export API_URL=$(gcloud run services describe $API_SERVICE_NAME --region $REGION --format='value(status.url)')
 export INTERNAL_API_SECRET="your-internal-api-secret"   # same value as the GitHub secret
-
-gcloud scheduler jobs create http expire-listings \
-  --location=$REGION \
-  --schedule="0 * * * *" \
-  --uri="${API_URL}/api/v1/internal/expire-listings" \
-  --http-method=POST \
-  --headers="X-Internal-Secret=${INTERNAL_API_SECRET},Content-Type=application/json" \
-  --time-zone="UTC" \
-  --attempt-deadline=60s \
-  --description="Expire overdue listings and send 7-day warnings"
 ```
 
-### Job 2 — `sync-substack` (runs daily at 02:30 UTC)
+### Job 1 — `sync-substack` (runs daily at 02:30 UTC)
 
 Imports the latest Substack RSS posts into `blog_post` so `/blog`, homepage articles, profile guidance panels, and the sitemap stay current. Missing items are not archived.
 
@@ -422,7 +410,7 @@ gcloud scheduler jobs create http sync-substack \
   --description="Import latest Substack posts into the hirebridge blog"
 ```
 
-### Job 3 — `cleanup` (runs daily at 03:00 UTC)
+### Job 2 — `cleanup` (runs daily at 03:00 UTC)
 
 Purges expired auth sessions, used login tokens, and email log rows older than 90 days.
 
@@ -447,7 +435,6 @@ gcloud scheduler jobs list --location=$REGION
 ### Run manually (force trigger)
 
 ```bash
-gcloud scheduler jobs run expire-listings --location=$REGION
 gcloud scheduler jobs run sync-substack --location=$REGION
 gcloud scheduler jobs run cleanup-stale-data --location=$REGION
 ```
@@ -455,9 +442,9 @@ gcloud scheduler jobs run cleanup-stale-data --location=$REGION
 ### Update an existing job (e.g. if API URL changes)
 
 ```bash
-gcloud scheduler jobs update http expire-listings \
+gcloud scheduler jobs update http sync-substack \
   --location=$REGION \
-  --uri="${API_URL}/api/v1/internal/expire-listings"
+  --uri="${API_URL}/api/v1/internal/sync-substack"
 ```
 
 ---
@@ -702,9 +689,9 @@ If degraded: check CloudSQL instance status in GCP Console → SQL → your inst
 
 ### Internal cron endpoints not firing
 
-**Symptom:** Listings are not expiring or expiry warning emails are not being sent.
+**Symptom:** Stale auth sessions/tokens/email logs are not being purged, or Substack posts are not syncing.
 
-The cron endpoints (`POST /api/v1/internal/expire-listings`, `POST /api/v1/internal/cleanup`) are protected by `X-Internal-Secret` header matching the `INTERNAL_API_SECRET` env var.
+The cron endpoints (`POST /api/v1/internal/cleanup`, `POST /api/v1/internal/sync-substack`) are protected by `X-Internal-Secret` header matching the `INTERNAL_API_SECRET` env var.
 
 **Verify secret is set:**
 ```bash
@@ -715,6 +702,6 @@ gcloud run services describe $API_SERVICE_NAME \
 
 **Test manually:**
 ```bash
-curl -X POST https://your-api-url/api/v1/internal/expire-listings \
+curl -X POST https://your-api-url/api/v1/internal/cleanup \
   -H "X-Internal-Secret: your-internal-secret"
 ```

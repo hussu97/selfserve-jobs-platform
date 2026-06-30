@@ -108,10 +108,13 @@ Full spec: `design-system/DESIGN.md`. HTML mockups: `design-system/DESKTOP_WEB.h
 
 ## Status State Machine
 `pending_verification` → `active` (on email verify)
-`active` → `expired` (auto, via cron after `expires_at`)
+`active` → `inactive` (user manually deactivates via magic link)
+`inactive` → `active` (user manually reactivates)
 `active` → `removed` (user deletes via magic link)
 `active` → `under_review` (3+ reports trigger auto-hide)
 `under_review` → `active` or `removed` (manual admin review)
+
+Note: Automatic expiry (auto-deactivation via cron) and listing renewal have been removed. Listings stay active indefinitely until the user manually deactivates or deletes them. The `expires_at` field is still set on creation but no longer drives any status transition.
 
 ## Naming Conventions
 - Python: `snake_case` for everything
@@ -122,7 +125,7 @@ Full spec: `design-system/DESIGN.md`. HTML mockups: `design-system/DESKTOP_WEB.h
 
 ## Additional Notes
 - Listing limits: max 5 active jobs + 2 active profiles per email address
-- Listings expire after 60 days (auto-archived)
+- Listings no longer auto-expire or require renewal — they remain active until manually deactivated or deleted by the user
 - Bot protection: honeypot fields + IP rate limiting on creation endpoints
 - Never expose internal `id` columns in API responses — only `*_code` fields
 - Email normalization: lowercase + trim on ingestion

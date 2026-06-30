@@ -29,7 +29,3 @@ ADMIN_VERIFICATION_RESEND_COOLDOWN_MINUTES: int = 5
 
 # Reporting
 REPORT_THRESHOLD: int = 3  # auto-flag entity for review after this many reports
-
-# Renewal
-MAX_RENEWALS: int = 2  # maximum number of times a listing can be renewed
-RENEWAL_EXTENSION_DAYS: int = 60  # each renewal extends expires_at by this many days

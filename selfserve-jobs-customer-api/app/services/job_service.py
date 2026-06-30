@@ -311,28 +311,3 @@ async def validate_token(
     return result.scalar_one_or_none() is not None
 
 
-async def renew_job(db: AsyncSession, job_code: str, edit_token: str) -> Job:
-    """Extend a job listing's expiry by RENEWAL_EXTENSION_DAYS (max MAX_RENEWALS times)."""
-    from app.constants import MAX_RENEWALS, RENEWAL_EXTENSION_DAYS
-
-    job = await get_job_by_code_and_token(db, job_code, edit_token)
-    if job.status not in ("active", "expired"):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Only active or expired listings can be renewed",
-        )
-    if job.renewal_count >= MAX_RENEWALS:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Maximum of {MAX_RENEWALS} renewals reached for this listing",
-        )
-    now = datetime.now(UTC)
-    # Extend from max(now, current expires_at) so the extension always adds full days
-    base = max(now, job.expires_at)
-    job.expires_at = base + timedelta(days=RENEWAL_EXTENSION_DAYS)
-    job.renewal_count += 1
-    job.status = "active"
-    job.last_renewed_at = now
-    job.updated_at = now
-    await db.flush()
-    return job

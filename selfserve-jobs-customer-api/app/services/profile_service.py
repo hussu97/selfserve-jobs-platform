@@ -443,29 +443,3 @@ async def get_entities_for_email(
         )
 
     return entities
-
-
-async def renew_profile(db: AsyncSession, profile_code: str, edit_token: str) -> Profile:
-    """Extend a profile listing's expiry by RENEWAL_EXTENSION_DAYS (max MAX_RENEWALS times)."""
-    from app.constants import MAX_RENEWALS, RENEWAL_EXTENSION_DAYS
-
-    profile = await get_profile_by_code_and_token(db, profile_code, edit_token)
-    if profile.status not in ("active", "expired"):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Only active or expired listings can be renewed",
-        )
-    if profile.renewal_count >= MAX_RENEWALS:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Maximum of {MAX_RENEWALS} renewals reached for this listing",
-        )
-    now = datetime.now(UTC)
-    base = max(now, profile.expires_at)
-    profile.expires_at = base + timedelta(days=RENEWAL_EXTENSION_DAYS)
-    profile.renewal_count += 1
-    profile.status = "active"
-    profile.last_renewed_at = now
-    profile.updated_at = now
-    await db.flush()
-    return profile
