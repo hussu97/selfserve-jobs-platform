@@ -144,6 +144,7 @@ Note: Automatic expiry (auto-deactivation via cron) and listing renewal have bee
 - **Do** trigger all workflows on changes to `.github/workflows/**` or `README.md` — workflow/infra changes should always be validated
 - Required secrets for API deploy: `GCP_WORKLOAD_IDENTITY_PROVIDER`, `GCP_SERVICE_ACCOUNT`, `GCP_PROJECT_ID`, `GCP_REGION`
 - Required secrets for web deploy: `VERCEL_TOKEN`
+- **No `schedule:` triggers in GitHub Actions.** GitHub auto-disables scheduled workflows after 60 days of repository inactivity, so they are unreliable. Recurring jobs that hit the API (`/api/v1/internal/*`) belong in Cloud Scheduler — see PRODUCTION.md §11.
 
 ## Testing Conventions
 - **API tests:** pytest + pytest-asyncio, test files in `selfserve-jobs-customer-api/tests/`, named `test_*.py`

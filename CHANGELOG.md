@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Removed
+- **`Cleanup Job` GitHub Actions workflow** — deleted `.github/workflows/deploy-cleanup-job.yml`. It called `POST /api/v1/internal/cleanup` on a `0 3 * * *` cron, exactly duplicating the `cleanup-stale-data` Cloud Scheduler job documented in PRODUCTION.md §11. Because GitHub auto-disables `schedule:`-triggered workflows after 60 days without a commit on the default branch, the workflow generated recurring "will be disabled soon" warning emails and could not be relied on as a trigger. Cloud Scheduler is now the sole driver of the internal cron endpoints; the `INTERNAL_API_SECRET` secret is still required by `deploy-api.yml` (it is passed to Cloud Run as an env var) and is unchanged.
 - **Auto-expiry and listing renewal** — job and profile listings no longer automatically deactivate after `expires_at`. Removed the hourly `expire-listings` internal cron endpoint (and its Cloud Scheduler job), the 7-day expiry warning email and template, the `MAX_RENEWALS`/`RENEWAL_EXTENSION_DAYS` constants, the `POST /{code}/renew` job/profile endpoints and service logic, and the "Renew Listing" UI on the manage page. Listings now remain active indefinitely until the user manually deactivates or deletes them; manual deactivate/reactivate is unaffected.
 
 ### Changed

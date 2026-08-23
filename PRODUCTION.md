@@ -377,7 +377,7 @@ gcloud iam workload-identity-pools providers describe "github-provider" \
 
 Two scheduled jobs keep the platform healthy and content fresh. All call internal API endpoints protected by `X-Internal-Secret`.
 
-The repository also includes `.github/workflows/deploy-cleanup-job.yml`, which runs the cleanup endpoint daily from GitHub Actions using the same `GCP_*` and `INTERNAL_API_SECRET` secrets. Use that workflow when Cloud Scheduler API is unavailable or not enabled for the project.
+Cloud Scheduler is the only mechanism that drives these endpoints. A duplicate GitHub Actions workflow (`.github/workflows/deploy-cleanup-job.yml`) previously called the cleanup endpoint on the same daily schedule; it has been removed because GitHub automatically disables `schedule:` workflows after 60 days without a commit on the default branch, which made it an unreliable second trigger that emailed a "workflow will be disabled soon" warning on every quiet period. Do not reintroduce a GitHub Actions cron for these endpoints — add or edit a Cloud Scheduler job instead.
 
 > **Note:** Automatic listing expiry (the former `expire-listings` job) has been removed. Job and profile listings no longer auto-deactivate or require renewal — they stay active until the user manually deactivates or deletes them. If you previously created an `expire-listings` Cloud Scheduler job in a live environment, delete it: `gcloud scheduler jobs delete expire-listings --location=$REGION`.
 
